@@ -45,7 +45,7 @@ namespace Sundew.Base.Text
                 0 => string.Format(this.formatProvider, format, arg),
                 1 => string.Format(this.formatProvider, format, arg),
                 4 => this.FormatWithAlignment(arg, formats[0], formats[1][0], formats[2], formats[3], formatProvider),
-                _ => throw new ArgumentOutOfRangeException($"The format: {format} was invalid", format)
+                _ => throw new ArgumentOutOfRangeException($"The format: {format} was invalid", format),
             };
         }
 

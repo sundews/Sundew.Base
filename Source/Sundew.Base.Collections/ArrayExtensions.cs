@@ -22,7 +22,7 @@ namespace Sundew.Base.Collections
         /// <returns>An <see cref="ArraySegment{TItem}"/>.</returns>
         public static ArraySegment<TItem> GetSegment<TItem>(this TItem[] array)
         {
-            return new (array, 0, array.Length);
+            return new(array, 0, array.Length);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Sundew.Base.Collections
         /// <returns>An <see cref="ArraySegment{TItem}"/>.</returns>
         public static ArraySegment<TItem> GetSegment<TItem>(this TItem[] array, int offset)
         {
-            return new (array, offset, array.Length - offset);
+            return new(array, offset, array.Length - offset);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Sundew.Base.Collections
         /// <returns>An <see cref="ArraySegment{TItem}"/>.</returns>
         public static ArraySegment<TItem> GetSegment<TItem>(this TItem[] array, int offset, int count)
         {
-            return new (array, offset, count);
+            return new(array, offset, count);
         }
 
         /// <summary>

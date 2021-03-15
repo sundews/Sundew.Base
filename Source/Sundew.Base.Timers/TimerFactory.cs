@@ -15,7 +15,7 @@ namespace Sundew.Base.Timers
     /// <seealso cref="ITimerFactory" />
     public sealed class TimerFactory : ITimerFactory
     {
-        private readonly DisposingList<ITimerControl> timers = new ();
+        private readonly DisposingList<ITimerControl> timers = new();
 
         /// <summary>
         /// Creates this instance.

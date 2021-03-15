@@ -20,8 +20,8 @@ namespace Sundew.Base.Disposal
     /// <seealso cref="System.IDisposable" />
     public sealed partial class DisposingList<TDisposable> : IDisposable, IReportingDisposable
     {
-        private readonly AsyncLock asyncLock = new ();
-        private readonly List<object> disposables = new ();
+        private readonly AsyncLock asyncLock = new();
+        private readonly List<object> disposables = new();
         private IDisposableReporter? disposableReporter;
 
         /// <summary>Initializes a new instance of the <see cref="DisposingList{TDisposable}"/> class.</summary>

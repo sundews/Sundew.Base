@@ -111,7 +111,7 @@ namespace Sundew.Base.UnitTests.Text
                     return character switch
                     {
                         ':' => SplitAction.Split,
-                        _ => SplitAction.Include
+                        _ => SplitAction.Include,
                     };
                 },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -143,7 +143,7 @@ namespace Sundew.Base.UnitTests.Text
                         ']' => SplitAction.SplitAndSplitCurrent,
                         '(' => SplitAction.SplitAndSplitCurrent,
                         ')' => SplitAction.SplitAndSplitCurrent,
-                        _ => SplitAction.Include
+                        _ => SplitAction.Include,
                     };
                 },
                 StringSplitOptions.RemoveEmptyEntries);
@@ -175,7 +175,7 @@ namespace Sundew.Base.UnitTests.Text
                         ']' => SplitAction.SplitAndSplitCurrent,
                         '(' => SplitAction.SplitAndSplitCurrent,
                         ')' => SplitAction.SplitAndSplitCurrent,
-                        _ => SplitAction.Include
+                        _ => SplitAction.Include,
                     };
                 },
                 StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToString());
@@ -274,7 +274,8 @@ namespace Sundew.Base.UnitTests.Text
 
                                 return SplitAction.Include;
                         }
-                    }, StringSplitOptions.RemoveEmptyEntries);
+                    },
+                    StringSplitOptions.RemoveEmptyEntries);
             }
 
             return Array.Empty<string>();

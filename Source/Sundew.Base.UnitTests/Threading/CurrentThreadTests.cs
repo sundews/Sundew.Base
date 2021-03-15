@@ -16,7 +16,7 @@ namespace Sundew.Base.UnitTests.Threading
     public class CurrentThreadTests
     {
         [Fact]
-        public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRage()
+        public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange()
         {
             var testee = new CurrentThread();
             var stopwatch = Stopwatch.StartNew();

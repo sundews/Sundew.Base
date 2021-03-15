@@ -14,12 +14,12 @@ namespace Sundew.Base.Memory
     public enum Slice
     {
         /// <summary>
-        /// The before
+        /// The before.
         /// </summary>
         Before,
 
         /// <summary>
-        /// The after
+        /// The after.
         /// </summary>
         After,
     }

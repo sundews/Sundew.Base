@@ -18,7 +18,7 @@ namespace Sundew.Base.Memory
     public sealed class ArrayPoolBufferResizer<TItem> : IBufferResizer<TItem>, IDisposable
     {
         private readonly ArrayPool<TItem> arrayPool;
-        private readonly AllocatingBufferResizer<TItem> allocatingBufferResizer = new ();
+        private readonly AllocatingBufferResizer<TItem> allocatingBufferResizer = new();
         private TItem[]? currentArray;
 
         /// <summary>

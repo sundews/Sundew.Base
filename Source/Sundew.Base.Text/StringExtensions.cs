@@ -19,7 +19,7 @@ namespace Sundew.Base.Text
     /// </summary>
     public static class StringExtensions
     {
-        private static readonly Regex WhitespaceRegex = new (@"\s+");
+        private static readonly Regex WhitespaceRegex = new(@"\s+");
 
         /// <summary>
         /// Toes the URI.

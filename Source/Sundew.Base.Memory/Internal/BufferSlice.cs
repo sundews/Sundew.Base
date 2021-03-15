@@ -216,7 +216,7 @@ namespace Sundew.Base.Memory.Internal
             {
                 DefaultSlice.Content => this.parentBuffer.Slice(this, 0, capacity),
                 DefaultSlice.Append => this.parentBuffer.Slice(this, Memory.Slice.After, capacity),
-                _ => throw new ArgumentOutOfRangeException(nameof(defaultSlice), defaultSlice, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(defaultSlice), defaultSlice, null),
             };
         }
 

@@ -23,8 +23,8 @@ namespace Sundew.Base.Disposal
         where TKey : notnull
 #pragma warning restore CS1710 // XML comment has a duplicate typeparam tag
     {
-        private readonly AsyncLock asyncLock = new ();
-        private readonly List<Item> disposables = new ();
+        private readonly AsyncLock asyncLock = new();
+        private readonly List<Item> disposables = new();
         private IDisposableReporter? disposableReporter;
 
         /// <summary>Initializes a new instance of the <see cref="DisposingDictionary{TKey}"/> class.</summary>

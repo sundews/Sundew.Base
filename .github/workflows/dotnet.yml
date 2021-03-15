@@ -45,7 +45,7 @@ jobs:
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ env.buildConfiguration }} --no-build
     - name: 'Publish package'
       if: ${{ steps.build.outputs.pushSource != '' }}
-      run: dotnet nuget push '**/*.nupkg' -s '${{ steps.build.outputs.pushSource }}' -k '${{ steps.build.outputs.apiKey }}' -n
+      run: dotnet nuget push '**/*.nupkg' -s '${{ steps.build.outputs.pushSource }}' -k '${{ steps.build.outputs.apiKey }}' -n true
     - name: 'Publish symbols'
       if: ${{ steps.build.outputs.symbolPushSource != '' }}
       run: dotnet nuget push '**/*.snupkg' -s '${{ steps.build.outputs.symbolPushSource }}' -k '${{ steps.build.outputs.symbolApiKey }}'

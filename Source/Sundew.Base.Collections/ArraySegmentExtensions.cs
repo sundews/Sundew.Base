@@ -51,7 +51,7 @@ namespace Sundew.Base.Collections
         /// <returns>The new <see cref="ArraySegment{TItem}"/>.</returns>
         public static ArraySegment<TItem> GetSegment<TItem>(this ArraySegment<TItem> arraySegment, int offset, int count)
         {
-            return new (arraySegment.Array, arraySegment.Offset + offset, count);
+            return new(arraySegment.Array, arraySegment.Offset + offset, count);
         }
 
         /// <summary>

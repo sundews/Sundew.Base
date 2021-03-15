@@ -16,7 +16,7 @@ namespace Sundew.Base.Timers
     /// <seealso cref="ITimerControl" />
     public abstract class TimerBase : ITimerControl
     {
-        private readonly object lockObject = new ();
+        private readonly object lockObject = new();
         private readonly System.Threading.Timer timer;
 
         /// <summary>
