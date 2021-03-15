@@ -8,11 +8,6 @@
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <DocumentationFile>bin\Release\netcoreapp2.2\.xml</DocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
-  </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Properties\**" />
     <EmbeddedResource Remove="Properties\**" />

@@ -5,35 +5,37 @@
     <Company>Hukano</Company>
     <Authors>Kim Hugener-Ohlsen</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <IncludeSymbols>true</IncludeSymbols>
     <Deterministic>true</Deterministic>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageReleaseNotes>6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
-5.0 - Changed string split extension interface.
-4.2 - Result struct with same value and error type.
-4.1 - Added Non-allocating SplitMemory, Async support for Results and ToLower/ToUpper overloads
-4.0 - Multitargeting for netstandard2.1 and netstandard1.2. 2.1 version has support for IAsyncDisposable in Disposal API.
-3.3 - Added Memory extensions and Buffer&lt;TItem&gt;
-3.2 - Improved IDateTime, Result, StringExtensions, Added AsyncLock, Async Manual- and AutoResetEvents, Timer, CurrentThread
-3.1 - Added Linq style string split, char repeat, array and enum extensions.
-3.0 - Packaged as .NET Standard project
-</PackageReleaseNotes>
+    <DebugSymbols>false</DebugSymbols>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DebugType>None</DebugType>
+    <NoWarn>NU5128</NoWarn>
+    <PackageReleaseNotes>7.0 All in one package including:
+Sundew.Base.Collections
+Sundew.Base.Disposal
+Sundew.Base.Equality
+Sundew.Base.Initialization
+Sundew.Base.Memory
+Sundew.Base.Primitives
+Sundew.Base.Reporting
+Sundew.Base.Text
+Sundew.Base.Threading.Jobs
+Sundew.Base.Threading
+Sundew.Base.Timers</PackageReleaseNotes>
     <Description>Common extension methods and reusable concepts</Description>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Kim Hugener-Ohlsen</Copyright>
-    <DocumentationFile>$(OutputPath)\Sundew.Base.xml</DocumentationFile>
+    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
@@ -55,11 +57,60 @@
     <SppSourceName>local-stable</SppSourceName>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework)=='netstandard1.2'">
-    <Compile Remove="Disposal\Disposer.IAsyncDisposable.cs" />
-    <Compile Remove="Disposal\DisposingList.IAsyncDisposable.cs" />
-    <Compile Remove="Disposal\DisposingDictionary.IAsyncDisposable.cs" />
-    <Compile Remove="Disposal\DisposeAction.IAsyncDisposable.cs" />
+  <ItemGroup>
+    <Compile Remove="Collections\**" />
+    <Compile Remove="Computation\**" />
+    <Compile Remove="ControlFlow\**" />
+    <Compile Remove="Disposal\**" />
+    <Compile Remove="Enumerations\**" />
+    <Compile Remove="Equality\**" />
+    <Compile Remove="Initialization\**" />
+    <Compile Remove="Memory\**" />
+    <Compile Remove="Numeric\**" />
+    <Compile Remove="Reporting\**" />
+    <Compile Remove="Text\**" />
+    <Compile Remove="Threading\**" />
+    <Compile Remove="Time\**" />
+    <Compile Remove="Visiting\**" />
+    <Compile Remove="WeakReferencing\**" />
+    <EmbeddedResource Remove="Collections\**" />
+    <EmbeddedResource Remove="Computation\**" />
+    <EmbeddedResource Remove="ControlFlow\**" />
+    <EmbeddedResource Remove="Disposal\**" />
+    <EmbeddedResource Remove="Enumerations\**" />
+    <EmbeddedResource Remove="Equality\**" />
+    <EmbeddedResource Remove="Initialization\**" />
+    <EmbeddedResource Remove="Memory\**" />
+    <EmbeddedResource Remove="Numeric\**" />
+    <EmbeddedResource Remove="Reporting\**" />
+    <EmbeddedResource Remove="Text\**" />
+    <EmbeddedResource Remove="Threading\**" />
+    <EmbeddedResource Remove="Time\**" />
+    <EmbeddedResource Remove="Visiting\**" />
+    <EmbeddedResource Remove="WeakReferencing\**" />
+    <None Remove="Collections\**" />
+    <None Remove="Computation\**" />
+    <None Remove="ControlFlow\**" />
+    <None Remove="Disposal\**" />
+    <None Remove="Enumerations\**" />
+    <None Remove="Equality\**" />
+    <None Remove="Initialization\**" />
+    <None Remove="Memory\**" />
+    <None Remove="Numeric\**" />
+    <None Remove="Reporting\**" />
+    <None Remove="Text\**" />
+    <None Remove="Threading\**" />
+    <None Remove="Time\**" />
+    <None Remove="Visiting\**" />
+    <None Remove="WeakReferencing\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="GlobalSuppressions.cs" />
+    <Compile Remove="GuidExtension.cs" />
+    <Compile Remove="ObjectExtensions.cs" />
+    <Compile Remove="Predicate.cs" />
+    <Compile Remove="Void.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -87,18 +138,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Buffers" Version="4.5.1" />
-    <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework)=='netstandard1.2'">
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.3" />
-    <PackageReference Include="System.Buffers" Version="4.5.0" />
-    <PackageReference Include="System.Memory" Version="4.5.3" />
-    <PackageReference Include="System.Threading.Timer" Version="4.3.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Equality\Sundew.Base.Equality.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Initialization\Sundew.Base.Initialization.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Threading.Jobs\Sundew.Base.Threading.Jobs.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Threading\Sundew.Base.Threading.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Timers\Sundew.Base.Timers.csproj" />
   </ItemGroup>
 
 </Project>

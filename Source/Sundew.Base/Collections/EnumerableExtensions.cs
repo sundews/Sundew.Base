@@ -118,82 +118,6 @@ namespace Sundew.Base.Collections
         }
 
         /// <summary>
-        /// Ensures the enumerable is an array or calls ToArray to create it.
-        /// </summary>
-        /// <typeparam name="TItem">The type of the item.</typeparam>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="createListFunction">The create list function.</param>
-        /// <returns>
-        /// The same enumerable casted to a list if possible, otherwise a new list containing the elements.
-        /// </returns>
-        public static TItem[] ToArrayIfNeeded<TItem>(this IEnumerable<TItem> enumerable, Func<IEnumerable<TItem>, TItem[]>? createListFunction = null)
-        {
-            if (enumerable is TItem[] array)
-            {
-                return array;
-            }
-
-            return createListFunction != null ? createListFunction(enumerable) : enumerable.ToArray();
-        }
-
-        /// <summary>
-        /// Toes the list if needed.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="createListFunction">The create list function.</param>
-        /// <returns>The same enumerable casted to a list if possible, otherwise a new list containing the elements.</returns>
-        public static IList ToListIfNeeded(this IEnumerable enumerable, Func<IEnumerable, IList>? createListFunction = null)
-        {
-            if (enumerable is IList nonGenericListIfNeeded)
-            {
-                return nonGenericListIfNeeded;
-            }
-
-            if (createListFunction != null)
-            {
-                return createListFunction(enumerable);
-            }
-
-            var list = new List<object>();
-            list.AddRange(enumerable.Cast<object>());
-            return list;
-        }
-
-        /// <summary>
-        /// Ensures the enumerable is a list or calls ToList on it.
-        /// </summary>
-        /// <typeparam name="TItem">The type of the item.</typeparam>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="createListFunction">The create list function.</param>
-        /// <returns>The same enumerable casted to a list if possible, otherwise a new list containing the elements.</returns>
-        public static IList<TItem> ToListIfNeeded<TItem>(this IEnumerable<TItem> enumerable, Func<IEnumerable<TItem>, IList<TItem>> createListFunction)
-        {
-            if (enumerable is IList<TItem> list)
-            {
-                return list;
-            }
-
-            return createListFunction != null ? createListFunction(enumerable) : enumerable.ToList();
-        }
-
-        /// <summary>
-        /// Ensures the enumerable is a list or calls ToList on it.
-        /// </summary>
-        /// <typeparam name="TItem">The type of the item.</typeparam>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="createListFunction">The create list function.</param>
-        /// <returns>The same enumerable casted to a list if possible, otherwise a new list containing the elements.</returns>
-        public static List<TItem> ToListIfNeeded<TItem>(this IEnumerable<TItem> enumerable, Func<IEnumerable<TItem>, List<TItem>>? createListFunction = null)
-        {
-            if (enumerable is List<TItem> list)
-            {
-                return list;
-            }
-
-            return createListFunction != null ? createListFunction(enumerable) : enumerable.ToList();
-        }
-
-        /// <summary>
         /// Creates and returns an <see cref="IReadOnlyCollection{Object}" /> with the executed enumerable if needed.
         /// </summary>
         /// <param name="enumerable">The enumerable.</param>
@@ -233,48 +157,6 @@ namespace Sundew.Base.Collections
                     return new NonDeferredEnumerable<TItem>(enumerable, collection.Count);
                 default:
                     return new ReadOnlyArray<TItem>(enumerable.ToArray());
-            }
-        }
-
-        /// <summary>
-        /// Selects from the non generic enumerable.
-        /// </summary>
-        /// <typeparam name="TItem">The type of the item.</typeparam>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="selectFunction">The select function.</param>
-        /// <returns>Yield returns an Enumerable based on the select function.</returns>
-        public static IEnumerable<TItem> SelectFromNonGeneric<TItem>(this IEnumerable enumerable, Func<object, TItem> selectFunction)
-        {
-            foreach (var item in enumerable)
-            {
-                yield return selectFunction(item);
-            }
-        }
-
-        /// <summary>
-        /// Iterates through the enumerable and executes the specified action on all items.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="action">The action.</param>
-        public static void ForEachNonGeneric(this IEnumerable enumerable, Action<object, int> action)
-        {
-            var i = 0;
-            foreach (var item in enumerable)
-            {
-                action(item, i++);
-            }
-        }
-
-        /// <summary>
-        /// Iterates through the enumerable and executes the specified action on all items.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="action">The action.</param>
-        public static void ForEachNonGeneric(this IEnumerable enumerable, Action<object> action)
-        {
-            foreach (var item in enumerable)
-            {
-                action(item);
             }
         }
 

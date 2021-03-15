@@ -72,56 +72,6 @@ namespace Sundew.Base.UnitTests.Collections
         }
 
         [Fact]
-        public void ToListIfNeeded_When_PassingEnumerable_Then_ResultShouldNotBeExpectedEnumerable()
-        {
-            var expectedEnumerable = this.numberList.Where(x => x > 2 && x < 6);
-
-            var result = expectedEnumerable.ToListIfNeeded();
-
-            result.Should().NotBeSameAs(expectedEnumerable);
-        }
-
-        [Fact]
-        public void ToListIfNeeded_When_PassingEnumerable_Then_ResultShouldBeEquivalentToExpectedEnumerable()
-        {
-            var expectedEnumerable = this.numberList.Where(x => x > 2 && x < 6);
-
-            var result = expectedEnumerable.ToListIfNeeded();
-
-            result.Should().BeEquivalentTo(expectedEnumerable);
-        }
-
-        [Fact]
-        public void ToListIfNeeded_When_PassingEnumerable_Then_ResultShouldBeIListOfInt32()
-        {
-            var enumerable = this.numberList.Where(x => x > 2 && x < 6);
-
-            var result = enumerable.ToListIfNeeded();
-
-            result.Should().BeAssignableTo<IList<int>>();
-        }
-
-        [Fact]
-        public void ToListIfNeeded_When_PassingList_Then_ResultShouldBeTheSameList()
-        {
-            var enumerable = this.numberList;
-
-            var result = enumerable.ToListIfNeeded();
-
-            result.Should().Equal(enumerable);
-        }
-
-        [Fact]
-        public void SelectFromNonGeneric_Then_ResultShouldContainTheSelectedItems()
-        {
-            var items = new List<int> { 5, 7, 9, 3 };
-
-            var result = items.SelectFromNonGeneric(item => (int)item);
-
-            result.Should().BeEquivalentTo(items);
-        }
-
-        [Fact]
         public void Concat_Then_ResultShouldBeExpectedResult()
         {
             var items1 = new List<int> { 1, 2, 3, 4 };

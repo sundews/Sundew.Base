@@ -30,10 +30,7 @@ namespace Sundew.Base.Memory.Internal
         public int Length
         {
             get => this.length;
-            private set
-            {
-                this.length = Math.Max(value, this.Length);
-            }
+            private set => this.length = Math.Max(value, this.Length);
         }
 
         public int Capacity { get; private set; }
