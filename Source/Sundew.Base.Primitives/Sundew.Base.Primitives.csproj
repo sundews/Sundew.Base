@@ -7,6 +7,7 @@
     <Authors>Kim Hugener-Ohlsen</Authors>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Deterministic>true</Deterministic>
+    <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReleaseNotes>6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
 5.0 - Changed string split extension interface.
