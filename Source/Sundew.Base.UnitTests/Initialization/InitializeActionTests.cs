@@ -26,7 +26,8 @@ namespace Sundew.Base.UnitTests.Initialization
                 {
                     Thread.Sleep(10);
                     manualResetEvent.Set();
-                }, useYield);
+                },
+                useYield);
 
             await testee.InitializeAsync();
 
@@ -42,7 +43,8 @@ namespace Sundew.Base.UnitTests.Initialization
                 {
                     Thread.Sleep(10);
                     manualResetEvent.Set();
-                }, true);
+                },
+                true);
 
             testee.InitializeAsync();
 
