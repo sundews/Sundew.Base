@@ -1,28 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.2</TargetFrameworks>
-    <Company>Hukano</Company>
-    <Authors>Kim Hugener-Ohlsen</Authors>
+    <TargetFrameworks>netstandard2.1;netstandard1.3</TargetFrameworks>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Deterministic>true</Deterministic>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <PackageReleaseNotes>6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
-5.0 - Changed string split extension interface.
-4.2 - Result struct with same value and error type.
-4.1 - Added Non-allocating SplitMemory, Async support for Results and ToLower/ToUpper overloads
-4.0 - Multitargeting for netstandard2.1 and netstandard1.2. 2.1 version has support for IAsyncDisposable in Disposal API.
-3.3 - Added Memory extensions and Buffer&lt;TItem&gt;
-3.2 - Improved IDateTime, Result, StringExtensions, Added AsyncLock, Async Manual- and AutoResetEvents, Timer, CurrentThread
-3.1 - Added Linq style string split, char repeat, array and enum extensions.
-3.0 - Packaged as .NET Standard project
-</PackageReleaseNotes>
-    <Description>Common extension methods and reusable concepts</Description>
+    <Description>Threading concepts such as AsyncLazy, AsyncLock and async reset events.</Description>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Kim Hugener-Ohlsen</Copyright>
-    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
+    <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -64,6 +49,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Nullable" Version="1.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -72,14 +61,14 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.Packaging.Publish" Version="5.1.0-u20210316-212604-pre">
+    <PackageReference Include="Sundew.Packaging.Publish" Version="5.1.0-u20210327-235734-pre">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework)=='netstandard1.2'">
+  <ItemGroup Condition="$(TargetFramework)=='netstandard1.3'">
     <PackageReference Include="System.Threading.Timer" Version="4.3.0" />
   </ItemGroup>
 

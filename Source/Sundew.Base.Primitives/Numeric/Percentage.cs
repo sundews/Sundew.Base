@@ -395,7 +395,7 @@ namespace Sundew.Base.Numeric
         /// <returns>The limited percentage.</returns>
         public Percentage Limit(double min, double max)
         {
-            return new Percentage(Math.Min(Math.Max(min, this.Value), max));
+            return new(Math.Min(Math.Max(min, this.Value), max));
         }
 
         /// <summary>
@@ -427,7 +427,7 @@ namespace Sundew.Base.Numeric
         /// <returns>The rounded percentage.</returns>
         public Percentage Round(int decimalDigits, MidpointRounding midpointRounding)
         {
-            return new Percentage(Math.Round(this.Value, decimalDigits, midpointRounding));
+            return new(Math.Round(this.Value, decimalDigits, midpointRounding));
         }
 
         /// <summary>
@@ -436,7 +436,7 @@ namespace Sundew.Base.Numeric
         /// <returns>The new percentage.</returns>
         public Percentage Ceiling()
         {
-            return new Percentage(Math.Ceiling(this.Value));
+            return new(Math.Ceiling(this.Value));
         }
 
         /// <summary>
@@ -445,7 +445,7 @@ namespace Sundew.Base.Numeric
         /// <returns>The new percentage.</returns>
         public Percentage Floor()
         {
-            return new Percentage(Math.Floor(this.Value));
+            return new(Math.Floor(this.Value));
         }
 
         /// <summary>
@@ -454,7 +454,7 @@ namespace Sundew.Base.Numeric
         /// <returns>´The absolute percentage.</returns>
         public Percentage Absolute()
         {
-            return new Percentage(Math.Abs(this.Value));
+            return new(Math.Abs(this.Value));
         }
 
         /// <summary>
@@ -522,7 +522,8 @@ namespace Sundew.Base.Numeric
         /// </returns>
         public string ToString(CultureInfo cultureInfo)
         {
-            return this.Value.ToString("P", cultureInfo);
+            const string percentageFormat = "P";
+            return this.Value.ToString(percentageFormat, cultureInfo);
         }
 
         /// <summary>
@@ -571,10 +572,11 @@ namespace Sundew.Base.Numeric
                 return Result.Error();
             }
 
-#if NETSTANDARD1_2
-            var isNegative = input.Contains("-");
-#else
+#if NETSTANDARD2_1
             var isNegative = input.Contains('-', StringComparison.Ordinal);
+#else
+            const string dash = "-";
+            var isNegative = input.Contains(dash);
 #endif
             int start;
             int fromEnd;

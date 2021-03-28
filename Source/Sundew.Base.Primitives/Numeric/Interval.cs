@@ -22,7 +22,7 @@ namespace Sundew.Base.Numeric
         /// <returns>An interval.</returns>
         public static Interval<int> FromMinAndLength(int minimum, int length)
         {
-            return new Interval<int>(minimum, minimum + length);
+            return new(minimum, minimum + length);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Sundew.Base.Numeric
         /// <returns>An interval.</returns>
         public static Interval<double> FromMinAndLength(double minimum, double length)
         {
-            return new Interval<double>(minimum, minimum + length);
+            return new(minimum, minimum + length);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Sundew.Base.Numeric
         public static Interval<TValue> From<TValue>(TValue min, TValue max)
             where TValue : struct, IComparable<TValue>
         {
-            return new Interval<TValue>(min, max);
+            return new(min, max);
         }
     }
 }

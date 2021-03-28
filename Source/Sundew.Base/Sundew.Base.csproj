@@ -1,32 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.2</TargetFrameworks>
-    <Company>Hukano</Company>
-    <Authors>Kim Hugener-Ohlsen</Authors>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Deterministic>true</Deterministic>
+    <TargetFrameworks>netstandard2.1;netstandard1.3</TargetFrameworks>
     <DebugSymbols>false</DebugSymbols>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DebugType>None</DebugType>
     <NoWarn>NU5128</NoWarn>
-    <PackageReleaseNotes>7.0 All in one package including:
-Sundew.Base.Collections
-Sundew.Base.Disposal
-Sundew.Base.Equality
-Sundew.Base.Initialization
-Sundew.Base.Memory
-Sundew.Base.Primitives
-Sundew.Base.Reporting
-Sundew.Base.Text
-Sundew.Base.Threading.Jobs
-Sundew.Base.Threading
-Sundew.Base.Timers</PackageReleaseNotes>
-    <Description>Common extension methods and reusable concepts</Description>
+    <PackageReleaseNotes>
+      7.0 - Split into separate package and cleanup
+      6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
+      5.0 - Changed string split extension interface.
+      4.2 - Result struct with same value and error type.
+      4.1 - Added Non-allocating SplitMemory, Async support for Results and ToLower/ToUpper overloads
+      4.0 - Multitargeting for netstandard2.1 and netstandard1.2. 2.1 version has support for IAsyncDisposable in Disposal API.
+      3.3 - Added Memory extensions and Buffer&lt;TItem&gt;
+      3.2 - Improved IDateTime, Result, StringExtensions, Added AsyncLock, Async Manual- and AutoResetEvents, Timer, CurrentThread
+      3.1 - Added Linq style string split, char repeat, array and enum extensions.
+      3.0 - Packaged as .NET Standard project
+    </PackageReleaseNotes>
+    <Description>
+      All in one package including:
+      Sundew.Base.Collections
+      Sundew.Base.Disposal
+      Sundew.Base.Equality
+      Sundew.Base.Initialization
+      Sundew.Base.Memory
+      Sundew.Base.Primitives
+      Sundew.Base.Reporting
+      Sundew.Base.Text
+      Sundew.Base.Threading.Jobs
+      Sundew.Base.Threading
+      Sundew.Base.Timers
+    </Description>
+    <PackageReleaseNotes>7.0 - Split into separate packages, cleanup and retarget to netstandard1.3</PackageReleaseNotes>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Kim Hugener-Ohlsen</Copyright>
-    <DocumentationFile>$(OutputPath)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -57,88 +65,26 @@ Sundew.Base.Timers</PackageReleaseNotes>
     <SppSourceName>local-stable</SppSourceName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Collections\**" />
-    <Compile Remove="Computation\**" />
-    <Compile Remove="ControlFlow\**" />
-    <Compile Remove="Disposal\**" />
-    <Compile Remove="Enumerations\**" />
-    <Compile Remove="Equality\**" />
-    <Compile Remove="Initialization\**" />
-    <Compile Remove="Memory\**" />
-    <Compile Remove="Numeric\**" />
-    <Compile Remove="Reporting\**" />
-    <Compile Remove="Text\**" />
-    <Compile Remove="Threading\**" />
-    <Compile Remove="Time\**" />
-    <Compile Remove="Visiting\**" />
-    <Compile Remove="WeakReferencing\**" />
-    <EmbeddedResource Remove="Collections\**" />
-    <EmbeddedResource Remove="Computation\**" />
-    <EmbeddedResource Remove="ControlFlow\**" />
-    <EmbeddedResource Remove="Disposal\**" />
-    <EmbeddedResource Remove="Enumerations\**" />
-    <EmbeddedResource Remove="Equality\**" />
-    <EmbeddedResource Remove="Initialization\**" />
-    <EmbeddedResource Remove="Memory\**" />
-    <EmbeddedResource Remove="Numeric\**" />
-    <EmbeddedResource Remove="Reporting\**" />
-    <EmbeddedResource Remove="Text\**" />
-    <EmbeddedResource Remove="Threading\**" />
-    <EmbeddedResource Remove="Time\**" />
-    <EmbeddedResource Remove="Visiting\**" />
-    <EmbeddedResource Remove="WeakReferencing\**" />
-    <None Remove="Collections\**" />
-    <None Remove="Computation\**" />
-    <None Remove="ControlFlow\**" />
-    <None Remove="Disposal\**" />
-    <None Remove="Enumerations\**" />
-    <None Remove="Equality\**" />
-    <None Remove="Initialization\**" />
-    <None Remove="Memory\**" />
-    <None Remove="Numeric\**" />
-    <None Remove="Reporting\**" />
-    <None Remove="Text\**" />
-    <None Remove="Threading\**" />
-    <None Remove="Time\**" />
-    <None Remove="Visiting\**" />
-    <None Remove="WeakReferencing\**" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
+    <DefineConstants>TRACE;DISABLE_SPP</DefineConstants>
+  </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="GlobalSuppressions.cs" />
-    <Compile Remove="GuidExtension.cs" />
-    <Compile Remove="ObjectExtensions.cs" />
-    <Compile Remove="Predicate.cs" />
-    <Compile Remove="Void.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <EmbeddedFiles Remove="$(GeneratedAssemblyInfoFile)" />
     <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.0.3">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Nullable" Version="1.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.333">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Sundew.Packaging.Publish" Version="5.1.0-u20210316-212604-pre">
+    <PackageReference Include="Sundew.Packaging.Publish" Version="5.1.0-u20210327-235734-pre">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
     <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />

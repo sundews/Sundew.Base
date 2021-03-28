@@ -94,11 +94,7 @@ namespace Sundew.Base.Threading.Jobs
                 {
                     this.aggregateException = null;
                     this.cancellationTokenSource = new CancellationTokenSource();
-#if NETSTANDARD2_1
                     const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
-#else
-                    const TaskCreationOptions taskCreationOptions = (TaskCreationOptions)64 | TaskCreationOptions.DenyChildAttach;
-#endif
                     this.jobContinuationTask = Task.Factory.StartNew(this.TaskAction, this.cancellationTokenSource.Token, taskCreationOptions, this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default);
 
                     return Result.Success(this.cancellationTokenSource.Token);

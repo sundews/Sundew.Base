@@ -16,6 +16,8 @@ jobs:
       dev-symbols-source: 'https://www.myget.org/F/sundew-dev/api/v3/index.json'
       package-versions: 'logs/packages.pkgver'
       source-package-versions: './Source/logs/packages.pkgver'
+      packages-to-push: 'logs/packages.push'
+      source-packages-to-push: './Source/logs/packages.pkgver'
     steps:
     - name: 'Await other builds'
       uses: softprops/turnstyle@v1
@@ -38,9 +40,10 @@ jobs:
         -p:"SppAllowLocalSource=false"
         -p:"SppEnablePublish=false"
         '-p:"SppPublishLogFormats=::set-output name=stage::{3}|::set-output name=pushSource::{4}|::set-output name=feedSource::{6}|::set-output name=apiKey::{5}|::set-output name=symbolPushSource::{8}|::set-output name=symbolApiKey::{9}"'
-        '-p:"SppAppendPublishFileLogFormats={0},{1}  > ${{ env.package-versions }}"'
+        '-p:"SppAppendPublishFileLogFormats={0},{1}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},***,{11}{7}{11},{11}{8}{11},{11}***{11}{12} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
+        -p:"ContinuousIntegrationBuild=true"
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ env.buildConfiguration }} --no-build
     - name: 'Publish package(s)'

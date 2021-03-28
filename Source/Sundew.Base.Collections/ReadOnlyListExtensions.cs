@@ -134,10 +134,10 @@ namespace Sundew.Base.Collections
         {
             if (sourceArray == null)
             {
-#if NETSTANDARD1_2
-                return new TOutItem[0];
-#else
+#if NETSTANDARD2_1
                 return Array.Empty<TOutItem>();
+#else
+                return new TOutItem[0];
 #endif
             }
 

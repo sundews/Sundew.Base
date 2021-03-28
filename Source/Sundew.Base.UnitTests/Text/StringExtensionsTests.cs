@@ -10,6 +10,7 @@ namespace Sundew.Base.UnitTests.Text
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using FluentAssertions;
     using Sundew.Base.Text;
     using Xunit;
@@ -95,7 +96,7 @@ namespace Sundew.Base.UnitTests.Text
         {
             const string? input = null;
 
-            var result = input.Split((char _, int _) => SplitAction.Include);
+            var result = input.Split((_, _, _) => SplitAction.Include);
 
             result.Should().BeEmpty();
         }
@@ -106,7 +107,7 @@ namespace Sundew.Base.UnitTests.Text
             const string Input = "m:s:t:";
 
             var result = Input.Split(
-                (char character, int _) =>
+                (character, _, _) =>
                 {
                     return character switch
                     {
@@ -132,7 +133,7 @@ namespace Sundew.Base.UnitTests.Text
         public void Split_Then_LaResultShouldBeExpectedResult(string input, string[] expectedResult)
         {
             var result = input.Split(
-                (char character, int _) =>
+                (character, _, _) =>
                 {
                     return character switch
                     {
@@ -161,10 +162,10 @@ namespace Sundew.Base.UnitTests.Text
         [InlineData("[Name,Age]", new[] { "[", "Name", ",", "Age", "]" })]
         [InlineData(".", new[] { "." })]
         [InlineData("", new string[0])]
-        public void SplitMemory_Then_LaResultShouldBeExpectedResult(string input, string[] expectedResult)
+        public void SplitMemory_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
         {
             var result = input.SplitMemory(
-                (char character, int _) =>
+                (character, _) =>
                 {
                     return character switch
                     {
@@ -181,6 +182,88 @@ namespace Sundew.Base.UnitTests.Text
                 StringSplitOptions.RemoveEmptyEntries).Select(x => x.ToString());
 
             result.Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("123   1234", 3, new[] { "   ", "1234" })]
+        public void SplitMemory_When_TrimmingWhitespaceAndTheStart_Then_ResultShouldBeExpectedResult(string input, int startIndex, string[] expectedResult)
+        {
+            var result = input.SplitMemory(
+                (character, index) =>
+                {
+                    if (index < startIndex)
+                    {
+                        return SplitAction.Ignore;
+                    }
+
+                    if (char.IsWhiteSpace(character))
+                    {
+                        return SplitAction.Include;
+                    }
+
+                    return SplitAction.SplitAndIncludeRest;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("123   1234", 3, new[] { "   ", "1234" })]
+        public void Splity_When_TrimmingWhitespaceAndTheStart_Then_ResultShouldBeExpectedResult(string input, int startIndex, string[] expectedResult)
+        {
+            var result = input.Split(
+                (character, index, _) =>
+                {
+                    if (index < startIndex)
+                    {
+                        return SplitAction.Ignore;
+                    }
+
+                    if (char.IsWhiteSpace(character))
+                    {
+                        return SplitAction.Include;
+                    }
+
+                    return SplitAction.SplitAndIncludeRest;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("ValuE1234", new[] { "ValuE", "1234" })]
+        public void SplitMemory_When_UsingIncludeAndSplit_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
+        {
+            var result = input.SplitMemory(
+                (character, index) =>
+                {
+                    if (character == 'E')
+                    {
+                        return SplitAction.IncludeAndSplit;
+                    }
+
+                    return SplitAction.Include;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("ValuE1234", new[] { "ValuE", "1234" })]
+        public void Split_When_UsingIncludeAndSplit_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
+        {
+            var result = input.Split(
+                (character, index, _) =>
+                {
+                    if (character == 'E')
+                    {
+                        return SplitAction.IncludeAndSplit;
+                    }
+
+                    return SplitAction.Include;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
         }
 
         [Theory]
@@ -207,18 +290,18 @@ namespace Sundew.Base.UnitTests.Text
         }
 
         [Theory]
-        [InlineData("0123456789ABCDEFGHIJK", PadSide.Right, LimitSide.Right, "0123456789")]
-        [InlineData("0123456789ABCDEFGHIJ", PadSide.Right, LimitSide.Left, "ABCDEFGHIJ")]
-        [InlineData("0123456789", PadSide.Right, LimitSide.Right, "0123456789")]
-        [InlineData("s", PadSide.BothLeft, LimitSide.Right, "     s    ")]
-        [InlineData("s", PadSide.BothRight, LimitSide.Right, "    s     ")]
-        [InlineData("s", PadSide.Left, LimitSide.Right, "         s")]
-        [InlineData("s", PadSide.Right, LimitSide.Right, "s         ")]
-        [InlineData("", PadSide.Right, LimitSide.Right, "          ")]
-        [InlineData(null, PadSide.Right, LimitSide.Right, "          ")]
-        public void LimitAndPad_Then_StringLengthShouldBe10(string input, PadSide padSide, LimitSide limitSide, string expectedResult)
+        [InlineData("0123456789ABCDEFGHIJK", Alignment.Right, false, "0123456789")]
+        [InlineData("0123456789ABCDEFGHIJ", Alignment.Right, true, "ABCDEFGHIJ")]
+        [InlineData("0123456789", Alignment.Right, false, "0123456789")]
+        [InlineData("s", Alignment.CenterLeft, false, "    s     ")]
+        [InlineData("s", Alignment.CenterRight, false, "     s    ")]
+        [InlineData("s", Alignment.Right, false, "         s")]
+        [InlineData("s", Alignment.Left, false, "s         ")]
+        [InlineData("", Alignment.Right, false, "          ")]
+        [InlineData(null, Alignment.Right, false, "          ")]
+        public void LimitAndPad_Then_StringLengthShouldBe10(string input, Alignment alignment, bool isLimitLeft, string expectedResult)
         {
-            var result = input.LimitAndPad(10, ' ', padSide, limitSide);
+            var result = input.AlignAndLimit(10, ' ', alignment, Limit.With(isLimitLeft));
 
             result.Should().Be(expectedResult);
         }
@@ -241,6 +324,23 @@ namespace Sundew.Base.UnitTests.Text
             result.Should().Equal(expectedResult);
         }
 
+        [Theory]
+        [InlineData(null, new string[0])]
+        [InlineData("", new string[0])]
+        [InlineData(";", new string[0])]
+        [InlineData(";;", new string[0])]
+        [InlineData("T;", new[] { "T" })]
+        [InlineData("T;;", new[] { "T", })]
+        [InlineData("##vso[task.setvariable variable=package_{0}]{3}", new[] { "##vso[task.setvariable variable=package_{0}]{3}" })]
+        [InlineData("##vso[task.setvariable variable=package_{0}]{3};##vso[task.setvariable variable=source_{0}]{2}", new[] { "##vso[task.setvariable variable=package_{0}]{3}", "##vso[task.setvariable variable=source_{0}]{2}" })]
+        [InlineData("1;2;3", new[] { "1", "2", "3" })]
+        public void SplitMemory_When_CharacterSplitMemoryParserIsUsed_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
+        {
+            var result = CharacterSplitMemoryParser(input);
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
         private static IEnumerable<string> CharacterSplitParser(string input)
         {
             if (!string.IsNullOrEmpty(input))
@@ -248,7 +348,7 @@ namespace Sundew.Base.UnitTests.Text
                 const char semiColon = ';';
                 var lastWasSemiColon = false;
                 return input.Split(
-                    (char character, int _) =>
+                    (character, _, _) =>
                     {
                         var wasSemiColon = lastWasSemiColon;
                         if (wasSemiColon)
@@ -279,6 +379,28 @@ namespace Sundew.Base.UnitTests.Text
             }
 
             return Array.Empty<string>();
+        }
+
+        private static IEnumerable<ReadOnlyMemory<char>> CharacterSplitMemoryParser(string input)
+        {
+            if (!string.IsNullOrEmpty(input))
+            {
+                const char semiColon = ';';
+                return input.SplitMemory(
+                    (character, _) =>
+                    {
+                        switch (character)
+                        {
+                            case semiColon:
+                                return SplitAction.Split;
+                            default:
+                                return SplitAction.Include;
+                        }
+                    },
+                    StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            return Array.Empty<ReadOnlyMemory<char>>();
         }
 
         private static IEnumerable<string> SplitBasedCommandLineParser(ReadOnlyMemory<char> input)

@@ -86,7 +86,13 @@ namespace Sundew.Base.Enumerations
         public static bool TryParseEnum<TEnum>(this string value, out TEnum result, bool ignoreCase = false)
             where TEnum : Enum
         {
-#if NETSTANDARD1_2
+#if NETSTANDARD2_1
+            if (Enum.TryParse(typeof(TEnum), value, ignoreCase, out var actualValue))
+            {
+                result = (TEnum)actualValue;
+                return true;
+            }
+#else
             try
             {
                 result = ParseEnum<TEnum>(value, ignoreCase);
@@ -104,12 +110,6 @@ namespace Sundew.Base.Enumerations
             }
             catch (FormatException)
             {
-            }
-#else
-            if (Enum.TryParse(typeof(TEnum), value, ignoreCase, out var actualValue))
-            {
-                result = (TEnum)actualValue;
-                return true;
             }
 #endif
 

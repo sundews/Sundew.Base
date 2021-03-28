@@ -35,44 +35,6 @@ namespace Sundew.Base.Text
         }
 
         /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The splitted strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<string> Split(
-            this ReadOnlyMemory<char> input,
-            SplitFuncWithoutIndex splitFunc,
-            StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return
-                input.Split((character, _, builder) => splitFunc(character, builder), stringSplitOptions);
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The splitted strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<string> Split(
-            this ReadOnlyMemory<char> input,
-            SplitFuncWithoutStringBuilder splitFunc,
-            StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return
-                input.Split(
-                    (character, index, _) => splitFunc(character, index),
-                    stringSplitOptions);
-        }
-
-        /// <summary>
         /// Splits the specified split function.
         /// </summary>
         /// <param name="input">The input.</param>
@@ -98,44 +60,34 @@ namespace Sundew.Base.Text
                     stringBuilder.Append(character);
                 }
 
-                if (splitResult.HasFlag(SplitAction.Split) && ShouldOutputString(stringSplitOptions, stringBuilder))
+                if (splitResult.HasFlag(SplitAction.Split) && ShouldOutputString(stringSplitOptions, stringBuilder.Length))
                 {
                     yield return stringBuilder.ToString();
                     stringBuilder.Clear();
                 }
 
-                if (splitResult == SplitAction.SplitAndSplitCurrent)
+                switch (splitResult)
                 {
-                    yield return new string(character, 1);
+                    case SplitAction.SplitAndSplitCurrent:
+                        yield return new string(character, 1);
+                        break;
+                    case SplitAction.SplitAndInclude:
+                        stringBuilder.Append(character);
+                        break;
                 }
 
-                if (splitResult == SplitAction.SplitAndInclude)
+                if (splitResult == SplitAction.SplitAndIncludeRest)
                 {
-                    stringBuilder.Append(character);
+                    stringBuilder.Append(input.Span.Slice(index, input.Length - index));
+                    yield return stringBuilder.ToString();
+                    yield break;
                 }
             }
 
-            if (ShouldOutputString(stringSplitOptions, stringBuilder))
+            if (ShouldOutputString(stringSplitOptions, stringBuilder.Length))
             {
                 yield return stringBuilder.ToString();
             }
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The splitted strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<ReadOnlyMemory<char>> SplitMemory(
-            this ReadOnlyMemory<char> input,
-            SplitMemoryFuncWithoutIndex splitFunc,
-            StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return input.SplitMemory((character, _) => splitFunc(character), stringSplitOptions);
         }
 
         /// <summary>
@@ -167,12 +119,11 @@ namespace Sundew.Base.Text
 
                 if (splitResult.HasFlag(SplitAction.Include))
                 {
-                    if (length < 0 && startIndex + length <= index)
-                    {
-                        throw new InvalidOperationException($"Cannot use SplitAction.Ignored at index: {index} within a section in a SplitMemory call. Use Split alternative.");
-                    }
-
                     length++;
+                    if (startIndex + length < index)
+                    {
+                        throw new InvalidOperationException($"Cannot use SplitAction.Ignored at index: {index - 1} within a section in a SplitMemory call. Use Split method instead.");
+                    }
                 }
 
                 if (splitResult.HasFlag(SplitAction.Split) && ShouldOutputString(stringSplitOptions, length))
@@ -184,16 +135,23 @@ namespace Sundew.Base.Text
                     yield return input.Slice(oldStartIndex, oldLength);
                 }
 
-                if (splitResult == SplitAction.SplitAndSplitCurrent)
+                switch (splitResult)
                 {
-                    startIndex = index + 1;
-                    length = 0;
-                    yield return input.Slice(index, 1);
+                    case SplitAction.SplitAndSplitCurrent:
+                        startIndex = index + 1;
+                        length = 0;
+                        yield return input.Slice(index, 1);
+                        break;
+                    case SplitAction.SplitAndInclude:
+                        length++;
+                        break;
                 }
 
-                if (splitResult == SplitAction.SplitAndInclude)
+                if (splitResult == SplitAction.SplitAndIncludeRest)
                 {
-                    length++;
+                    startIndex--;
+                    yield return input.Slice(startIndex, input.Length - startIndex);
+                    yield break;
                 }
             }
 
@@ -201,11 +159,6 @@ namespace Sundew.Base.Text
             {
                 yield return input.Slice(startIndex, length);
             }
-        }
-
-        private static bool ShouldOutputString(StringSplitOptions stringSplitOptions, StringBuilder stringBuilder)
-        {
-            return stringBuilder.Length > 0 || stringSplitOptions == StringSplitOptions.None;
         }
 
         private static bool ShouldOutputString(StringSplitOptions stringSplitOptions, int length)

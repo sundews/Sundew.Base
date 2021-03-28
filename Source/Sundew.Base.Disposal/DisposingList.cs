@@ -13,12 +13,14 @@ namespace Sundew.Base.Disposal
     using Sundew.Base.Reporting;
     using Sundew.Base.Threading;
 
+#pragma warning disable CS1710 // XML comment has a duplicate typeparam tag
     /// <summary>
     /// Stores <see cref="IDisposable"/> in a list for later disposal.
     /// </summary>
     /// <typeparam name="TDisposable">The type of the disposable.</typeparam>
     /// <seealso cref="System.IDisposable" />
     public sealed partial class DisposingList<TDisposable> : IDisposable, IReportingDisposable
+#pragma warning restore CS1710 // XML comment has a duplicate typeparam tag
     {
         private readonly AsyncLock asyncLock = new();
         private readonly List<object> disposables = new();

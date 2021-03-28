@@ -12,6 +12,7 @@ namespace Sundew.Base.Text
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -56,64 +57,9 @@ namespace Sundew.Base.Text
         /// <returns>
         /// The split strings as an <see cref="IEnumerable{T}" />.
         /// </returns>
-        public static IEnumerable<string> Split(
-            this string input,
-            SplitFuncWithoutIndex splitFunc,
-            StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return
-                input.Split((character, _, builder) => splitFunc(character, builder), stringSplitOptions);
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The split strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<string> Split(
-            this string? input,
-            SplitFuncWithoutStringBuilder splitFunc,
-            StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return
-                input.Split(
-                    (character, index, _) => splitFunc(character, index),
-                    stringSplitOptions);
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The split strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
         public static IEnumerable<string> Split(this string? input, SplitFunc splitFunc, StringSplitOptions stringSplitOptions = StringSplitOptions.None)
         {
             return input?.AsMemory().Split(splitFunc, stringSplitOptions) ?? Enumerable.Empty<string>();
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The split strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<ReadOnlyMemory<char>> SplitMemory(
-            this string? input,
-            SplitMemoryFuncWithoutIndex splitFunc,
-            StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return input.SplitMemory((character, _) => splitFunc(character), stringSplitOptions);
         }
 
         /// <summary>
@@ -292,29 +238,33 @@ namespace Sundew.Base.Text
         }
 
         /// <summary>
-        /// Fixes the length left.
+        /// Aligns the specified value to the left and limits the length.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="length">The length.</param>
         /// <param name="paddingCharacter">The padding character.</param>
-        /// <param name="limitSide">The limit side.</param>
-        /// <returns>The string with the fixed length.</returns>
-        public static string LimitAndPadLeft(this string value, int length, char paddingCharacter, LimitSide limitSide = LimitSide.Right)
+        /// <param name="limit">The limit.</param>
+        /// <returns>
+        /// The string with the fixed length.
+        /// </returns>
+        public static string AlignLeftAndLimit(this string value, int length, char paddingCharacter, Limit limit = default)
         {
-            return value.LimitAndPad(length, paddingCharacter, PadSide.Left, limitSide);
+            return value.AlignAndLimit(length, paddingCharacter, Alignment.Left, limit);
         }
 
         /// <summary>
-        /// Fixes the length right.
+        /// Aligns the specified value to the right and limits the length.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="length">The length.</param>
         /// <param name="paddingCharacter">The padding character.</param>
-        /// <param name="limitSide">The limit side.</param>
-        /// <returns>The string with the fixed length.</returns>
-        public static string LimitAndPadRight(this string value, int length, char paddingCharacter, LimitSide limitSide = LimitSide.Right)
+        /// <param name="limit">The limit.</param>
+        /// <returns>
+        /// The string with the fixed length.
+        /// </returns>
+        public static string AlignRightAndLimit(this string value, int length, char paddingCharacter, Limit limit = default)
         {
-            return value.LimitAndPad(length, paddingCharacter, PadSide.Right, limitSide);
+            return value.AlignAndLimit(length, paddingCharacter, Alignment.Right, limit);
         }
 
         /// <summary>
@@ -323,62 +273,16 @@ namespace Sundew.Base.Text
         /// <param name="value">The value.</param>
         /// <param name="length">The length.</param>
         /// <param name="paddingCharacter">The padding character.</param>
-        /// <param name="padSide">The pad side.</param>
-        /// <param name="limitSide">The limit side.</param>
-        /// <returns>The string with the fixed length.</returns>
-        public static string LimitAndPad(this string value, int length, char paddingCharacter, PadSide padSide, LimitSide limitSide)
+        /// <param name="alignment">The pad side.</param>
+        /// <param name="limit">The limit.</param>
+        /// <returns>
+        /// The string with the fixed length.
+        /// </returns>
+        public static string AlignAndLimit(this string value, int length, char paddingCharacter, Alignment alignment, Limit limit)
         {
-            if (string.IsNullOrEmpty(value))
-            {
-                return paddingCharacter.Repeat(length);
-            }
-
-            var remainingCharacters = length - value.Length;
-            if (remainingCharacters == 0)
-            {
-                return value;
-            }
-
-            if (remainingCharacters < 0)
-            {
-                switch (limitSide)
-                {
-                    case LimitSide.Left:
-                        var excessCharacters = remainingCharacters * -1;
-                        return value.Substring(excessCharacters, length);
-                    default:
-                        return value.Substring(0, length);
-                }
-            }
-
-            switch (padSide)
-            {
-                case PadSide.BothRight:
-                    {
-                        var remainingLeft = remainingCharacters / 2;
-                        return paddingCharacter.Repeat(remainingLeft) +
-                               value +
-                               paddingCharacter.Repeat(remainingLeft + (remainingCharacters % 2));
-                    }
-
-                case PadSide.BothLeft:
-                    {
-                        var remainingRight = remainingCharacters / 2;
-                        return paddingCharacter.Repeat(remainingRight + (remainingCharacters % 2)) +
-                               value +
-                               paddingCharacter.Repeat(remainingRight);
-                    }
-
-                case PadSide.Left:
-                    {
-                        return paddingCharacter.Repeat(remainingCharacters) + value;
-                    }
-
-                default:
-                    {
-                        return value + paddingCharacter.Repeat(remainingCharacters);
-                    }
-            }
+            var stringBuilder = new StringBuilder();
+            stringBuilder.Append(value, length, paddingCharacter, alignment, limit);
+            return stringBuilder.ToString();
         }
 
         private static void VerifyBounds(string input, int startIndex, int length)

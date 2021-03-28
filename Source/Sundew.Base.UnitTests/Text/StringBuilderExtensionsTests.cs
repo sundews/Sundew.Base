@@ -29,14 +29,26 @@ namespace Sundew.Base.UnitTests.Text
         }
 
         [Fact]
-        public void ToStringFromEnd_Then_ResultShouldBeExpectedResult()
+        public void ToStringWithoutLast_Then_ResultShouldBeExpectedResult()
         {
             const string ExpectedResult = "1,2,3,4";
             var values = new[] { 1, 2, 3, 4 };
-            var stringBuilder = new StringBuilder();
-            values.AggregateToStringBuilder(stringBuilder, (builder, i) => builder.Append(i).Append(','));
+            var stringBuilder = values.AggregateToStringBuilder(new StringBuilder(), (builder, i) => builder.Append(i).Append(','));
 
-            var result = stringBuilder.ToStringFromEnd(0, 1);
+            var result = stringBuilder.ToStringWithoutLast(0);
+
+            result.Should().Be(ExpectedResult);
+        }
+
+        [Fact]
+        public void ToString_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
+        {
+            const string ExpectedResult = "1, 2, 3, 4";
+            var values = new[] { 1, 2, 3, 4 };
+            const string separator = ", ";
+            var stringBuilder = values.AggregateToStringBuilder(new StringBuilder(), (builder, i) => builder.Append(i).Append(separator));
+
+            var result = stringBuilder.ToString(0, separator);
 
             result.Should().Be(ExpectedResult);
         }

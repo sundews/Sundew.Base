@@ -2,7 +2,8 @@
 
   <PropertyGroup>    
     <TargetFramework>net5.0</TargetFramework>
-	  <LangVersion>9</LangVersion>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+    <LangVersion>9</LangVersion>
     <Authors>Kim Hugener-Ohlsen</Authors>    
     <Company>Hukano</Company>    
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>

@@ -30,14 +30,19 @@ namespace Sundew.Base.Text
         /// <summary>
         /// Includes the current item and yields a section.
         /// </summary>
-        IncludeAndSplit = Split | Include,
+        IncludeAndSplit = Include | Split, // 0x0000_0011
 
         /// <summary>Yields a section if one in started and yields the current character in a new section.</summary>
-        SplitAndSplitCurrent = Split | 0x04,
+        SplitAndSplitCurrent = Split | 0x0000_0110, // 0x0000_0110
 
         /// <summary>
         /// Yields a section if one is started and starts a new section including the current item.
         /// </summary>
-        SplitAndInclude = Split | 0x08,
+        SplitAndInclude = Split | 0x0000_1000, // 0x0000_1010
+
+        /// <summary>
+        /// Yields a section if one is started and starts a new section including the rest.
+        /// </summary>
+        SplitAndIncludeRest = Split | 0x0001_0000, // 0x0001_0010
     }
 }
