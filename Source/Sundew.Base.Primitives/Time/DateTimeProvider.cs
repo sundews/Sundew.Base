@@ -16,20 +16,20 @@ namespace Sundew.Base.Time
     public class DateTimeProvider : IDateTime
     {
         /// <summary>
-        /// Gets the UTC time.
+        /// Gets the UTC now.
         /// </summary>
         /// <value>
         /// The UTC now.
         /// </value>
-        public DateTime UtcTime => DateTime.UtcNow;
+        public DateTime UtcNow => DateTime.UtcNow;
 
         /// <summary>
-        /// Gets the local time.
+        /// Gets the local now.
         /// </summary>
         /// <value>
         /// The now.
         /// </value>
-        public DateTime LocalTime => DateTime.Now;
+        public DateTime LocalNow => DateTime.Now;
 
         /// <summary>
         /// Gets the offset UTC now.
@@ -37,15 +37,15 @@ namespace Sundew.Base.Time
         /// <value>
         /// The UTC now.
         /// </value>
-        public DateTimeOffset UtcTimeOffset => DateTimeOffset.UtcNow;
+        public DateTimeOffset UtcNowOffset => DateTimeOffset.UtcNow;
 
         /// <summary>
-        /// Gets the local time offset.
+        /// Gets the local now offset.
         /// </summary>
         /// <value>
         /// The now.
         /// </value>
-        public DateTimeOffset LocalTimeOffset => DateTimeOffset.Now;
+        public DateTimeOffset LocalNowOffset => DateTimeOffset.Now;
 
         /// <summary>
         /// Gets the time.
@@ -54,14 +54,14 @@ namespace Sundew.Base.Time
         /// <returns>
         /// The <see cref="System.DateTime" /> now.
         /// </returns>
-        public DateTime GetTime(bool useUtc)
+        public DateTime GetNow(bool useUtc)
         {
             if (useUtc)
             {
-                return this.UtcTime;
+                return this.UtcNow;
             }
 
-            return this.LocalTime;
+            return this.LocalNow;
         }
 
         /// <summary>
@@ -71,14 +71,14 @@ namespace Sundew.Base.Time
         /// <returns>
         /// The <see cref="Sundew.Base.Time.DateTimeProvider" /> now.
         /// </returns>
-        public DateTimeOffset GetTimeOffset(bool useUtc)
+        public DateTimeOffset GetNowOffset(bool useUtc)
         {
             if (useUtc)
             {
-                return this.UtcTimeOffset;
+                return this.UtcNowOffset;
             }
 
-            return this.LocalTimeOffset;
+            return this.LocalNowOffset;
         }
     }
 }

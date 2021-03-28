@@ -20,15 +20,15 @@ namespace Sundew.Base.Time
         /// <value>
         /// The UTC now.
         /// </value>
-        DateTime UtcTime { get; }
+        DateTime UtcNow { get; }
 
         /// <summary>
-        /// Gets the now.
+        /// Gets the local now.
         /// </summary>
         /// <value>
         /// The now.
         /// </value>
-        DateTime LocalTime { get; }
+        DateTime LocalNow { get; }
 
         /// <summary>
         /// Gets the offset UTC now.
@@ -36,7 +36,7 @@ namespace Sundew.Base.Time
         /// <value>
         /// The UTC now.
         /// </value>
-        DateTimeOffset UtcTimeOffset { get; }
+        DateTimeOffset UtcNowOffset { get; }
 
         /// <summary>
         /// Gets the offset now.
@@ -44,20 +44,20 @@ namespace Sundew.Base.Time
         /// <value>
         /// The now.
         /// </value>
-        DateTimeOffset LocalTimeOffset { get; }
+        DateTimeOffset LocalNowOffset { get; }
 
         /// <summary>
         /// Gets time in either local time or UTC.
         /// </summary>
         /// <param name="useUtc">if set to <c>true</c> [use UTC].</param>
         /// <returns>The <see cref="DateTimeProvider"/> now.</returns>
-        DateTime GetTime(bool useUtc);
+        DateTime GetNow(bool useUtc);
 
         /// <summary>
         /// Gets time offset in either local time or UTC.
         /// </summary>
         /// <param name="useUtc">if set to <c>true</c> [use UTC].</param>
         /// <returns>The <see cref="DateTimeProvider"/> now.</returns>
-        DateTimeOffset GetTimeOffset(bool useUtc);
+        DateTimeOffset GetNowOffset(bool useUtc);
     }
 }
