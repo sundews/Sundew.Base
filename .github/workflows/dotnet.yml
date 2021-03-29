@@ -34,7 +34,7 @@ jobs:
         dotnet tool update Sundew.Packaging.Tool -g
         dotnet tool update CommandlineBatcher -g
     - name: Restore
-      run: dotnet restore -s ${{ env.source }} -s ${{ env.dev-source-latest-version }} 
+      run: dotnet restore ${{ env.solutionPath }} --configuration ${{ env.buildConfiguration }} -s ${{ env.source }} -s ${{ env.dev-source-latest-version }} 
     - name: Build
       id: build
       run: >
