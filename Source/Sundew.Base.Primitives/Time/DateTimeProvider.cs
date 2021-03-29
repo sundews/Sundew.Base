@@ -5,14 +5,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Time
+namespace Sundew.Base.Primitives.Time
 {
     using System;
 
     /// <summary>
     /// Provides the current date and time.
     /// </summary>
-    /// <seealso cref="Sundew.Base.Time.IDateTime" />
+    /// <seealso cref="IDateTime" />
     public class DateTimeProvider : IDateTime
     {
         /// <summary>
@@ -69,7 +69,7 @@ namespace Sundew.Base.Time
         /// </summary>
         /// <param name="useUtc">if set to <c>true</c> [use UTC].</param>
         /// <returns>
-        /// The <see cref="Sundew.Base.Time.DateTimeProvider" /> now.
+        /// The <see cref="DateTimeProvider" /> now.
         /// </returns>
         public DateTimeOffset GetNowOffset(bool useUtc)
         {

@@ -7,7 +7,7 @@
 
 namespace Sundew.Base.Memory.Internal
 {
-    using Sundew.Base.Numeric;
+    using Sundew.Base.Primitives.Numeric;
 
     internal static class BufferHelper
     {

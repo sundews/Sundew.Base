@@ -10,7 +10,7 @@ namespace Sundew.Base.Threading.Jobs
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Sundew.Base.Computation;
+    using Sundew.Base.Primitives.Computation;
     using Sundew.Base.Threading.Internal;
 
     /// <summary>

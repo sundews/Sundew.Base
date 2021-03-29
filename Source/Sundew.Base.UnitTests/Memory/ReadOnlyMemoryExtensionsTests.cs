@@ -17,6 +17,70 @@ namespace Sundew.Base.UnitTests.Memory
     public class ReadOnlyMemoryExtensionsTests
     {
         [Theory]
+        [InlineData("1|2|3,4|5|6", new[] { "123", "456" })]
+        public void Split_When_IgnoringInSection_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
+        {
+            var result = input.AsMemory().Split(
+                (character, index, _) =>
+                {
+                    if (character == '|')
+                    {
+                        return SplitAction.Ignore;
+                    }
+
+                    if (character == ',')
+                    {
+                        return SplitAction.Split;
+                    }
+
+                    return SplitAction.Include;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("123   1234", 3, new[] { "   ", "1234" })]
+        public void Split_When_TrimmingWhitespaceAndTheStart_Then_ResultShouldBeExpectedResult(string input, int startIndex, string[] expectedResult)
+        {
+            var result = input.AsMemory().Split(
+                (character, index, _) =>
+                {
+                    if (index < startIndex)
+                    {
+                        return SplitAction.Ignore;
+                    }
+
+                    if (char.IsWhiteSpace(character))
+                    {
+                        return SplitAction.Include;
+                    }
+
+                    return SplitAction.SplitAndIncludeRest;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("ValuE1234", new[] { "ValuE", "1234" })]
+        public void Split_When_UsingIncludeAndSplit_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
+        {
+            var result = input.AsMemory().Split(
+                (character, _, _) =>
+                {
+                    if (character == 'E')
+                    {
+                        return SplitAction.IncludeAndSplit;
+                    }
+
+                    return SplitAction.Include;
+                });
+
+            result.Select(x => x.ToString()).Should().Equal(expectedResult);
+        }
+
+        [Theory]
         [InlineData("warm:;up", new[] { "warm", "up" })]
         [InlineData(":;ok:;correct:;", new[] { "ok", "correct" })]
         [InlineData(":;ok:;correct", new[] { "ok", "correct" })]

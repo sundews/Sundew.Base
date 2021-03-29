@@ -59,7 +59,7 @@ namespace Sundew.Base.Memory
                         }
 
                         break;
-                    case SplitAction.SplitInclusive:
+                    case SplitAction.IncludeAndSplit:
                         {
                             splitContext.Include(item);
                             var section = splitContext.GetSectionAndReset();
@@ -73,6 +73,42 @@ namespace Sundew.Base.Memory
                     case SplitAction.Ignore:
                         splitContext.IsIgnoring = true;
                         break;
+                    case SplitAction.SplitAndSplitCurrent:
+                        {
+                            var section = splitContext.GetSectionAndReset();
+                            if (!section.IsEmpty)
+                            {
+                                yield return section;
+                            }
+
+                            yield return input.Slice(index, 1);
+                        }
+
+                        break;
+                    case SplitAction.SplitAndInclude:
+                        {
+                            var section = splitContext.GetSectionAndReset();
+                            if (!section.IsEmpty)
+                            {
+                                yield return section;
+                            }
+
+                            splitContext.Include(item);
+                        }
+
+                        break;
+                    case SplitAction.SplitAndIncludeRest:
+                        {
+                            var section = splitContext.GetSectionAndReset();
+                            if (!section.IsEmpty)
+                            {
+                                yield return section;
+                            }
+
+                            yield return input.Slice(index, input.Length - index);
+                            yield break;
+                        }
+
                     default:
                         throw new ArgumentOutOfRangeException($"Invalid SplitMemory value: {splitMemory}");
                 }

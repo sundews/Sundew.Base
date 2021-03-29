@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Numeric
+namespace Sundew.Base.Primitives.Numeric
 {
     /// <summary>
     /// Enumeration for specifying comparison of intervals.

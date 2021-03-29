@@ -12,7 +12,7 @@ namespace Sundew.Base.Memory
     using System.Runtime.CompilerServices;
     using System.Runtime.InteropServices;
     using Sundew.Base.Memory.Internal;
-    using Sundew.Base.Numeric;
+    using Sundew.Base.Primitives.Numeric;
     using Sundew.Base.Reporting;
 
     /// <summary>
@@ -141,7 +141,6 @@ namespace Sundew.Base.Memory
         /// The item.
         /// </value>
         /// <param name="index">The index.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "IndexOfOutRangeException not listed as invalid for indexer get.")]
         public TItem this[int index]
         {
             get

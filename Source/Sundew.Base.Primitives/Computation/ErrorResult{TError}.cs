@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Computation
+namespace Sundew.Base.Primitives.Computation
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -65,7 +65,7 @@ namespace Sundew.Base.Computation
             return result.Error;
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="ErrorResult"/> to <see cref="Computation.Result.IfSuccess{TValue}"/>.</summary>
+        /// <summary>Performs an implicit conversion from <see cref="ErrorResult"/> to <see cref="Result.IfSuccess{TValue}"/>.</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

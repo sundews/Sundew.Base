@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Computation
+namespace Sundew.Base.Primitives.Computation
 {
     /// <summary>
     /// Interface for implementing a progress reporter.

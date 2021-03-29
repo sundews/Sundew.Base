@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Time
+namespace Sundew.Base.Primitives.Time
 {
     using System;
 

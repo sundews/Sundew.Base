@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Visiting
+namespace Sundew.Base.Primitives.Visiting
 {
     /// <summary>
     /// Interface for implementing the visitor pattern with a parameter and a variable.

@@ -5,10 +5,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Numeric
+namespace Sundew.Base.UnitTests.Primitives.Numeric
 {
     using FluentAssertions;
-    using Sundew.Base.Numeric;
+    using Sundew.Base.Primitives.Numeric;
     using Xunit;
 
     public class ComparableExtensionsTests

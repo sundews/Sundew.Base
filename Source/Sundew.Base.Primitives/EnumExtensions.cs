@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Enumerations
+namespace Sundew.Base.Primitives
 {
     using System;
     using System.Globalization;

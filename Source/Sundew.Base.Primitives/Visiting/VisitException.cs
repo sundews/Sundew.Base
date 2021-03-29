@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Visiting
+namespace Sundew.Base.Primitives.Visiting
 {
     using System;
 

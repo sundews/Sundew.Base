@@ -5,11 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Enumerations
+namespace Sundew.Base.UnitTests.Primitives
 {
     using System;
     using FluentAssertions;
-    using Sundew.Base.Enumerations;
+    using Sundew.Base.Primitives;
     using Xunit;
 
     public class EnumExtensionsTests

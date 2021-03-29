@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Computation
+namespace Sundew.Base.Primitives.Computation
 {
     /// <summary>
     /// Interface for implementing message actions before and after reporting progress.

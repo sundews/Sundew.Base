@@ -5,13 +5,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Numeric
+namespace Sundew.Base.Primitives.Numeric
 {
     using System;
     using System.Globalization;
     using System.Runtime.CompilerServices;
-    using Sundew.Base.Computation;
     using Sundew.Base.Equality;
+    using Sundew.Base.Primitives.Computation;
 
     /// <summary>
     /// Represents a percentage.

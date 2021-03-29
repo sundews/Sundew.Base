@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Numeric
+namespace Sundew.Base.Primitives.Numeric
 {
     using System;
     using System.Runtime.CompilerServices;

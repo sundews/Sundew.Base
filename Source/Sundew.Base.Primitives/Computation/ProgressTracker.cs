@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Computation
+namespace Sundew.Base.Primitives.Computation
 {
     using System;
 

@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Computation
+namespace Sundew.Base.Primitives.Computation
 {
     /// <summary>
     /// Specifies the type of progress.

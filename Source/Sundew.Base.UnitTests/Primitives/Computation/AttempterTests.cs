@@ -5,11 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.ControlFlow
+namespace Sundew.Base.UnitTests.Primitives.Computation
 {
     using System.Collections.Generic;
     using FluentAssertions;
-    using Sundew.Base.ControlFlow;
+    using Sundew.Base.Primitives.Computation;
     using Xunit;
 
     public class AttempterTests

@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Visiting
+namespace Sundew.Base.Primitives.Visiting
 {
     using System;
 
@@ -15,7 +15,7 @@ namespace Sundew.Base.Visiting
     /// <typeparam name="TVisitable">The type of the visitable.</typeparam>
     /// <typeparam name="TParameter">The type of the parameter.</typeparam>
     /// <typeparam name="TVariable">The type of the variable.</typeparam>
-    /// <seealso cref="Sundew.Base.Visiting.VisitException" />
+    /// <seealso cref="VisitException" />
     /// <seealso cref="System.Exception" />
     public class VisitException<TVisitable, TParameter, TVariable> : VisitException
         where TVisitable : notnull
