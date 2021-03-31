@@ -14,10 +14,6 @@
    <RepositoryType>git</RepositoryType>
    <PackageLicenseExpression>MIT</PackageLicenseExpression>
    <PackageReleaseNotes>7.0 - Split into separate packages and cleanup</PackageReleaseNotes>
-   <SppAppendPublishFileLogFormats>{11}{2}{11},{11}{4}{11},{5},{11}{7}{11},{11}{8}{11},{11}{9}{11}{12} > logs\push.txt</SppAppendPublishFileLogFormats>
-   <SppApiKey>AKey</SppApiKey>
-   <SppSymbolsApiKey>ASymbolKey</SppSymbolsApiKey>
-   <_SppSymbolsSource>c:\teste</_SppSymbolsSource>
  </PropertyGroup>
   <ItemGroup>
     <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>

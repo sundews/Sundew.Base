@@ -65,10 +65,6 @@
     <SppSourceName>local-stable</SppSourceName>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
-    <DefineConstants>TRACE;DISABLE_SPP</DefineConstants>
-  </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedFiles Remove="$(GeneratedAssemblyInfoFile)" />
     <AdditionalFiles Include="stylecop.json" />
