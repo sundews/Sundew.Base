@@ -45,8 +45,7 @@ jobs:
         '-p:"SppDevelopmentSource=refs/heads/(?:develop.*|feature/(?<Postfix>.+)|bugfix/(?<Postfix>.+)) => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
         -p:"SppAllowLocalSource=false"
         -p:"SppEnablePublish=false"
-        '-p:"SppPublishLogFormats=::set-output name=stage::{3}|::set-output name=feedSource::{6}"'
-        '-p:"SppAppendPublishFileLogFormats={0},{1}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},{5}{12} > ${{ env.packages-to-push }}|{11}{7}{11},{11}{8}{11},{9}{12} > ${{ env.packages-to-push }}"'
+        '-p:"SppAppendPublishFileLogFormats={0},{1},{3},{6}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},{5}{12} > ${{ env.packages-to-push }}|{11}{7}{11},{11}{8}{11},{9}{12} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
@@ -55,13 +54,13 @@ jobs:
     - name: 'Publish package(s)'
       run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -n true" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
-      if: ${{ success() &&  steps.build.outputs.stage == 'prod' }}
+      if: ${{ success() }}
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
-        cb -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
+        cb -c --if "{2}==prod" "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
-    - name: 'Await package publish'
-      if: ${{ success() && steps.build.outputs.stage == 'prod' }}
-      run: cb -c "spt|await -s ${{ steps.build.outputs.feedSource }} {0}.{1}" -s ',' -bf ${{ env.source-package-versions }}
+    - name: 'Await stable package publish'
+      if: ${{ success() }}
+      run: cb --if "{2}==prod" -c "spt|await -s {3} {0}.{1}" -s ',' -bf ${{ env.source-package-versions }}
