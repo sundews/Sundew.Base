@@ -58,7 +58,7 @@ jobs:
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
-        cb -c --if "{2}==prod" "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
+        cb --if "{2}==prod" -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Await stable package publish'
