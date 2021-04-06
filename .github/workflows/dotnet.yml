@@ -60,8 +60,8 @@ jobs:
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
         cb -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
+    - name: Cleanup
+      run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Await package publish'
       if: ${{ success() && steps.build.outputs.stage == 'prod' }}
       run: cb -c "spt|await -s ${{ steps.build.outputs.feedSource }} {0}.{1}" -s ',' -bf ${{ env.source-package-versions }}
-    - name: Clean
-      run: spt delete -v ${{ env.source-packages-to-push }}
