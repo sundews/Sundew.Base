@@ -31,8 +31,8 @@ jobs:
         dotnet-version: 5.0.x
     - name: Setup tools
       run: |
-        dotnet tool update Sundew.Packaging.Tool -g
-        dotnet tool update CommandlineBatcher -g
+        dotnet tool update Sundew.Packaging.Tool -g --version 3.0.0-u20210406-185029-dev
+        dotnet tool update CommandlineBatcher -g --version 2.1.0-u20210331-220055-dev
     - name: Restore
       run: dotnet restore ${{ env.solutionPath }} -s ${{ env.source }} -s ${{ env.dev-source-latest-version }} 
     - name: Build
@@ -42,11 +42,11 @@ jobs:
         -p:"SppSourceName=${{ github.ref }}"
         '-p:"SppProductionSource=refs/heads/(?:master|main).* => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppIntegrationSource=refs/heads/release/.+ => ${{ env.source }}|${{ env.source }}"'
-        '-p:"SppDevelopmentSource=refs/heads/(?:develop.*|feature/.+|bugfix/.+) => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
+        '-p:"SppDevelopmentSource=refs/heads/(?:develop.*|feature/(?<Postfix>.+)|bugfix/(?<Postfix>.+)) => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
         -p:"SppAllowLocalSource=false"
         -p:"SppEnablePublish=false"
         '-p:"SppPublishLogFormats=::set-output name=stage::{3}|::set-output name=pushSource::{4}|::set-output name=feedSource::{6}|::set-output name=apiKey::{5}|::set-output name=symbolPushSource::{8}|::set-output name=symbolApiKey::{9}"'
-        '-p:"SppAppendPublishFileLogFormats={0},{1}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},***,{11}{7}{11},{11}{8}{11},{11}***{11}{12} > ${{ env.packages-to-push }}"'
+        '-p:"SppAppendPublishFileLogFormats={0},{1}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},***{12} > ${{ env.packages-to-push }}|{11}{7}{11},{11}{8}{11},***{12} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
@@ -58,6 +58,10 @@ jobs:
     - name: 'Publish symbols'
       if: ${{ steps.build.outputs.symbolPushSource != '' }}
       run: dotnet nuget push '**/*.snupkg' -s '${{ steps.build.outputs.symbolPushSource }}' -k '${{ steps.build.outputs.symbolApiKey }}'
+    - name: Delete packages to push
+      run: |
+        cb -c "bash|echo {0}...{1}...{2}" -bs NewLine -s ',' -bf ${{ env.source-packages-to-push }}
+        spt delete ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
       if: ${{ success() &&  steps.build.outputs.stage == 'prod' }}
       run: |

@@ -38,6 +38,7 @@ namespace Sundew.Base.UnitTests.Text
         [InlineData(1.2345678910111213, "{0:12,-=<<}", @"/678910111213\")]
         [InlineData(1.2345678910111213, "{0:12,-=<<:N}", @"/----1.23----\")]
         [InlineData(1.2345678910111213, "{0:12,-=<<:N3}", @"/---1.235----\")]
+        [InlineData(1.2345678910111213, "{0:12,-=<>E:N14}", @"/1.234567891…\")]
         [InlineData(null, @"{0:12,-=<<}", @"/------------\")]
         [InlineData(Strings.Empty, @"{0:12,-=<<}", @"/------------\")]
         [InlineData("A long text that should be limited", "{0:12,-<>E}", @"/A long text…\")]
