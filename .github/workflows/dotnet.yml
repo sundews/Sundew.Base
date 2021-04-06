@@ -63,4 +63,4 @@ jobs:
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Await stable package publish'
       if: ${{ success() }}
-      run: cb --if "{2}==prod" -c "spt|await -s {3} {0}.{1}" -s ',' -bf ${{ env.source-package-versions }}
+      run: cb --if "{2}==prod" -c "spt|await -s {3} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
