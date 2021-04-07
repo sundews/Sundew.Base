@@ -20,6 +20,48 @@ namespace Sundew.Base.Text
         /// <summary>
         /// Joins the specified enumerable to string builder.
         /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>
+        /// The result of the result function.
+        /// </returns>
+        public static string JoinToString(this IEnumerable<string> enumerable, char separator)
+        {
+            return enumerable.Aggregate(
+                new StringBuilder(),
+                (builder, item) =>
+                {
+                    builder.Append(item);
+                    builder.Append(separator);
+                    return builder;
+                },
+                builder => builder.ToString(0, new FromEnd(1)));
+        }
+
+        /// <summary>
+        /// Joins the specified enumerable to string builder.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>
+        /// The result of the result function.
+        /// </returns>
+        public static string JoinToString(this IEnumerable<string> enumerable, string separator)
+        {
+            return enumerable.Aggregate(
+                new StringBuilder(),
+                (builder, item) =>
+                {
+                    builder.Append(item);
+                    builder.Append(separator);
+                    return builder;
+                },
+                builder => builder.ToString(0, separator));
+        }
+
+        /// <summary>
+        /// Joins the specified enumerable to string builder.
+        /// </summary>
         /// <typeparam name="TItem">The type of the item.</typeparam>
         /// <param name="enumerable">The enumerable.</param>
         /// <param name="separator">The separator.</param>
@@ -175,6 +217,50 @@ namespace Sundew.Base.Text
                     return builder;
                 },
                 builder => builder.ToString(0, separator));
+        }
+
+        /// <summary>
+        /// Joins the specified enumerable to string builder.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="stringBuilder">The string builder.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>
+        /// The result of the result function.
+        /// </returns>
+        public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, char separator)
+        {
+            return enumerable.Aggregate(
+                stringBuilder,
+                (builder, item) =>
+                {
+                    builder.Append(item);
+                    builder.Append(separator);
+                    return builder;
+                },
+                builder => builder.Remove(builder.Length - 1, 1));
+        }
+
+        /// <summary>
+        /// Joins the specified enumerable to string builder.
+        /// </summary>
+        /// <param name="enumerable">The enumerable.</param>
+        /// <param name="stringBuilder">The string builder.</param>
+        /// <param name="separator">The separator.</param>
+        /// <returns>
+        /// The result of the result function.
+        /// </returns>
+        public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, string separator)
+        {
+            return enumerable.Aggregate(
+                stringBuilder,
+                (builder, item) =>
+                {
+                    builder.Append(item);
+                    builder.Append(separator);
+                    return builder;
+                },
+                builder => builder.Remove(builder.Length - separator.Length, separator.Length));
         }
 
         /// <summary>
