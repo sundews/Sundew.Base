@@ -1,0 +1,98 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netstandard1.3</TargetFrameworks>
+    <DebugSymbols>false</DebugSymbols>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DebugType>None</DebugType>
+    <NoWarn>NU5128</NoWarn>
+    <PackageReleaseNotes>
+      7.0 - Split into separate package and cleanup
+      6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
+      5.0 - Changed string split extension interface.
+      4.2 - Result struct with same value and error type.
+      4.1 - Added Non-allocating SplitMemory, Async support for Results and ToLower/ToUpper overloads
+      4.0 - Multitargeting for netstandard2.1 and netstandard1.2. 2.1 version has support for IAsyncDisposable in Disposal API.
+      3.3 - Added Memory extensions and Buffer&lt;TItem&gt;
+      3.2 - Improved IDateTime, Result, StringExtensions, Added AsyncLock, Async Manual- and AutoResetEvents, Timer, CurrentThread
+      3.1 - Added Linq style string split, char repeat, array and enum extensions.
+      3.0 - Packaged as .NET Standard project
+    </PackageReleaseNotes>
+    <Description>
+      All in one package including:
+      Sundew.Base.Collections
+      Sundew.Base.Disposal
+      Sundew.Base.Equality
+      Sundew.Base.Initialization
+      Sundew.Base.Memory
+      Sundew.Base.Primitives
+      Sundew.Base.Reporting
+      Sundew.Base.Text
+      Sundew.Base.Threading.Jobs
+      Sundew.Base.Threading
+      Sundew.Base.Timers
+    </Description>
+    <PackageReleaseNotes>7.0 - Split into separate packages, cleanup and retarget to netstandard1.3</PackageReleaseNotes>
+    <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <SppSourceName>default</SppSourceName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningsAsErrors />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Publish|AnyCPU'">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WarningsAsErrors />
+    <SppSourceName>local-stable</SppSourceName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedFiles Remove="$(GeneratedAssemblyInfoFile)" />
+    <AdditionalFiles Include="stylecop.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Sundew.Packaging.Publish" Version="5.1.0-u20210407-193833-pre">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Equality\Sundew.Base.Equality.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Initialization\Sundew.Base.Initialization.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Threading.Jobs\Sundew.Base.Threading.Jobs.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Threading\Sundew.Base.Threading.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Timers\Sundew.Base.Timers.csproj" />
+  </ItemGroup>
+
+</Project>
