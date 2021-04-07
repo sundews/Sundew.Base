@@ -26,15 +26,14 @@ namespace Sundew.Base.Text
         /// <summary>
         /// Appends the specified value.
         /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
         /// <param name="stringBuilder">The string builder.</param>
         /// <param name="value">The value.</param>
         /// <param name="formatProvider">The format provider.</param>
         /// <returns>
         /// The <see cref="StringBuilder" />.
         /// </returns>
-        public static StringBuilder Append<TValue>(this StringBuilder stringBuilder, TValue value, IFormatProvider formatProvider)
-            where TValue : struct
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider formatProvider)
         {
             return stringBuilder.AppendFormat(formatProvider, Format, value);
         }

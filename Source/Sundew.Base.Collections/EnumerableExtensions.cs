@@ -293,7 +293,10 @@ namespace Sundew.Base.Collections
         /// <returns>
         /// A <see cref="StringBuilder" />.
         /// </returns>
-        public static StringBuilder AggregateToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, Action<StringBuilder, TItem> aggregateFunction)
+        public static StringBuilder AggregateToStringBuilder<TItem>(
+            this IEnumerable<TItem> enumerable,
+            StringBuilder stringBuilder,
+            Action<StringBuilder, TItem> aggregateFunction)
         {
             return enumerable.Aggregate(
                 stringBuilder,
@@ -315,7 +318,10 @@ namespace Sundew.Base.Collections
         /// <returns>
         /// The result of the result function.
         /// </returns>
-        public static TResult AggregateToStringBuilder<TItem, TResult>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateFunction, Func<StringBuilder, TResult> resultFunc)
+        public static TResult AggregateToStringBuilder<TItem, TResult>(
+            this IEnumerable<TItem> enumerable,
+            Action<StringBuilder, TItem> aggregateFunction,
+            Func<StringBuilder, TResult> resultFunc)
         {
             return enumerable.Aggregate(
                 new StringBuilder(),
@@ -339,7 +345,11 @@ namespace Sundew.Base.Collections
         /// <returns>
         /// The result of the result function.
         /// </returns>
-        public static TResult AggregateToStringBuilder<TItem, TResult>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, Action<StringBuilder, TItem> aggregateFunction, Func<StringBuilder, TResult> resultFunc)
+        public static TResult AggregateToStringBuilder<TItem, TResult>(
+            this IEnumerable<TItem> enumerable,
+            StringBuilder stringBuilder,
+            Action<StringBuilder, TItem> aggregateFunction,
+            Func<StringBuilder, TResult> resultFunc)
         {
             return enumerable.Aggregate(
                 stringBuilder,
