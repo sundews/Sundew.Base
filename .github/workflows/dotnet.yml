@@ -53,14 +53,14 @@ jobs:
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ env.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
       run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -n true" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
+    - name: Cleanup
+      run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
       if: ${{ success() }}
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
         cb --if "{2}==prod" -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
-    - name: Cleanup
-      run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Await stable package publish'
       if: ${{ success() }}
       run: cb --if "{2}==prod" -c "spt|await -s {3} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
