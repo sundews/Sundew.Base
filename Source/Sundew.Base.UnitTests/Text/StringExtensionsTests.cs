@@ -10,7 +10,6 @@ namespace Sundew.Base.UnitTests.Text
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
     using FluentAssertions;
     using Sundew.Base.Text;
     using Xunit;

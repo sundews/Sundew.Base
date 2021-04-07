@@ -11,16 +11,15 @@ namespace Sundew.Base.UnitTests.Collections
     using System.Linq;
     using FluentAssertions;
     using Sundew.Base.Collections;
-    using Sundew.Base.Collections.Internal;
     using Xunit;
 
-    public class EnumerableExtensionsTests
+    public class EnumerableToTextExtensionsTests
     {
         private readonly IList<int> numberList = new List<int> { 1, 2, 4, 5, 6, 5, 6 };
 
         private readonly int[] numberArray;
 
-        public EnumerableExtensionsTests()
+        public EnumerableToTextExtensionsTests()
         {
             this.numberArray = this.numberList.ToArray();
         }

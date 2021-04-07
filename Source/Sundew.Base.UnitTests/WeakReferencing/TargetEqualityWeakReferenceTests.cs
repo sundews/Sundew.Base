@@ -8,7 +8,6 @@
 namespace Sundew.Base.UnitTests.WeakReferencing
 {
     using FluentAssertions;
-    using Microsoft.VisualBasic;
     using Sundew.Base.Equality;
     using Xunit;
 
