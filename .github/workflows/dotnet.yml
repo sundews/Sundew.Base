@@ -60,7 +60,7 @@ jobs:
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
         -p:"SppForceVersion=${{ secrets.SPP_FORCE_VERSION_IF_SET }}"
-        -p:"SppPostfix=${{ steps.build-setup.outputs.package-postfix }}"
+        -p:"SppPrereleasePostfix=${{ steps.build-setup.outputs.package-postfix }}"
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
