@@ -9,7 +9,6 @@ jobs:
     env:
       solutionPath: ./Source/Sundew.Base.sln
       repository: 'https://sundew-dev:${{ secrets.SUNDEW_DEV_TOKEN }}@github.com/hugener/Sundew.Base.git'
-      buildConfiguration: Release
       source: 'https://api.nuget.org/v3/index.json'
       dev-source: 'https://www.myget.org/F/sundew-dev/api/v2/package'
       dev-source-latest-version: 'https://www.myget.org/F/sundew-dev/api/v3/index.json'
