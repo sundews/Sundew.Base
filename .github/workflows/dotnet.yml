@@ -67,11 +67,11 @@ jobs:
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
-      if: ${{ success() }}
+      if: ${{ success() && steps.build-setup.outputs.stage == production }}
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
         cb --if "{2}==prod" -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
     - name: 'Await stable package publish'
-      if: ${{ success() }}
+      if: ${{ success() && steps.build-setup.outputs.stage == production }}
       run: cb --if "{2}==prod" -c "spt|await -s {3} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
