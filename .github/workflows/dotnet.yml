@@ -37,13 +37,13 @@ jobs:
       run: >
         cb match --patterns
         "(?:master|main).* => stage=production|buildConfiguration=Release"
-        "release/.+ => stage=ci|buildConfiguration=Debug"
-        "(?:develop.*|feature/(?<Postfix>.+)|bugfix/(?<Postfix>.+)) => stage=development|buildConfiguration=Debug|package-postfix={Postfix}"
+        "release/.+ => stage=ci|buildConfiguration=Debug|dev-package-source-if-set= -s ${{ env.dev-source-latest-version }}"
+        "(?:develop.*|feature/(?<Postfix>.+)|bugfix/(?<Postfix>.+)) => stage=development|buildConfiguration=Debug|package-postfix={Postfix}|dev-package-source-if-set= -s ${{ env.dev-source-latest-version }} "
         --format "::set-output name={0}::{1}"
-        -tvs =
+        -tvs '='
         --input ${{ github.ref }}
     - name: Restore
-      run: dotnet restore ${{ env.solutionPath }} -s ${{ env.source }} -s ${{ env.dev-source-latest-version }} 
+      run: dotnet restore ${{ env.solutionPath }} -s ${{ env.source }}${{ steps.build-setup.outputs.dev-package-source-if-set }}
     - name: Build
       id: build
       run: >
@@ -71,7 +71,7 @@ jobs:
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
-        cb --if "{2}==prod" -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
+        cb -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
     - name: 'Await stable package publish'
       if: ${{ success() && steps.build-setup.outputs.stage == 'production' }}
-      run: cb --if "{2}==prod" -c "spt|await -s {3} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
+      run: cb -c "spt|await -s {3} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
