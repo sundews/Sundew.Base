@@ -39,6 +39,7 @@ jobs:
         "(?:master|main).* => stage=production|buildConfiguration=Release"
         "release/.+ => stage=ci|buildConfiguration=Debug|dev-package-source-if-set= -s ${{ env.dev-source-latest-version }}"
         "(?:develop.*|feature/(?<Postfix>.+)|bugfix/(?<Postfix>.+)) => stage=development|buildConfiguration=Debug|package-postfix={Postfix}|dev-package-source-if-set= -s ${{ env.dev-source-latest-version }}"
+        ".+ => stage=none|buildConfiguration=Release"
         --format "::set-output name={0}::{1}"
         -tvs '='
         --input ${{ github.ref }}
