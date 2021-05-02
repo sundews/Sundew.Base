@@ -48,8 +48,8 @@ jobs:
     - name: Build
       id: build
       run: >
-        dotnet build ${{ env.solutionPath }} --verbosity normal --configuration ${{ build-setup.outputs.buildConfiguration }} --no-restore
-        -p:"SppSourceName=${{ build-setup.outputs.stage }}"
+        dotnet build ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-restore
+        -p:"SppSourceName=${{ steps.build-setup.outputs.stage }}"
         '-p:"SppProductionSource=production => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppIntegrationSource=ci => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppDevelopmentSource=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
@@ -60,9 +60,9 @@ jobs:
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
         -p:"SppForceVersion=${{ secrets.SPP_FORCE_VERSION_IF_SET }}"
-        -p:"SppPostfix=${{ build-setup.outputs.package-postfix }}"
+        -p:"SppPostfix=${{ steps.build-setup.outputs.package-postfix }}"
     - name: Test
-      run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ build-setup.outputs.buildConfiguration }} --no-build
+      run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
       run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -n true" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
     - name: Cleanup
