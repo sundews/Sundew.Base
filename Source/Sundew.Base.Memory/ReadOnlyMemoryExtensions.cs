@@ -61,6 +61,12 @@ namespace Sundew.Base.Memory
                         break;
                     case SplitAction.IncludeAndSplit:
                         {
+                            if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
+                            {
+                                splitContext.StartIncluding(index);
+                                break;
+                            }
+
                             splitContext.Include(item);
                             var section = splitContext.GetSectionAndReset();
                             if (!section.IsEmpty)
@@ -91,6 +97,12 @@ namespace Sundew.Base.Memory
                             if (!section.IsEmpty)
                             {
                                 yield return section;
+                            }
+
+                            if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
+                            {
+                                splitContext.StartIncluding(index);
+                                break;
                             }
 
                             splitContext.Include(item);
