@@ -70,4 +70,8 @@
     <PackageReference Include="System.Memory" Version="4.5.4" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
+  </ItemGroup>
 </Project>
