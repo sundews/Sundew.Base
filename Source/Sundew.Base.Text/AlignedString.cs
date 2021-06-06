@@ -21,7 +21,7 @@ namespace Sundew.Base.Text
         /// <param name="format">The format.</param>
         /// <param name="arg0">The arg0.</param>
         /// <returns>the formatted string.</returns>
-        public static string FormatInvariant(string format, object arg0)
+        public static string FormatInvariant(string format, object? arg0)
         {
             return string.Format(new AlignAndLimitFormatProvider(CultureInfo.InvariantCulture), format, arg0);
         }
@@ -33,7 +33,7 @@ namespace Sundew.Base.Text
         /// <param name="format">The format.</param>
         /// <param name="arg0">The arg0.</param>
         /// <returns>the formatted string.</returns>
-        public static string Format(IFormatProvider formatProvider, string format, object arg0)
+        public static string Format(IFormatProvider formatProvider, string format, object? arg0)
         {
             return string.Format(new AlignAndLimitFormatProvider(formatProvider), format, arg0);
         }
@@ -46,7 +46,7 @@ namespace Sundew.Base.Text
         /// <param name="arg0">The arg0.</param>
         /// <param name="arg1">The arg1.</param>
         /// <returns>the formatted string.</returns>
-        public static string Format(IFormatProvider formatProvider, string format, object arg0, object arg1)
+        public static string Format(IFormatProvider formatProvider, string format, object? arg0, object? arg1)
         {
             return string.Format(new AlignAndLimitFormatProvider(formatProvider), format, arg0, arg1);
         }
@@ -58,7 +58,7 @@ namespace Sundew.Base.Text
         /// <param name="arg0">The arg0.</param>
         /// <param name="arg1">The arg1.</param>
         /// <returns>the formatted string.</returns>
-        public static string FormatInvariant(string format, object arg0, object arg1)
+        public static string FormatInvariant(string format, object? arg0, object? arg1)
         {
             return string.Format(new AlignAndLimitFormatProvider(CultureInfo.InvariantCulture), format, arg0, arg1);
         }
@@ -72,7 +72,7 @@ namespace Sundew.Base.Text
         /// <param name="arg1">The arg1.</param>
         /// <param name="arg2">The arg2.</param>
         /// <returns>The formatted string.</returns>
-        public static string Format(IFormatProvider formatProvider, string format, object arg0, object arg1, object arg2)
+        public static string Format(IFormatProvider formatProvider, string format, object? arg0, object? arg1, object? arg2)
         {
             return string.Format(new AlignAndLimitFormatProvider(formatProvider), format, arg0, arg1, arg2);
         }
@@ -87,7 +87,7 @@ namespace Sundew.Base.Text
         /// <returns>
         /// the formatted string.
         /// </returns>
-        public static string FormatInvariant(string format, object arg0, object arg1, object arg2)
+        public static string FormatInvariant(string format, object? arg0, object? arg1, object? arg2)
         {
             return string.Format(new AlignAndLimitFormatProvider(CultureInfo.InvariantCulture), format, arg0, arg1, arg2);
         }
@@ -99,7 +99,7 @@ namespace Sundew.Base.Text
         /// <param name="format">The format.</param>
         /// <param name="arguments">The arguments.</param>
         /// <returns>the formatted string.</returns>
-        public static string Format(IFormatProvider formatProvider, string format, params object[] arguments)
+        public static string Format(IFormatProvider formatProvider, string format, params object?[] arguments)
         {
             return string.Format(new AlignAndLimitFormatProvider(formatProvider), format, arguments);
         }
@@ -110,7 +110,7 @@ namespace Sundew.Base.Text
         /// <param name="format">The format.</param>
         /// <param name="arguments">The arguments.</param>
         /// <returns>the formatted string.</returns>
-        public static string Format(string format, params object[] arguments)
+        public static string Format(string format, params object?[] arguments)
         {
             return string.Format(new AlignAndLimitFormatProvider(CultureInfo.CurrentCulture), format, arguments);
         }
@@ -123,7 +123,7 @@ namespace Sundew.Base.Text
         /// <returns>
         /// the formatted string.
         /// </returns>
-        public static string FormatInvariant(string format, params object[] arguments)
+        public static string FormatInvariant(string format, params object?[] arguments)
         {
             return string.Format(new AlignAndLimitFormatProvider(CultureInfo.InvariantCulture), format, arguments);
         }

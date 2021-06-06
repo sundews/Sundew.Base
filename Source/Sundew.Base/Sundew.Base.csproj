@@ -4,7 +4,6 @@
     <DebugSymbols>false</DebugSymbols>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <DebugType>None</DebugType>
     <NoWarn>NU5128</NoWarn>
     <PackageReleaseNotes>
@@ -35,33 +34,21 @@
     </Description>
     <PackageReleaseNotes>7.0 - Split into separate packages, cleanup and retarget to netstandard1.3</PackageReleaseNotes>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
     <SppSourceName>default</SppSourceName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <WarningsAsErrors />
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Publish|AnyCPU'">
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <WarningsAsErrors />
     <SppSourceName>local-stable</SppSourceName>
   </PropertyGroup>
 
@@ -75,7 +62,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.Packaging.Publish" Version="6.1.0">
+    <PackageReference Include="Sundew.Packaging.Publish" Version="7.0.0-u20210605-231657-pre">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

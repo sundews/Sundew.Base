@@ -55,7 +55,7 @@ jobs:
         '-p:"SppDevelopmentSource=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
         -p:"SppAllowLocalSource=false"
         -p:"SppEnablePublish=false"
-        '-p:"SppAppendPublishFileLogFormats={0},{1},{3},{6}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},{5}{12} > ${{ env.packages-to-push }}|{11}{7}{11},{11}{8}{11},{9}{12} > ${{ env.packages-to-push }}"'
+        '-p:"SppAppendPublishFileLogFormats={0},{1},{3},{6}  > ${{ env.package-versions }}|{DQ}{2}{DQ},{DQ}{4}{DQ},{5}{NL} > ${{ env.packages-to-push }}|{DQ}{7}{DQ},{DQ}{8}{DQ},{9}{NL} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"

@@ -9,6 +9,7 @@ namespace Sundew.Base.Memory
 {
     using System;
     using System.Collections.Generic;
+    using Sundew.Base.Memory.Internal;
 
     /// <summary>
     /// Extends <see cref="ReadOnlyMemory{Char}"/> with easy to use methods.
@@ -21,12 +22,12 @@ namespace Sundew.Base.Memory
         /// <typeparam name="TItem">The type of the item.</typeparam>
         /// <param name="input">The input.</param>
         /// <param name="splitFunc">The split function.</param>
+        /// <param name="splitOptions">The split options.</param>
         /// <returns>
         /// The splitted items as an <see cref="IEnumerable{T}" />.
         /// </returns>
-        /// <exception cref="NotSupportedException">Thrown when attempting to include an items while ignoring previous items.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when an unknown <see cref="SplitAction" /> result is returned.</exception>
-        public static IEnumerable<ReadOnlyMemory<TItem>> Split<TItem>(this ReadOnlyMemory<TItem> input, SplitFunc<TItem> splitFunc)
+        public static IEnumerable<ReadOnlyMemory<TItem>> Split<TItem>(this ReadOnlyMemory<TItem> input, SplitFunc<TItem> splitFunc, SplitOptions splitOptions = SplitOptions.None)
         {
             if (input.IsEmpty)
             {
@@ -52,7 +53,7 @@ namespace Sundew.Base.Memory
                     case SplitAction.Split:
                         {
                             var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty)
+                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
                             {
                                 yield return section;
                             }
@@ -64,12 +65,14 @@ namespace Sundew.Base.Memory
                             if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
                             {
                                 splitContext.StartIncluding(index);
-                                break;
+                            }
+                            else
+                            {
+                                splitContext.Include(item);
                             }
 
-                            splitContext.Include(item);
                             var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty)
+                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
                             {
                                 yield return section;
                             }
@@ -82,7 +85,7 @@ namespace Sundew.Base.Memory
                     case SplitAction.SplitAndSplitCurrent:
                         {
                             var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty)
+                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
                             {
                                 yield return section;
                             }
@@ -94,7 +97,7 @@ namespace Sundew.Base.Memory
                     case SplitAction.SplitAndInclude:
                         {
                             var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty)
+                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
                             {
                                 yield return section;
                             }
@@ -112,7 +115,7 @@ namespace Sundew.Base.Memory
                     case SplitAction.SplitAndIncludeRest:
                         {
                             var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty)
+                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
                             {
                                 yield return section;
                             }
@@ -127,7 +130,7 @@ namespace Sundew.Base.Memory
             }
 
             var lastSection = splitContext.GetSectionAndReset();
-            if (!lastSection.IsEmpty)
+            if (!lastSection.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
             {
                 yield return lastSection;
             }
