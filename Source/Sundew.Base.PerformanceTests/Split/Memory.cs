@@ -21,8 +21,7 @@ namespace Sundew.Base.PerformanceTests.Split
             var isInQuote = false;
             var isInEscape = false;
             var previousWasSpace = false;
-            var memory = input.AsMemory();
-            return memory.Split(
+            return input.AsMemory().Split(
                 (character, index, splitContext) =>
                 {
                     var actualIsInEscape = isInEscape;
@@ -32,7 +31,7 @@ namespace Sundew.Base.PerformanceTests.Split
                     switch (character)
                     {
                         case slash:
-                            if (isInQuote && splitContext.GetNextOrDefault(index) == doubleQuote)
+                            if (splitContext.GetNextOrDefault(index) == doubleQuote)
                             {
                                 isInEscape = true;
                                 return SplitAction.Ignore;
@@ -42,8 +41,7 @@ namespace Sundew.Base.PerformanceTests.Split
                         case doubleQuote:
                             if (!actualIsInEscape)
                             {
-                                isInEscape = true;
-                                isInQuote = true;
+                                isInQuote = !isInQuote;
                             }
 
                             return actualIsInEscape ? SplitAction.Include : SplitAction.Ignore;

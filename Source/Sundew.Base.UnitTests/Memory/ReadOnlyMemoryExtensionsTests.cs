@@ -107,7 +107,7 @@ namespace Sundew.Base.UnitTests.Memory
 
         [Theory]
         [InlineData(@"-a -b ""1 _ ewr _ 23"" -c -d 32 -e 34", new[] { "-a", "-b", "1 _ ewr _ 23", "-c", "-d", "32", "-e", "34" })]
-        [InlineData(@"-a -b ""1 """" ewr """" 23"" -c -d 32 -e 34", new[] { "-a", "-b", @"1 "" ewr "" 23", "-c", "-d", "32", "-e", "34" })]
+        [InlineData(@"-a -b ""1 \"" ewr \"" 23"" -c -d 32 -e 34", new[] { "-a", "-b", @"1 "" ewr "" 23", "-c", "-d", "32", "-e", "34" })]
         [InlineData("a warm up", new[] { "a", "warm", "up" })]
         public void Split_When_LexingCommandLine_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
         {
@@ -220,9 +220,9 @@ namespace Sundew.Base.UnitTests.Memory
 
         [Theory]
         [InlineData(
-            @"Sundew ""Text with space"" ""Multiple space after this""     http:\\url.com\ """"Sundew""""With""""Quotes""""\",
+            @"Sundew ""Text with space"" ""Multiple space after this""     http:\\url.com\ \""Sundew\""With\""Quotes\""\",
             new[] { "Sundew", "Text with space", "Multiple space after this", @"http:\\url.com\", @"""Sundew""With""Quotes""\" })]
-        [InlineData(@"-fl """"""""", new[] { "-fl", @"""""" })]
+        [InlineData(@"-fl \""\""", new[] { "-fl", @"""""" })]
         public void Split_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
         {
             var result = SplitBasedCommandLineLexer(input.AsMemory());
@@ -248,7 +248,7 @@ namespace Sundew.Base.UnitTests.Memory
                     switch (character)
                     {
                         case slash:
-                            if (isInQuote && splitContext.GetNextOrDefault(index) == doubleQuote)
+                            if (splitContext.GetNextOrDefault(index) == doubleQuote)
                             {
                                 isInEscape = true;
                                 return SplitAction.Ignore;
@@ -258,8 +258,7 @@ namespace Sundew.Base.UnitTests.Memory
                         case doubleQuote:
                             if (!actualIsInEscape)
                             {
-                                isInEscape = true;
-                                isInQuote = true;
+                                isInQuote = !isInQuote;
                             }
 
                             return actualIsInEscape ? SplitAction.Include : SplitAction.Ignore;

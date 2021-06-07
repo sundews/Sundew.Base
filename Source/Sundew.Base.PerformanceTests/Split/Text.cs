@@ -37,7 +37,7 @@ namespace Sundew.Base.PerformanceTests.Split
                     {
                         case slash:
                             var nextIndex = index + 1;
-                            if (isInQuote && input.Length > nextIndex && memory.Span[nextIndex] == doubleQuote)
+                            if (input.Length > nextIndex && memory.Span[nextIndex] == doubleQuote)
                             {
                                 isInEscape = true;
                                 return SplitAction.Ignore;
@@ -47,8 +47,7 @@ namespace Sundew.Base.PerformanceTests.Split
                         case doubleQuote:
                             if (!actualIsInEscape)
                             {
-                                isInEscape = true;
-                                isInQuote = true;
+                                isInQuote = !isInQuote;
                             }
 
                             return actualIsInEscape ? SplitAction.Include : SplitAction.Ignore;
