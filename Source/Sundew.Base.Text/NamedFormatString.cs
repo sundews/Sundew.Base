@@ -44,10 +44,29 @@ namespace Sundew.Base.Text
         /// <param name="names">The names.</param>
         public NamedFormatString(string format, IReadOnlyList<string> names)
         {
-            var (indexedFormat, formatNames) = ConvertToIndexedFormat(names, format);
+            var (indexedFormat, formatNames, unknownNames) = ConvertToIndexedFormat(names, format);
+            if (unknownNames.Count > 0)
+            {
+                throw new FormatException($"The string was in an invalid format: {format}");
+            }
+
             this.format = indexedFormat;
             this.FormatNames = formatNames;
         }
+
+        private NamedFormatString(string format, IReadOnlyCollection<(string Name, int Index)> formatNames)
+        {
+            this.format = format;
+            this.FormatNames = formatNames;
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the format string is valid.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is valid; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsValid => this.format != null;
 
         /// <summary>
         /// Gets the indices.
@@ -67,6 +86,30 @@ namespace Sundew.Base.Text
         public static implicit operator string(in NamedFormatString namedFormatString)
         {
             return namedFormatString.format;
+        }
+
+        /// <summary>
+        /// Tries the create.
+        /// </summary>
+        /// <param name="format">The format.</param>
+        /// <param name="names">The names.</param>
+        /// <param name="namedFormatString">The named format string.</param>
+        /// <param name="unknownNames">The unknown names.</param>
+        /// <returns>
+        /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
+        /// </returns>
+        public static bool TryCreate(string format, IReadOnlyList<string> names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+        {
+            var (indexedFormat, formatNames, actualUnknownNames) = ConvertToIndexedFormat(names, format);
+            unknownNames = actualUnknownNames;
+            if (unknownNames.Count > 0)
+            {
+                namedFormatString = default;
+                return false;
+            }
+
+            namedFormatString = new NamedFormatString(indexedFormat, formatNames);
+            return true;
         }
 
         /// <summary>
@@ -213,8 +256,9 @@ namespace Sundew.Base.Text
         /// <param name="names">The names.</param>
         /// <param name="namedFormat">The named format.</param>
         /// <returns>A tuple of the indexed format and name-index pairs.</returns>
-        private static (string Format, IReadOnlyCollection<(string Name, int Index)> Names) ConvertToIndexedFormat(IReadOnlyList<string> names, string namedFormat)
+        private static (string Format, IReadOnlyCollection<(string Name, int Index)> Names, IReadOnlyList<string> UnknownNames) ConvertToIndexedFormat(IReadOnlyList<string> names, string namedFormat)
         {
+            var unknownNames = new List<string>();
             var namesAndIndices = new HashSet<(string Name, int Index)>();
             var indexedFormat = FormatRegex.Replace(
                 namedFormat,
@@ -237,9 +281,11 @@ namespace Sundew.Base.Text
                         return match.Value;
                     }
 
-                    throw new FormatException($"The string was in an invalid format: {namedFormat}");
+                    unknownNames.Add(match.Value);
+                    return match.Value;
                 });
-            return (indexedFormat, namesAndIndices);
+
+            return (indexedFormat, namesAndIndices, unknownNames);
         }
 
         /// <summary>
