@@ -57,14 +57,13 @@ jobs:
         '-p:"SppProductionSource=production => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppIntegrationSource=ci => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppDevelopmentSource=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
-        -p:"SppAllowLocalSource=false"
-        -p:"SppEnablePublish=false"
         '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey}{NL} > ${{ env.packages-to-push }}|{DQ}{SymbolsPath}{DQ},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
         -p:"SppForceVersion=${{ secrets.SPP_FORCE_VERSION_IF_SET }}"
         -p:"SppPrereleasePostfix=${{ steps.build-setup.outputs.package-postfix }}"
+        -p:GeneratePackageOnBuild=true
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
@@ -72,11 +71,11 @@ jobs:
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
-      if: ${{ success() && steps.build-setup.outputs.stage == 'production' }}
+      if: ${{ steps.build-setup.outputs.stage == 'production' }}
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
         cb -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
     - name: 'Await stable package publish'
-      if: ${{ success() && steps.build-setup.outputs.stage == 'production' }}
+      if: ${{ steps.build-setup.outputs.stage == 'production' }}
       run: cb -c "spt|await -s {2} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
