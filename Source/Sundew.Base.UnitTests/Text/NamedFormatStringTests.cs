@@ -61,8 +61,11 @@ namespace Sundew.Base.UnitTests.Text
         public void FormatInvariant_When_PassingNullArray_Then_ArgumentNullExceptionShouldBeThrown()
         {
             var testee = new NamedFormatString("{One}", new[] { "One" });
+            object[]? array = null;
 
-            Action act = () => testee.FormatInvariant(null);
+#pragma warning disable CS8604 // Possible null reference argument.
+            Action act = () => testee.FormatInvariant(array);
+#pragma warning restore CS8604 // Possible null reference argument.
 
             act.Should().Throw<ArgumentNullException>();
         }

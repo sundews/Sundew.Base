@@ -5,8 +5,8 @@
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
     <LangVersion>9</LangVersion>
     <Authors>Kim Hugener-Ohlsen</Authors>    
-    <Company>Hukano</Company>    
-    <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
+    <Company>Hukano</Company>
+    <NoWarn>1701;1702;SA0001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

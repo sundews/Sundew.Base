@@ -5,40 +5,9 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Description>Various type helping with initialization</Description>
-    <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-    <SppSourceName>default</SppSourceName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <WarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Publish|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <WarningsAsErrors />
-    <SppSourceName>local-stable</SppSourceName>
-  </PropertyGroup>
-  
   <ItemGroup>
     <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
   </ItemGroup>

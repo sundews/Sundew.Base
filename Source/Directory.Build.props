@@ -13,8 +13,15 @@
     <PackageProjectUrl>https://github.com/hugener/Sundew.Base</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>7.0 - Split into separate packages and cleanup</PackageReleaseNotes>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReleaseNotes>
+      8.0 - Added NamedFormatProvider, removed Text Split, use Memory.Split instead
+      7.0 - Split into separate packages and cleanup
+    </PackageReleaseNotes>
+    <Configurations>Debug;Release;Debug-Publish;Release-Publish;Release-Stable</Configurations>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>

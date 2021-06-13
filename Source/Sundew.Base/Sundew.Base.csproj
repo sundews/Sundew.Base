@@ -7,6 +7,7 @@
     <DebugType>None</DebugType>
     <NoWarn>NU5128</NoWarn>
     <PackageReleaseNotes>
+      8.0 - Added NamedFormatProvider, removed Text Split, use Memory.Split instead
       7.0 - Split into separate package and cleanup
       6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
       5.0 - Changed string split extension interface.
@@ -32,25 +33,6 @@
       Sundew.Base.Threading
       Sundew.Base.Timers
     </Description>
-    <PackageReleaseNotes>7.0 - Split into separate packages, cleanup and retarget to netstandard1.3</PackageReleaseNotes>
-    <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
-    <SppSourceName>default</SppSourceName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatSpecificWarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Publish|AnyCPU'">
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <SppSourceName>local-stable</SppSourceName>
   </PropertyGroup>
 
   <ItemGroup>
