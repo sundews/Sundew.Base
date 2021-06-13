@@ -61,13 +61,31 @@ namespace Sundew.Base.Equality
         /// <typeparam name="TItem">The type of the item.</typeparam>
         /// <param name="span">The span.</param>
         /// <returns>The span hashcode.</returns>
+        public static int GetItemsHashCode<TItem>(this ReadOnlySpan<TItem> span)
+            where TItem : struct
+        {
+            var hashcode = 0;
+            for (int i = 0; i < span.Length; i++)
+            {
+                hashcode = CombineHashCodeUnordered(hashcode, span[i].GetHashCode());
+            }
+
+            return hashcode;
+        }
+
+        /// <summary>
+        /// Gets the items hash code.
+        /// </summary>
+        /// <typeparam name="TItem">The type of the item.</typeparam>
+        /// <param name="span">The span.</param>
+        /// <returns>The span hashcode.</returns>
         public static int GetItemsHashCode<TItem>(this Span<TItem> span)
             where TItem : struct
         {
             var hashcode = 0;
-            foreach (var item in span)
+            for (int i = 0; i < span.Length; i++)
             {
-                hashcode = CombineHashCode(hashcode, item.GetHashCode());
+                hashcode = CombineHashCodeUnordered(hashcode, span[i].GetHashCode());
             }
 
             return hashcode;
@@ -101,9 +119,27 @@ namespace Sundew.Base.Equality
             where TItem : struct
         {
             var hashcode = 0;
-            foreach (var item in span)
+            for (int i = 0; i < span.Length; i++)
             {
-                hashcode = CombineHashCodeUnordered(hashcode, item.GetHashCode());
+                hashcode = CombineHashCodeUnordered(hashcode, span[i].GetHashCode());
+            }
+
+            return hashcode;
+        }
+
+        /// <summary>
+        /// Gets the unordered items hash code.
+        /// </summary>
+        /// <typeparam name="TItem">The type of the item.</typeparam>
+        /// <param name="span">The span.</param>
+        /// <returns>The span hashcode.</returns>
+        public static int GetUnorderedItemsHashCode<TItem>(this ReadOnlySpan<TItem> span)
+            where TItem : struct
+        {
+            var hashcode = 0;
+            for (int i = 0; i < span.Length; i++)
+            {
+                hashcode = CombineHashCodeUnordered(hashcode, span[i].GetHashCode());
             }
 
             return hashcode;

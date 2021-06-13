@@ -1,21 +1,30 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SplitFunc.cs" company="Hukano">
+// <copyright file="ISplitContextInternal.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory.Internal
 {
+    using System;
+
     /// <summary>
-    /// Delegate for splitting memory in a LINQ manner.
+    /// Interface for split context.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="item">The item.</param>
-    /// <param name="index">The index.</param>
-    /// <param name="splitContext">The split context.</param>
-    /// <returns>
-    ///   <c>true</c>, if a split should occur otherwise false.
-    /// </returns>
-    public delegate SplitAction SplitFunc<TItem>(TItem item, int index, ISplitContext<TItem> splitContext);
+    internal interface ISplitContextInternal<TItem> : ISplitContext<TItem>
+    {
+        int Length { get; }
+
+        int StartIndex { get; }
+
+        bool IsIgnoring { get; set; }
+
+        ReadOnlyMemory<TItem> GetSectionAndReset();
+
+        void Include(TItem item);
+
+        void StartIncluding(int startIndex);
+    }
 }

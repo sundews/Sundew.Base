@@ -5,16 +5,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory.Internal
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Represents a context for splitting <see cref="ReadOnlyMemory{T}"/>.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
-    public sealed class SplitContext<TItem>
+    internal sealed class SplitContext<TItem> : ISplitContextInternal<TItem>
     {
         /// <summary>
         /// The section not started index.
@@ -41,6 +42,14 @@ namespace Sundew.Base.Memory
         }
 
         /// <summary>
+        /// Gets the input.
+        /// </summary>
+        /// <value>
+        /// The input.
+        /// </value>
+        public ReadOnlyMemory<TItem> Input => this.input;
+
+        /// <summary>
         /// Gets the length.
         /// </summary>
         /// <value>
@@ -56,7 +65,77 @@ namespace Sundew.Base.Memory
         /// </value>
         public int StartIndex { get; private set; }
 
-        internal bool IsIgnoring { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is ignoring.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if this instance is ignoring; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsIgnoring { get; set; }
+
+        /// <summary>
+        /// Gets the next item or default.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The next item or default.</returns>
+        public TItem? GetNextOrDefault(int index)
+        {
+            var nextIndex = index + 1;
+            return nextIndex > -1 && nextIndex < this.input.Length ? this.input.Span[nextIndex] : default;
+        }
+
+        /// <summary>
+        /// Gets the previous item or default.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <returns>The previous item or default.</returns>
+        public TItem? GetPreviousOrDefault(int index)
+        {
+            var previousIndex = index - 1;
+            return previousIndex > -1 && previousIndex < this.input.Length ? this.input.Span[previousIndex] : default;
+        }
+
+        /// <summary>
+        /// Tries to get the next item or default.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="item">The item.</param>
+        /// <returns>
+        ///   <c>true</c> if next is a valid item.
+        /// </returns>
+        public bool TryGetNext(int index, out TItem? item)
+        {
+            var nextIndex = index + 1;
+            if (nextIndex > -1 && nextIndex < this.input.Length)
+            {
+                item = this.input.Span[nextIndex];
+                return true;
+            }
+
+            item = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Tries to get the previous item or default.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <param name="item">The item.</param>
+        /// <returns>
+        ///   <c>true</c> if previous is a valid item.
+        /// </returns>
+        public bool TryGetPrevious(int index, out TItem? item)
+        {
+            var previousIndex = index - 1;
+            if (previousIndex > -1 && previousIndex < this.input.Length)
+            {
+                item = this.input.Span[previousIndex];
+                return true;
+            }
+
+            item = default;
+            return false;
+        }
 
         /// <summary>
         /// Appends the specified item.
@@ -98,7 +177,11 @@ namespace Sundew.Base.Memory
             this.buffer!.Write(span);
         }
 
-        internal ReadOnlyMemory<TItem> GetSectionAndReset()
+        /// <summary>
+        /// Gets the section and reset.
+        /// </summary>
+        /// <returns>The readonly memory.</returns>
+        public ReadOnlyMemory<TItem> GetSectionAndReset()
         {
             var memory = ReadOnlyMemory<TItem>.Empty;
             if (this.StartIndex > SectionNotStartedIndex)
@@ -120,13 +203,21 @@ namespace Sundew.Base.Memory
             return memory;
         }
 
-        internal void StartIncluding(int startIndex)
+        /// <summary>
+        /// Starts the including.
+        /// </summary>
+        /// <param name="startIndex">The start index.</param>
+        public void StartIncluding(int startIndex)
         {
             this.StartIndex = startIndex;
             this.IsIgnoring = false;
         }
 
-        internal void Include(TItem item)
+        /// <summary>
+        /// Includes the specified item.
+        /// </summary>
+        /// <param name="item">The item.</param>
+        public void Include(TItem item)
         {
             if (this.IsIgnoring)
             {

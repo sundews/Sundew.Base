@@ -9,6 +9,7 @@ namespace Sundew.Base.Text
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -20,7 +21,20 @@ namespace Sundew.Base.Text
     /// </summary>
     public static class StringExtensions
     {
-        private static readonly Regex WhitespaceRegex = new(@"\s+");
+        private static readonly Regex WhitespaceRegex = new(@"\s+", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Determines whether [is null or empty] [the specified input].
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns>
+        ///   <c>true</c> if [is null or empty] [the specified input]; otherwise, <c>false</c>.
+        /// </returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsNullOrEmpty([NotNullWhen(false)] this string? input)
+        {
+            return string.IsNullOrEmpty(input);
+        }
 
         /// <summary>
         /// Toes the URI.
@@ -46,34 +60,6 @@ namespace Sundew.Base.Text
             }
 
             return WhitespaceRegex.Replace(input, string.Empty);
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The split strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<string> Split(this string? input, SplitFunc splitFunc, StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return input?.AsMemory().Split(splitFunc, stringSplitOptions) ?? Enumerable.Empty<string>();
-        }
-
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc" />.
-        /// </summary>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="stringSplitOptions">The string split options.</param>
-        /// <returns>
-        /// The split strings as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        public static IEnumerable<ReadOnlyMemory<char>> SplitMemory(this string? input, SplitMemoryFunc splitFunc, StringSplitOptions stringSplitOptions = StringSplitOptions.None)
-        {
-            return input?.AsMemory().SplitMemory(splitFunc, stringSplitOptions) ?? Enumerable.Empty<ReadOnlyMemory<char>>();
         }
 
         /// <summary>

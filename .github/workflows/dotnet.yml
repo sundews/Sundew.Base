@@ -24,6 +24,10 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout
       uses: actions/checkout@v2
+    - name: Setup .NET 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
@@ -49,30 +53,29 @@ jobs:
       id: build
       run: >
         dotnet build ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-restore
-        -p:"SppSourceName=${{ steps.build-setup.outputs.stage }}"
-        '-p:"SppProductionSource=production => ${{ env.source }}|${{ env.source }}"'
-        '-p:"SppIntegrationSource=ci => ${{ env.source }}|${{ env.source }}"'
-        '-p:"SppDevelopmentSource=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
-        -p:"SppAllowLocalSource=false"
-        -p:"SppEnablePublish=false"
-        '-p:"SppAppendPublishFileLogFormats={0},{1},{3},{6}  > ${{ env.package-versions }}|{11}{2}{11},{11}{4}{11},{5}{12} > ${{ env.packages-to-push }}|{11}{7}{11},{11}{8}{11},{9}{12} > ${{ env.packages-to-push }}"'
+        -p:"SppStage=${{ steps.build-setup.outputs.stage }}"
+        '-p:"SppProduction=production => ${{ env.source }}|${{ env.source }}"'
+        '-p:"SppIntegration=ci => $u{DateTime}-{Stage}  ${{ env.source }}|${{ env.source }}"'
+        '-p:"SppDevelopment=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
+        '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey},{DQ}{SymbolsPath}{DQ},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
         -p:"SppForceVersion=${{ secrets.SPP_FORCE_VERSION_IF_SET }}"
         -p:"SppPrereleasePostfix=${{ steps.build-setup.outputs.package-postfix }}"
+        -p:GeneratePackageOnBuild=true
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
-      run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -n true" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
+      run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -ss {4} -sk {5}" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
-      if: ${{ success() && steps.build-setup.outputs.stage == 'production' }}
+      if: ${{ steps.build-setup.outputs.stage == 'production' }}
       run: |
         git config user.email "sundew-dev@outlook.com"
         git config user.name "sundew-build"
         cb -c "git|tag -a {1}-{0} -m "{1}-{0}"" "git|push ${{ env.repository }} {1}-{0}" -bvs ',' -bf ${{ env.source-package-versions }}
     - name: 'Await stable package publish'
-      if: ${{ success() && steps.build-setup.outputs.stage == 'production' }}
-      run: cb -c "spt|await -s {3} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
+      if: ${{ steps.build-setup.outputs.stage == 'production' }}
+      run: cb -c "spt|await -s {2} {0}.{1}" -bvs ',' -bf ${{ env.source-package-versions }}
