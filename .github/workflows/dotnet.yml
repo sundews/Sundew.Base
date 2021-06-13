@@ -60,9 +60,10 @@ jobs:
         '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey},{DQ}{SymbolsPath}{DQ},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
-        -p:"ContinuousIntegrationBuild=true"
         -p:"SppForceVersion=${{ secrets.SPP_FORCE_VERSION_IF_SET }}"
         -p:"SppPrereleasePostfix=${{ steps.build-setup.outputs.package-postfix }}"
+        -p:"ContinuousIntegrationBuild=true"
+        -p:"SppEnablePublish=false"
         -p:GeneratePackageOnBuild=true
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
