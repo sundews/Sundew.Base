@@ -57,7 +57,7 @@ jobs:
         '-p:"SppProduction=production => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppIntegration=ci => $u{DateTime}-{Stage}  ${{ env.source }}|${{ env.source }}"'
         '-p:"SppDevelopment=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
-        '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey},{DQ}{SymbolsPath}{DQ},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
+        '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppForceVersion=${{ secrets.SPP_FORCE_VERSION_IF_SET }}"
