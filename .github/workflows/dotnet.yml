@@ -68,7 +68,7 @@ jobs:
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
-      run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -ss {4} -sk {5}" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
+      run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -ss {3} -sk {4}" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
