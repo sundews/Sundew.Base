@@ -57,7 +57,7 @@ jobs:
         '-p:"SppProduction=production => ${{ env.source }}|${{ env.source }}"'
         '-p:"SppIntegration=ci => $u{DateTime}-{Stage}  ${{ env.source }}|${{ env.source }}"'
         '-p:"SppDevelopment=development => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}"'
-        '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey}{NL} > ${{ env.packages-to-push }}|{DQ}{SymbolsPath}{DQ},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
+        '-p:"SppAppendPublishFileLogFormats={PackageId},{Version},{FeedSource}  > ${{ env.package-versions }}|{DQ}{PackagePath}{DQ},{DQ}{PushSource}{DQ},{ApiKey},{DQ}{SymbolsPath}{DQ},{DQ}{SymbolsPushSource}{DQ},{SymbolsApiKey}{NL} > ${{ env.packages-to-push }}"'
         -p:"SppApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"SppSymbolApiKey=${{ secrets.SPP_API_KEY }}"
         -p:"ContinuousIntegrationBuild=true"
@@ -67,7 +67,7 @@ jobs:
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
-      run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -n true" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
+      run: cb -c "dotnet|nuget push {0} -s {1} -k {2} -ss {4} -sk {5}" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
     - name: Cleanup
       run: spt delete -v ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
