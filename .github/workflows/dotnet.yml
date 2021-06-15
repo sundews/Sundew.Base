@@ -67,7 +67,7 @@ jobs:
         -p:GeneratePackageOnBuild=true
         -p:"PackageOutputPath=${{ steps.stage-build.outputs.nuGetPackagesPath }}"
     - name: Test
-      run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.build-setup.outputs.buildConfiguration }} --no-build
+      run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.stage-build.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
       run: cb -c "dotnet|nuget push {1} -s ${{ steps.stage-build.outputs.pushSource }} -k ${{ steps.stage-build.outputs.apiKey }} -ss ${{ steps.stage-build.outputs.symbolsPushSource }} -sk ${{ steps.stage-build.outputs.symbolsApiKey }}" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
     - name: 'Tag stable version'
