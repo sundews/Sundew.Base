@@ -63,7 +63,7 @@ jobs:
         dotnet build ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.stage-build.outputs.buildConfiguration }} --no-restore
         -p:"ContinuousIntegrationBuild=true"
         -p:"SppForceVersion=${{ steps.stage-build.outputs.fullVersion }}"
-        '-p:"SppAppendPublishFileLogFormats={PackageId},{PackagePath}  > ${{ env.packages-to-push }}"'
+        '-p:"SppAppendPublishFileLogFormats={PackageId},{DQ}{PackagePath}{DQ}{NL} > ${{ env.packages-to-push }}"'
         -p:GeneratePackageOnBuild=true
         -p:"PackageOutputPath=${{ steps.stage-build.outputs.nuGetPackagesPath }}"
     - name: Test
@@ -80,4 +80,4 @@ jobs:
         git push ${{ env.repository }} ${{ steps.stage-build.outputs.version }}
     - name: 'Await stable package publish'
       if: ${{ steps.build-setup.outputs.stage == 'production' }}
-      run: cb -c "spt|await -s ${{ steps.stage-build.outputs.feedSource }} {0}.${{ steps.stage-build.outputs.version }}" -bvs ',' -bf ${{ env.source-packages-to-push }}
+      run: cb -c "spt|await -s ${{ steps.stage-build.outputs.feedSource }} {0}.${{ steps.stage-build.outputs.version }}" -bs NewLine -bvs ',' -bf ${{ env.source-packages-to-push }}
