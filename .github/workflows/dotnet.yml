@@ -66,8 +66,6 @@ jobs:
         '-p:"SppAppendPublishFileLogFormats={PackageId},{DQ}{PackagePath}{DQ}{NL} > ${{ env.packages-to-push }}"'
         -p:GeneratePackageOnBuild=true
         -p:"PackageOutputPath=${{ steps.stage-build.outputs.nuGetPackagesPath }}"
-        -p:IncludeSymbols=true
-        -p:SymbolPackageFormat=snupkg
     - name: Test
       run: dotnet test ${{ env.solutionPath }} --verbosity normal --configuration ${{ steps.stage-build.outputs.buildConfiguration }} --no-build
     - name: 'Publish package(s)'
