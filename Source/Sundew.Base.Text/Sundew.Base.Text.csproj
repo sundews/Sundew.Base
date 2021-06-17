@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard1.3</TargetFrameworks>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReleaseNotes>7.0 Split into separate package and AlignAndLimitFormatProvider
     </PackageReleaseNotes>
     <Description>Extension methods and classes for working with text.</Description>
