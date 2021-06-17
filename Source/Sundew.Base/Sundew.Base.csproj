@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.1;netstandard1.3</TargetFrameworks>
+    <IncludeSymbols>false</IncludeSymbols>
     <DebugSymbols>false</DebugSymbols>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
