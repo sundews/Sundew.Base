@@ -9,18 +9,18 @@
     <Company>Hukano</Company>
     <Authors>Kim Hugener-Ohlsen</Authors>
     <Copyright>Kim Hugener-Ohlsen</Copyright>
-    <RepositoryUrl>https://github.com/hugener/Sundew.Base</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/hugener/Sundew.Base</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sundews/Sundew.Base</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/sundews/Sundew.Base</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
     <PackageReleaseNotes>8.0 - Added NamedFormatProvider, removed Text Split, use Memory.Split instead
 7.0 - Split into separate packages and cleanup
     </PackageReleaseNotes>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish;Release-Stable</Configurations>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
   <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
     <IncludeSymbols>true</IncludeSymbols>
