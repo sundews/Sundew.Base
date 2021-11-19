@@ -5,27 +5,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal.Internal
+namespace Sundew.Base.Disposal.Internal;
+
+using System;
+using System.Collections.Generic;
+
+internal class DisposerBuilder : IDisposerBuilder
 {
-    using System;
-    using System.Collections.Generic;
+    public List<object> Disposables { get; } = new();
 
-    internal class DisposerBuilder : IDisposerBuilder
+    public IDisposerBuilder Add(IDisposable disposable)
     {
-        public List<object> Disposables { get; } = new List<object>();
-
-        public IDisposerBuilder Add(IDisposable disposable)
-        {
-            this.Disposables.Add(disposable);
-            return this;
-        }
+        this.Disposables.Add(disposable);
+        return this;
+    }
 
 #if NETSTANDARD2_1
-        public IDisposerBuilder AddAsync(IAsyncDisposable asyncDisposable)
-        {
-            this.Disposables.Add(asyncDisposable);
-            return this;
-        }
-#endif
+    public IDisposerBuilder AddAsync(IAsyncDisposable asyncDisposable)
+    {
+        this.Disposables.Add(asyncDisposable);
+        return this;
     }
+#endif
 }

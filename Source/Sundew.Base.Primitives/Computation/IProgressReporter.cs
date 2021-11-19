@@ -5,19 +5,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation
+namespace Sundew.Base.Primitives.Computation;
+
+/// <summary>
+/// Interface for implementing a progress reporter.
+/// </summary>
+/// <typeparam name="TReport">The type of the report.</typeparam>
+public interface IProgressReporter<TReport>
+    where TReport : class
 {
     /// <summary>
-    /// Interface for implementing a progress reporter.
+    /// Reports the specified progress.
     /// </summary>
-    /// <typeparam name="TReport">The type of the report.</typeparam>
-    public interface IProgressReporter<TReport>
-        where TReport : class
-    {
-        /// <summary>
-        /// Reports the specified progress.
-        /// </summary>
-        /// <param name="progress">The progress.</param>
-        void Report(Progress<TReport> progress);
-    }
+    /// <param name="progress">The progress.</param>
+    void Report(Progress<TReport> progress);
 }

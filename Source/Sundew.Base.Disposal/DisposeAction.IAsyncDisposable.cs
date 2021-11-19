@@ -5,32 +5,31 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal
-{
-    using System;
-    using System.Threading.Tasks;
+namespace Sundew.Base.Disposal;
 
+using System;
+using System.Threading.Tasks;
+
+/// <summary>
+/// Wraps an <see cref="Action"/> in an <see cref="IDisposable"/>.
+/// </summary>
+/// <seealso cref="System.IDisposable" />
+public partial class DisposeAction : IAsyncDisposable
+{
     /// <summary>
-    /// Wraps an <see cref="Action"/> in an <see cref="IDisposable"/>.
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
-    public partial class DisposeAction : IAsyncDisposable
+    /// <returns>A value task.</returns>
+    public async ValueTask DisposeAsync()
     {
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <returns>A value task.</returns>
-        public async ValueTask DisposeAsync()
+        switch (this.disposeAction)
         {
-            switch (this.disposeAction)
-            {
-                case Func<ValueTask> func:
-                    await func().ConfigureAwait(false);
-                    break;
-                case Action action:
-                    action();
-                    break;
-            }
+            case Func<ValueTask> func:
+                await func().ConfigureAwait(false);
+                break;
+            case Action action:
+                action();
+                break;
         }
     }
 }

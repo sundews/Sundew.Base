@@ -5,25 +5,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation
+namespace Sundew.Base.Primitives.Computation;
+
+/// <summary>
+/// Interface for implementing message actions before and after reporting progress.
+/// </summary>
+/// <typeparam name="TReport">The type of the report.</typeparam>
+public interface IAggregatedReport<in TReport>
+    where TReport : class
 {
     /// <summary>
-    /// Interface for implementing message actions before and after reporting progress.
+    /// Called when before the progress has been reported.
     /// </summary>
-    /// <typeparam name="TReport">The type of the report.</typeparam>
-    public interface IAggregatedReport<in TReport>
-        where TReport : class
-    {
-        /// <summary>
-        /// Called when before the progress has been reported.
-        /// </summary>
-        /// <param name="previousReport">The previous report.</param>
-        void OnReporting(TReport? previousReport);
+    /// <param name="previousReport">The previous report.</param>
+    void OnReporting(TReport? previousReport);
 
-        /// <summary>
-        /// Called when after the progress has been reported.
-        /// </summary>
-        /// <param name="previousReport">The previous report.</param>
-        void OnReported(TReport? previousReport);
-    }
+    /// <summary>
+    /// Called when after the progress has been reported.
+    /// </summary>
+    /// <param name="previousReport">The previous report.</param>
+    void OnReported(TReport? previousReport);
 }

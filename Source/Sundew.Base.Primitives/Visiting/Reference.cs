@@ -43,7 +43,6 @@ namespace Sundew.Base.Visiting
         /// </summary>
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Use Value property instead.")]
         public static implicit operator TValue(Reference<TValue> result)
         {
             return result.Value;

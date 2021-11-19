@@ -5,29 +5,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Text
+namespace Sundew.Base.Text;
+
+using System;
+
+/// <summary>Contains reusable strings.</summary>
+public static class Strings
 {
-    using System;
+    /// <summary>A empty string.</summary>
+    public const string Empty = "";
 
-    /// <summary>Contains reusable strings.</summary>
-    public static class Strings
-    {
-        /// <summary>A empty string.</summary>
-        public const string Empty = "";
+    /// <summary>
+    /// The unix new line.
+    /// </summary>
+    public const string UnixNewLine = "\n";
 
-        /// <summary>
-        /// The unix new line.
-        /// </summary>
-        public const string UnixNewLine = "\n";
+    /// <summary>
+    /// The windows new line.
+    /// </summary>
+    public const string WindowsNewLine = "\r\n";
 
-        /// <summary>
-        /// The windows new line.
-        /// </summary>
-        public const string WindowsNewLine = "\r\n";
-
-        /// <summary>
-        /// The environment new line.
-        /// </summary>
-        public static readonly string NewLine = Environment.NewLine;
-    }
+    /// <summary>
+    /// The environment new line.
+    /// </summary>
+    public static readonly string NewLine = Environment.NewLine;
 }

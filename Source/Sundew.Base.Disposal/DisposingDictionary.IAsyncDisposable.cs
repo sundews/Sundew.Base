@@ -5,135 +5,133 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal
+namespace Sundew.Base.Disposal;
+
+using System;
+using System.Threading.Tasks;
+using Sundew.Base.Disposal.Internal;
+
+/// <summary>
+/// Maps a key to a disposable for cleaning up unmanaged resources.
+/// </summary>
+#pragma warning disable SA1619 // Generic type parameters should be documented partial class
+public partial class DisposingDictionary<TKey> : IAsyncDisposable
+#pragma warning restore SA1619 // Generic type parameters should be documented partial class
+    where TKey : notnull
 {
-    using System;
-    using System.Threading.Tasks;
-    using Sundew.Base.Disposal.Internal;
-
-#pragma warning disable CS1710 // XML comment has a duplicate typeparam tag
     /// <summary>
-    /// Maps a key to a disposable for cleaning up unmanaged resources.
+    /// Adds the specified item.
     /// </summary>
-    /// <typeparam name="TKey">The type of the key.</typeparam>
-    public partial class DisposingDictionary<TKey> : IAsyncDisposable
-        where TKey : notnull
-#pragma warning restore CS1710 // XML comment has a duplicate typeparam tag
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
+    /// <returns>
+    /// The added key.
+    /// </returns>
+    public Task<TActualKey> AddAsyncKeyAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, DisposeKey disposeKey = DisposeKey.No)
+        where TActualKey : TKey, IDisposable
     {
-        /// <summary>
-        /// Adds the specified item.
-        /// </summary>
-        /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
-        /// <param name="key">The item.</param>
-        /// <param name="disposable">The disposable.</param>
-        /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
-        /// <returns>
-        /// The added key.
-        /// </returns>
-        public Task<TActualKey> AddAsyncKeyAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, DisposeKey disposeKey = DisposeKey.No)
-            where TActualKey : TKey, IDisposable
-        {
-            return this.PrivateAddAsync(key, disposable, disposeKey);
-        }
+        return this.PrivateAddAsync(key, disposable, disposeKey);
+    }
 
-        /// <summary>
-        /// Adds the specified item.
-        /// </summary>
-        /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
-        /// <param name="key">The item.</param>
-        /// <param name="disposable">The disposable.</param>
-        /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
-        /// <returns>
-        /// The added key.
-        /// </returns>
-        public TActualKey AddAsyncKey<TActualKey>(TActualKey key, IDisposable disposable, DisposeKey disposeKey = DisposeKey.No)
-            where TActualKey : TKey, IAsyncDisposable
-        {
-            return this.PrivateAdd(key, disposable, disposeKey);
-        }
+    /// <summary>
+    /// Adds the specified item.
+    /// </summary>
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
+    /// <returns>
+    /// The added key.
+    /// </returns>
+    public TActualKey AddAsyncKey<TActualKey>(TActualKey key, IDisposable disposable, DisposeKey disposeKey = DisposeKey.No)
+        where TActualKey : TKey, IAsyncDisposable
+    {
+        return this.PrivateAdd(key, disposable, disposeKey);
+    }
 
-        /// <summary>
-        /// Adds the specified item.
-        /// </summary>
-        /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
-        /// <param name="key">The item.</param>
-        /// <param name="disposable">The disposable.</param>
-        /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
-        /// <returns>
-        /// The added key.
-        /// </returns>
-        public Task<TActualKey> AddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, DisposeKey disposeKey)
-            where TActualKey : TKey, IAsyncDisposable
-        {
-            return this.PrivateAddAsync(key, disposable, disposeKey);
-        }
+    /// <summary>
+    /// Adds the specified item.
+    /// </summary>
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
+    /// <returns>
+    /// The added key.
+    /// </returns>
+    public Task<TActualKey> AddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, DisposeKey disposeKey)
+        where TActualKey : TKey, IAsyncDisposable
+    {
+        return this.PrivateAddAsync(key, disposable, disposeKey);
+    }
 
-        /// <summary>
-        /// Adds the specified item.
-        /// </summary>
-        /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
-        /// <param name="key">The item.</param>
-        /// <param name="disposable">The disposable.</param>
-        /// <returns>
-        /// The added key.
-        /// </returns>
-        public Task<TActualKey> AddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable)
-            where TActualKey : TKey
-        {
-            return this.PrivateAddAsync(key, disposable);
-        }
+    /// <summary>
+    /// Adds the specified item.
+    /// </summary>
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <returns>
+    /// The added key.
+    /// </returns>
+    public Task<TActualKey> AddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable)
+        where TActualKey : TKey
+    {
+        return this.PrivateAddAsync(key, disposable);
+    }
 
-        /// <summary>
-        /// Disposes the specified key.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <returns>A value task.</returns>
-        public async ValueTask DisposeAsync(TKey key)
+    /// <summary>
+    /// Disposes the specified key.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <returns>A value task.</returns>
+    public async ValueTask DisposeAsync(TKey key)
+    {
+        using (await this.asyncLock.LockAsync().ConfigureAwait(false))
         {
-            using (await this.asyncLock.LockAsync().ConfigureAwait(false))
+            var itemIndex = this.disposables.FindIndex(x => Equals(x.Key, key));
+            if (itemIndex > -1)
             {
-                var itemIndex = this.disposables.FindIndex(x => Equals(x.Key, key));
-                if (itemIndex > -1)
-                {
-                    var item = this.disposables[itemIndex];
-                    await DisposableHelper.DisposeAsync(item, this.disposableReporter).ConfigureAwait(false);
-                    this.disposables.RemoveAt(itemIndex);
-                }
+                var item = this.disposables[itemIndex];
+                await DisposableHelper.DisposeAsync(item, this.disposableReporter).ConfigureAwait(false);
+                this.disposables.RemoveAt(itemIndex);
             }
         }
+    }
 
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <returns>A value task.</returns>
-        public async ValueTask DisposeAsync()
+    /// <summary>
+    /// Releases unmanaged and - optionally - managed resources.
+    /// </summary>
+    /// <returns>A value task.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        using (await this.asyncLock.LockAsync().ConfigureAwait(false))
         {
-            using (await this.asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                await DisposableHelper.DisposeAsync(GetDisposables(this.disposables), this.disposableReporter).ConfigureAwait(false);
-                this.disposables.Clear();
-            }
+            await DisposableHelper.DisposeAsync(GetDisposables(this.disposables), this.disposableReporter).ConfigureAwait(false);
+            this.disposables.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Adds the specified item.
+    /// </summary>
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
+    /// <returns>
+    /// The added key.
+    /// </returns>
+    private async Task<TActualKey> PrivateAddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, DisposeKey disposeKey = DisposeKey.No)
+        where TActualKey : TKey
+    {
+        using (await this.asyncLock.LockAsync().ConfigureAwait(false))
+        {
+            this.disposables.Add(new Item(key, disposable, disposeKey));
         }
 
-        /// <summary>
-        /// Adds the specified item.
-        /// </summary>
-        /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
-        /// <param name="key">The item.</param>
-        /// <param name="disposable">The disposable.</param>
-        /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
-        /// <returns>
-        /// The added key.
-        /// </returns>
-        private async Task<TActualKey> PrivateAddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, DisposeKey disposeKey = DisposeKey.No)
-            where TActualKey : TKey
-        {
-            using (await this.asyncLock.LockAsync().ConfigureAwait(false))
-            {
-                this.disposables.Add(new Item(key, disposable, disposeKey));
-            }
-
-            return key;
-        }
+        return key;
     }
 }

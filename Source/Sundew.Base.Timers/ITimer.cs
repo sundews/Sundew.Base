@@ -5,20 +5,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Timers
+namespace Sundew.Base.Timers;
+
+/// <summary>
+/// Interface for implementing a stateless timer.
+/// </summary>
+/// <seealso cref="ITimerControl" />
+public interface ITimer : ITimerControl
 {
     /// <summary>
-    /// Interface for implementing a stateless timer.
+    /// Gets or sets the action.
     /// </summary>
-    /// <seealso cref="ITimerControl" />
-    public interface ITimer : ITimerControl
-    {
-        /// <summary>
-        /// Gets or sets the action.
-        /// </summary>
-        /// <value>
-        /// The action.
-        /// </value>
-        event TickEventHandler Tick;
-    }
+    /// <value>
+    /// The action.
+    /// </value>
+    event TickEventHandler Tick;
 }

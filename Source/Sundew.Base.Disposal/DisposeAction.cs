@@ -5,57 +5,56 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal
+namespace Sundew.Base.Disposal;
+
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
+
+/// <summary>
+/// Wraps an <see cref="Action"/> in an <see cref="IDisposable"/>.
+/// </summary>
+/// <seealso cref="System.IDisposable" />
+public sealed partial class DisposeAction : IDisposable
 {
-    using System;
-    using System.Reflection;
-    using System.Threading.Tasks;
+    private readonly Delegate disposeAction;
+
+    /// <summary>Initializes a new instance of the <see cref="DisposeAction"/> class.</summary>
+    /// <param name="disposeAction">The dispose action.</param>
+    public DisposeAction(Action disposeAction)
+    {
+        this.disposeAction = disposeAction;
+    }
 
     /// <summary>
-    /// Wraps an <see cref="Action"/> in an <see cref="IDisposable"/>.
+    /// Initializes a new instance of the <see cref="DisposeAction"/> class.
     /// </summary>
-    /// <seealso cref="System.IDisposable" />
-    public sealed partial class DisposeAction : IDisposable
+    /// <param name="disposeAction">The asynchronous dispose action.</param>
+    public DisposeAction(Func<ValueTask> disposeAction)
     {
-        private readonly Delegate disposeAction;
+        this.disposeAction = disposeAction;
+    }
 
-        /// <summary>Initializes a new instance of the <see cref="DisposeAction"/> class.</summary>
-        /// <param name="disposeAction">The dispose action.</param>
-        public DisposeAction(Action disposeAction)
+    /// <summary>
+    /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+    /// </summary>
+    public void Dispose()
+    {
+        switch (this.disposeAction)
         {
-            this.disposeAction = disposeAction;
+            case Action action:
+                action();
+                break;
+            case Func<ValueTask> func:
+                func().AsTask().Wait();
+                break;
         }
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DisposeAction"/> class.
-        /// </summary>
-        /// <param name="disposeAction">The asynchronous dispose action.</param>
-        public DisposeAction(Func<ValueTask> disposeAction)
-        {
-            this.disposeAction = disposeAction;
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            switch (this.disposeAction)
-            {
-                case Action action:
-                    action();
-                    break;
-                case Func<ValueTask> func:
-                    func().AsTask().Wait();
-                    break;
-            }
-        }
-
-        /// <summary>Converts to string.</summary>
-        /// <returns>A <see cref="string"/> that represents this instance.</returns>
-        public override string ToString()
-        {
-            return $"DisposableAction: {this.disposeAction.Target}.{this.disposeAction.GetMethodInfo().Name}";
-        }
+    /// <summary>Converts to string.</summary>
+    /// <returns>A <see cref="string"/> that represents this instance.</returns>
+    public override string ToString()
+    {
+        return $"DisposableAction: {this.disposeAction.Target}.{this.disposeAction.GetMethodInfo().Name}";
     }
 }

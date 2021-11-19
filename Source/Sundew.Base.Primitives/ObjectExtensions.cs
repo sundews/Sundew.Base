@@ -5,44 +5,43 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives
+namespace Sundew.Base.Primitives;
+
+using System;
+
+/// <summary>
+/// Extension methods for <see cref="object"/>.
+/// </summary>
+public static class ObjectExtensions
 {
-    using System;
+    /// <summary>
+    /// Tries to cast the value to a type and otherwise calls GetType.
+    /// </summary>
+    /// <param name="value">The @value.</param>
+    /// <returns>The type.</returns>
+    public static Type AsType(this object value)
+    {
+        if (value is Type type)
+        {
+            return type;
+        }
+
+        return value.GetType();
+    }
 
     /// <summary>
-    /// Extension methods for <see cref="object"/>.
+    /// Converts the value to string or an empty string.
     /// </summary>
-    public static class ObjectExtensions
+    /// <typeparam name="TObject">The type of the object.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A string.</returns>
+    public static string ToStringOrEmpty<TObject>(this TObject value)
     {
-        /// <summary>
-        /// Tries to cast the value to a type and otherwise calls GetType.
-        /// </summary>
-        /// <param name="value">The @value.</param>
-        /// <returns>The type.</returns>
-        public static Type AsType(this object value)
+        if (value == null)
         {
-            if (value is Type type)
-            {
-                return type;
-            }
-
-            return value.GetType();
+            return string.Empty;
         }
 
-        /// <summary>
-        /// Converts the value to string or an empty string.
-        /// </summary>
-        /// <typeparam name="TObject">The type of the object.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <returns>A string.</returns>
-        public static string ToStringOrEmpty<TObject>(this TObject value)
-        {
-            if (value == null)
-            {
-                return string.Empty;
-            }
-
-            return value.ToString() ?? string.Empty;
-        }
+        return value.ToString() ?? string.Empty;
     }
 }

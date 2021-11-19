@@ -5,43 +5,103 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory;
+
+using System;
+using System.Collections.Generic;
+using Sundew.Base.Memory.Internal;
+
+/// <summary>
+/// Extends <see cref="ReadOnlyMemory{Char}"/> with easy to use methods.
+/// </summary>
+public static class ReadOnlyMemoryExtensions
 {
-    using System;
-    using System.Collections.Generic;
-    using Sundew.Base.Memory.Internal;
-
     /// <summary>
-    /// Extends <see cref="ReadOnlyMemory{Char}"/> with easy to use methods.
+    /// Splits the specified input with the <see cref="SplitFunc{TItem}" />.
     /// </summary>
-    public static class ReadOnlyMemoryExtensions
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="input">The input.</param>
+    /// <param name="splitFunc">The split function.</param>
+    /// <param name="splitOptions">The split options.</param>
+    /// <returns>
+    /// The splitted items as an <see cref="IEnumerable{T}" />.
+    /// </returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when an unknown <see cref="SplitAction" /> result is returned.</exception>
+    public static IEnumerable<ReadOnlyMemory<TItem>> Split<TItem>(this ReadOnlyMemory<TItem> input, SplitFunc<TItem> splitFunc, SplitOptions splitOptions = SplitOptions.None)
     {
-        /// <summary>
-        /// Splits the specified input with the <see cref="SplitFunc{TItem}" />.
-        /// </summary>
-        /// <typeparam name="TItem">The type of the item.</typeparam>
-        /// <param name="input">The input.</param>
-        /// <param name="splitFunc">The split function.</param>
-        /// <param name="splitOptions">The split options.</param>
-        /// <returns>
-        /// The splitted items as an <see cref="IEnumerable{T}" />.
-        /// </returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when an unknown <see cref="SplitAction" /> result is returned.</exception>
-        public static IEnumerable<ReadOnlyMemory<TItem>> Split<TItem>(this ReadOnlyMemory<TItem> input, SplitFunc<TItem> splitFunc, SplitOptions splitOptions = SplitOptions.None)
+        if (input.IsEmpty)
         {
-            if (input.IsEmpty)
-            {
-                yield break;
-            }
+            yield break;
+        }
 
-            var splitContext = new SplitContext<TItem>(input);
-            for (var index = 0; index < input.Length; index++)
+        var splitContext = new SplitContext<TItem>(input);
+        for (var index = 0; index < input.Length; index++)
+        {
+            var item = input.Span[index];
+            var splitMemory = splitFunc(item, index, splitContext);
+            switch (splitMemory)
             {
-                var item = input.Span[index];
-                var splitMemory = splitFunc(item, index, splitContext);
-                switch (splitMemory)
-                {
-                    case SplitAction.Include:
+                case SplitAction.Include:
+                    if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
+                    {
+                        splitContext.StartIncluding(index);
+                        break;
+                    }
+
+                    splitContext.Include(item);
+                    break;
+                case SplitAction.Split:
+                    {
+                        var section = splitContext.GetSectionAndReset();
+                        if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+                        {
+                            yield return section;
+                        }
+                    }
+
+                    break;
+                case SplitAction.IncludeAndSplit:
+                    {
+                        if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
+                        {
+                            splitContext.StartIncluding(index);
+                        }
+                        else
+                        {
+                            splitContext.Include(item);
+                        }
+
+                        var section = splitContext.GetSectionAndReset();
+                        if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+                        {
+                            yield return section;
+                        }
+                    }
+
+                    break;
+                case SplitAction.Ignore:
+                    splitContext.IsIgnoring = true;
+                    break;
+                case SplitAction.SplitAndSplitCurrent:
+                    {
+                        var section = splitContext.GetSectionAndReset();
+                        if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+                        {
+                            yield return section;
+                        }
+
+                        yield return input.Slice(index, 1);
+                    }
+
+                    break;
+                case SplitAction.SplitAndInclude:
+                    {
+                        var section = splitContext.GetSectionAndReset();
+                        if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+                        {
+                            yield return section;
+                        }
+
                         if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
                         {
                             splitContext.StartIncluding(index);
@@ -49,91 +109,30 @@ namespace Sundew.Base.Memory
                         }
 
                         splitContext.Include(item);
-                        break;
-                    case SplitAction.Split:
-                        {
-                            var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
-                            {
-                                yield return section;
-                            }
-                        }
+                    }
 
-                        break;
-                    case SplitAction.IncludeAndSplit:
-                        {
-                            if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
-                            {
-                                splitContext.StartIncluding(index);
-                            }
-                            else
-                            {
-                                splitContext.Include(item);
-                            }
+                    break;
+                case SplitAction.SplitAndIncludeRest:
+                {
+                    var section = splitContext.GetSectionAndReset();
+                    if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+                    {
+                        yield return section;
+                    }
 
-                            var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
-                            {
-                                yield return section;
-                            }
-                        }
-
-                        break;
-                    case SplitAction.Ignore:
-                        splitContext.IsIgnoring = true;
-                        break;
-                    case SplitAction.SplitAndSplitCurrent:
-                        {
-                            var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
-                            {
-                                yield return section;
-                            }
-
-                            yield return input.Slice(index, 1);
-                        }
-
-                        break;
-                    case SplitAction.SplitAndInclude:
-                        {
-                            var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
-                            {
-                                yield return section;
-                            }
-
-                            if (splitContext.StartIndex == SplitContext<TItem>.SectionNotStartedIndex)
-                            {
-                                splitContext.StartIncluding(index);
-                                break;
-                            }
-
-                            splitContext.Include(item);
-                        }
-
-                        break;
-                    case SplitAction.SplitAndIncludeRest:
-                        {
-                            var section = splitContext.GetSectionAndReset();
-                            if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
-                            {
-                                yield return section;
-                            }
-
-                            yield return input.Slice(index, input.Length - index);
-                            yield break;
-                        }
-
-                    default:
-                        throw new ArgumentOutOfRangeException($"Invalid SplitMemory value: {splitMemory}");
+                    yield return input.Slice(index, input.Length - index);
+                    yield break;
                 }
-            }
 
-            var lastSection = splitContext.GetSectionAndReset();
-            if (!lastSection.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
-            {
-                yield return lastSection;
+                default:
+                    throw new ArgumentOutOfRangeException($"Invalid SplitMemory value: {splitMemory}");
             }
+        }
+
+        var lastSection = splitContext.GetSectionAndReset();
+        if (!lastSection.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+        {
+            yield return lastSection;
         }
     }
 }

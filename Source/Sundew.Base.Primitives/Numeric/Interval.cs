@@ -5,48 +5,47 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Numeric
+namespace Sundew.Base.Primitives.Numeric;
+
+using System;
+
+/// <summary>
+/// Methods for creating intervals.
+/// </summary>
+public static class Interval
 {
-    using System;
+    /// <summary>
+    /// Creates an interval with the specified minimum and a length.
+    /// </summary>
+    /// <param name="minimum">The minimum.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>An interval.</returns>
+    public static Interval<int> FromMinAndLength(int minimum, int length)
+    {
+        return new Interval<int>(minimum, minimum + length);
+    }
 
     /// <summary>
-    /// Methods for creating intervals.
+    /// Creates an interval with the specified minimum and a length.
     /// </summary>
-    public static class Interval
+    /// <param name="minimum">The minimum.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>An interval.</returns>
+    public static Interval<double> FromMinAndLength(double minimum, double length)
     {
-        /// <summary>
-        /// Creates an interval with the specified minimum and a length.
-        /// </summary>
-        /// <param name="minimum">The minimum.</param>
-        /// <param name="length">The length.</param>
-        /// <returns>An interval.</returns>
-        public static Interval<int> FromMinAndLength(int minimum, int length)
-        {
-            return new(minimum, minimum + length);
-        }
+        return new Interval<double>(minimum, minimum + length);
+    }
 
-        /// <summary>
-        /// Creates an interval with the specified minimum and a length.
-        /// </summary>
-        /// <param name="minimum">The minimum.</param>
-        /// <param name="length">The length.</param>
-        /// <returns>An interval.</returns>
-        public static Interval<double> FromMinAndLength(double minimum, double length)
-        {
-            return new(minimum, minimum + length);
-        }
-
-        /// <summary>
-        /// Creates an interval with the specified minimum and maximum.
-        /// </summary>
-        /// <typeparam name="TValue">The type of the value.</typeparam>
-        /// <param name="min">The minimum.</param>
-        /// <param name="max">The maximum.</param>
-        /// <returns>An interval.</returns>
-        public static Interval<TValue> From<TValue>(TValue min, TValue max)
-            where TValue : struct, IComparable<TValue>
-        {
-            return new(min, max);
-        }
+    /// <summary>
+    /// Creates an interval with the specified minimum and maximum.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="min">The minimum.</param>
+    /// <param name="max">The maximum.</param>
+    /// <returns>An interval.</returns>
+    public static Interval<TValue> From<TValue>(TValue min, TValue max)
+        where TValue : struct, IComparable<TValue>
+    {
+        return new Interval<TValue>(min, max);
     }
 }

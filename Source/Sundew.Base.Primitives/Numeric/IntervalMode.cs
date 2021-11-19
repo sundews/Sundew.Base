@@ -5,31 +5,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Numeric
+namespace Sundew.Base.Primitives.Numeric;
+
+/// <summary>
+/// Enumeration for specifying comparison of intervals.
+/// </summary>
+public enum IntervalMode
 {
     /// <summary>
-    /// Enumeration for specifying comparison of intervals.
+    /// The inclusive, includes the interval values.
     /// </summary>
-    public enum IntervalMode
-    {
-        /// <summary>
-        /// The inclusive, includes the interval values.
-        /// </summary>
-        Inclusive,
+    Inclusive,
 
-        /// <summary>
-        /// The exclusive, excludes the interval values.
-        /// </summary>
-        Exclusive,
+    /// <summary>
+    /// The exclusive, excludes the interval values.
+    /// </summary>
+    Exclusive,
 
-        /// <summary>
-        /// The min exclusive, excludes the min value, but includes the max.
-        /// </summary>
-        MinExclusive,
+    /// <summary>
+    /// The min exclusive, excludes the min value, but includes the max.
+    /// </summary>
+    MinExclusive,
 
-        /// <summary>
-        /// The max exclusive, includes the min value, but excludes the max.
-        /// </summary>
-        MaxExclusive,
-    }
+    /// <summary>
+    /// The max exclusive, includes the min value, but excludes the max.
+    /// </summary>
+    MaxExclusive,
 }

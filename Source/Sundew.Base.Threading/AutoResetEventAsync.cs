@@ -5,36 +5,35 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Threading
+namespace Sundew.Base.Threading;
+
+/// <summary>
+/// An asynchronous auto reset event.
+/// </summary>
+public sealed class AutoResetEventAsync : ResetEventAsync
 {
     /// <summary>
-    /// An asynchronous auto reset event.
+    /// Initializes a new instance of the <see cref="AutoResetEventAsync"/> class.
     /// </summary>
-    public sealed class AutoResetEventAsync : ResetEventAsync
+    public AutoResetEventAsync()
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AutoResetEventAsync"/> class.
-        /// </summary>
-        public AutoResetEventAsync()
-        {
-        }
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AutoResetEventAsync"/> class.
-        /// </summary>
-        /// <param name="isSet">if set to <c>true</c> [initial state].</param>
-        public AutoResetEventAsync(bool isSet)
-            : base(isSet)
-        {
-        }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AutoResetEventAsync"/> class.
+    /// </summary>
+    /// <param name="isSet">if set to <c>true</c> [initial state].</param>
+    public AutoResetEventAsync(bool isSet)
+        : base(isSet)
+    {
+    }
 
-        /// <summary>
-        /// Called during a Wait or WaitAsync call when the event is set and the lock is acquired.
-        /// </summary>
-        /// <param name="isSet">if set to <c>true</c> [is set].</param>
-        protected override void OnIsSetDuringWaitWhileLocked(ref bool isSet)
-        {
-            isSet = false;
-        }
+    /// <summary>
+    /// Called during a Wait or WaitAsync call when the event is set and the lock is acquired.
+    /// </summary>
+    /// <param name="isSet">if set to <c>true</c> [is set].</param>
+    protected override void OnIsSetDuringWaitWhileLocked(ref bool isSet)
+    {
+        isSet = false;
     }
 }

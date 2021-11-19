@@ -5,36 +5,35 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation
+namespace Sundew.Base.Primitives.Computation;
+
+/// <summary>
+/// Specifies the type of progress.
+/// </summary>
+public enum ProgressType
 {
     /// <summary>
-    /// Specifies the type of progress.
+    /// Specifies that the reported progress is that items were added.
     /// </summary>
-    public enum ProgressType
-    {
-        /// <summary>
-        /// Specifies that the reported progress is that items were added.
-        /// </summary>
-        ItemsAdded,
+    ItemsAdded,
 
-        /// <summary>
-        /// Specifies that no more items will be added.
-        /// </summary>
-        CompletedAdding,
+    /// <summary>
+    /// Specifies that no more items will be added.
+    /// </summary>
+    CompletedAdding,
 
-        /// <summary>
-        /// Specifies that the reported progress is a message.
-        /// </summary>
-        Message,
+    /// <summary>
+    /// Specifies that the reported progress is a message.
+    /// </summary>
+    Message,
 
-        /// <summary>
-        /// Specifies that the progress has changed.
-        /// </summary>
-        ItemCompleted,
+    /// <summary>
+    /// Specifies that the progress has changed.
+    /// </summary>
+    ItemCompleted,
 
-        /// <summary>
-        /// Specifies that progress has been cleared.
-        /// </summary>
-        Cleared,
-    }
+    /// <summary>
+    /// Specifies that progress has been cleared.
+    /// </summary>
+    Cleared,
 }

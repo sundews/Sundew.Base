@@ -5,19 +5,18 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Initialization
-{
-    using System.Threading.Tasks;
+namespace Sundew.Base.Initialization;
 
+using System.Threading.Tasks;
+
+/// <summary>
+/// Interface for implementing initializable objects.
+/// </summary>
+public interface IInitializable
+{
     /// <summary>
-    /// Interface for implementing initializable objects.
+    /// Initializes the asynchronous.
     /// </summary>
-    public interface IInitializable
-    {
-        /// <summary>
-        /// Initializes the asynchronous.
-        /// </summary>
-        /// <returns>An async task.</returns>
-        ValueTask InitializeAsync();
-    }
+    /// <returns>An async task.</returns>
+    ValueTask InitializeAsync();
 }

@@ -5,41 +5,37 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Text
+namespace Sundew.Base.Text;
+
+using System;
+
+/// <summary>
+/// Provides the proper line endings.
+/// </summary>
+public static class LineEndings
 {
-    using System;
+    /// <summary>
+    /// The carriage return followed by new line.
+    /// </summary>
+    public const string CarriageReturnNewLine = "\r\n";
 
     /// <summary>
-    /// Provides the proper line endings.
+    /// The new line character.
     /// </summary>
-    public static class LineEndings
+    public const string NewLine = "\n";
+
+    /// <summary>
+    /// Gets the line endings for the specified operating system.
+    /// </summary>
+    /// <param name="platform">The operating system.</param>
+    /// <returns>The line endings.</returns>
+    public static string For(Platform platform)
     {
-        /// <summary>
-        /// The carriage return followed by new line.
-        /// </summary>
-        public const string CarriageReturnNewLine = "\r\n";
-
-        /// <summary>
-        /// The new line character.
-        /// </summary>
-        public const string NewLine = "\n";
-
-        /// <summary>
-        /// Gets the line endings for the specified operating system.
-        /// </summary>
-        /// <param name="platform">The operating system.</param>
-        /// <returns>The line endings.</returns>
-        public static string For(Platform platform)
+        return platform switch
         {
-            switch (platform)
-            {
-                case Platform.Windows:
-                    return CarriageReturnNewLine;
-                case Platform.Unix:
-                    return NewLine;
-                default:
-                    return Environment.NewLine;
-            }
-        }
+            Platform.Windows => CarriageReturnNewLine,
+            Platform.Unix => NewLine,
+            _ => Environment.NewLine,
+        };
     }
 }

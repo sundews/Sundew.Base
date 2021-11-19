@@ -5,54 +5,53 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Timers
+namespace Sundew.Base.Timers;
+
+using Sundew.Base.Disposal;
+
+/// <summary>
+/// Factory for creating timers.
+/// </summary>
+/// <seealso cref="ITimerFactory" />
+public sealed class TimerFactory : ITimerFactory
 {
-    using Sundew.Base.Disposal;
+    private readonly DisposingList<ITimerControl> timers = new();
 
     /// <summary>
-    /// Factory for creating timers.
+    /// Creates this instance.
     /// </summary>
-    /// <seealso cref="ITimerFactory" />
-    public sealed class TimerFactory : ITimerFactory
+    /// <returns>A new <see cref="Timer"/>.</returns>
+    public ITimer Create()
     {
-        private readonly DisposingList<ITimerControl> timers = new();
+        return this.timers.Add(new Timer());
+    }
 
-        /// <summary>
-        /// Creates this instance.
-        /// </summary>
-        /// <returns>A new <see cref="Timer"/>.</returns>
-        public ITimer Create()
-        {
-            return this.timers.Add(new Timer());
-        }
+    /// <summary>
+    /// Creates the specified state.
+    /// </summary>
+    /// <typeparam name="TState">The type of the state.</typeparam>
+    /// <param name="state">The state.</param>
+    /// <returns>A new <see cref="Timer{TState}"/>.</returns>
+    public ITimer<TState> Create<TState>(TState state)
+        where TState : notnull
+    {
+        return this.timers.Add(new Timer<TState>(state));
+    }
 
-        /// <summary>
-        /// Creates the specified state.
-        /// </summary>
-        /// <typeparam name="TState">The type of the state.</typeparam>
-        /// <param name="state">The state.</param>
-        /// <returns>A new <see cref="Timer{TState}"/>.</returns>
-        public ITimer<TState> Create<TState>(TState state)
-            where TState : notnull
-        {
-            return this.timers.Add(new Timer<TState>(state));
-        }
+    /// <summary>
+    /// Disposes the specified timer base.
+    /// </summary>
+    /// <param name="timerControl">The timer base.</param>
+    public void Dispose(ITimerControl timerControl)
+    {
+        this.timers.Dispose(timerControl);
+    }
 
-        /// <summary>
-        /// Disposes the specified timer base.
-        /// </summary>
-        /// <param name="timerControl">The timer base.</param>
-        public void Dispose(ITimerControl timerControl)
-        {
-            this.timers.Dispose(timerControl);
-        }
-
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        public void Dispose()
-        {
-            this.timers.Dispose();
-        }
+    /// <summary>
+    /// Releases unmanaged and - optionally - managed resources.
+    /// </summary>
+    public void Dispose()
+    {
+        this.timers.Dispose();
     }
 }

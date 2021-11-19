@@ -5,34 +5,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Timers
+namespace Sundew.Base.Timers;
+
+using System;
+
+/// <summary>
+/// Interface for implementing a timer factory.
+/// </summary>
+public interface ITimerFactory : IDisposable
 {
-    using System;
+    /// <summary>
+    /// Creates a new <see cref="ITimer"/>.
+    /// </summary>
+    /// <returns>A new <see cref="ITimer"/>.</returns>
+    ITimer Create();
 
     /// <summary>
-    /// Interface for implementing a timer factory.
+    /// Creates a new <see cref="ITimer{TState}"/>.
     /// </summary>
-    public interface ITimerFactory : IDisposable
-    {
-        /// <summary>
-        /// Creates a new <see cref="ITimer"/>.
-        /// </summary>
-        /// <returns>A new <see cref="ITimer"/>.</returns>
-        ITimer Create();
+    /// <typeparam name="TState">The type of the state.</typeparam>
+    /// <param name="state">The state.</param>
+    /// <returns>A new <see cref="ITimer{TState}"/>.</returns>
+    ITimer<TState> Create<TState>(TState state)
+        where TState : notnull;
 
-        /// <summary>
-        /// Creates a new <see cref="ITimer{TState}"/>.
-        /// </summary>
-        /// <typeparam name="TState">The type of the state.</typeparam>
-        /// <param name="state">The state.</param>
-        /// <returns>A new <see cref="ITimer{TState}"/>.</returns>
-        ITimer<TState> Create<TState>(TState state)
-            where TState : notnull;
-
-        /// <summary>
-        /// Disposes the specified timer base.
-        /// </summary>
-        /// <param name="timerControl">The timer base.</param>
-        void Dispose(ITimerControl timerControl);
-    }
+    /// <summary>
+    /// Disposes the specified timer base.
+    /// </summary>
+    /// <param name="timerControl">The timer base.</param>
+    void Dispose(ITimerControl timerControl);
 }

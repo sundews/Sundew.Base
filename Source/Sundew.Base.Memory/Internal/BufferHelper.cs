@@ -5,12 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory.Internal
-{
-    using Sundew.Base.Primitives.Numeric;
+namespace Sundew.Base.Memory.Internal;
 
-    internal static class BufferHelper
-    {
-        public static readonly Interval<int> StartIndexInterval = new(10, 128);
-    }
+using Sundew.Base.Primitives.Numeric;
+
+internal static class BufferHelper
+{
+    public static readonly Interval<int> StartIndexInterval = new(10, 128);
 }

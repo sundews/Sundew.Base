@@ -5,33 +5,32 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Text
+namespace Sundew.Base.Text;
+
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Text;
+
+/// <summary>
+/// Easy to use methods for <see cref="char"/>s.
+/// </summary>
+public static class CharExtensions
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
-    using System.Text;
-
     /// <summary>
-    /// Easy to use methods for <see cref="char"/>s.
+    /// Repeats the specified count.
     /// </summary>
-    public static class CharExtensions
+    /// <param name="character">The character.</param>
+    /// <param name="count">The count.</param>
+    /// <returns>The string with repeated characters.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string Repeat(this char character, int count)
     {
-        /// <summary>
-        /// Repeats the specified count.
-        /// </summary>
-        /// <param name="character">The character.</param>
-        /// <param name="count">The count.</param>
-        /// <returns>The string with repeated characters.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Repeat(this char character, int count)
+        if (count <= 0)
         {
-            if (count <= 0)
-            {
-                return string.Empty;
-            }
-
-            return new string(character, count);
+            return string.Empty;
         }
+
+        return new string(character, count);
     }
 }

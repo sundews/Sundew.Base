@@ -5,37 +5,36 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Timers
+namespace Sundew.Base.Timers;
+
+using System;
+
+/// <summary>
+/// Interface for controlling a timer.
+/// </summary>
+public interface ITimerControl : ITimerInfo, IDisposable
 {
-    using System;
+    /// <summary>
+    /// Starts or restarts the timer.
+    /// </summary>
+    /// <param name="startDelay">The delay before the first occurence.</param>
+    void StartOnce(TimeSpan startDelay);
 
     /// <summary>
-    /// Interface for controlling a timer.
+    /// Starts or restarts the timer.
     /// </summary>
-    public interface ITimerControl : ITimerInfo, IDisposable
-    {
-        /// <summary>
-        /// Starts or restarts the timer.
-        /// </summary>
-        /// <param name="startDelay">The delay before the first occurence.</param>
-        void StartOnce(TimeSpan startDelay);
+    /// <param name="interval">The interval.</param>
+    void Start(TimeSpan interval);
 
-        /// <summary>
-        /// Starts or restarts the timer.
-        /// </summary>
-        /// <param name="interval">The interval.</param>
-        void Start(TimeSpan interval);
+    /// <summary>
+    /// Starts or restarts the timer.
+    /// </summary>
+    /// <param name="startDelay">The delay before the first occurence.</param>
+    /// <param name="interval">The interval.</param>
+    void Start(TimeSpan startDelay, TimeSpan interval);
 
-        /// <summary>
-        /// Starts or restarts the timer.
-        /// </summary>
-        /// <param name="startDelay">The delay before the first occurence.</param>
-        /// <param name="interval">The interval.</param>
-        void Start(TimeSpan startDelay, TimeSpan interval);
-
-        /// <summary>
-        /// Stops the timer.
-        /// </summary>
-        void Stop();
-    }
+    /// <summary>
+    /// Stops the timer.
+    /// </summary>
+    void Stop();
 }

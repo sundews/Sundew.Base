@@ -5,16 +5,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Initialization
-{
-    using System.Collections.Generic;
-    using Sundew.Base.Reporting;
+namespace Sundew.Base.Initialization;
 
-    /// <summary>Interface for implementing a <see cref="IInitializable"/> reporter.</summary>
-    public interface IInitializableReporter : IReporter
-    {
-        /// <summary>Called when initializables have been initialized.</summary>
-        /// <param name="initializable">The initializable.</param>
-        void Initialized(IEnumerable<IInitializable> initializable);
-    }
+using System.Collections.Generic;
+using Sundew.Base.Reporting;
+
+/// <summary>Interface for implementing a <see cref="IInitializable"/> reporter.</summary>
+public interface IInitializableReporter : IReporter
+{
+    /// <summary>Called when initializables have been initialized.</summary>
+    /// <param name="initializable">The initializable.</param>
+    void Initialized(IEnumerable<IInitializable> initializable);
 }

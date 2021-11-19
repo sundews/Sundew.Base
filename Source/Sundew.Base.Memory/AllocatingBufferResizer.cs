@@ -5,44 +5,43 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory;
+
+using System;
+
+/// <summary>
+/// Implementation of <see cref="IBufferResizer{TItem}" /> which always allocates an array if necessary.
+/// </summary>
+/// <typeparam name="TItem">The type of the item.</typeparam>
+/// <seealso cref="IBufferResizer{TItem}" />
+public sealed class AllocatingBufferResizer<TItem> : IBufferResizer<TItem>
 {
-    using System;
+    internal const int MaxDoublingLimit = 5000;
 
     /// <summary>
-    /// Implementation of <see cref="IBufferResizer{TItem}" /> which always allocates an array if necessary.
+    /// Resizes the specified source.
     /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <seealso cref="IBufferResizer{TItem}" />
-    public sealed class AllocatingBufferResizer<TItem> : IBufferResizer<TItem>
+    /// <param name="source">The source.</param>
+    /// <param name="minimumCapacity">The minimum capacity.</param>
+    /// <returns>A new resized array.</returns>
+    public TItem[] Resize(TItem[]? source, int minimumCapacity)
     {
-        internal const int MaxDoublingLimit = 5000;
-
-        /// <summary>
-        /// Resizes the specified source.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="minimumCapacity">The minimum capacity.</param>
-        /// <returns>A new resized array.</returns>
-        public TItem[] Resize(TItem[]? source, int minimumCapacity)
+        if (source == null)
         {
-            if (source == null)
-            {
-                source = new TItem[minimumCapacity];
-                return source;
-            }
-
-            if (minimumCapacity < MaxDoublingLimit)
-            {
-                minimumCapacity <<= 1;
-            }
-
-            if (source.Length < minimumCapacity)
-            {
-                Array.Resize(ref source, minimumCapacity);
-            }
-
+            source = new TItem[minimumCapacity];
             return source;
         }
+
+        if (minimumCapacity < MaxDoublingLimit)
+        {
+            minimumCapacity <<= 1;
+        }
+
+        if (source.Length < minimumCapacity)
+        {
+            Array.Resize(ref source, minimumCapacity);
+        }
+
+        return source;
     }
 }

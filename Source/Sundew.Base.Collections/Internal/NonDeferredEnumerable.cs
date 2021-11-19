@@ -5,58 +5,57 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections.Internal
+namespace Sundew.Base.Collections.Internal;
+
+using System.Collections;
+using System.Collections.Generic;
+
+/// <summary>
+/// Provides read only access to <see cref="List{TItem}"/>.
+/// </summary>
+/// <typeparam name="TItem">The type of the item.</typeparam>
+internal sealed class NonDeferredEnumerable<TItem> : IReadOnlyCollection<TItem>
 {
-    using System.Collections;
-    using System.Collections.Generic;
+    private readonly IEnumerable<TItem> source;
 
     /// <summary>
-    /// Provides read only access to <see cref="List{TItem}"/>.
+    /// Initializes a new instance of the <see cref="NonDeferredEnumerable{TItem}" /> class.
     /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    internal sealed class NonDeferredEnumerable<TItem> : IReadOnlyCollection<TItem>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="count">The count.</param>
+    public NonDeferredEnumerable(IEnumerable<TItem> enumerable, int count)
     {
-        private readonly IEnumerable<TItem> source;
+        this.Count = count;
+        this.source = enumerable;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="NonDeferredEnumerable{TItem}" /> class.
-        /// </summary>
-        /// <param name="enumerable">The enumerable.</param>
-        /// <param name="count">The count.</param>
-        public NonDeferredEnumerable(IEnumerable<TItem> enumerable, int count)
-        {
-            this.Count = count;
-            this.source = enumerable;
-        }
+    /// <summary>
+    /// Gets the count.
+    /// </summary>
+    /// <value>
+    /// The count.
+    /// </value>
+    public int Count { get; }
 
-        /// <summary>
-        /// Gets the count.
-        /// </summary>
-        /// <value>
-        /// The count.
-        /// </value>
-        public int Count { get; }
+    /// <summary>
+    /// Gets the enumerator.
+    /// </summary>
+    /// <returns>
+    /// An enumerator that can be used to iterate through the collection.
+    /// </returns>
+    public IEnumerator<TItem> GetEnumerator()
+    {
+        return this.source.GetEnumerator();
+    }
 
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        public IEnumerator<TItem> GetEnumerator()
-        {
-            return this.source.GetEnumerator();
-        }
-
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+    /// <summary>
+    /// Gets the enumerator.
+    /// </summary>
+    /// <returns>
+    /// An enumerator that can be used to iterate through the collection.
+    /// </returns>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
     }
 }

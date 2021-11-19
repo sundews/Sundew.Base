@@ -5,12 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory.Internal
-{
-    internal interface IBufferInternal<TItem> : IBuffer<TItem>
-    {
-        void EnsureAdditionalCapacity(int requiredAdditionalCapacity);
+namespace Sundew.Base.Memory.Internal;
 
-        void WriteInternal(TItem item);
-    }
+internal interface IBufferInternal<TItem> : IBuffer<TItem>
+{
+    void EnsureAdditionalCapacity(int requiredAdditionalCapacity);
+
+    void WriteInternal(TItem item);
 }

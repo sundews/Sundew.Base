@@ -5,65 +5,64 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Initialization
+namespace Sundew.Base.Initialization;
+
+using System;
+using System.Reflection;
+using System.Threading.Tasks;
+
+/// <summary>
+/// An action and async action which implements <see cref="IInitializable"/>.
+/// </summary>
+/// <seealso cref="Sundew.Base.Initialization.IInitializable" />
+public class InitializeAction : IInitializable
 {
-    using System;
-    using System.Reflection;
-    using System.Threading.Tasks;
+    private readonly Func<ValueTask> action;
 
     /// <summary>
-    /// An action and async action which implements <see cref="IInitializable"/>.
+    /// Initializes a new instance of the <see cref="InitializeAction" /> class.
     /// </summary>
-    /// <seealso cref="Sundew.Base.Initialization.IInitializable" />
-    public class InitializeAction : IInitializable
+    /// <param name="action">The action.</param>
+    /// <param name="useYield">if set to <c>true</c> [use yield].</param>
+    public InitializeAction(Action action, bool useYield = false)
+        : this(async () => await ActionToAsyncFunc(action, useYield).ConfigureAwait(false))
     {
-        private readonly Func<ValueTask> action;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InitializeAction" /> class.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        /// <param name="useYield">if set to <c>true</c> [use yield].</param>
-        public InitializeAction(Action action, bool useYield = false)
-            : this(async () => await ActionToAsyncFunc(action, useYield).ConfigureAwait(false))
+    /// <summary>
+    /// Initializes a new instance of the <see cref="InitializeAction"/> class.
+    /// </summary>
+    /// <param name="action">The action.</param>
+    public InitializeAction(Func<ValueTask> action)
+    {
+        this.action = action;
+    }
+
+    /// <summary>
+    /// Initializes the asynchronous.
+    /// </summary>
+    /// <returns>
+    /// An async task.
+    /// </returns>
+    public async ValueTask InitializeAsync()
+    {
+        await this.action().ConfigureAwait(false);
+    }
+
+    /// <summary>Converts to string.</summary>
+    /// <returns>A <see cref="string"/> that represents this instance.</returns>
+    public override string ToString()
+    {
+        return $"InitializeAction {this.action.Target}.{this.action.GetMethodInfo().Name}";
+    }
+
+    private static async ValueTask ActionToAsyncFunc(Action action, bool useYield)
+    {
+        if (useYield)
         {
+            await Task.Yield();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="InitializeAction"/> class.
-        /// </summary>
-        /// <param name="action">The action.</param>
-        public InitializeAction(Func<ValueTask> action)
-        {
-            this.action = action;
-        }
-
-        /// <summary>
-        /// Initializes the asynchronous.
-        /// </summary>
-        /// <returns>
-        /// An async task.
-        /// </returns>
-        public async ValueTask InitializeAsync()
-        {
-            await this.action().ConfigureAwait(false);
-        }
-
-        /// <summary>Converts to string.</summary>
-        /// <returns>A <see cref="string"/> that represents this instance.</returns>
-        public override string ToString()
-        {
-            return $"InitializeAction {this.action.Target}.{this.action.GetMethodInfo().Name}";
-        }
-
-        private static async ValueTask ActionToAsyncFunc(Action action, bool useYield)
-        {
-            if (useYield)
-            {
-                await Task.Yield();
-            }
-
-            action();
-        }
+        action();
     }
 }

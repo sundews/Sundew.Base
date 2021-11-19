@@ -5,22 +5,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory;
+
+/// <summary>
+/// Determines SliceDefault creates a slices.
+/// </summary>
+public enum DefaultSlice
 {
     /// <summary>
-    /// Determines SliceDefault creates a slices.
+    /// The content.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "The name is also singular.")]
-    public enum DefaultSlice
-    {
-        /// <summary>
-        /// The content.
-        /// </summary>
-        Content,
+    Content,
 
-        /// <summary>
-        /// The append.
-        /// </summary>
-        Append,
-    }
+    /// <summary>
+    /// The append.
+    /// </summary>
+    Append,
 }

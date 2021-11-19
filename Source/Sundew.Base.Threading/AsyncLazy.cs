@@ -5,79 +5,78 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Threading
+namespace Sundew.Base.Threading;
+
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
+
+/// <summary>
+/// Lazy initializer with support for async await.
+/// </summary>
+/// <typeparam name="TValue">The type of the value.</typeparam>
+public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
 {
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
-    using System.Threading;
-    using System.Threading.Tasks;
+    private readonly Lazy<Task<TValue>> lazy;
 
     /// <summary>
-    /// Lazy initializer with support for async await.
+    /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
+    /// <param name="valueFunc">The value function.</param>
+    /// <param name="runOnThreadPool">if set to <c>true</c> [run on thread pool].</param>
+    public AsyncLazy(Func<Task<TValue>> valueFunc, bool runOnThreadPool = false)
     {
-        private readonly Lazy<Task<TValue>> lazy;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
-        /// </summary>
-        /// <param name="valueFunc">The value function.</param>
-        /// <param name="runOnThreadPool">if set to <c>true</c> [run on thread pool].</param>
-        public AsyncLazy(Func<Task<TValue>> valueFunc, bool runOnThreadPool = false)
+        var actualValueFunc = valueFunc;
+        if (runOnThreadPool)
         {
-            var actualValueFunc = valueFunc;
-            if (runOnThreadPool)
-            {
-                actualValueFunc = () => Task.Run(valueFunc);
-            }
-
-            this.lazy = new Lazy<Task<TValue>>(actualValueFunc, LazyThreadSafetyMode.ExecutionAndPublication);
+            actualValueFunc = () => Task.Run(valueFunc);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
-        /// </summary>
-        /// <param name="valueFunc">The value function.</param>
-        public AsyncLazy(Func<TValue> valueFunc)
+        this.lazy = new Lazy<Task<TValue>>(actualValueFunc, LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
+    /// </summary>
+    /// <param name="valueFunc">The value function.</param>
+    public AsyncLazy(Func<TValue> valueFunc)
+    {
+        this.lazy = new Lazy<Task<TValue>>(() => Task.Run(valueFunc), LazyThreadSafetyMode.ExecutionAndPublication);
+    }
+
+    /// <summary>
+    /// Gets the value if created and otherwise the default.
+    /// </summary>
+    /// <returns>The created value or default.</returns>
+    [return: MaybeNull]
+    public TValue GetValueOrDefault()
+    {
+        if (this.lazy.IsValueCreated)
         {
-            this.lazy = new Lazy<Task<TValue>>(() => Task.Run(valueFunc), LazyThreadSafetyMode.ExecutionAndPublication);
+            return this.lazy.Value.Result;
         }
 
-        /// <summary>
-        /// Gets the value if created and otherwise the default.
-        /// </summary>
-        /// <returns>The created value or default.</returns>
-        [return: MaybeNull]
-        public TValue GetValueOrDefault()
-        {
-            if (this.lazy.IsValueCreated)
-            {
-                return this.lazy.Value.Result;
-            }
+        return default;
+    }
 
-            return default;
-        }
+    /// <summary>Configures the await.</summary>
+    /// <param name="continueOnCapturedContext">if set to <c>true</c> [continue on captured context].</param>
+    /// <returns>A <see cref="ConfiguredTaskAwaitable{TResult}"/>.</returns>
+    public ConfiguredTaskAwaitable<TValue> ConfigureAwait(bool continueOnCapturedContext)
+    {
+        return this.lazy.Value.ConfigureAwait(continueOnCapturedContext);
+    }
 
-        /// <summary>Configures the await.</summary>
-        /// <param name="continueOnCapturedContext">if set to <c>true</c> [continue on captured context].</param>
-        /// <returns>A <see cref="ConfiguredTaskAwaitable{TResult}"/>.</returns>
-        public ConfiguredTaskAwaitable<TValue> ConfigureAwait(bool continueOnCapturedContext)
-        {
-            return this.lazy.Value.ConfigureAwait(continueOnCapturedContext);
-        }
-
-        /// <summary>
-        /// Gets the awaiter.
-        /// </summary>
-        /// <returns>
-        /// A task awaiter.
-        /// </returns>
-        public TaskAwaiter<TValue> GetAwaiter()
-        {
-            return this.lazy.Value.GetAwaiter();
-        }
+    /// <summary>
+    /// Gets the awaiter.
+    /// </summary>
+    /// <returns>
+    /// A task awaiter.
+    /// </returns>
+    public TaskAwaiter<TValue> GetAwaiter()
+    {
+        return this.lazy.Value.GetAwaiter();
     }
 }

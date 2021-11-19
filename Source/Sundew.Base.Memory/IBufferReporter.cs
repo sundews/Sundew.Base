@@ -5,21 +5,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
-{
-    using Sundew.Base.Reporting;
+namespace Sundew.Base.Memory;
 
+using Sundew.Base.Reporting;
+
+/// <summary>
+/// Interface for implementing a buffer reporter.
+/// </summary>
+/// <seealso cref="Sundew.Base.Reporting.IReporter" />
+public interface IBufferReporter : IReporter
+{
     /// <summary>
-    /// Interface for implementing a buffer reporter.
+    /// Called when a buffer gets expanded.
     /// </summary>
-    /// <seealso cref="Sundew.Base.Reporting.IReporter" />
-    public interface IBufferReporter : IReporter
-    {
-        /// <summary>
-        /// Called when a buffer gets expanded.
-        /// </summary>
-        /// <param name="oldCapacity">The old capacity.</param>
-        /// <param name="newCapacity">The new capacity.</param>
-        void OnExpanding(int oldCapacity, int newCapacity);
-    }
+    /// <param name="oldCapacity">The old capacity.</param>
+    /// <param name="newCapacity">The new capacity.</param>
+    void OnExpanding(int oldCapacity, int newCapacity);
 }

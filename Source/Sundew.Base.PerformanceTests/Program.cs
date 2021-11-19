@@ -12,7 +12,7 @@ namespace Sundew.Base.PerformanceTests
 
     public class Program
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             BenchmarkRunner.Run(typeof(Program).Assembly, ManualConfig.Create(DefaultConfig.Instance));
         }

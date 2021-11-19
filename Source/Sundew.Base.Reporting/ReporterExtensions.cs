@@ -5,23 +5,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Reporting
+namespace Sundew.Base.Reporting;
+
+/// <summary>
+/// Extends <see cref="IReporter"/> with easy to use methods.
+/// </summary>
+public static class ReporterExtensions
 {
     /// <summary>
-    /// Extends <see cref="IReporter"/> with easy to use methods.
+    /// Sets the source.
     /// </summary>
-    public static class ReporterExtensions
+    /// <typeparam name="TReporter">The type of the reporter.</typeparam>
+    /// <param name="reporter">The reporter.</param>
+    /// <param name="source">The source.</param>
+    public static void SetSource<TReporter>(this TReporter reporter, object source)
+        where TReporter : IReporter
     {
-        /// <summary>
-        /// Sets the source.
-        /// </summary>
-        /// <typeparam name="TReporter">The type of the reporter.</typeparam>
-        /// <param name="reporter">The reporter.</param>
-        /// <param name="source">The source.</param>
-        public static void SetSource<TReporter>(this TReporter reporter, object source)
-            where TReporter : IReporter
-        {
-            reporter.SetSource(typeof(TReporter), source);
-        }
+        reporter.SetSource(typeof(TReporter), source);
     }
 }

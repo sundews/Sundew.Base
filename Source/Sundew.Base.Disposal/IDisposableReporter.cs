@@ -5,15 +5,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal
-{
-    using Sundew.Base.Reporting;
+namespace Sundew.Base.Disposal;
 
-    /// <summary>Interface for implementing a disposing subject that reports, what it disposes.</summary>
-    public interface IDisposableReporter : IReporter
-    {
-        /// <summary>Called when object is disposed.</summary>
-        /// <param name="disposable">The disposable.</param>
-        void Disposed(object disposable);
-    }
+using Sundew.Base.Reporting;
+
+/// <summary>Interface for implementing a disposing subject that reports, what it disposes.</summary>
+public interface IDisposableReporter : IReporter
+{
+    /// <summary>Called when object is disposed.</summary>
+    /// <param name="disposable">The disposable.</param>
+    void Disposed(object disposable);
 }

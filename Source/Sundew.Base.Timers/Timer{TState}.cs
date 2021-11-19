@@ -5,36 +5,34 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Timers
-{
+namespace Sundew.Base.Timers;
 #nullable disable
+/// <summary>
+/// Implementation of a timer with state.
+/// </summary>
+/// <typeparam name="TState">The type of the state.</typeparam>
+public sealed class Timer<TState> : TimerBase, ITimer<TState>
+{
     /// <summary>
-    /// Implementation of a timer with state.
+    /// Initializes a new instance of the <see cref="Timer{TState}"/> class.
     /// </summary>
-    /// <typeparam name="TState">The type of the state.</typeparam>
-    public sealed class Timer<TState> : TimerBase, ITimer<TState>
+    /// <param name="state">The state.</param>
+    public Timer(TState state)
+        : base(state)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Timer{TState}"/> class.
-        /// </summary>
-        /// <param name="state">The state.</param>
-        public Timer(TState state)
-            : base(state)
-        {
-        }
+    }
 
-        /// <summary>
-        /// Occurs when the timer ticks.
-        /// </summary>
-        public event TickEventHandler<TState> Tick;
+    /// <summary>
+    /// Occurs when the timer ticks.
+    /// </summary>
+    public event TickEventHandler<TState> Tick;
 
-        /// <summary>
-        /// Called when the timer ticks.
-        /// </summary>
-        /// <param name="state">The state.</param>
-        protected override void OnTick(object state)
-        {
-            this.Tick?.Invoke(this, (TState)state);
-        }
+    /// <summary>
+    /// Called when the timer ticks.
+    /// </summary>
+    /// <param name="state">The state.</param>
+    protected override void OnTick(object state)
+    {
+        this.Tick?.Invoke(this, (TState)state);
     }
 }

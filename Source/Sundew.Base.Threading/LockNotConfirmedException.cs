@@ -5,24 +5,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Threading
+namespace Sundew.Base.Threading;
+
+using System;
+
+/// <summary>
+/// Throw when the result of a <see cref="AsyncLock"/> has not been confirmed.
+/// </summary>
+/// <seealso cref="System.Exception" />
+public sealed class LockNotConfirmedException : Exception
 {
-    using System;
+    private const string LockHasNotBeenConfirmedDidYouForgetToCallCheckText = "The lock has not been confirmed, did you forget to call Check()?";
 
     /// <summary>
-    /// Throw when the result of a <see cref="AsyncLock"/> has not been confirmed.
+    /// Initializes a new instance of the <see cref="LockNotConfirmedException"/> class.
     /// </summary>
-    /// <seealso cref="System.Exception" />
-    public sealed class LockNotConfirmedException : Exception
+    internal LockNotConfirmedException()
+        : base(LockHasNotBeenConfirmedDidYouForgetToCallCheckText)
     {
-        private const string LockHasNotBeenConfirmedDidYouForgetToCallCheckText = "The lock has not been confirmed, did you forget to call Check()?";
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LockNotConfirmedException"/> class.
-        /// </summary>
-        internal LockNotConfirmedException()
-            : base(LockHasNotBeenConfirmedDidYouForgetToCallCheckText)
-        {
-        }
     }
 }

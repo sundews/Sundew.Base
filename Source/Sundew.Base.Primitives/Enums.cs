@@ -5,36 +5,35 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives
+namespace Sundew.Base.Primitives;
+
+using System;
+using System.Collections.Generic;
+
+/// <summary>
+/// Enum methods.
+/// </summary>
+public static class Enums
 {
-    using System;
-    using System.Collections.Generic;
+    /// <summary>
+    /// Gets the values.
+    /// </summary>
+    /// <typeparam name="TEnum">The type of the enum.</typeparam>
+    /// <returns>The enum values.</returns>
+    public static IReadOnlyList<TEnum> GetValues<TEnum>()
+        where TEnum : Enum
+    {
+        return (TEnum[])Enum.GetValues(typeof(TEnum));
+    }
 
     /// <summary>
-    /// Enum methods.
+    /// Gets the names.
     /// </summary>
-    public static class Enums
+    /// <typeparam name="TEnum">The type of the enum.</typeparam>
+    /// <returns>The enum names.</returns>
+    public static IReadOnlyList<string> GetNames<TEnum>()
+        where TEnum : Enum
     {
-        /// <summary>
-        /// Gets the values.
-        /// </summary>
-        /// <typeparam name="TEnum">The type of the enum.</typeparam>
-        /// <returns>The enum values.</returns>
-        public static IReadOnlyList<TEnum> GetValues<TEnum>()
-            where TEnum : Enum
-        {
-            return (TEnum[])Enum.GetValues(typeof(TEnum));
-        }
-
-        /// <summary>
-        /// Gets the names.
-        /// </summary>
-        /// <typeparam name="TEnum">The type of the enum.</typeparam>
-        /// <returns>The enum names.</returns>
-        public static IReadOnlyList<string> GetNames<TEnum>()
-            where TEnum : Enum
-        {
-            return Enum.GetNames(typeof(TEnum));
-        }
+        return Enum.GetNames(typeof(TEnum));
     }
 }

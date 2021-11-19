@@ -5,20 +5,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory;
+
+/// <summary>
+/// Interface for implementing an array provider.
+/// </summary>
+/// <typeparam name="TItem">The type of the item.</typeparam>
+public interface IBufferResizer<TItem>
 {
     /// <summary>
-    /// Interface for implementing an array provider.
+    /// Resizes the specified source.
     /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    public interface IBufferResizer<TItem>
-    {
-                              /// <summary>
-                              /// Resizes the specified source.
-                              /// </summary>
-                              /// <param name="source">The source.</param>
-                              /// <param name="minimumCapacity">The new minimum capacity.</param>
-                              /// <returns>A new resized array.</returns>
-        TItem[] Resize(TItem[]? source, int minimumCapacity);
-    }
+    /// <param name="source">The source.</param>
+    /// <param name="minimumCapacity">The new minimum capacity.</param>
+    /// <returns>A new resized array.</returns>
+    TItem[] Resize(TItem[]? source, int minimumCapacity);
 }

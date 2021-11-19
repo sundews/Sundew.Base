@@ -5,26 +5,25 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal
+namespace Sundew.Base.Disposal;
+
+/// <summary>
+/// Defines how a key in a <see cref="DisposingDictionary{TKey}"/> should be disposed.
+/// </summary>
+public enum DisposeKey
 {
     /// <summary>
-    /// Defines how a key in a <see cref="DisposingDictionary{TKey}"/> should be disposed.
+    /// The key will not tried to be disposed.
     /// </summary>
-    public enum DisposeKey
-    {
-        /// <summary>
-        /// The key will not tried to be disposed.
-        /// </summary>
-        No,
+    No,
 
-        /// <summary>
-        /// The key will be tried to be disposed before the value.
-        /// </summary>
-        BeforeValue,
+    /// <summary>
+    /// The key will be tried to be disposed before the value.
+    /// </summary>
+    BeforeValue,
 
-        /// <summary>
-        /// The key will be tried to be disposed after the value.
-        /// </summary>
-        AfterValue,
-    }
+    /// <summary>
+    /// The key will be tried to be disposed after the value.
+    /// </summary>
+    AfterValue,
 }

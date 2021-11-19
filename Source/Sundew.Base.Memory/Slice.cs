@@ -5,22 +5,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory;
+
+/// <summary>
+/// Determines where to slice, when slicing relative to an <see cref="IBuffer{TItem}"/>.
+/// </summary>
+public enum Slice
 {
     /// <summary>
-    /// Determines where to slice, when slicing relative to an <see cref="IBuffer{TItem}"/>.
+    /// The before.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1717:Only FlagsAttribute enums should have plural names", Justification = "The name is also singular.")]
-    public enum Slice
-    {
-        /// <summary>
-        /// The before.
-        /// </summary>
-        Before,
+    Before,
 
-        /// <summary>
-        /// The after.
-        /// </summary>
-        After,
-    }
+    /// <summary>
+    /// The after.
+    /// </summary>
+    After,
 }

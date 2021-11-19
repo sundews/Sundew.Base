@@ -5,56 +5,55 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections.Internal
+namespace Sundew.Base.Collections.Internal;
+
+using System.Collections;
+using System.Collections.Generic;
+
+/// <summary>
+/// Provides read only access to <see cref="List{TItem}"/>.
+/// </summary>
+/// <typeparam name="TItem">The type of the item.</typeparam>
+internal sealed class ReadOnlyCollection<TItem> : IReadOnlyCollection<TItem>
 {
-    using System.Collections;
-    using System.Collections.Generic;
+    private readonly ICollection<TItem> readOnlyCollection;
 
     /// <summary>
-    /// Provides read only access to <see cref="List{TItem}"/>.
+    /// Initializes a new instance of the <see cref="ReadOnlyCollection{TItem}"/> class.
     /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    internal sealed class ReadOnlyCollection<TItem> : IReadOnlyCollection<TItem>
+    /// <param name="readOnlyCollection">The list.</param>
+    public ReadOnlyCollection(ICollection<TItem> readOnlyCollection)
     {
-        private readonly ICollection<TItem> readOnlyCollection;
+        this.readOnlyCollection = readOnlyCollection;
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ReadOnlyCollection{TItem}"/> class.
-        /// </summary>
-        /// <param name="readOnlyCollection">The list.</param>
-        public ReadOnlyCollection(ICollection<TItem> readOnlyCollection)
-        {
-            this.readOnlyCollection = readOnlyCollection;
-        }
+    /// <summary>
+    /// Gets the count.
+    /// </summary>
+    /// <value>
+    /// The count.
+    /// </value>
+    public int Count => this.readOnlyCollection.Count;
 
-        /// <summary>
-        /// Gets the count.
-        /// </summary>
-        /// <value>
-        /// The count.
-        /// </value>
-        public int Count => this.readOnlyCollection.Count;
+    /// <summary>
+    /// Gets the enumerator.
+    /// </summary>
+    /// <returns>
+    /// An enumerator that can be used to iterate through the collection.
+    /// </returns>
+    public IEnumerator<TItem> GetEnumerator()
+    {
+        return this.readOnlyCollection.GetEnumerator();
+    }
 
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        public IEnumerator<TItem> GetEnumerator()
-        {
-            return this.readOnlyCollection.GetEnumerator();
-        }
-
-        /// <summary>
-        /// Gets the enumerator.
-        /// </summary>
-        /// <returns>
-        /// An enumerator that can be used to iterate through the collection.
-        /// </returns>
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+    /// <summary>
+    /// Gets the enumerator.
+    /// </summary>
+    /// <returns>
+    /// An enumerator that can be used to iterate through the collection.
+    /// </returns>
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
     }
 }

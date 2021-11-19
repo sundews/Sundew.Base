@@ -5,25 +5,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives
-{
-    using System;
+namespace Sundew.Base.Primitives;
 
+using System;
+
+/// <summary>
+/// Extends <see cref="Guid"/> with easy to use methods.
+/// </summary>
+public static class GuidExtension
+{
     /// <summary>
-    /// Extends <see cref="Guid"/> with easy to use methods.
+    /// Determines whether the specified GUID is empty.
     /// </summary>
-    public static class GuidExtension
+    /// <param name="id">The GUID value.</param>
+    /// <returns>
+    ///   <c>true</c> if the specified GUID is empty otherwise, <c>false</c>.
+    /// </returns>
+    public static bool IsEmpty(this Guid id)
     {
-        /// <summary>
-        /// Determines whether the specified GUID is empty.
-        /// </summary>
-        /// <param name="id">The GUID value.</param>
-        /// <returns>
-        ///   <c>true</c> if the specified GUID is empty otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsEmpty(this Guid id)
-        {
-            return id.Equals(Guid.Empty);
-        }
+        return id.Equals(Guid.Empty);
     }
 }

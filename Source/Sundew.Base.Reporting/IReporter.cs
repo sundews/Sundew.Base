@@ -5,20 +5,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Reporting
-{
-    using System;
+namespace Sundew.Base.Reporting;
 
+using System;
+
+/// <summary>
+/// Interface for implementing a reporter.
+/// </summary>
+public interface IReporter
+{
     /// <summary>
-    /// Interface for implementing a reporter.
+    /// Sets the source.
     /// </summary>
-    public interface IReporter
-    {
-        /// <summary>
-        /// Sets the source.
-        /// </summary>
-        /// <param name="target">The target.</param>
-        /// <param name="source">The source.</param>
-        void SetSource(Type target, object source);
-    }
+    /// <param name="target">The target.</param>
+    /// <param name="source">The source.</param>
+    void SetSource(Type target, object source);
 }

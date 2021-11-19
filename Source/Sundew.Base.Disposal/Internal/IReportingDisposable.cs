@@ -5,12 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal.Internal
+namespace Sundew.Base.Disposal.Internal;
+
+internal interface IReportingDisposable
 {
-    internal interface IReportingDisposable
-    {
-        /// <summary>Sets the reporter.</summary>
-        /// <param name="disposableReporter">The disposable reporter.</param>
-        void SetReporter(IDisposableReporter? disposableReporter);
-    }
+    /// <summary>Sets the reporter.</summary>
+    /// <param name="disposableReporter">The disposable reporter.</param>
+    void SetReporter(IDisposableReporter? disposableReporter);
 }

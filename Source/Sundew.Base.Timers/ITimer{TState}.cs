@@ -5,18 +5,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Timers
+namespace Sundew.Base.Timers;
+
+/// <summary>
+/// Interface for implementing a timer with state.
+/// </summary>
+/// <typeparam name="TState">The type of the state.</typeparam>
+/// <seealso cref="System.IDisposable" />
+public interface ITimer<TState> : ITimerControl
 {
     /// <summary>
-    /// Interface for implementing a timer with state.
+    /// Occurs when the timer ticks.
     /// </summary>
-    /// <typeparam name="TState">The type of the state.</typeparam>
-    /// <seealso cref="System.IDisposable" />
-    public interface ITimer<TState> : ITimerControl
-    {
-        /// <summary>
-        /// Occurs when the timer ticks.
-        /// </summary>
-        event TickEventHandler<TState> Tick;
-    }
+    event TickEventHandler<TState> Tick;
 }

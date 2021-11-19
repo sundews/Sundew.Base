@@ -5,24 +5,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Memory
+namespace Sundew.Base.Memory;
+
+using System;
+
+/// <summary>
+/// Options for a split.
+/// </summary>
+[Flags]
+public enum SplitOptions
 {
-    using System;
+    /// <summary>
+    /// The none.
+    /// </summary>
+    None,
 
     /// <summary>
-    /// Options for a split.
+    /// The remove empty entries.
     /// </summary>
-    [Flags]
-    public enum SplitOptions
-    {
-        /// <summary>
-        /// The none.
-        /// </summary>
-        None,
-
-        /// <summary>
-        /// The remove empty entries.
-        /// </summary>
-        RemoveEmptyEntries,
-    }
+    RemoveEmptyEntries,
 }

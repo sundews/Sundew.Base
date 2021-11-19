@@ -5,25 +5,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Threading
+namespace Sundew.Base.Threading;
+
+using System;
+
+/// <summary>
+/// Thrown if the lock could not be acquired.
+/// </summary>
+/// <seealso cref="System.Exception" />
+public class LockNotAcquiredException : Exception
 {
-    using System;
+    private const string LockCouldNotBeAcquiredText = "The lock could not be acquired.";
 
     /// <summary>
-    /// Thrown if the lock could not be acquired.
+    /// Initializes a new instance of the <see cref="LockNotAcquiredException"/> class.
     /// </summary>
-    /// <seealso cref="System.Exception" />
-    public class LockNotAcquiredException : Exception
+    public LockNotAcquiredException()
+        : base(LockCouldNotBeAcquiredText)
     {
-        private const string LockCouldNotBeAcquiredText = "The lock could not be acquired.";
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LockNotAcquiredException"/> class.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "No plans for translations.")]
-        public LockNotAcquiredException()
-            : base(LockCouldNotBeAcquiredText)
-        {
-        }
     }
 }

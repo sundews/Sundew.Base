@@ -5,31 +5,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Text
+namespace Sundew.Base.Text;
+
+/// <summary>
+/// Defines where the string is padded.
+/// </summary>
+public enum Alignment
 {
     /// <summary>
-    /// Defines where the string is padded.
+    /// Pads to the left.
     /// </summary>
-    public enum Alignment
-    {
-        /// <summary>
-        /// Pads to the left.
-        /// </summary>
-        Left,
+    Left,
 
-        /// <summary>
-        /// Pads to both sides, but for string that cannot be equally padded, the string will padded more to the left.
-        /// </summary>
-        CenterLeft,
+    /// <summary>
+    /// Pads to both sides, but for string that cannot be equally padded, the string will padded more to the left.
+    /// </summary>
+    CenterLeft,
 
-        /// <summary>
-        /// Pads to both sides, but for string that cannot be equally padded, the string will bpadded more to the right.
-        /// </summary>
-        CenterRight,
+    /// <summary>
+    /// Pads to both sides, but for string that cannot be equally padded, the string will bpadded more to the right.
+    /// </summary>
+    CenterRight,
 
-        /// <summary>
-        /// Pads to the right.
-        /// </summary>
-        Right,
-    }
+    /// <summary>
+    /// Pads to the right.
+    /// </summary>
+    Right,
 }

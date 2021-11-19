@@ -5,14 +5,13 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Threading.Internal
+namespace Sundew.Base.Threading.Internal;
+
+using System.Threading.Tasks;
+
+internal static class TaskHelper
 {
-    using System.Threading.Tasks;
+    public static readonly Task<bool> CompletedTrueTask = Task.FromResult(true);
 
-    internal static class TaskHelper
-    {
-        public static readonly Task<bool> CompletedTrueTask = Task.FromResult(true);
-
-        public static readonly Task<bool> CompletedFalseTask = Task.FromResult(false);
-    }
+    public static readonly Task<bool> CompletedFalseTask = Task.FromResult(false);
 }

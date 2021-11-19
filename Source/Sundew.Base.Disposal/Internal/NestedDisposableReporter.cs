@@ -5,31 +5,30 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Disposal.Internal
+namespace Sundew.Base.Disposal.Internal;
+
+using System;
+
+internal class NestedDisposableReporter : IDisposableReporter
 {
-    using System;
+    private readonly IDisposableReporter disposableReporter;
+    private readonly IDisposableReporter? nextDisposableReporter;
 
-    internal class NestedDisposableReporter : IDisposableReporter
+    public NestedDisposableReporter(IDisposableReporter disposableReporter, IDisposableReporter? nextDisposableReporter)
     {
-        private readonly IDisposableReporter disposableReporter;
-        private readonly IDisposableReporter? nextDisposableReporter;
+        this.disposableReporter = disposableReporter;
+        this.nextDisposableReporter = nextDisposableReporter;
+    }
 
-        public NestedDisposableReporter(IDisposableReporter disposableReporter, IDisposableReporter? nextDisposableReporter)
-        {
-            this.disposableReporter = disposableReporter;
-            this.nextDisposableReporter = nextDisposableReporter;
-        }
+    public void SetSource(Type target, object source)
+    {
+        this.disposableReporter.SetSource(target, source);
+        this.nextDisposableReporter?.SetSource(target, source);
+    }
 
-        public void SetSource(Type target, object source)
-        {
-            this.disposableReporter.SetSource(target, source);
-            this.nextDisposableReporter?.SetSource(target, source);
-        }
-
-        public void Disposed(object disposable)
-        {
-            this.disposableReporter.Disposed(disposable);
-            this.nextDisposableReporter?.Disposed(disposable);
-        }
+    public void Disposed(object disposable)
+    {
+        this.disposableReporter.Disposed(disposable);
+        this.nextDisposableReporter?.Disposed(disposable);
     }
 }

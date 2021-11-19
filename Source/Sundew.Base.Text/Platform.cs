@@ -5,26 +5,25 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Text
+namespace Sundew.Base.Text;
+
+/// <summary>
+/// Enum for the different platforms.
+/// </summary>
+public enum Platform
 {
     /// <summary>
-    /// Enum for the different platforms.
+    /// The windows platform.
     /// </summary>
-    public enum Platform
-    {
-        /// <summary>
-        /// The windows platform.
-        /// </summary>
-        Windows,
+    Windows,
 
-        /// <summary>
-        /// The unix platform.
-        /// </summary>
-        Unix,
+    /// <summary>
+    /// The unix platform.
+    /// </summary>
+    Unix,
 
-        /// <summary>
-        /// The current platform.
-        /// </summary>
-        Current,
-    }
+    /// <summary>
+    /// The current platform.
+    /// </summary>
+    Current,
 }
