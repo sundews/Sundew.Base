@@ -46,7 +46,7 @@ namespace Sundew.Base.UnitTests.Initialization
                 },
                 true);
 
-            testee.InitializeAsync();
+            _ = testee.InitializeAsync();
 
             manualResetEvent.IsSet.Should().BeFalse();
         }

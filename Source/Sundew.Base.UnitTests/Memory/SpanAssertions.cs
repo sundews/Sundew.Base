@@ -24,7 +24,7 @@ namespace Sundew.Base.UnitTests.Memory
         public void Equal(ReadOnlySpan<TItem> expected)
         {
             var assertionScope = Execute.Assertion.ForCondition(this.Subject.SequenceEqual(expected));
-            if (!assertionScope.Succeeded)
+            if (assertionScope.HasFailures())
             {
                 var stringBuilder = new StringBuilder();
                 var expectedText = GetSpan(expected, stringBuilder);

@@ -47,7 +47,6 @@ namespace Sundew.Base.Threading
         /// <returns>
         /// The result of the conversion.
         /// </returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2225:Operator overloads have named alternates", Justification = "Use Check method instead.")]
         public static implicit operator bool(LockResult lockResult)
         {
             return lockResult.Check();
@@ -69,7 +68,6 @@ namespace Sundew.Base.Threading
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         /// <exception cref="LockNotConfirmedException">Thrown if the user forgot to call Check().</exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1065:Do not raise exceptions in unexpected locations", Justification = "The exception should never be handled, the user forgot to check if the lock was acquired. Will leave it until an analyzer is implemented for checking if the lock was acquired.")]
         public void Dispose()
         {
             if (this.hasLock)

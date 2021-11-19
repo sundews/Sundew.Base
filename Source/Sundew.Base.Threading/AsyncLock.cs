@@ -17,7 +17,7 @@ namespace Sundew.Base.Threading
     /// <seealso cref="IDisposable" />
     public sealed class AsyncLock : IDisposable
     {
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
         /// <summary>
         /// Waits asynchronously to acquire the lock.
