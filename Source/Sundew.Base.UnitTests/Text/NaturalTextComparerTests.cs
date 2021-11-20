@@ -139,7 +139,7 @@ namespace Sundew.Base.UnitTests.Text
             input.Should().Equal(expectedResult);
         }
 
-        [Theory]
+        [Theory(Skip = "Windows and DK culture only")]
         [InlineData(new string[] { null!, null! }, new string[] { null!, null!, })]
         [InlineData(new[] { null, "b" }, new[] { null, "b", })]
         [InlineData(new[] { "b", null }, new[] { null, "b", })]
