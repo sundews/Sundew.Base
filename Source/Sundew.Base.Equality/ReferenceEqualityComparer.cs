@@ -24,9 +24,7 @@ public sealed class ReferenceEqualityComparer<TObject> : IEqualityComparer<TObje
     /// Gets the instance.
     /// </summary>
     /// <value>The instance.</value>
-#pragma warning disable CA1000 // Do not declare static members on generic types
     public static ReferenceEqualityComparer<TObject> Instance { get; } = new();
-#pragma warning restore CA1000 // Do not declare static members on generic types
 
     /// <summary>
     /// Determines whether the specified objects are reference equal.
