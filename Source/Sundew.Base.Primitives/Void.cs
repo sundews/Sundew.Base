@@ -16,7 +16,6 @@ public readonly struct ˍ
     /// <summary>
     /// The void.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "CA1707:Identifiers should not contain underscores", Justification = "Underscore is a common pattern for indicating something should be ignored.")]
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.NamingRules", "SA1309:Field names should not begin with underscore", Justification = "Underscore is a common pattern for indicating something should be ignored.")]
     public static readonly ˍ _ = default;
 }

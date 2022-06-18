@@ -14,6 +14,7 @@ using System.Runtime.InteropServices;
 using Sundew.Base.Memory.Internal;
 using Sundew.Base.Primitives.Numeric;
 using Sundew.Base.Reporting;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Represents a buffer that can grow in size as needed.
@@ -28,6 +29,7 @@ public class Buffer<TItem> : IBufferInternal<TItem>
     private int position;
     private int length;
     private BufferSlice<TItem>? lastBufferSlice;
+    private TItem[]? internalBuffer;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Buffer{TItem}" /> class.
@@ -132,7 +134,11 @@ public class Buffer<TItem> : IBufferInternal<TItem>
         }
     }
 
-    internal TItem[]? InternalBuffer { get; private set; }
+    internal TItem[]? InternalBuffer
+    {
+        get => this.internalBuffer;
+        private set => this.internalBuffer = value;
+    }
 
     /// <summary>
     /// Gets or sets the item at the specified index.
@@ -505,9 +511,36 @@ public class Buffer<TItem> : IBufferInternal<TItem>
     /// <returns>The new array.</returns>
     public TItem[] ToArray()
     {
+        if (this.internalBuffer == null)
+        {
+            return Arrays.Empty<TItem>();
+        }
+
         var newArray = new TItem[this.Length];
-        Array.Copy(this.InternalBuffer, 0, newArray, 0, this.Length);
+        Array.Copy(this.internalBuffer, 0, newArray, 0, this.Length);
         return newArray;
+    }
+
+    /// <summary>Converts to array.</summary>
+    /// <returns>The new array.</returns>
+    public TItem[] ToFinalArray()
+    {
+        if (this.internalBuffer == null)
+        {
+            return Arrays.Empty<TItem>();
+        }
+
+        if (this.Length < this.internalBuffer.Length)
+        {
+            Array.Resize(ref this.internalBuffer, this.Length);
+        }
+
+        var actualBuffer = this.internalBuffer;
+        this.startIndex = -1;
+        this.position = 0;
+        this.length = 0;
+        this.internalBuffer = null;
+        return actualBuffer;
     }
 
     /// <summary>

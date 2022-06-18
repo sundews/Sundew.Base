@@ -13,7 +13,7 @@ namespace Sundew.Base.UnitTests.Threading
 
     public class FlagTests
     {
-        private readonly Flag testee = new Flag();
+        private readonly Flag testee = new();
 
         [Fact]
         public void IsSet_When_Set_Then_ResultShouldBeTrue()

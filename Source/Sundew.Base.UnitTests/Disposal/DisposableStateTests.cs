@@ -59,6 +59,7 @@ namespace Sundew.Base.UnitTests.Disposal
             public void Dispose()
             {
                 this.disposer.Dispose(true, this.Dispose);
+                GC.SuppressFinalize(this);
             }
 
             public ValueTask DisposeAsync()
