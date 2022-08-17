@@ -5,12 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System.Linq;
-
 namespace Sundew.Base.Disposal;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Sundew.Base.Collections;
 using Sundew.Base.Disposal.Internal;
 using Sundew.Base.Reporting;
