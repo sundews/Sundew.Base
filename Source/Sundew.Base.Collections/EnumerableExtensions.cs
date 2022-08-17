@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using Sundew.Base.Collections.Internal;
 using Sundew.Base.Memory;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Extends the generic IEnumerable interface with functions.
@@ -26,12 +27,14 @@ public static class EnumerableExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-    public static IEnumerable<TItem> ToEnumerable<TItem>(this TItem item)
+    public static IReadOnlyCollection<TItem> ToEnumerable<TItem>(this TItem? item)
     {
         if (item != null)
         {
-            yield return item;
+            return new[] { item };
         }
+
+        return Arrays.Empty<TItem>();
     }
 
     /// <summary>
@@ -80,6 +83,11 @@ public static class EnumerableExtensions
     /// <returns>The index found by the matching predicate.</returns>
     public static int IndexOf<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> indexPredicate)
     {
+        if (enumerable is List<TItem> list)
+        {
+            return list.FindIndex(x => indexPredicate(x));
+        }
+
         var index = 0;
         foreach (var item in enumerable)
         {
@@ -161,7 +169,7 @@ public static class EnumerableExtensions
 
     /// <summary>
     /// Create an array from the specified enumerable.
-    /// Potentially more efficient than Linq Select + ToArray if the enumerable is not deferred.
+    /// More efficient than Linq Select + ToArray if the enumerable is not deferred.
     /// </summary>
     /// <typeparam name="TInItem">The type of the in item.</typeparam>
     /// <typeparam name="TOutItem">The type of the out item.</typeparam>
@@ -196,16 +204,16 @@ public static class EnumerableExtensions
     /// <returns>The new Array.</returns>
     public static TItem[] Concat<TItem>(this IEnumerable<TItem> enumerable, IEnumerable<TItem> second, IEnumerable<TItem> third)
     {
-        var estimatedCount = EstimateCount(enumerable);
-        estimatedCount += EstimateCount(second);
-        estimatedCount += EstimateCount(third);
+        var estimatedCount = EstimateCount<TItem>(enumerable);
+        estimatedCount += EstimateCount<TItem>(second);
+        estimatedCount += EstimateCount<TItem>(third);
 
         var buffer = new Buffer<TItem>(estimatedCount);
         buffer.WriteRange(enumerable);
         buffer.WriteRange(second);
         buffer.WriteRange(third);
 
-        return buffer.ToArray();
+        return buffer.ToFinalArray();
     }
 
     /// <summary>Concats the specified additional.</summary>
@@ -217,10 +225,10 @@ public static class EnumerableExtensions
     /// <returns>The new Array.</returns>
     public static TItem[] Concat<TItem>(this IEnumerable<TItem> enumerable, IEnumerable<TItem> second, IEnumerable<TItem> third, IEnumerable<TItem> fourth)
     {
-        var estimatedCount = EstimateCount(enumerable);
-        estimatedCount += EstimateCount(second);
-        estimatedCount += EstimateCount(third);
-        estimatedCount += EstimateCount(fourth);
+        var estimatedCount = EstimateCount<TItem>(enumerable);
+        estimatedCount += EstimateCount<TItem>(second);
+        estimatedCount += EstimateCount<TItem>(third);
+        estimatedCount += EstimateCount<TItem>(fourth);
 
         var buffer = new Buffer<TItem>(estimatedCount);
         buffer.WriteRange(enumerable);
@@ -228,7 +236,7 @@ public static class EnumerableExtensions
         buffer.WriteRange(third);
         buffer.WriteRange(fourth);
 
-        return buffer.ToArray();
+        return buffer.ToFinalArray();
     }
 
     /// <summary>Concats the specified additional.</summary>
@@ -241,11 +249,11 @@ public static class EnumerableExtensions
     /// <returns>The new Array.</returns>
     public static TItem[] Concat<TItem>(this IEnumerable<TItem> enumerable, IEnumerable<TItem> second, IEnumerable<TItem> third, IEnumerable<TItem> fourth, params IEnumerable<TItem>[] additionalEnumerables)
     {
-        var estimatedCount = EstimateCount(enumerable);
-        estimatedCount += EstimateCount(second);
-        estimatedCount += EstimateCount(third);
-        estimatedCount += EstimateCount(fourth);
-        estimatedCount += additionalEnumerables.Sum(EstimateCount);
+        var estimatedCount = EstimateCount<TItem>(enumerable);
+        estimatedCount += EstimateCount<TItem>(second);
+        estimatedCount += EstimateCount<TItem>(third);
+        estimatedCount += EstimateCount<TItem>(fourth);
+        estimatedCount += additionalEnumerables.Sum(EstimateCount<TItem>);
 
         var buffer = new Buffer<TItem>(estimatedCount);
         buffer.WriteRange(enumerable);
@@ -257,7 +265,7 @@ public static class EnumerableExtensions
             buffer.WriteRange(item);
         }
 
-        return buffer.ToArray();
+        return buffer.ToFinalArray();
     }
 
     /// <summary>
@@ -366,7 +374,7 @@ public static class EnumerableExtensions
         return result;
     }
 
-    private static int EstimateCount<TItem>(IEnumerable<TItem> x)
+    private static int EstimateCount<TItem>(object x)
     {
         if (x is ICollection<TItem> collectionOfT)
         {

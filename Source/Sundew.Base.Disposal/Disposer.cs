@@ -5,6 +5,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Linq;
+
 namespace Sundew.Base.Disposal;
 
 using System;
@@ -25,6 +27,21 @@ public sealed partial class Disposer : IDisposable, IReportingDisposable
     /// <summary>
     /// Initializes a new instance of the <see cref="Disposer"/> class.
     /// </summary>
+    public Disposer()
+        : this(Enumerable.Empty<IDisposable>())
+    {
+    }
+
+    /// <summary>Initializes a new instance of the <see cref="Disposer"/> class.</summary>
+    /// <param name="disposableReporter">The disposable reporter.</param>
+    public Disposer(IDisposableReporter disposableReporter)
+        : this(Enumerable.Empty<IDisposable>(), disposableReporter)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Disposer"/> class.
+    /// </summary>
     /// <param name="disposables">The disposables.</param>
     public Disposer(params IDisposable[] disposables)
         : this((IEnumerable<IDisposable>)disposables)
@@ -34,7 +51,7 @@ public sealed partial class Disposer : IDisposable, IReportingDisposable
     /// <summary>Initializes a new instance of the <see cref="Disposer"/> class.</summary>
     /// <param name="disposableReporter">The disposable reporter.</param>
     /// <param name="disposables">The disposables.</param>
-    public Disposer(IDisposableReporter? disposableReporter, params IDisposable[] disposables)
+    public Disposer(IDisposableReporter disposableReporter, params IDisposable[] disposables)
         : this(disposables, disposableReporter)
     {
     }
