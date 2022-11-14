@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
-    <PackageReference Include="JustMock" Version="2022.2.621.1" />
+    <PackageReference Include="JustMock" Version="2022.3.1109.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.333">
       <PrivateAssets>all</PrivateAssets>
