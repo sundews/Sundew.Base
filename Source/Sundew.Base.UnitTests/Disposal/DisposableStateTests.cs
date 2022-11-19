@@ -39,7 +39,12 @@ namespace Sundew.Base.UnitTests.Disposal
             testee.Calls.Should().Equal(expectedCalls);
         }
 
-        internal class DisposableBase : IDisposable, IAsyncDisposable
+        internal class DisposableBase :
+#if NET6_0_OR_GREATER
+IDisposable, IAsyncDisposable
+#else
+IDisposable
+#endif
         {
             private readonly DisposableState disposer;
 
@@ -59,9 +64,9 @@ namespace Sundew.Base.UnitTests.Disposal
             public void Dispose()
             {
                 this.disposer.Dispose(true, this.Dispose);
-                GC.SuppressFinalize(this);
             }
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:TryDispose methods should call SuppressFinalize", Justification = "It is done by disposer.")]
             public ValueTask DisposeAsync()
             {
                 return this.disposer.DisposeAsync(true, this.DisposeAsync);

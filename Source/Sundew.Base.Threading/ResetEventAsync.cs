@@ -66,12 +66,12 @@ public abstract class ResetEventAsync
         TaskCompletionSource<bool>? completedWaiter = null;
         lock (this.lockObject)
         {
-            if (this.awaiters.Count > 0)
+            var first = this.awaiters.First;
+            if (first != null)
             {
-                var awaiter = this.awaiters.First;
                 this.awaiters.RemoveFirst();
-                completedWaiter = awaiter.Value.TaskCompletionSource;
-                awaiter.Value.CancellationTokenSource.Cancel();
+                completedWaiter = first.Value.TaskCompletionSource;
+                first.Value.CancellationTokenSource.Cancel();
             }
 
             this.isSet = completedWaiter == null;

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AsyncLazyTests.cs" company="Hukano">
+// <copyright file="AsyncLazyOfTTests.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -8,32 +8,34 @@
 namespace Sundew.Base.UnitTests.Threading
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
     using FluentAssertions;
     using Sundew.Base.Threading;
     using Xunit;
 
-    public class AsyncLazyTests
+    public class AsyncLazyOfTTests
     {
         private const string ExpectedResult = "Computed";
 
         [Fact]
-        public async void Await_Then_ResultShouldBeExpectedResult()
+        public async void Await_Then_TaskResultShouldBeExpectedResult()
         {
-            var expectedResult = 3;
-            var asyncLazy = new AsyncLazy<int>(() => Task.FromResult(expectedResult));
+            var expectedResult = new List<int> { 3 };
+            var asyncLazy = new AsyncLazy<IList<int>, List<int>>(() => Task.FromResult(expectedResult));
+            IAsyncLazy<IList<int>> asyncLazyBase = asyncLazy;
 
-            var result = await asyncLazy;
+            var result = await asyncLazyBase;
 
-            result.Should().Be(expectedResult);
+            result.Should().BeSameAs(expectedResult);
         }
 
         [Fact]
         public async Task GetValueAsync_When_CancellationTokenIsCancelled_Then_TaskCancelledExceptionIsThrown()
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            var testee = new AsyncLazy<string>(async cancellationToken =>
+            var testee = new AsyncLazy<string, string>(async cancellationToken =>
             {
                 await Task.Delay(50, cancellationToken);
                 return ExpectedResult;
@@ -54,7 +56,7 @@ namespace Sundew.Base.UnitTests.Threading
         public async Task GetValueAsync_When_FirstAttemptIsCancelledAndASecondAttemptIsMade_Then_ResultShouldBeExpectedResult()
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            var testee = new AsyncLazy<string>(async cancellationToken =>
+            var testee = new AsyncLazy<string, string>(async cancellationToken =>
             {
                 await Task.Delay(50, cancellationToken);
                 return ExpectedResult;
@@ -82,7 +84,7 @@ namespace Sundew.Base.UnitTests.Threading
         {
             var cancellationTokenSource = new CancellationTokenSource();
             var hasRun = false;
-            var testee = new AsyncLazy<string>(async cancellationToken =>
+            var testee = new AsyncLazy<string, string>(async cancellationToken =>
             {
                 if (hasRun)
                 {

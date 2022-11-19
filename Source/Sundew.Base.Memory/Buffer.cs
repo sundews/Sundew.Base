@@ -12,9 +12,9 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Sundew.Base.Memory.Internal;
+using Sundew.Base.Primitives;
 using Sundew.Base.Primitives.Numeric;
 using Sundew.Base.Reporting;
-using Sundew.Base.Primitives;
 
 /// <summary>
 /// Represents a buffer that can grow in size as needed.

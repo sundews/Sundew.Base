@@ -17,7 +17,7 @@ namespace Sundew.Base.PerformanceTests.Text
     [MemoryDiagnoser]
     [SimpleJob(RuntimeMoniker.Net48, baseline: true)]
     [SimpleJob(RuntimeMoniker.NetCoreApp31)]
-    [SimpleJob(RuntimeMoniker.CoreRt60)]
+    [SimpleJob(RuntimeMoniker.Net70)]
     public class NaturalText
     {
         private readonly Win32NaturalTextComparer win32NaturalTextComparer;

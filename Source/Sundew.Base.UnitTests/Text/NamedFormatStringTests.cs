@@ -12,7 +12,6 @@ namespace Sundew.Base.UnitTests.Text
     using FluentAssertions;
     using Sundew.Base.Text;
     using Xunit;
-    using static Sundew.Base.Text.NamedFormatString;
 
     public class NamedFormatStringTests
     {
@@ -68,6 +67,16 @@ namespace Sundew.Base.UnitTests.Text
 #pragma warning restore CS8604 // Possible null reference argument.
 
             act.Should().Throw<ArgumentNullException>();
+        }
+
+        [Fact]
+        public void FormatInvariant_When_Then_ResultShouldBeExpectedResult()
+        {
+            const string expectedResult = "$\"4";
+
+            var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
+
+            result.Should().BeOfType<StringFormatted>().And.Subject.Should().Be(expectedResult);
         }
     }
 }

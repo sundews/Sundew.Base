@@ -15,6 +15,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Sundew.Base.Collections;
+using Sundew.Base.Memory;
 
 /// <summary>
 /// A formatter that supports names and indices.
@@ -110,6 +111,65 @@ public readonly struct NamedFormatString
 
         namedFormatString = new NamedFormatString(indexedFormat, formatNames);
         return true;
+    }
+
+    /// <summary>
+    /// Formats the specified string based on the named string and additional values.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="namedValues">The named strings.</param>
+    /// <param name="additionalValues">The additional values.</param>
+    /// <returns>A <see cref="FormattedStringResult"/>.</returns>
+    public static FormattedStringResult FormatInvariant(string format, NamedValues namedValues, params object[] additionalValues)
+    {
+        return Format(CultureInfo.InvariantCulture, format, namedValues, additionalValues);
+    }
+
+    /// <summary>
+    /// Formats the specified string based on the named string and additional values.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="namedValues">The named strings.</param>
+    /// <param name="additionalValues">The additional values.</param>
+    /// <returns>A <see cref="FormattedStringResult"/>.</returns>
+    public static FormattedStringResult Format(string format, NamedValues namedValues, params object[] additionalValues)
+    {
+        return Format(CultureInfo.CurrentCulture, format, namedValues, additionalValues);
+    }
+
+    /// <summary>
+    /// Formats the specified string based on the named string and additional values.
+    /// </summary>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <param name="format">The format.</param>
+    /// <param name="namedValues">The named strings.</param>
+    /// <param name="additionalValues">The additional values.</param>
+    /// <returns>A <see cref="FormattedStringResult"/>.</returns>
+    public static FormattedStringResult Format(IFormatProvider formatProvider, string format, NamedValues namedValues, params object[] additionalValues)
+    {
+        var arguments = new Buffer<object?>(additionalValues.Length + namedValues.Pairs.Length);
+        var names = new Buffer<string>(arguments.Capacity);
+        arguments.WriteRange(additionalValues);
+        names.WriteRange(Enumerable.Repeat(string.Empty, additionalValues.Length));
+        foreach (var namedString in namedValues.Pairs)
+        {
+            arguments.Write(namedString.Value);
+            names.Write(namedString.Name);
+        }
+
+        var result = TryCreate(format, names.ToFinalArray(), out var namedFormatString, out var unknownNames);
+        if (result)
+        {
+            var nullArguments = namedFormatString.GetNullArguments(arguments);
+            if (nullArguments.Count > 0)
+            {
+                return FormattedStringResult.ArgumentsContainedNullValues(nullArguments);
+            }
+
+            return FormattedStringResult.StringFormatted(namedFormatString.Format(formatProvider, namedFormatString, arguments.ToFinalArray()));
+        }
+
+        return FormattedStringResult.UnexpectedNames(unknownNames);
     }
 
     /// <summary>
