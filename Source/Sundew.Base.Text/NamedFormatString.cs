@@ -120,7 +120,7 @@ public readonly struct NamedFormatString
     /// <param name="namedValues">The named strings.</param>
     /// <param name="additionalValues">The additional values.</param>
     /// <returns>A <see cref="FormattedStringResult"/>.</returns>
-    public static FormattedStringResult FormatInvariant(string format, NamedValues namedValues, params object[] additionalValues)
+    public static FormattedStringResult FormatInvariant(string format, NamedValues namedValues, params object?[] additionalValues)
     {
         return Format(CultureInfo.InvariantCulture, format, namedValues, additionalValues);
     }
@@ -132,7 +132,7 @@ public readonly struct NamedFormatString
     /// <param name="namedValues">The named strings.</param>
     /// <param name="additionalValues">The additional values.</param>
     /// <returns>A <see cref="FormattedStringResult"/>.</returns>
-    public static FormattedStringResult Format(string format, NamedValues namedValues, params object[] additionalValues)
+    public static FormattedStringResult Format(string format, NamedValues namedValues, params object?[] additionalValues)
     {
         return Format(CultureInfo.CurrentCulture, format, namedValues, additionalValues);
     }
@@ -145,7 +145,7 @@ public readonly struct NamedFormatString
     /// <param name="namedValues">The named strings.</param>
     /// <param name="additionalValues">The additional values.</param>
     /// <returns>A <see cref="FormattedStringResult"/>.</returns>
-    public static FormattedStringResult Format(IFormatProvider formatProvider, string format, NamedValues namedValues, params object[] additionalValues)
+    public static FormattedStringResult Format(IFormatProvider formatProvider, string format, NamedValues namedValues, params object?[] additionalValues)
     {
         var arguments = new Buffer<object?>(additionalValues.Length + namedValues.Pairs.Length);
         var names = new Buffer<string>(arguments.Capacity);
