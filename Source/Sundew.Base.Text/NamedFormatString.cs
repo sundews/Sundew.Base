@@ -160,13 +160,14 @@ public readonly struct NamedFormatString
         var result = TryCreate(format, names.ToFinalArray(), out var namedFormatString, out var unknownNames);
         if (result)
         {
-            var nullArguments = namedFormatString.GetNullArguments(arguments);
+            var argumentArray = arguments.ToFinalArray();
+            var nullArguments = namedFormatString.GetNullArguments(argumentArray);
             if (nullArguments.Count > 0)
             {
                 return FormattedStringResult.ArgumentsContainedNullValues(nullArguments);
             }
 
-            return FormattedStringResult.StringFormatted(namedFormatString.Format(formatProvider, namedFormatString, arguments.ToFinalArray()));
+            return FormattedStringResult.StringFormatted(namedFormatString.Format(formatProvider, argumentArray));
         }
 
         return FormattedStringResult.UnexpectedNames(unknownNames);

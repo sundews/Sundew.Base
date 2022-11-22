@@ -72,11 +72,28 @@ namespace Sundew.Base.UnitTests.Text
         [Fact]
         public void FormatInvariant_When_Then_ResultShouldBeExpectedResult()
         {
-            const string expectedResult = "$\"4";
+            const string expectedResult = "$, \", 4";
 
             var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
 
-            result.Should().BeOfType<StringFormatted>().And.Subject.Should().Be(expectedResult);
+            result.Should().BeOfType<StringFormatted>().Which.Value.Should().Be(expectedResult);
+        }
+
+        [Fact]
+        public void FormatInvariant_When_Then_ContentShouldBeExpectedResult()
+        {
+            const string expectedResult = "$, \", 4";
+
+            var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
+
+            var content = result switch
+            {
+                StringFormatted stringFormatted => stringFormatted.Value,
+                ArgumentsContainedNullValues argumentsContainedNullValues => nameof(argumentsContainedNullValues),
+                UnexpectedNames unexpectedNames => nameof(unexpectedNames),
+            };
+
+            content.Should().Be(expectedResult);
         }
     }
 }

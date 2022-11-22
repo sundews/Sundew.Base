@@ -13,44 +13,29 @@ using System.Collections.Generic;
 /// Represents a result of formatting a <see cref="NamedFormatString"/>.
 /// </summary>
 [Sundew.DiscriminatedUnions.DiscriminatedUnion]
-public abstract record FormattedStringResult
+public abstract class FormattedStringResult
 {
     /// <summary>
     /// Creates a successfully formatted string.
     /// </summary>
-    /// <param name="formattedString">The formatted string.</param>
+    /// <param name="value">The value.</param>
     /// <returns>The result.</returns>
-    public static FormattedStringResult StringFormatted(string formattedString) => new StringFormatted(formattedString);
-
-    /// <summary>
-    /// Creates a failed formatted string due to arguments containing null values.
-    /// </summary>
-    /// <param name="nullArguments">The null arguments.</param>
-    /// <returns>The result.</returns>
-    public static FormattedStringResult ArgumentsContainedNullValues(IReadOnlyList<(string Name, int Index)> nullArguments) => new ArgumentsContainedNullValues(nullArguments);
+    [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(StringFormatted))]
+    public static FormattedStringResult StringFormatted(string value) => new StringFormatted(value);
 
     /// <summary>
     /// Creates a failed formatted string due unexpected names.
     /// </summary>
     /// <param name="names">The unknown names.</param>
     /// <returns>The result.</returns>
+    [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(UnexpectedNames))]
     public static FormattedStringResult UnexpectedNames(IReadOnlyList<string> names) => new UnexpectedNames(names);
+
+    /// <summary>
+    /// Creates a failed formatted string due to arguments containing null values.
+    /// </summary>
+    /// <param name="nullArguments">The null arguments.</param>
+    /// <returns>The result.</returns>
+    [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(ArgumentsContainedNullValues))]
+    public static FormattedStringResult ArgumentsContainedNullValues(IReadOnlyList<(string Name, int Index)> nullArguments) => new ArgumentsContainedNullValues(nullArguments);
 }
-
-/// <summary>
-/// Represents a successfully formatted string.
-/// </summary>
-/// <param name="Value">The formatted string.</param>
-public sealed record StringFormatted(string Value) : FormattedStringResult;
-
-/// <summary>
-/// Represents a failed formatted string due to arguments containing null values.
-/// </summary>
-/// <param name="NullArguments">The arguments that contained null values.</param>
-public sealed record ArgumentsContainedNullValues(IReadOnlyList<(string Name, int Index)> NullArguments) : FormattedStringResult;
-
-/// <summary>
-/// Represents a failed formatted string due to unknown names in format string.
-/// </summary>
-/// <param name="Names">The unknown names.</param>
-public sealed record UnexpectedNames(IReadOnlyList<string> Names) : FormattedStringResult;
