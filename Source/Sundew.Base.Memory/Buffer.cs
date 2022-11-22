@@ -252,7 +252,7 @@ public class Buffer<TItem> : IBufferInternal<TItem>
     /// <returns>The current position.</returns>
     public int Write(TItem[] items)
     {
-        return this.Write(items.AsSpan());
+        return this.Write(new ReadOnlySpan<TItem>(items));
     }
 
     /// <summary>

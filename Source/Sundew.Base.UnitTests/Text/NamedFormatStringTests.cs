@@ -70,7 +70,7 @@ namespace Sundew.Base.UnitTests.Text
         }
 
         [Fact]
-        public void FormatInvariant_When_Then_ResultShouldBeExpectedResult()
+        public void FormatInvariant_Then_ResultShouldBeStringFormattedWithExpectedResult()
         {
             const string expectedResult = "$, \", 4";
 
@@ -80,11 +80,29 @@ namespace Sundew.Base.UnitTests.Text
         }
 
         [Fact]
-        public void FormatInvariant_When_Then_ContentShouldBeExpectedResult()
+        public void FormatInvariant_Then_ContentShouldBeExpectedResult()
         {
             const string expectedResult = "$, \", 4";
 
             var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
+
+            var content = result switch
+            {
+                StringFormatted stringFormatted => stringFormatted.Value,
+                ArgumentsContainedNullValues argumentsContainedNullValues => nameof(argumentsContainedNullValues),
+                UnexpectedNames unexpectedNames => nameof(unexpectedNames),
+            };
+
+            content.Should().Be(expectedResult);
+        }
+
+        [Fact]
+        public void FormatInvariant_When_PassingStringArray_Then_ContentShouldBeExpectedResult()
+        {
+            const string expectedResult = "$, \", 4";
+            var arguments = new[] { "4" };
+
+            var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), arguments);
 
             var content = result switch
             {
