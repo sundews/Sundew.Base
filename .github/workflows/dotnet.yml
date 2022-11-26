@@ -61,7 +61,7 @@ jobs:
         "::set-output name=pushSource::{PushSource}" "::set-output name=apiKey::{ApiKey}" "::set-output name=fullVersion::{FullVersion}" "::set-output name=symbolsPushSource::{SymbolsPushSource}"
         "::set-output name=symbolsApiKey::{SymbolsApiKey}"
 
-        cb match -p "^refs/tags/release[^/]*$ => ::set-output name=isReleaseCommand::{true}" -i "${{ github.ref }}"
+        cb match -p "^refs/tags/release[^/]*$ => ::set-output name=isReleaseCommand::true" -i "${{ github.ref }}"
     - name: Restore
       run: dotnet restore ${{ env.solutionPath }} --verbosity normal -s ${{ env.source }}${{ steps.stage-build.outputs.dev-package-source-if-set }}
     - name: Build
@@ -86,7 +86,7 @@ jobs:
         git tag -a v.${{ steps.stage-build.outputs.version }} -m "v.${{ steps.stage-build.outputs.version }}"
         git push ${{ env.repository }} v.${{ steps.stage-build.outputs.version }}
 
-        cb --if "${{ steps.stage-build.outputs.isReleaseCommand }} == 'true'" -c "git|push --delete ${{ env.repository }} ${{ github.ref }}" -b none
+        cb --if "${{ steps.stage-build.outputs.isReleaseCommand }} == true" -c "git|push --delete ${{ env.repository }} ${{ github.ref }}" -b none
     - name: 'Await stable package publish'
       if: ${{ steps.stage-build.outputs.stage == 'production' }}
       run: cb -c "spt|await -s ${{ steps.stage-build.outputs.feedSource }} {0}.${{ steps.stage-build.outputs.version }}" -bs NewLine -bvs ':' -bf ${{ env.source-packages-to-push }}
