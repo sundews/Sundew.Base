@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnexpectedNames.cs" company="Hukano">
+// <copyright file="FormatContainedUnknownNames.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,13 +12,13 @@ using System.Collections.Generic;
 /// <summary>
 /// Represents a failed formatted string due to unknown names in format string.
 /// </summary>
-public sealed class UnexpectedNames : FormattedStringResult
+public sealed class FormatContainedUnknownNames : FormattedStringResult
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="UnexpectedNames"/> class.
+    /// Initializes a new instance of the <see cref="FormatContainedUnknownNames"/> class.
     /// </summary>
     /// <param name="names">The names.</param>
-    public UnexpectedNames(IReadOnlyList<string> names)
+    public FormatContainedUnknownNames(IReadOnlyList<string> names)
     {
         this.Names = names;
     }

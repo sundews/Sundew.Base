@@ -76,7 +76,7 @@ namespace Sundew.Base.UnitTests.Text
 
             var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
 
-            result.Should().BeOfType<StringFormatted>().Which.Value.Should().Be(expectedResult);
+            result.Should().BeOfType<StringFormatted>().Which.Result.Should().Be(expectedResult);
         }
 
         [Fact]
@@ -88,9 +88,9 @@ namespace Sundew.Base.UnitTests.Text
 
             var content = result switch
             {
-                StringFormatted stringFormatted => stringFormatted.Value,
+                StringFormatted stringFormatted => stringFormatted.Result,
                 ArgumentsContainedNullValues argumentsContainedNullValues => nameof(argumentsContainedNullValues),
-                UnexpectedNames unexpectedNames => nameof(unexpectedNames),
+                FormatContainedUnknownNames unexpectedNames => nameof(unexpectedNames),
             };
 
             content.Should().Be(expectedResult);
@@ -106,9 +106,9 @@ namespace Sundew.Base.UnitTests.Text
 
             var content = result switch
             {
-                StringFormatted stringFormatted => stringFormatted.Value,
+                StringFormatted stringFormatted => stringFormatted.Result,
                 ArgumentsContainedNullValues argumentsContainedNullValues => nameof(argumentsContainedNullValues),
-                UnexpectedNames unexpectedNames => nameof(unexpectedNames),
+                FormatContainedUnknownNames formatContainedUnknownNames => nameof(formatContainedUnknownNames),
             };
 
             content.Should().Be(expectedResult);

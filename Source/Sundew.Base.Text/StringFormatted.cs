@@ -15,14 +15,14 @@ public sealed class StringFormatted : FormattedStringResult
     /// <summary>
     /// Initializes a new instance of the <see cref="StringFormatted"/> class.
     /// </summary>
-    /// <param name="value">The value.</param>
-    public StringFormatted(string value)
+    /// <param name="result">The result.</param>
+    public StringFormatted(string result)
     {
-        this.Value = value;
+        this.Result = result;
     }
 
     /// <summary>
     /// Gets the value.
     /// </summary>
-    public string Value { get; }
+    public string Result { get; }
 }

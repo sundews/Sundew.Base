@@ -358,7 +358,7 @@ public readonly struct NamedFormatString
             return FormattedStringResult.StringFormatted(namedFormatString.Format(formatProvider, argumentArray));
         }
 
-        return FormattedStringResult.UnexpectedNames(unknownNames);
+        return FormattedStringResult.FormatContainedUnknownNames(unknownNames);
     }
 
     /// <summary>

@@ -18,18 +18,18 @@ public abstract class FormattedStringResult
     /// <summary>
     /// Creates a successfully formatted string.
     /// </summary>
-    /// <param name="value">The value.</param>
-    /// <returns>The result.</returns>
+    /// <param name="result">The result.</param>
+    /// <returns>The string formatted value.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(StringFormatted))]
-    public static FormattedStringResult StringFormatted(string value) => new StringFormatted(value);
+    public static FormattedStringResult StringFormatted(string result) => new StringFormatted(result);
 
     /// <summary>
-    /// Creates a failed formatted string due unexpected names.
+    /// Creates a failed formatted string result due format containing unknown names.
     /// </summary>
     /// <param name="names">The unknown names.</param>
     /// <returns>The result.</returns>
-    [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(UnexpectedNames))]
-    public static FormattedStringResult UnexpectedNames(IReadOnlyList<string> names) => new UnexpectedNames(names);
+    [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(FormatContainedUnknownNames))]
+    public static FormattedStringResult FormatContainedUnknownNames(IReadOnlyList<string> names) => new FormatContainedUnknownNames(names);
 
     /// <summary>
     /// Creates a failed formatted string due to arguments containing null values.
