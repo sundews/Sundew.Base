@@ -1,10 +1,15 @@
 name: .NET
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - "*"
+    tags:
+      - "release*"
+  pull_request:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     env:
       solutionPath: ./Source/Sundew.Base.sln
@@ -43,7 +48,7 @@ jobs:
       id: stage-build
       run: >
         spt stage-build --project-file "${{ env.versioningProjectPath }}"
-        --production  "refs/heads/release/.+                                                 => ${{ secrets.SPP_API_KEY }}@${{ env.source }}|${{ env.source }}||Configuration=Release"
+        --production  "refs/(heads/release/.+|tags/release)                                  => ${{ secrets.SPP_API_KEY }}@${{ env.source }}|${{ env.source }}||Configuration=Release"
         --integration "refs/heads/(?:master|main).*                                          => &u{DateTime}-{Stage} ${{ secrets.SPP_API_KEY }}@${{ env.source }}|${{ env.source }}||Configuration=Debug|DevFeedSource= -s ${{ env.dev-source-latest-version }}"
         --development "refs/heads/(?:develop.*|feature/(?<Postfix>.+)|bugfix/(?<Postfix>.+)) => ${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-source }} {${{ env.dev-source-latest-version }}}|${{ secrets.SPP_DEVELOPMENT_API_KEY }}@${{ env.dev-symbols-source }}||Configuration=Debug|DevFeedSource= -s ${{ env.dev-source-latest-version }}"
         --no-stage "Configuration=Release"
@@ -81,7 +86,7 @@ jobs:
         git tag -a v.${{ steps.stage-build.outputs.version }} -m "v.${{ steps.stage-build.outputs.version }}"
         git push ${{ env.repository }} v.${{ steps.stage-build.outputs.version }}
 
-        cb --if "${{ steps.stage-build.outputs.isReleaseCommand }} == 'true'" -c "git|push ${{ env.repository }} -d ${{ github.ref }}" -b none
+        cb --if "${{ steps.stage-build.outputs.isReleaseCommand }} == 'true'" -c "git|push --delete ${{ env.repository }} ${{ github.ref }}" -b none
     - name: 'Await stable package publish'
       if: ${{ steps.stage-build.outputs.stage == 'production' }}
       run: cb -c "spt|await -s ${{ steps.stage-build.outputs.feedSource }} {0}.${{ steps.stage-build.outputs.version }}" -bs NewLine -bvs ':' -bf ${{ env.source-packages-to-push }}
