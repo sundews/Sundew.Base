@@ -7,10 +7,7 @@
 
 namespace Sundew.Base.Text;
 
-using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 /// <summary>
 /// Easy to use methods for <see cref="char"/>s.

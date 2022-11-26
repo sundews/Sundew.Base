@@ -26,7 +26,11 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 6.0.203
+        dotnet-version: 7.x.x
+    - name: Setup .NET 6
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.x.x
     - name: Build setup
       id: build-setup
       run: >
@@ -52,7 +56,7 @@ jobs:
         "::set-output name=pushSource::{PushSource}" "::set-output name=apiKey::{ApiKey}" "::set-output name=fullVersion::{FullVersion}" "::set-output name=symbolsPushSource::{SymbolsPushSource}"
         "::set-output name=symbolsApiKey::{SymbolsApiKey}"
     - name: Restore
-      run: dotnet restore ${{ env.solutionPath }} --verbosity normal -s ${{ env.source }}${{ steps.build-setup.outputs.dev-package-source-if-set }}
+      run: dotnet restore ${{ env.solutionPath }} --verbosity normal -s ${{ env.source }}${{ steps.stage-build.outputs.dev-package-source-if-set }}
     - name: Build
       id: build
       run: >

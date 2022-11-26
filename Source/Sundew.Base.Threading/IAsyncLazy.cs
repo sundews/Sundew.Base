@@ -9,6 +9,8 @@ namespace Sundew.Base.Threading;
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Interface for implementing an async lazy.
@@ -16,6 +18,18 @@ using System.Runtime.CompilerServices;
 /// <typeparam name="TValue">The type of the value.</typeparam>
 public interface IAsyncLazy<TValue>
 {
+    /// <summary>
+    /// Gets a value indicating whether the lazy value has been created.
+    /// </summary>
+    bool IsValueCreated { get; }
+
+    /// <summary>
+    /// Gets or creates the value async.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>A task.</returns>
+    Task<TValue> GetValueAsync(CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Gets the value or default.
     /// </summary>
