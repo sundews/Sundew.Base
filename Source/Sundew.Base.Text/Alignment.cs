@@ -18,12 +18,12 @@ public enum Alignment
     Left,
 
     /// <summary>
-    /// Pads to both sides, but for string that cannot be equally padded, the string will padded more to the left.
+    /// Pads to both sides, but for string that cannot be equally padded, the string will be padded more to the left.
     /// </summary>
     CenterLeft,
 
     /// <summary>
-    /// Pads to both sides, but for string that cannot be equally padded, the string will bpadded more to the right.
+    /// Pads to both sides, but for string that cannot be equally padded, the string will be padded more to the right.
     /// </summary>
     CenterRight,
 

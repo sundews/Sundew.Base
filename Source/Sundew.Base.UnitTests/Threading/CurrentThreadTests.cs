@@ -25,7 +25,7 @@ namespace Sundew.Base.UnitTests.Threading
             testee.Sleep(60, cancellationTokenSource.Token);
 
             stopwatch.Stop();
-            stopwatch.ElapsedMilliseconds.Should().BeInRange(19, 60);
+            stopwatch.ElapsedMilliseconds.Should().BeInRange(20, 60);
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace Sundew.Base.UnitTests.Threading
             testee.Sleep(10, CancellationToken.None);
 
             stopwatch.Stop();
-            stopwatch.ElapsedMilliseconds.Should().BeInRange(9, 20);
+            stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Sundew.Base.UnitTests.Threading
             testee.Sleep(10);
 
             stopwatch.Stop();
-            stopwatch.ElapsedMilliseconds.Should().BeInRange(9, 25);
+            stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
         }
     }
 }

@@ -19,7 +19,7 @@ using Sundew.Base.Primitives;
 /// <summary>
 /// Extends the generic IEnumerable interface with functions.
 /// </summary>
-public static class EnumerableExtensions
+public static partial class EnumerableExtensions
 {
     /// <summary>
     /// Gets an <see cref="IEnumerable{TItem}"/> from an item.
