@@ -48,6 +48,18 @@ public static class Item
     }
 
     /// <summary>
+    /// Creates a valid result with the passed item.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <returns>The result.</returns>
+    public static Item<TItem, TError> Pass<TItem, TError>(TItem item)
+    {
+        return new Item<TItem, TError>(item, default, true);
+    }
+
+    /// <summary>
     /// Create an error result.
     /// </summary>
     /// <returns>The result.</returns>
@@ -57,9 +69,53 @@ public static class Item
     }
 
     /// <summary>
+    /// Create an error result.
+    /// </summary>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>The result.</returns>
+    public static FailedItem<TError> Fail<TError>(TError? error)
+    {
+        return new FailedItem<TError>(error);
+    }
+
+    /// <summary>
+    /// Create an error result.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>The result.</returns>
+    public static Item<TResult, TError> Fail<TResult, TError>(TError? error)
+    {
+        return new Item<TResult, TError>(default, error, false);
+    }
+
+    /// <summary>
     /// Represents a failed item.
     /// </summary>
     public readonly struct FailedItem
     {
+    }
+
+    /// <summary>
+    /// Represents a failed item.
+    /// </summary>
+    /// <typeparam name="TError">The error type.</typeparam>
+    public readonly struct FailedItem<TError>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FailedItem{TError}"/> struct.
+        /// </summary>
+        /// <param name="error">The error.</param>
+        public FailedItem(TError? error)
+        {
+            this.Error = error;
+        }
+
+        /// <summary>
+        /// Gets the error.
+        /// </summary>
+        public TError? Error { get; }
     }
 }

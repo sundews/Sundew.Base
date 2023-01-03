@@ -7,6 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Collections;
 
+using System;
 using System.Linq;
 using FluentAssertions;
 using Sundew.Base.Collections;
@@ -15,7 +16,7 @@ using Xunit;
 public class EnumerableExtensionsAllOrFailedTests
 {
     [Fact]
-    public void AllOrFailedOfInt32_When_SelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
+    public void AllOrFailed_When_Int32AndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new int?[] { 1, 2, 3, 4 };
         var result = expectedItems.AllOrFailed(x =>
@@ -33,7 +34,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedOfInt32_When_SelectorHasOneError_Then_ResultShouldBeErrorResult()
+    public void AllOrFailed_When_Int32AndSelectorHasOneError_Then_ResultShouldBeErrorResult()
     {
         var result = new int?[] { 1, 2, null, 4, null }.AllOrFailed(x =>
         {
@@ -50,7 +51,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedIfNotNullInt32_When_SelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
+    public void AllOrFailed_When_NonNullInt32AndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new int?[] { 1, 2, 3, 4 };
 
@@ -61,7 +62,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedInt32_When_SelectorHasOneError_Then_ResultShouldBeNone()
+    public void AllOrFailed_When_Int32AndSelectorHasOneError_Then_ResultShouldBeNone()
     {
         var result = new int?[] { 1, 2, null, 4, null }.AllOrFailed();
 
@@ -70,7 +71,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedOfString_When_SelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
+    public void AllOrFailed_When_StringAndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new string?[] { "1", "2", "3", "4" };
         var result = expectedItems.AllOrFailed(x =>
@@ -88,7 +89,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedOfString_When_SelectorHasOneError_Then_ResultShouldBeErrorResult2()
+    public void AllOrFailed_When_StringAndSelectorHasOneError_Then_ResultShouldBeErrorResult2()
     {
         var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed(x =>
         {
@@ -105,7 +106,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedOfString_When_SelectorHasOneError_Then_ResultShouldBeErrorResult()
+    public void AllOrFailed_When_StringAndSelectorHasOneError_Then_ResultShouldBeErrorResult()
     {
         var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed(x =>
         {
@@ -122,7 +123,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailedIfNotNullString_When_SelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
+    public void AllOrFailed_When_NonNullStringAndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new string?[] { "1", "2", "3", "4" };
 
@@ -139,5 +140,43 @@ public class EnumerableExtensionsAllOrFailedTests
 
         result.Should().BeOfType<Failed<string?, string>>().Which
             .Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
+    }
+
+    [Fact]
+    public void AllOrFailed_When_NonNullStringSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
+    {
+        var expectedItems = new string?[] { "1", "2", "3", "4" };
+
+        var result = expectedItems.AllOrFailed(x =>
+        {
+            if (x != null)
+            {
+                return Item.Pass<double, string>(double.Parse(x));
+            }
+
+            return Item.Fail("Failed");
+        });
+
+        result.Should().BeOfType<All<string?, double, string>>().Which
+        .Items.Should().Equal(expectedItems.Select(x => double.Parse(x!)));
+    }
+
+    [Fact]
+    public void AllOrFailed_When_NonNullStringSelectorReturnsError_Then_ResultShouldBeFailedWithFailedItems()
+    {
+        var expectedItems = new string?[] { "1", "2", null, "4", null };
+
+        var result = expectedItems.AllOrFailed(x =>
+        {
+            if (x != null)
+            {
+                return Item.Pass<double, string>(double.Parse(x));
+            }
+
+            return Item.Fail("Failed");
+        });
+
+        result.Should().BeOfType<Failed<string?, double, string>>().Which
+            .Items.Should().Equal(new[] { new FailedItem<string?, string>(2, null, "Failed"), new FailedItem<string?, string>(4, null, "Failed") });
     }
 }
