@@ -74,7 +74,7 @@ public static class Item
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="error">The error.</param>
     /// <returns>The result.</returns>
-    public static FailedItem<TError> Fail<TError>(TError? error)
+    public static FailedItem<TError> Fail<TError>(TError error)
     {
         return new FailedItem<TError>(error);
     }
@@ -86,7 +86,7 @@ public static class Item
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="error">The error.</param>
     /// <returns>The result.</returns>
-    public static Item<TResult, TError> Fail<TResult, TError>(TError? error)
+    public static Item<TResult, TError> Fail<TResult, TError>(TError error)
     {
         return new Item<TResult, TError>(default, error, false);
     }
@@ -108,7 +108,7 @@ public static class Item
         /// Initializes a new instance of the <see cref="FailedItem{TError}"/> struct.
         /// </summary>
         /// <param name="error">The error.</param>
-        public FailedItem(TError? error)
+        public FailedItem(TError error)
         {
             this.Error = error;
         }
@@ -116,6 +116,6 @@ public static class Item
         /// <summary>
         /// Gets the error.
         /// </summary>
-        public TError? Error { get; }
+        public TError Error { get; }
     }
 }
