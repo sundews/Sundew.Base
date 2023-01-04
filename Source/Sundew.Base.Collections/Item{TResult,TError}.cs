@@ -44,6 +44,7 @@ public readonly record struct Item<TResult, TError>
     /// Gets a value indicating whether the result is valid.
     /// </summary>
     [MemberNotNullWhen(true, nameof(SelectedItem))]
+    [MemberNotNullWhen(false, nameof(ErrorItem))]
     public bool IsValid { get; }
 
     /// <summary>

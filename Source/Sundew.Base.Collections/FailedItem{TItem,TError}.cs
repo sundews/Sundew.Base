@@ -15,4 +15,4 @@ namespace Sundew.Base.Collections;
 /// <param name="Index">The index.</param>
 /// <param name="Item">The item.</param>
 /// <param name="Error">The error.</param>
-public readonly record struct FailedItem<TItem, TError>(int Index, TItem? Item, TError? Error);
+public readonly record struct FailedItem<TItem, TError>(int Index, TItem? Item, TError Error);
