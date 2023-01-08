@@ -16,6 +16,7 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <WarningsAsErrors />
     <PackageReleaseNotes>8.4 - AllOrFailed extension for IEnumerable&lt;T&gt;
 8.3 - NamedFormatString and AsyncLazy improvements
@@ -32,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   <Import Project="Directory.Build.props.user" Condition="Exists('Directory.Build.props.user')"/>
 </Project>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumerableExtensions.ClassifyByCount.cs" company="Hukano">
+// <copyright file="EnumerableExtensions.Classify.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -21,7 +21,7 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>The result.</returns>
-    public static EmptyOrSingleOrMultiple<TItem> ClassifyByCount<TItem>(this IEnumerable<TItem> enumerable)
+    public static EmptyOrSingleOrMultiple<TItem> Classify<TItem>(this IEnumerable<TItem> enumerable)
     {
         EmptyOrSingleOrMultiple<TItem> FromList(IEnumerable<TItem> enumerable, int count)
         {
