@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumerableExtensions.Classify.cs" company="Hukano">
+// <copyright file="EnumerableExtensions.ByCardinality.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -16,24 +16,24 @@ using System.Linq;
 public static partial class EnumerableExtensions
 {
     /// <summary>
-    /// Classifies the specified <see cref="IEnumerable{T}"/> into either an empty, single or a multiple items result.
+    /// Gets the cardinality of the specified <see cref="IEnumerable{T}"/> into either an empty, single or a multiple items result.
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>The result.</returns>
-    public static ListClassification<TItem> Classify<TItem>(this IEnumerable<TItem>? enumerable)
+    public static ListCardinality<TItem> ByCardinality<TItem>(this IEnumerable<TItem>? enumerable)
     {
-        ListClassification<TItem> FromList(IEnumerable<TItem> enumerable, int count)
+        ListCardinality<TItem> FromList(IEnumerable<TItem> enumerable, int count)
         {
             return count switch
             {
-                0 => ListClassification<TItem>.Empty(),
-                1 => ListClassification<TItem>.Single(enumerable.First()),
-                _ => ListClassification<TItem>.Multiple(enumerable),
+                0 => ListCardinality<TItem>.Empty(),
+                1 => ListCardinality<TItem>.Single(enumerable.First()),
+                _ => ListCardinality<TItem>.Multiple(enumerable),
             };
         }
 
-        ListClassification<TItem> FromEnumerable(IEnumerable<TItem> enumerable)
+        ListCardinality<TItem> FromEnumerable(IEnumerable<TItem> enumerable)
         {
             using var enumerator = enumerable.GetEnumerator();
             TItem single = default!;
@@ -43,20 +43,20 @@ public static partial class EnumerableExtensions
             }
             else
             {
-                return ListClassification<TItem>.Empty();
+                return ListCardinality<TItem>.Empty();
             }
 
             if (enumerator.MoveNext())
             {
-                return ListClassification<TItem>.Multiple(enumerable);
+                return ListCardinality<TItem>.Multiple(enumerable);
             }
 
-            return ListClassification<TItem>.Single(single);
+            return ListCardinality<TItem>.Single(single);
         }
 
         return enumerable switch
         {
-            null => ListClassification<TItem>.Empty(),
+            null => ListCardinality<TItem>.Empty(),
             IReadOnlyCollection<TItem> readOnlyCollection => FromList(enumerable, readOnlyCollection.Count),
             ICollection<TItem> collection => FromList(enumerable, collection.Count),
             _ => FromEnumerable(enumerable),

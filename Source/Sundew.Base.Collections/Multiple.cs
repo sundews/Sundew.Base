@@ -14,7 +14,7 @@ using System.Collections.Generic;
 /// Represents an <see cref="IEnumerable{T}"/> with multiple items.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
-public sealed class Multiple<TItem> : ListClassification<TItem>, IEnumerable<TItem>
+public sealed class Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Multiple{TItem}"/> class.

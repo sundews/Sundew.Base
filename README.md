@@ -6,7 +6,7 @@ Sundew.Base is a collection of smaller NuGet packages that work on various .NETS
 Contains various Linq style extension methods for collection types suchs IEnumerable, IReadOnlyList etc.
 * AggregateToStringBuilder, For, ForEach, ForReverse, IndexOf, ToReadOnly.
 * AllOrFailed extension allows seemless conversion from IEnumerable<TItem?> to IEnumerable\<TItem\>.
-* Classify extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
+* ByCardinality extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
 
 ## Disposal
 * DisposeAction for wrapping an Action in an IDisposable.

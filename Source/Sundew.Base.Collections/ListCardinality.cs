@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ListClassification.cs" company="Hukano">
+// <copyright file="ListCardinality.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -14,14 +14,14 @@ using System.Collections.Generic;
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
 [Sundew.DiscriminatedUnions.DiscriminatedUnion]
-public abstract class ListClassification<TItem>
+public abstract class ListCardinality<TItem>
 {
     /// <summary>
     /// Creates an empty result.
     /// </summary>
     /// <returns>A empty result.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(Empty<>))]
-    public static ListClassification<TItem> Empty() => new Empty<TItem>();
+    public static ListCardinality<TItem> Empty() => new Empty<TItem>();
 
     /// <summary>
     /// Create a single result.
@@ -29,7 +29,7 @@ public abstract class ListClassification<TItem>
     /// <param name="item">The single item.</param>
     /// <returns>A single result.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(Single<>))]
-    public static ListClassification<TItem> Single(TItem item) => new Single<TItem>(item);
+    public static ListCardinality<TItem> Single(TItem item) => new Single<TItem>(item);
 
     /// <summary>
     /// Creates a multiple result.
@@ -37,5 +37,5 @@ public abstract class ListClassification<TItem>
     /// <param name="items">The items.</param>
     /// <returns>A multiple result.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(Multiple<>))]
-    public static ListClassification<TItem> Multiple(IEnumerable<TItem> items) => new Multiple<TItem>(items);
+    public static ListCardinality<TItem> Multiple(IEnumerable<TItem> items) => new Multiple<TItem>(items);
 }
