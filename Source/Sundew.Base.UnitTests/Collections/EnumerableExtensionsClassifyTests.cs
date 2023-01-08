@@ -8,6 +8,7 @@
 namespace Sundew.Base.UnitTests.Collections;
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Sundew.Base.Collections;
@@ -73,5 +74,15 @@ public class EnumerableExtensionsClassifyTests
         var result = testee.Classify();
 
         result.Should().BeOfType<Multiple<int>>().Which.Items.Should().Equal(new[] { 1, 2 });
+    }
+
+    [Fact]
+    public void Classify_When_EnumerableIsNull_Then_ResultShouldBeEmpty()
+    {
+        IEnumerable<int>? testee = null;
+
+        var result = testee.Classify();
+
+        result.Should().BeOfType<Empty<int>>();
     }
 }

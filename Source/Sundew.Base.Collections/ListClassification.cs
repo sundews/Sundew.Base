@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EmptyOrSingleOrMultiple.cs" company="Hukano">
+// <copyright file="ListClassification.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -14,14 +14,14 @@ using System.Collections.Generic;
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
 [Sundew.DiscriminatedUnions.DiscriminatedUnion]
-public abstract class EmptyOrSingleOrMultiple<TItem>
+public abstract class ListClassification<TItem>
 {
     /// <summary>
     /// Creates an empty result.
     /// </summary>
     /// <returns>A empty result.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(Empty<>))]
-    public static EmptyOrSingleOrMultiple<TItem> Empty() => new Empty<TItem>();
+    public static ListClassification<TItem> Empty() => new Empty<TItem>();
 
     /// <summary>
     /// Create a single result.
@@ -29,7 +29,7 @@ public abstract class EmptyOrSingleOrMultiple<TItem>
     /// <param name="item">The single item.</param>
     /// <returns>A single result.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(Single<>))]
-    public static EmptyOrSingleOrMultiple<TItem> Single(TItem item) => new Single<TItem>(item);
+    public static ListClassification<TItem> Single(TItem item) => new Single<TItem>(item);
 
     /// <summary>
     /// Creates a multiple result.
@@ -37,5 +37,5 @@ public abstract class EmptyOrSingleOrMultiple<TItem>
     /// <param name="items">The items.</param>
     /// <returns>A multiple result.</returns>
     [Sundew.DiscriminatedUnions.CaseTypeAttribute(typeof(Multiple<>))]
-    public static EmptyOrSingleOrMultiple<TItem> Multiple(IEnumerable<TItem> items) => new Multiple<TItem>(items);
+    public static ListClassification<TItem> Multiple(IEnumerable<TItem> items) => new Multiple<TItem>(items);
 }

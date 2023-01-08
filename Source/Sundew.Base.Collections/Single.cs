@@ -11,7 +11,7 @@ namespace Sundew.Base.Collections;
 /// Represents a single item.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
-public sealed class Single<TItem> : EmptyOrSingleOrMultiple<TItem>
+public sealed class Single<TItem> : ListClassification<TItem>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Single{TItem}"/> class.

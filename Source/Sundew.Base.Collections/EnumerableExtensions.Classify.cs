@@ -21,19 +21,19 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>The result.</returns>
-    public static EmptyOrSingleOrMultiple<TItem> Classify<TItem>(this IEnumerable<TItem> enumerable)
+    public static ListClassification<TItem> Classify<TItem>(this IEnumerable<TItem>? enumerable)
     {
-        EmptyOrSingleOrMultiple<TItem> FromList(IEnumerable<TItem> enumerable, int count)
+        ListClassification<TItem> FromList(IEnumerable<TItem> enumerable, int count)
         {
             return count switch
             {
-                0 => EmptyOrSingleOrMultiple<TItem>.Empty(),
-                1 => EmptyOrSingleOrMultiple<TItem>.Single(enumerable.First()),
-                _ => EmptyOrSingleOrMultiple<TItem>.Multiple(enumerable),
+                0 => ListClassification<TItem>.Empty(),
+                1 => ListClassification<TItem>.Single(enumerable.First()),
+                _ => ListClassification<TItem>.Multiple(enumerable),
             };
         }
 
-        EmptyOrSingleOrMultiple<TItem> FromEnumerable(IEnumerable<TItem> enumerable)
+        ListClassification<TItem> FromEnumerable(IEnumerable<TItem> enumerable)
         {
             using var enumerator = enumerable.GetEnumerator();
             TItem single = default!;
@@ -43,19 +43,20 @@ public static partial class EnumerableExtensions
             }
             else
             {
-                return EmptyOrSingleOrMultiple<TItem>.Empty();
+                return ListClassification<TItem>.Empty();
             }
 
             if (enumerator.MoveNext())
             {
-                return EmptyOrSingleOrMultiple<TItem>.Multiple(enumerable);
+                return ListClassification<TItem>.Multiple(enumerable);
             }
 
-            return EmptyOrSingleOrMultiple<TItem>.Single(single);
+            return ListClassification<TItem>.Single(single);
         }
 
         return enumerable switch
         {
+            null => ListClassification<TItem>.Empty(),
             IReadOnlyCollection<TItem> readOnlyCollection => FromList(enumerable, readOnlyCollection.Count),
             ICollection<TItem> collection => FromList(enumerable, collection.Count),
             _ => FromEnumerable(enumerable),

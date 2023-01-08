@@ -13,6 +13,6 @@ using System.Collections.Generic;
 /// Represents an empty <see cref="IEnumerable{T}"/>.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
-public sealed class Empty<TItem> : EmptyOrSingleOrMultiple<TItem>
+public sealed class Empty<TItem> : ListClassification<TItem>
 {
 }
