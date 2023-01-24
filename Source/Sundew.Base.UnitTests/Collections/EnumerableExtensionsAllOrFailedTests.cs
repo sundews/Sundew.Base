@@ -89,24 +89,7 @@ public class EnumerableExtensionsAllOrFailedTests
     }
 
     [Fact]
-    public void AllOrFailed_When_StringAndSelectorHasOneError_Then_ResultShouldBeErrorResult2()
-    {
-        var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed(x =>
-        {
-            if (x != null)
-            {
-                return Item.Pass(x);
-            }
-
-            return Item.Fail();
-        });
-
-        result.Should().BeOfType<Failed<string?, string>>().Which
-            .Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
-    }
-
-    [Fact]
-    public void AllOrFailed_When_StringAndSelectorHasOneError_Then_ResultShouldBeErrorResult()
+    public void AllOrFailed_When_StringAndSelectorHasTwoErrors_Then_ResultShouldBeErrorResult()
     {
         var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed(x =>
         {

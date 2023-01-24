@@ -122,6 +122,20 @@ public static class StringBuilderExtensions
     }
 
     /// <summary>
+    /// Removes text from the end.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="fromEnd">The from end.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    public static StringBuilder Remove(this StringBuilder stringBuilder, FromEnd fromEnd)
+    {
+        var length = fromEnd.Value;
+        return stringBuilder.Remove(stringBuilder.Length - length, length);
+    }
+
+    /// <summary>
     /// Fixes the length.
     /// </summary>
     /// <param name="stringBuilder">The string builder.</param>
@@ -132,7 +146,7 @@ public static class StringBuilderExtensions
     /// <param name="limit">The limit.</param>
     /// <param name="isRightToLeft">if set to <c>true</c> [is right to left].</param>
     /// <returns>
-    /// The string with the fixed length.
+    /// The <see cref="StringBuilder" />.
     /// </returns>
     public static StringBuilder Append(this StringBuilder stringBuilder, string value, int length, char paddingCharacter, Alignment alignment, Limit limit = default, bool isRightToLeft = false)
     {

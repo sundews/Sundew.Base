@@ -7,6 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Text
 {
+    using System;
     using System.Globalization;
     using System.Text;
     using FluentAssertions;
@@ -67,6 +68,14 @@ namespace Sundew.Base.UnitTests.Text
             var result = Values.JoinToStringBuilder(new StringBuilder(), StringSeparator, CultureInfo.InvariantCulture).ToString();
 
             result.Should().Be(ExpectedStringSeparatedResult);
+        }
+
+        [Fact]
+        public void JoinToStringBuilder_When_ArrayIsEmptyAndUsingStringSeparator_Then_ResultShouldBeEmpty()
+        {
+            var result = Array.Empty<string>().JoinToStringBuilder(new StringBuilder(), StringSeparator, CultureInfo.InvariantCulture).ToString();
+
+            result.Should().Be(string.Empty);
         }
 
         [Theory]

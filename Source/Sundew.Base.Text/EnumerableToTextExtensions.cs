@@ -10,6 +10,7 @@ namespace Sundew.Base.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 /// <summary>
@@ -28,14 +29,14 @@ public static class EnumerableToTextExtensions
     public static string JoinToString(this IEnumerable<string> enumerable, char separator)
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, new FromEnd(1)));
+            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
     }
 
     /// <summary>
@@ -49,14 +50,14 @@ public static class EnumerableToTextExtensions
     public static string JoinToString(this IEnumerable<string> enumerable, string separator)
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, separator));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
     }
 
     /// <summary>
@@ -73,14 +74,14 @@ public static class EnumerableToTextExtensions
         where TItem : notnull
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item, formatProvider);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item, formatProvider);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, new FromEnd(1)));
+            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
     }
 
     /// <summary>
@@ -98,22 +99,22 @@ public static class EnumerableToTextExtensions
         where TItem : class?
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
                 if (item != null)
                 {
-                    builder.Append(item!, formatProvider);
+                    builderPair.stringBuilder.Append(item!, formatProvider);
                 }
                 else if (skipNullValues)
                 {
-                    return builder;
+                    return builderPair with { wasAggregated = true };
                 }
 
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, new FromEnd(1)));
+            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
     }
 
     /// <summary>
@@ -130,14 +131,14 @@ public static class EnumerableToTextExtensions
         where TItem : notnull
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item, formatProvider);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item, formatProvider);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, separator));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
     }
 
     /// <summary>
@@ -155,22 +156,22 @@ public static class EnumerableToTextExtensions
         where TItem : class?
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
                 if (item != null)
                 {
-                    builder.Append(item!, formatProvider);
+                    builderPair.stringBuilder.Append(item!, formatProvider);
                 }
                 else if (skipNullValues)
                 {
-                    return builder;
+                    return builderPair with { wasAggregated = true };
                 }
 
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, separator));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
     }
 
     /// <summary>
@@ -186,14 +187,14 @@ public static class EnumerableToTextExtensions
     public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateFunction, char separator)
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
-                aggregateFunction.Invoke(builder, item);
-                builder.Append(separator);
-                return builder;
+                aggregateFunction.Invoke(builderPair.stringBuilder, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, new FromEnd(1)));
+            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
     }
 
     /// <summary>
@@ -209,14 +210,14 @@ public static class EnumerableToTextExtensions
     public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateFunction, string separator)
     {
         return enumerable.Aggregate(
-            new StringBuilder(),
-            (builder, item) =>
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
             {
-                aggregateFunction.Invoke(builder, item);
-                builder.Append(separator);
-                return builder;
+                aggregateFunction.Invoke(builderPair.stringBuilder, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.ToString(0, separator));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
     }
 
     /// <summary>
@@ -231,14 +232,14 @@ public static class EnumerableToTextExtensions
     public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, char separator)
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - 1, 1));
+            RemoveSeparatorAtEnd);
     }
 
     /// <summary>
@@ -253,14 +254,14 @@ public static class EnumerableToTextExtensions
     public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, string separator)
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - separator.Length, separator.Length));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
     }
 
     /// <summary>
@@ -278,14 +279,14 @@ public static class EnumerableToTextExtensions
         where TItem : notnull
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item, formatProvider);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item, formatProvider);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - 1, 1));
+            RemoveSeparatorAtEnd);
     }
 
     /// <summary>
@@ -304,22 +305,22 @@ public static class EnumerableToTextExtensions
         where TItem : class?
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
                 if (item != null)
                 {
-                    builder.Append(item!, formatProvider);
+                    builderPair.stringBuilder.Append(item!, formatProvider);
                 }
                 else if (skipNullValues)
                 {
-                    return builder;
+                    return builderPair with { wasAggregated = true };
                 }
 
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - 1, 1));
+            RemoveSeparatorAtEnd);
     }
 
     /// <summary>
@@ -337,14 +338,14 @@ public static class EnumerableToTextExtensions
         where TItem : notnull
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
-                builder.Append(item, formatProvider);
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(item, formatProvider);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - separator.Length, separator.Length));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
     }
 
     /// <summary>
@@ -363,22 +364,22 @@ public static class EnumerableToTextExtensions
         where TItem : class?
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
                 if (item != null)
                 {
-                    builder.Append(item!, formatProvider);
+                    builderPair.stringBuilder.Append(item!, formatProvider);
                 }
                 else if (skipNullValues)
                 {
-                    return builder;
+                    return builderPair with { wasAggregated = true };
                 }
 
-                builder.Append(separator);
-                return builder;
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - separator.Length, separator.Length));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
     }
 
     /// <summary>
@@ -399,14 +400,14 @@ public static class EnumerableToTextExtensions
         char separator)
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
-                aggregateFunction.Invoke(builder, item);
-                builder.Append(separator);
-                return builder;
+                aggregateFunction.Invoke(builderPair.stringBuilder, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - 1, 1));
+            RemoveSeparatorAtEnd);
     }
 
     /// <summary>
@@ -427,13 +428,25 @@ public static class EnumerableToTextExtensions
         string separator)
     {
         return enumerable.Aggregate(
-            stringBuilder,
-            (builder, item) =>
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
             {
-                aggregateFunction.Invoke(builder, item);
-                builder.Append(separator);
-                return builder;
+                aggregateFunction.Invoke(builderPair.stringBuilder, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
             },
-            builder => builder.Remove(builder.Length - separator.Length, separator.Length));
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static StringBuilder RemoveSeparatorAtEnd((StringBuilder StringBuilder, bool WasAggregated) builderPair, string separator)
+    {
+        return builderPair.WasAggregated ? builderPair.StringBuilder.Remove(builderPair.StringBuilder.Length - separator.Length, separator.Length) : builderPair.StringBuilder;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static StringBuilder RemoveSeparatorAtEnd((StringBuilder StringBuilder, bool WasAggregated) builderPair)
+    {
+        return builderPair.WasAggregated ? builderPair.StringBuilder.Remove(builderPair.StringBuilder.Length - 1, 1) : builderPair.StringBuilder;
     }
 }
