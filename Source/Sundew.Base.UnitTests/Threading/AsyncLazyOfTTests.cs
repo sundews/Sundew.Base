@@ -43,7 +43,7 @@ namespace Sundew.Base.UnitTests.Threading
 
             var cancelTask = Task.Run(async () =>
             {
-                await Task.Delay(25, CancellationToken.None);
+                await Task.Delay(10, CancellationToken.None);
                 cancellationTokenSource.Cancel();
             });
 

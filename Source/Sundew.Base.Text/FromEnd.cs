@@ -42,6 +42,18 @@ public readonly struct FromEnd
     }
 
     /// <summary>
+    /// Performs an implicit conversion from <see cref="string"/> to <see cref="FromEnd"/>.
+    /// </summary>
+    /// <param name="input">The input.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    public static implicit operator FromEnd(char input)
+    {
+        return new FromEnd(1);
+    }
+
+    /// <summary>
     /// Froms the string length.
     /// </summary>
     /// <param name="input">The input.</param>

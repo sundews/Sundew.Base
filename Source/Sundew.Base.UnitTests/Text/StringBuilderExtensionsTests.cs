@@ -52,5 +52,18 @@ namespace Sundew.Base.UnitTests.Text
 
             result.Should().Be(ExpectedResult);
         }
+
+        [Fact]
+        public void Remove_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
+        {
+            const string ExpectedResult = "1, 2, 3, 4";
+            var values = new[] { 1, 2, 3, 4 };
+            const string separator = ", ";
+            var stringBuilder = values.AggregateToStringBuilder(new StringBuilder(), (builder, i) => builder.Append(i).Append(separator));
+
+            var result = stringBuilder.Remove(separator);
+
+            result.ToString().Should().Be(ExpectedResult);
+        }
     }
 }
