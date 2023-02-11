@@ -45,6 +45,12 @@ public sealed class Failed<TItem, TResult> : AllOrFailed<TItem, TResult>, IReadO
     public FailedItem<TItem> this[int index] => this.Items[index];
 
     /// <summary>
+    /// Gets the items.
+    /// </summary>
+    /// <returns>The items.</returns>
+    public IReadOnlyList<TItem?> GetItems() => this.Items.ToArray(x => x.Item);
+
+    /// <summary>
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>

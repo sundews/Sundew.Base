@@ -10,6 +10,7 @@ namespace Sundew.Base.Collections;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using Sundew.Base.Collections.Internal;
@@ -36,7 +37,7 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-    public static IReadOnlyCollection<TItem> ToEnumerable<TItem>(this TItem? item)
+    public static IReadOnlyList<TItem> ToEnumerable<TItem>(this TItem? item)
     {
         if (item != null)
         {
@@ -187,22 +188,16 @@ public static partial class EnumerableExtensions
     /// <returns>The new array.</returns>
     public static TOutItem[] ToArray<TInItem, TOutItem>(this IEnumerable<TInItem> enumerable, Func<TInItem, TOutItem> selectFunc)
     {
-        if (enumerable is ICollection<TInItem> collectionOfT)
+        return enumerable switch
         {
-            return ToArrayUnsafe(enumerable, selectFunc, collectionOfT.Count);
-        }
-
-        if (enumerable is IReadOnlyCollection<TInItem> readonlyCollectionOfT)
-        {
-            return ToArrayUnsafe(enumerable, selectFunc, readonlyCollectionOfT.Count);
-        }
-
-        if (enumerable is ICollection collection)
-        {
-            return ToArrayUnsafe(enumerable, selectFunc, collection.Count);
-        }
-
-        return enumerable.Select(selectFunc).ToArray();
+            ImmutableArray<TInItem> immutableArray => ToArrayUnsafe(immutableArray, selectFunc),
+            IImmutableList<TInItem> immutableList => ToArrayUnsafe(immutableList, selectFunc, immutableList.Count),
+            IReadOnlyList<TInItem> readonlyListOfT => ToArrayUnsafe(readonlyListOfT, selectFunc),
+            ICollection<TInItem> collectionOfT => ToArrayUnsafe(collectionOfT, selectFunc, collectionOfT.Count),
+            IReadOnlyCollection<TInItem> readonlyCollectionOfT => ToArrayUnsafe(enumerable, selectFunc, readonlyCollectionOfT.Count),
+            ICollection collection => ToArrayUnsafe(enumerable, selectFunc, collection.Count),
+            _ => enumerable.Select(selectFunc).ToArray(),
+        };
     }
 
     /// <summary>Concats the specified additional.</summary>
@@ -403,6 +398,18 @@ public static partial class EnumerableExtensions
                 return builderPair with { wasAggregated = true };
             },
             builderPair => resultFunc(builderPair.stringBuilder, builderPair.wasAggregated));
+    }
+
+    private static TOutItem[] ToArrayUnsafe<TInItem, TOutItem>(IReadOnlyList<TInItem> list, Func<TInItem, TOutItem> selectFunc)
+    {
+        var count = list.Count;
+        var result = new TOutItem[count];
+        for (int i = 0; i < count; i++)
+        {
+            result[i] = selectFunc(list[i]);
+        }
+
+        return result;
     }
 
     private static TOutItem[] ToArrayUnsafe<TInItem, TOutItem>(IEnumerable<TInItem> enumerable, Func<TInItem, TOutItem> selectFunc, int count)
