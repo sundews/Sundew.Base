@@ -202,6 +202,29 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
+    /// <param name="aggregateFunction">The aggregate function that provides the string builder and a value indicating whether data was already aggregated.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, bool, TItem> aggregateFunction, char separator)
+    {
+        return enumerable.Aggregate(
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
+            {
+                aggregateFunction.Invoke(builderPair.stringBuilder, builderPair.wasAggregated, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
+            },
+            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
     /// <param name="aggregateFunction">The aggregate function.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
@@ -214,6 +237,29 @@ public static class EnumerableToTextExtensions
             (builderPair, item) =>
             {
                 aggregateFunction.Invoke(builderPair.stringBuilder, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
+            },
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="aggregateFunction">The aggregate function that provides the string builder and a value indicating whether data was already aggregated.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, bool, TItem> aggregateFunction, string separator)
+    {
+        return enumerable.Aggregate(
+            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (builderPair, item) =>
+            {
+                aggregateFunction.Invoke(builderPair.stringBuilder, builderPair.wasAggregated, item);
                 builderPair.stringBuilder.Append(separator);
                 return builderPair with { wasAggregated = true };
             },
@@ -416,6 +462,34 @@ public static class EnumerableToTextExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="aggregateFunction">The aggregate function that provides the string builder and a value indicating whether data was already aggregated.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder JoinToStringBuilder<TItem>(
+        this IEnumerable<TItem> enumerable,
+        StringBuilder stringBuilder,
+        Action<StringBuilder, bool, TItem> aggregateFunction,
+        char separator)
+    {
+        return enumerable.Aggregate(
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
+            {
+                aggregateFunction.Invoke(builderPair.stringBuilder, builderPair.wasAggregated, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
+            },
+            RemoveSeparatorAtEnd);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="stringBuilder">The string builder.</param>
     /// <param name="aggregateFunction">The aggregate function.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
@@ -432,6 +506,34 @@ public static class EnumerableToTextExtensions
             (builderPair, item) =>
             {
                 aggregateFunction.Invoke(builderPair.stringBuilder, item);
+                builderPair.stringBuilder.Append(separator);
+                return builderPair with { wasAggregated = true };
+            },
+            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="aggregateFunction">The aggregate function that provides the string builder and a value indicating whether data was already aggregated.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder JoinToStringBuilder<TItem>(
+        this IEnumerable<TItem> enumerable,
+        StringBuilder stringBuilder,
+        Action<StringBuilder, bool, TItem> aggregateFunction,
+        string separator)
+    {
+        return enumerable.Aggregate(
+            (stringBuilder, wasAggregated: false),
+            (builderPair, item) =>
+            {
+                aggregateFunction.Invoke(builderPair.stringBuilder, builderPair.wasAggregated, item);
                 builderPair.stringBuilder.Append(separator);
                 return builderPair with { wasAggregated = true };
             },
