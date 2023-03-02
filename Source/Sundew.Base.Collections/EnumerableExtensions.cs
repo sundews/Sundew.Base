@@ -22,9 +22,9 @@ using Sundew.Base.Primitives;
 /// </summary>
 /// <typeparam name="TResult">The result type.</typeparam>
 /// <param name="stringBuilder">The string builder.</param>
-/// <param name="wasAggregated">Indicated whether data was aggregated.</param>
+/// <param name="isSuccessive">Indicates that the current item is not the first.</param>
 /// <returns>The result.</returns>
-public delegate TResult AggregateToStringBuilderResult<out TResult>(StringBuilder stringBuilder, bool wasAggregated);
+public delegate TResult AggregateToStringBuilderResult<out TResult>(StringBuilder stringBuilder, bool isSuccessive);
 
 /// <summary>
 /// Extends the generic IEnumerable interface with functions.
@@ -336,13 +336,13 @@ public static partial class EnumerableExtensions
         out bool wasAggregated)
     {
         var result = enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
+            (stringBuilder, isSuccessive: false),
             (builderPair, item) =>
             {
                 aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                return builderPair with { wasAggregated = true };
+                return builderPair with { isSuccessive = true };
             });
-        wasAggregated = result.wasAggregated;
+        wasAggregated = result.isSuccessive;
         return result.stringBuilder;
     }
 
@@ -363,13 +363,13 @@ public static partial class EnumerableExtensions
         AggregateToStringBuilderResult<TResult> resultFunc)
     {
         return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (stringBuilder: new StringBuilder(), isSuccessive: false),
             (builderPair, item) =>
             {
                 aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                return builderPair with { wasAggregated = true };
+                return builderPair with { isSuccessive = true };
             },
-            builderPair => resultFunc(builderPair.stringBuilder, builderPair.wasAggregated));
+            builderPair => resultFunc(builderPair.stringBuilder, builderPair.isSuccessive));
     }
 
     /// <summary>
@@ -391,13 +391,13 @@ public static partial class EnumerableExtensions
         AggregateToStringBuilderResult<TResult> resultFunc)
     {
         return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
+            (stringBuilder: new StringBuilder(), isSuccessive: false),
             (builderPair, item) =>
             {
                 aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                return builderPair with { wasAggregated = true };
+                return builderPair with { isSuccessive = true };
             },
-            builderPair => resultFunc(builderPair.stringBuilder, builderPair.wasAggregated));
+            builderPair => resultFunc(builderPair.stringBuilder, builderPair.isSuccessive));
     }
 
     private static TOutItem[] ToArrayUnsafe<TInItem, TOutItem>(IReadOnlyList<TInItem> list, Func<TInItem, TOutItem> selectFunc)

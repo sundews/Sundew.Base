@@ -67,7 +67,7 @@ public sealed class ContinuousJob : IJob
     /// Starts the job.
     /// </summary>
     /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    public Result.IfSuccess<CancellationToken> Start()
+    public O<CancellationToken> Start()
     {
         return this.continuousJob.Start();
     }
@@ -76,7 +76,7 @@ public sealed class ContinuousJob : IJob
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    public Result.IfError<AggregateException?> Stop()
+    public R<AggregateException> Stop()
     {
         return this.continuousJob.Stop();
     }
@@ -85,7 +85,7 @@ public sealed class ContinuousJob : IJob
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    public Task<Result.IfError<AggregateException?>> StopAsync()
+    public Task<R<AggregateException>> StopAsync()
     {
         return this.continuousJob.StopAsync();
     }
@@ -96,7 +96,7 @@ public sealed class ContinuousJob : IJob
     /// <returns>
     /// An async task.
     /// </returns>
-    public Task<Result.IfError<AggregateException?>> WaitAsync()
+    public Task<R<AggregateException>> WaitAsync()
     {
         return this.continuousJob.WaitAsync();
     }
@@ -105,7 +105,7 @@ public sealed class ContinuousJob : IJob
     /// Waits for the job to finish.
     /// </summary>
     /// <returns>The result.</returns>
-    public Result.IfError<AggregateException?> Wait()
+    public R<AggregateException> Wait()
     {
         return this.continuousJob.Wait();
     }

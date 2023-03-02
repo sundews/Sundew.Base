@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Result{TValue}.cs" company="Hukano">
+// <copyright file="R{TValue,TError}.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -13,23 +13,28 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Sundew.Base.Equality;
 
-/// <summary>Contains extension methods for the Result class.</summary>
+/// <summary>
+/// R class for storing one value and a <see cref="bool" /> indicating whether the value is valid.
+/// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
-public readonly struct Result<TValue> : IEquatable<Result<TValue>>
+/// <typeparam name="TError">The type of the error.</typeparam>
+public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Result{TValue}" /> struct.
+    /// Initializes a new instance of the <see cref="R{TValue,TError}"/> struct.
     /// </summary>
     /// <param name="isSuccess">If set to <c>true</c> [success].</param>
     /// <param name="value">The result value.</param>
-    internal Result(bool isSuccess, TValue value)
+    /// <param name="error">The error.</param>
+    internal R(bool isSuccess, TValue value, TError error)
     {
         this.IsSuccess = isSuccess;
         this.Value = value;
+        this.Error = error;
     }
 
     /// <summary>
-    /// Gets a value indicating whether this <see cref="Result{TValue}"/> is success.
+    /// Gets a value indicating whether this <see cref="R"/> is success.
     /// </summary>
     /// <value>
     ///   <c>true</c> if success; otherwise, <c>false</c>.
@@ -46,82 +51,65 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     public TValue Value { get; }
 
     /// <summary>
+    /// Gets the error.
+    /// </summary>
+    /// <value>
+    /// The error.
+    /// </value>
+    [AllowNull]
+    public TError Error { get; }
+
+    /// <summary>
     /// Gets the result's success property.
     /// </summary>
-    /// <param name="result">The result.</param>
+    /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator bool(Result<TValue> result)
+    public static implicit operator bool(R<TValue, TError> r)
     {
-        return result.IsSuccess;
+        return r.IsSuccess;
     }
 
     /// <summary>
-    /// Performs an implicit conversion from <see cref="SuccessResult{TValue}"/> to <see cref="Result{TValue}"/>.
+    /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
     /// </summary>
     /// <param name="result">The result.</param>
     /// <returns>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Result<TValue>(SuccessResult<TValue> result)
+    public static implicit operator R<TValue, TError>(R.SuccessResult<TValue> result)
     {
-        return new Result<TValue>(true, result.Value);
+        return new R<TValue, TError>(true, result.Value, default!);
     }
 
     /// <summary>
-    /// Performs an implicit conversion from <see cref="ErrorResult{TValue}"/> to <see cref="Result{TValue, TError}"/>.
+    /// Performs an implicit conversion from <see cref="R.ErrorResult{TValue}"/> to <see cref="R"/>.
     /// </summary>
     /// <param name="result">The result.</param>
     /// <returns>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Result<TValue>(ErrorResult<TValue> result)
+    public static implicit operator R<TValue, TError>(R.ErrorResult<TError> result)
     {
-        return new Result<TValue>(false, result.Error);
+        return new R<TValue, TError>(false, default!, result.Error);
     }
 
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="SuccessResult{TValue}"/> to <see cref="Result{TValue, TError}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    /// <returns>
-    /// The result of the conversion.
-    /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Result<TValue>(TrueResult result)
-    {
-        return new Result<TValue>(result.IsSuccess, default!);
-    }
-
-    /// <summary>
-    /// Performs an implicit conversion from <see cref="ErrorResult{TValue}"/> to <see cref="Result{TValue, TError}"/>.
-    /// </summary>
-    /// <param name="result">The result.</param>
-    /// <returns>
-    /// The result of the conversion.
-    /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Result<TValue>(FalseResult result)
-    {
-        return new Result<TValue>(result.IsSuccess, default!);
-    }
-
-    /// <summary>Performs an implicit conversion from <see cref="ErrorResult"/> to <see cref="Result.IfSuccess{TValue}"/>.</summary>
-    /// <param name="result">The result.</param>
+    /// <summary>Performs an implicit conversion from <see cref="ValueTask{R}"/> to <see cref="R"/>.</summary>
+    /// <param name="r">The result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ValueTask<Result<TValue>>(Result<TValue> result)
+    public static implicit operator ValueTask<R<TValue, TError>>(R<TValue, TError> r)
     {
-        return result.ToValueTask();
+        return r.ToValueTask();
     }
 
     /// <summary>Implements the operator ==.</summary>
     /// <param name="left">The left.</param>
     /// <param name="right">The right.</param>
     /// <returns>The result of the operator.</returns>
-    public static bool operator ==(Result<TValue> left, Result<TValue> right)
+    public static bool operator ==(R<TValue, TError> left, R<TValue, TError> right)
     {
         return left.Equals(right);
     }
@@ -130,7 +118,7 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     /// <param name="left">The left.</param>
     /// <param name="right">The right.</param>
     /// <returns>The result of the operator.</returns>
-    public static bool operator !=(Result<TValue> left, Result<TValue> right)
+    public static bool operator !=(R<TValue, TError> left, R<TValue, TError> right)
     {
         return !(left == right);
     }
@@ -140,9 +128,9 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     /// </summary>
     /// <returns>The value task.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public ValueTask<Result<TValue>> ToValueTask()
+    public ValueTask<R<TValue, TError>> ToValueTask()
     {
-        return new ValueTask<Result<TValue>>(this);
+        return new ValueTask<R<TValue, TError>>(this);
     }
 
     /// <summary>
@@ -151,44 +139,39 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     /// <typeparam name="TNewValue">The type of the new value.</typeparam>
     /// <param name="valueFunc">The value function.</param>
     /// <returns>
-    /// A new <see cref="Result{TNewValue, TError}" />.
+    /// A new <see cref="R" />.
     /// </returns>
-    public Result<TNewValue, TValue> ConvertValue<TNewValue>(Func<TValue, TNewValue> valueFunc)
+    public R<TNewValue, TError> WithValue<TNewValue>(Func<TValue, TNewValue> valueFunc)
     {
-        return this.Convert(valueFunc, error => error);
+        return this.With(valueFunc, error => error);
     }
 
     /// <summary>
     /// Creates a result based on the specified result .
     /// </summary>
-    /// <typeparam name="TError">The type of the new error.</typeparam>
+    /// <typeparam name="TNewError">The type of the new error.</typeparam>
     /// <param name="errorFunc">The error function.</param>
     /// <returns>
-    /// A new <see cref="Result{TNewValue, TNewError}" />.
+    /// A new <see cref="R" />.
     /// </returns>
-    public Result<TValue, TError> ConvertError<TError>(Func<TValue, TError> errorFunc)
+    public R<TValue, TNewError> WithError<TNewError>(Func<TError, TNewError> errorFunc)
     {
-        return this.Convert(value => value, errorFunc);
+        return this.With(value => value, errorFunc);
     }
 
     /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TNewValue">The type of the new value.</typeparam>
-    /// <typeparam name="TError">The type of the new error.</typeparam>
+    /// <typeparam name="TNewError">The type of the new error.</typeparam>
     /// <param name="valueFunc">The value function.</param>
     /// <param name="errorFunc">The error function.</param>
     /// <returns>
-    /// A new <see cref="Result{TNewValue, TNewError}" />.
+    /// A new <see cref="R" />.
     /// </returns>
-    public Result<TNewValue, TError> Convert<TNewValue, TError>(Func<TValue, TNewValue> valueFunc, Func<TValue, TError> errorFunc)
+    public R<TNewValue, TNewError> With<TNewValue, TNewError>(Func<TValue, TNewValue> valueFunc, Func<TError, TNewError> errorFunc)
     {
-        if (this.IsSuccess)
-        {
-            return new Result<TNewValue, TError>(this.IsSuccess, valueFunc(this.Value), default!);
-        }
-
-        return new Result<TNewValue, TError>(this.IsSuccess, default!, errorFunc(this.Value));
+        return this.IsSuccess ? new R<TNewValue, TNewError>(this.IsSuccess, valueFunc(this.Value), default!) : new R<TNewValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error));
     }
 
     /// <summary>
@@ -201,10 +184,10 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     {
         if (this.IsSuccess)
         {
-            return $"True: {this.Value}";
+            return $"Success: {this.Value}";
         }
 
-        return $"False: {this.Value}";
+        return $"Error: {this.Error}";
     }
 
     /// <summary>
@@ -212,10 +195,12 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     /// </summary>
     /// <param name="isSuccess">if set to <c>true</c> [is success].</param>
     /// <param name="value">The value.</param>
-    public void Deconstruct(out bool isSuccess, out TValue value)
+    /// <param name="error">The error.</param>
+    public void Deconstruct(out bool isSuccess, out TValue value, out TError error)
     {
         isSuccess = this.IsSuccess;
         value = this.Value;
+        error = this.Error;
     }
 
     /// <summary>Indicates whether the current object is equal to another object of the same type.</summary>
@@ -231,9 +216,9 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     ///   <span class="nu">
     ///     <span class="keyword">true</span> (<span class="keyword">True</span> in Visual Basic)</span> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <span class="keyword"><span class="languageSpecificText"><span class="cs">false</span><span class="vb">False</span><span class="cpp">false</span></span></span><span class="nu"><span class="keyword">false</span> (<span class="keyword">False</span> in Visual Basic)</span>.
     /// </returns>
-    public bool Equals(Result<TValue> other)
+    public bool Equals(R<TValue, TError> other)
     {
-        return this.IsSuccess == other.IsSuccess && Equals(this.Value, other.Value);
+        return this.IsSuccess == other.IsSuccess && Equals(this.Value, other.Value) && Equals(this.Error, other.Error);
     }
 
     /// <summary>Determines whether the specified <see cref="object"/>, is equal to this instance.</summary>
@@ -249,6 +234,6 @@ public readonly struct Result<TValue> : IEquatable<Result<TValue>>
     /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
     public override int GetHashCode()
     {
-        return EqualityHelper.GetHashCode(this.IsSuccess.GetHashCode(), this.Value?.GetHashCode() ?? 0);
+        return EqualityHelper.GetHashCode(this.IsSuccess.GetHashCode(), this.Value?.GetHashCode() ?? 0, this.Error?.GetHashCode() ?? 0);
     }
 }

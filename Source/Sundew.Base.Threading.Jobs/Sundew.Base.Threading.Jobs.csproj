@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard1.3;netstandard2.0</TargetFrameworks>
     <Description>Cancellable- and ContinuousJobs.</Description>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>

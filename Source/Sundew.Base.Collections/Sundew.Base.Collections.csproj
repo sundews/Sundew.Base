@@ -1,10 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.2</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard1.2;netstandard2.0</TargetFrameworks>
     <Description>Extensions for collections types.</Description>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.2'">
+    <Compile Remove="Immutable\ValueDictionary.cs" />
+    <Compile Remove="Immutable\ImmutableDictionaryExtensions.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
@@ -46,6 +51,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.1'">
     <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Bcl.Hashcode" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>

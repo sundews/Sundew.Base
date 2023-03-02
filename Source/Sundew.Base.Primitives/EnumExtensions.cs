@@ -74,6 +74,11 @@ public static class EnumExtensions
     public static TEnum ParseEnum<TEnum>(this string value, bool ignoreCase = false)
         where TEnum : Enum
     {
+        if (value.StartsWith(typeof(TEnum).Name + '.'))
+        {
+            value = value.Substring(typeof(TEnum).Name.Length + 1);
+        }
+
         return (TEnum)Enum.Parse(typeof(TEnum), value, ignoreCase);
     }
 

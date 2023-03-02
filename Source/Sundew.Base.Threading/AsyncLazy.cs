@@ -94,7 +94,7 @@ public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
             return await task.WaitAsync(cancellationToken).ConfigureAwait(false);
 #else
             var cancelTaskCompletionSource = new TaskCompletionSource<TValue>();
-#if NETSTANDARD1_3
+#if NETSTANDARD1_3 || NETSTANDARD2_0
             using var cancellationTokenRegistration = cancellationToken.Register(() => cancelTaskCompletionSource.SetResult(default!));
 #else
             await using var cancellationTokenRegistration = cancellationToken.Register(() => cancelTaskCompletionSource.SetResult(default!));
