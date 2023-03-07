@@ -18,7 +18,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <WarningsAsErrors />
-    <PackageReleaseNotes>9.0 - Immutable collections with value semantics, Result type redesign and new Option type.
+    <PackageReleaseNotes>9.0 - Immutable collections with value semantics, Result type redesign and new Option type, AppendItems replaces AggregateToStringBuilder and JoinToStringBuilder.
 8.5 - JoinToStringBuilder and AggregateToStringBuilder improvements
 8.4 - AllOrFailed extension for IEnumerable&lt;T&gt;
 8.3 - NamedFormatString and AsyncLazy improvements

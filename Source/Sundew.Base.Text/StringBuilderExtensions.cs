@@ -16,7 +16,7 @@ using System.Text.RegularExpressions;
 /// <summary>
 /// Extends the string with extension methods.
 /// </summary>
-public static class StringBuilderExtensions
+public static partial class StringBuilderExtensions
 {
     private const string Format = "{0}";
     private static readonly Regex StartWhitespaceRegex = new(@"^\s+", RegexOptions.Compiled);

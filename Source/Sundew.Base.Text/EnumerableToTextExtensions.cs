@@ -9,18 +9,8 @@ namespace Sundew.Base.Text;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Globalization;
 using System.Text;
-
-/// <summary>
-/// Delegate for joining data to a <see cref="StringBuilder"/>.
-/// </summary>
-/// <typeparam name="TItem">The item type.</typeparam>
-/// <param name="stringBuilder">The string builder.</param>
-/// <param name="isSuccessive">Indicates that the current item is not the first.</param>
-/// <param name="item">The current item to aggregate.</param>
-public delegate void JoinToStringBuilderAction<in TItem>(StringBuilder stringBuilder, bool isSuccessive, TItem item);
 
 /// <summary>
 /// Extends IEnumerable with <see cref="StringBuilder"/> aggregate methods.
@@ -37,15 +27,7 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString(this IEnumerable<string> enumerable, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.CurrentCulture).ToString();
     }
 
     /// <summary>
@@ -58,15 +40,33 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString(this IEnumerable<string> enumerable, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.CurrentCulture).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToStringInvariant(this IEnumerable<string> enumerable, char separator)
+    {
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.InvariantCulture).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToStringInvariant(this IEnumerable<string> enumerable, string separator)
+    {
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.InvariantCulture).ToString();
     }
 
     /// <summary>
@@ -75,22 +75,58 @@ public static class EnumerableToTextExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider)
-        where TItem : notnull
+    public static string JoinToStringInvariant<TItem>(this IEnumerable<TItem> enumerable, char separator, bool skipNullValues = true)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.InvariantCulture, skipNullValues).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToStringInvariant<TItem>(this IEnumerable<TItem> enumerable, string separator, bool skipNullValues = true)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.InvariantCulture, skipNullValues).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, bool skipNullValues = true)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.CurrentCulture, skipNullValues).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, bool skipNullValues = true)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.CurrentCulture, skipNullValues).ToString();
     }
 
     /// <summary>
@@ -104,50 +140,9 @@ public static class EnumerableToTextExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues = true)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { isSuccessive = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
-    }
-
-    /// <summary>
-    /// Joins the specified enumerable to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider)
-        where TItem : notnull
-    {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, formatProvider, skipNullValues).ToString();
     }
 
     /// <summary>
@@ -161,26 +156,9 @@ public static class EnumerableToTextExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues = true)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { isSuccessive = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, formatProvider, skipNullValues).ToString();
     }
 
     /// <summary>
@@ -188,22 +166,14 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateAction">The aggregate function.</param>
+    /// <param name="appendAction">The append function.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateAction, char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -211,22 +181,14 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateAction">The aggregate action that provides the string builder and a value indicating whether data was already aggregated.</param>
+    /// <param name="appendAction">The append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, JoinToStringBuilderAction<TItem> aggregateAction, char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, builderPair.isSuccessive, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -234,22 +196,15 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateAction">The aggregate action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append function.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateAction, string separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -257,66 +212,15 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateAction">The aggregate action that provides the string builder and a value indicating whether data was already aggregated.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, JoinToStringBuilderAction<TItem> aggregateAction, string separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, builderPair.isSuccessive, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
-    }
-
-    /// <summary>
-    /// Joins the specified enumerable to string builder.
-    /// </summary>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, char separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            RemoveSeparatorAtEnd);
-    }
-
-    /// <summary>
-    /// Joins the specified enumerable to string builder.
-    /// </summary>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, string separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -324,24 +228,15 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, char separator, IFormatProvider formatProvider)
-        where TItem : notnull
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            RemoveSeparatorAtEnd);
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, finalAppendAction, separator).ToString();
     }
 
     /// <summary>
@@ -349,215 +244,48 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, char separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { isSuccessive = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            RemoveSeparatorAtEnd);
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, finalAppendAction, separator).ToString();
     }
 
     /// <summary>
-    /// Aggregates to string builder.
+    /// Joins the specified enumerable to string builder.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, string separator, IFormatProvider formatProvider)
-        where TItem : notnull
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, finalAppendAction, separator).ToString();
     }
 
     /// <summary>
-    /// Aggregates to string builder.
+    /// Joins the specified enumerable to string builder.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, string separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { isSuccessive = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateAction">The aggregate action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateAction,
-        char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            RemoveSeparatorAtEnd);
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateAction">The aggregate action that provides the string builder and a value indicating whether data was already aggregated.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        JoinToStringBuilderAction<TItem> aggregateAction,
-        char separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, builderPair.isSuccessive, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            RemoveSeparatorAtEnd);
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateAction">The aggregate action.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateAction,
-        string separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateAction">The aggregate action that provides the string builder and a value indicating whether data was already aggregated.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        JoinToStringBuilderAction<TItem> aggregateAction,
-        string separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateAction.Invoke(builderPair.stringBuilder, builderPair.isSuccessive, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static StringBuilder RemoveSeparatorAtEnd((StringBuilder StringBuilder, bool IsSuccessive) builderPair, string separator)
-    {
-        return builderPair.IsSuccessive ? builderPair.StringBuilder.Remove(builderPair.StringBuilder.Length - separator.Length, separator.Length) : builderPair.StringBuilder;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static StringBuilder RemoveSeparatorAtEnd((StringBuilder StringBuilder, bool IsSuccessive) builderPair)
-    {
-        return builderPair.IsSuccessive ? builderPair.StringBuilder.Remove(builderPair.StringBuilder.Length - 1, 1) : builderPair.StringBuilder;
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, finalAppendAction, separator).ToString();
     }
 }

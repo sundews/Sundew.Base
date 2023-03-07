@@ -12,19 +12,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Text;
 using Sundew.Base.Collections.Internal;
 using Sundew.Base.Memory;
 using Sundew.Base.Primitives;
-
-/// <summary>
-/// Delegate for aggregating data to a <see cref="StringBuilder"/>.
-/// </summary>
-/// <typeparam name="TResult">The result type.</typeparam>
-/// <param name="stringBuilder">The string builder.</param>
-/// <param name="isSuccessive">Indicates that the current item is not the first.</param>
-/// <returns>The result.</returns>
-public delegate TResult AggregateToStringBuilderResult<out TResult>(StringBuilder stringBuilder, bool isSuccessive);
 
 /// <summary>
 /// Extends the generic IEnumerable interface with functions.
@@ -270,134 +260,6 @@ public static partial class EnumerableExtensions
         }
 
         return buffer.ToFinalArray();
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
-    /// <returns>A <see cref="StringBuilder"/>.</returns>
-    public static StringBuilder AggregateToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateFunction)
-    {
-        return enumerable.AggregateToStringBuilder(new StringBuilder(), aggregateFunction, out _);
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
-    /// <param name="wasAggregated">Indicated whether data was aggregated.</param>
-    /// <returns>A <see cref="StringBuilder"/>.</returns>
-    public static StringBuilder AggregateToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        Action<StringBuilder, TItem> aggregateFunction,
-        out bool wasAggregated)
-    {
-        return enumerable.AggregateToStringBuilder(new StringBuilder(), aggregateFunction, out wasAggregated);
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
-    /// <returns>
-    /// A <see cref="StringBuilder" />.
-    /// </returns>
-    public static StringBuilder AggregateToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateFunction)
-    {
-        return AggregateToStringBuilder(enumerable, stringBuilder, aggregateFunction, out _);
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
-    /// <param name="wasAggregated">Indicated whether data was aggregated.</param>
-    /// <returns>
-    /// A <see cref="StringBuilder" /> and a value indicating whether data was aggregated.
-    /// </returns>
-    public static StringBuilder AggregateToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateFunction,
-        out bool wasAggregated)
-    {
-        var result = enumerable.Aggregate(
-            (stringBuilder, isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                return builderPair with { isSuccessive = true };
-            });
-        wasAggregated = result.isSuccessive;
-        return result.stringBuilder;
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
-    /// <param name="resultFunc">The result function.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static TResult AggregateToStringBuilder<TItem, TResult>(
-        this IEnumerable<TItem> enumerable,
-        Action<StringBuilder, TItem> aggregateFunction,
-        AggregateToStringBuilderResult<TResult> resultFunc)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => resultFunc(builderPair.stringBuilder, builderPair.isSuccessive));
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <typeparam name="TResult">The type of the result.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
-    /// <param name="resultFunc">The result function.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static TResult AggregateToStringBuilder<TItem, TResult>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateFunction,
-        AggregateToStringBuilderResult<TResult> resultFunc)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), isSuccessive: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                return builderPair with { isSuccessive = true };
-            },
-            builderPair => resultFunc(builderPair.stringBuilder, builderPair.isSuccessive));
     }
 
     private static TOutItem[] ToArrayUnsafe<TInItem, TOutItem>(IReadOnlyList<TInItem> list, Func<TInItem, TOutItem> selectFunc)

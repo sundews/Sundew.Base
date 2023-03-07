@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumerableToTextExtensionsTests.cs" company="Hukano">
+// <copyright file="EnumerableExtensionsTests.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -13,13 +13,13 @@ namespace Sundew.Base.UnitTests.Collections
     using Sundew.Base.Collections;
     using Xunit;
 
-    public class EnumerableToTextExtensionsTests
+    public class EnumerableExtensionsTests
     {
         private readonly IList<int> numberList = new List<int> { 1, 2, 4, 5, 6, 5, 6 };
 
         private readonly int[] numberArray;
 
-        public EnumerableToTextExtensionsTests()
+        public EnumerableExtensionsTests()
         {
             this.numberArray = this.numberList.ToArray();
         }
