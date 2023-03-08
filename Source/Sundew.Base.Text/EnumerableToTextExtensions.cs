@@ -9,8 +9,7 @@ namespace Sundew.Base.Text;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
+using System.Globalization;
 using System.Text;
 
 /// <summary>
@@ -28,15 +27,7 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString(this IEnumerable<string> enumerable, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.CurrentCulture).ToString();
     }
 
     /// <summary>
@@ -49,15 +40,33 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString(this IEnumerable<string> enumerable, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.CurrentCulture).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToStringInvariant(this IEnumerable<string> enumerable, char separator)
+    {
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.InvariantCulture).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToStringInvariant(this IEnumerable<string> enumerable, string separator)
+    {
+        return new StringBuilder().AppendItems(enumerable, separator, CultureInfo.InvariantCulture).ToString();
     }
 
     /// <summary>
@@ -66,22 +75,58 @@ public static class EnumerableToTextExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider)
-        where TItem : notnull
+    public static string JoinToStringInvariant<TItem>(this IEnumerable<TItem> enumerable, char separator, bool skipNullValues = true)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.InvariantCulture, skipNullValues).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToStringInvariant<TItem>(this IEnumerable<TItem> enumerable, string separator, bool skipNullValues = true)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.InvariantCulture, skipNullValues).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, bool skipNullValues = true)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.CurrentCulture, skipNullValues).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="separator">The separator.</param>
+    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, bool skipNullValues = true)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, CultureInfo.CurrentCulture, skipNullValues).ToString();
     }
 
     /// <summary>
@@ -95,50 +140,9 @@ public static class EnumerableToTextExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues = true)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { wasAggregated = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
-    }
-
-    /// <summary>
-    /// Joins the specified enumerable to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider)
-        where TItem : notnull
-    {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, formatProvider, skipNullValues).ToString();
     }
 
     /// <summary>
@@ -152,26 +156,9 @@ public static class EnumerableToTextExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues = true)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { wasAggregated = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, formatProvider, skipNullValues).ToString();
     }
 
     /// <summary>
@@ -179,22 +166,14 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
+    /// <param name="appendAction">The append function.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateFunction, char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair).ToString());
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -202,66 +181,14 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
+    /// <param name="appendAction">The append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> aggregateFunction, string separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder: new StringBuilder(), wasAggregated: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator).ToString());
-    }
-
-    /// <summary>
-    /// Joins the specified enumerable to string builder.
-    /// </summary>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, char separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            RemoveSeparatorAtEnd);
-    }
-
-    /// <summary>
-    /// Joins the specified enumerable to string builder.
-    /// </summary>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder JoinToStringBuilder(this IEnumerable<string> enumerable, StringBuilder stringBuilder, string separator)
-    {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -269,24 +196,15 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append function.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, char separator, IFormatProvider formatProvider)
-        where TItem : notnull
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            RemoveSeparatorAtEnd);
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -294,159 +212,80 @@ public static class EnumerableToTextExtensions
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, char separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { wasAggregated = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            RemoveSeparatorAtEnd);
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
-    /// Aggregates to string builder.
+    /// Joins the specified enumerable to string builder.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, string separator, IFormatProvider formatProvider)
-        where TItem : notnull
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                builderPair.stringBuilder.Append(item, formatProvider);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, finalAppendAction, separator).ToString();
     }
 
     /// <summary>
-    /// Aggregates to string builder.
+    /// Joins the specified enumerable to string builder.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="skipNullValues">if set to <c>true</c> [skip null values].</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(this IEnumerable<TItem> enumerable, StringBuilder stringBuilder, string separator, IFormatProvider formatProvider, bool skipNullValues)
-        where TItem : class?
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                if (item != null)
-                {
-                    builderPair.stringBuilder.Append(item!, formatProvider);
-                }
-                else if (skipNullValues)
-                {
-                    return builderPair with { wasAggregated = true };
-                }
-
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, finalAppendAction, separator).ToString();
     }
 
     /// <summary>
-    /// Aggregates to string builder.
+    /// Joins the specified enumerable to string builder.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateFunction,
-        char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, char separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            RemoveSeparatorAtEnd);
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, finalAppendAction, separator).ToString();
     }
 
     /// <summary>
-    /// Aggregates to string builder.
+    /// Joins the specified enumerable to string builder.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="aggregateFunction">The aggregate function.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="finalAppendAction">The final append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder JoinToStringBuilder<TItem>(
-        this IEnumerable<TItem> enumerable,
-        StringBuilder stringBuilder,
-        Action<StringBuilder, TItem> aggregateFunction,
-        string separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, string separator)
     {
-        return enumerable.Aggregate(
-            (stringBuilder, wasAggregated: false),
-            (builderPair, item) =>
-            {
-                aggregateFunction.Invoke(builderPair.stringBuilder, item);
-                builderPair.stringBuilder.Append(separator);
-                return builderPair with { wasAggregated = true };
-            },
-            builderPair => RemoveSeparatorAtEnd(builderPair, separator));
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static StringBuilder RemoveSeparatorAtEnd((StringBuilder StringBuilder, bool WasAggregated) builderPair, string separator)
-    {
-        return builderPair.WasAggregated ? builderPair.StringBuilder.Remove(builderPair.StringBuilder.Length - separator.Length, separator.Length) : builderPair.StringBuilder;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static StringBuilder RemoveSeparatorAtEnd((StringBuilder StringBuilder, bool WasAggregated) builderPair)
-    {
-        return builderPair.WasAggregated ? builderPair.StringBuilder.Remove(builderPair.StringBuilder.Length - 1, 1) : builderPair.StringBuilder;
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, finalAppendAction, separator).ToString();
     }
 }

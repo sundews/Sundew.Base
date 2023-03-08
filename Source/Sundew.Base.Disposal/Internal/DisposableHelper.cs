@@ -21,7 +21,7 @@ internal static class DisposableHelper
         }
         else
         {
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NETSTANDARD2_0
             DisposeItemPreferDispose(disposable).AsTask().Wait();
 #else
             DisposeItemPreferDispose(disposable);
@@ -44,7 +44,7 @@ internal static class DisposableHelper
             {
                 foreach (var disposable in disposables)
                 {
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NETSTANDARD2_0
                     DisposeItemPreferDispose(disposable).AsTask().Wait();
 #else
                     DisposeItemPreferDispose(disposable);
@@ -54,7 +54,7 @@ internal static class DisposableHelper
         }
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NETSTANDARD2_0
     public static async ValueTask DisposeAsync(object disposable, IDisposableReporter? disposableReporter)
     {
         if (disposableReporter != null)
@@ -120,7 +120,7 @@ internal static class DisposableHelper
             reportingDisposable.SetReporter(disposableReporter);
         }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NETSTANDARD2_0
         DisposeItemPreferDispose(disposable).AsTask().Wait();
 #else
         DisposeItemPreferDispose(disposable);
@@ -128,7 +128,7 @@ internal static class DisposableHelper
         disposableReporter.Disposed(disposable);
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NETSTANDARD2_0
     private static async ValueTask DisposeItemPreferDispose(object item)
     {
         switch (item)

@@ -4,9 +4,10 @@ Sundew.Base is a collection of smaller NuGet packages that work on various .NETS
 
 ## Collections
 Contains various Linq style extension methods for collection types suchs IEnumerable, IReadOnlyList etc.
-* AggregateToStringBuilder, For, ForEach, ForReverse, IndexOf, ToReadOnly.
+* For, ForEach, ForReverse, IndexOf, ToReadOnly.
 * AllOrFailed extension allows seemless conversion from IEnumerable<TItem?> to IEnumerable\<TItem\>.
 * ByCardinality extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
+* Value-Array, List and Dictionary* wrappers for Immutable collections with value semantics. (* Not on NETStandard1.2)
 
 ## Disposal
 * DisposeAction for wrapping an Action in an IDisposable.
@@ -34,11 +35,13 @@ IAsyncDisposable is only supported on .NETStandard2.1
 * Interval represents an interval of two values.
 * Percentage as a value type.
 * DateTime provider.
+* Result type (R) and Option type (O).
 
 ## Text
 * AlignedString and AlignAndLimitFormatProvider providers aligning and length limiting string formatting.
 * NamedFormatString allows to define a string format using names rather than indices.
 * NaturalTextComparer does logical text comparison for all platforms with performance similar to the Windows specific StrCmpLogicalW.
+* AppendItems allows joining items into a StringBuilder.
 
 ## Threading and Threading.Jobs
 * AsyncLazy provides a cancellable async lazy implementation

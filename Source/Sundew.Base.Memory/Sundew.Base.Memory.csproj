@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.3;netstandard1.2</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard1.3;netstandard1.2;netstandard2.0</TargetFrameworks>
     <Description>Various extensions and classes for working with memory.</Description>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>

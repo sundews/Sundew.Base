@@ -85,7 +85,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Starts the job.
     /// </summary>
     /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    public Result.IfSuccess<CancellationToken> Start()
+    public O<CancellationToken> Start()
     {
         lock (this.lockObject)
         {
@@ -96,10 +96,10 @@ public sealed class CancellableJob<TState> : IJob
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
                 this.jobContinuationTask = Task.Factory.StartNew(this.TaskAction, this.cancellationTokenSource.Token, taskCreationOptions, this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default);
 
-                return Result.Success(this.cancellationTokenSource.Token);
+                return O.Some(this.cancellationTokenSource.Token);
             }
 
-            return Result.Error();
+            return O.None();
         }
     }
 
@@ -107,7 +107,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    public Result.IfError<AggregateException?> Stop()
+    public R<AggregateException> Stop()
     {
         var task = this.StopAsync();
         task.Wait();
@@ -118,7 +118,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    public async Task<Result.IfError<AggregateException?>> StopAsync()
+    public async Task<R<AggregateException>> StopAsync()
     {
         var actualTask = this.jobContinuationTask;
         this.cancellationTokenSource?.Cancel();
@@ -128,7 +128,7 @@ public sealed class CancellableJob<TState> : IJob
             await actualTask.ConfigureAwait(false);
         }
 
-        return Result.FromError(this.aggregateException);
+        return R.FromError(this.aggregateException);
     }
 
     /// <summary>
@@ -137,21 +137,21 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>
     /// An async task.
     /// </returns>
-    public async Task<Result.IfError<AggregateException?>> WaitAsync()
+    public async Task<R<AggregateException>> WaitAsync()
     {
         if (this.jobContinuationTask != null)
         {
             await this.jobContinuationTask.ConfigureAwait(false);
         }
 
-        return Result.FromError(this.aggregateException);
+        return R.FromError(this.aggregateException);
     }
 
     /// <summary>
     /// Waits for the job to finish.
     /// </summary>
     /// <returns>A result.</returns>
-    public Result.IfError<AggregateException?> Wait()
+    public R<AggregateException> Wait()
     {
         var task = this.WaitAsync();
         task.Wait();

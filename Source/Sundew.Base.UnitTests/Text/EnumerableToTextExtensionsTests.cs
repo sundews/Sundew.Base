@@ -55,25 +55,25 @@ namespace Sundew.Base.UnitTests.Text
         }
 
         [Fact]
-        public void JoinToStringBuilder_Then_ResultShouldBeExpectedResult()
+        public void AppendItems_Then_ResultShouldBeExpectedResult()
         {
-            var result = Values.JoinToStringBuilder(new StringBuilder(), CharSeparator, CultureInfo.InvariantCulture).ToString();
+            var result = new StringBuilder().AppendItems(Values, CharSeparator, CultureInfo.InvariantCulture).ToString();
 
             result.Should().Be(ExpecteCharSeparatedResult);
         }
 
         [Fact]
-        public void JoinToStringBuilder_When_UsingStringSeparator_Then_ResultShouldBeExpectedResult()
+        public void AppendItems_When_UsingStringSeparator_Then_ResultShouldBeExpectedResult()
         {
-            var result = Values.JoinToStringBuilder(new StringBuilder(), StringSeparator, CultureInfo.InvariantCulture).ToString();
+            var result = new StringBuilder().AppendItems(Values, StringSeparator, CultureInfo.InvariantCulture).ToString();
 
             result.Should().Be(ExpectedStringSeparatedResult);
         }
 
         [Fact]
-        public void JoinToStringBuilder_When_ArrayIsEmptyAndUsingStringSeparator_Then_ResultShouldBeEmpty()
+        public void AppendItems_When_ArrayIsEmptyAndUsingStringSeparator_Then_ResultShouldBeEmpty()
         {
-            var result = Array.Empty<string>().JoinToStringBuilder(new StringBuilder(), StringSeparator, CultureInfo.InvariantCulture).ToString();
+            var result = new StringBuilder().AppendItems(Array.Empty<string>(), StringSeparator, CultureInfo.InvariantCulture).ToString();
 
             result.Should().Be(string.Empty);
         }
@@ -81,17 +81,17 @@ namespace Sundew.Base.UnitTests.Text
         [Theory]
         [InlineData(true, "Hi|there|!")]
         [InlineData(false, "Hi|there||!")]
-        public void JoinToStringBuilder_When_UsingNullableClassOverloadAndCharSeparator_Then_ResultShouldBeExpectedResult(bool skipNullValues, string expectedResult)
+        public void AppendItems_When_UsingNullableClassOverloadAndCharSeparator_Then_ResultShouldBeExpectedResult(bool skipNullValues, string expectedResult)
         {
-            var result = new[] { "Hi", "there", null, "!" }.JoinToStringBuilder(new StringBuilder(), CharSeparator, CultureInfo.InvariantCulture, skipNullValues).ToString();
+            var result = new StringBuilder().AppendItems(new[] { "Hi", "there", null, "!" }, CharSeparator, CultureInfo.InvariantCulture, skipNullValues).ToString();
 
             result.Should().Be(expectedResult);
         }
 
         [Fact]
-        public void JoinToStringBuilder_When_UsingNotNullOverloadAndCharSeparator_Then_ResultShouldBeExpectedResult()
+        public void AppendItems_When_UsingNotNullOverloadAndCharSeparator_Then_ResultShouldBeExpectedResult()
         {
-            var result = new[] { "Hi", "there", "!" }.JoinToStringBuilder(new StringBuilder(), CharSeparator, CultureInfo.InvariantCulture).ToString();
+            var result = new StringBuilder().AppendItems(new[] { "Hi", "there", "!" }, CharSeparator, CultureInfo.InvariantCulture).ToString();
 
             result.Should().Be("Hi|there|!");
         }

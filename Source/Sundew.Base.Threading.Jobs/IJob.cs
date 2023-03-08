@@ -35,19 +35,19 @@ public interface IJob : IDisposable
     /// Starts the job.
     /// </summary>
     /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    Result.IfSuccess<CancellationToken> Start();
+    O<CancellationToken> Start();
 
     /// <summary>
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    Result.IfError<AggregateException?> Stop();
+    R<AggregateException> Stop();
 
     /// <summary>
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    Task<Result.IfError<AggregateException?>> StopAsync();
+    Task<R<AggregateException>> StopAsync();
 
     /// <summary>
     /// Waits for the job to finish asynchronously.
@@ -55,10 +55,10 @@ public interface IJob : IDisposable
     /// <returns>
     /// An async task.
     /// </returns>
-    Task<Result.IfError<AggregateException?>> WaitAsync();
+    Task<R<AggregateException>> WaitAsync();
 
     /// <summary>
     /// Waits for the job to finish.
     /// </summary>
-    Result.IfError<AggregateException?> Wait();
+    R<AggregateException> Wait();
 }

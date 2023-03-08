@@ -1,10 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.2</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard1.2;netstandard2.0</TargetFrameworks>
     <Description>Extensions for collections types.</Description>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <NoWarn>1701;1702;SA1633</NoWarn>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.2'">
+    <Compile Remove="Immutable\ValueDictionary.cs" />
+    <Compile Remove="Immutable\ImmutableDictionaryExtensions.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
@@ -31,12 +37,13 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.DiscriminatedUnions" Version="2.0.6" />
+    <PackageReference Include="Sundew.DiscriminatedUnions" Version="3.0.0" />
     <PackageReference Include="Sundew.Packaging.Publish" Version="8.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
@@ -45,6 +52,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' != 'netstandard2.1'">
     <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.Bcl.Hashcode" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>

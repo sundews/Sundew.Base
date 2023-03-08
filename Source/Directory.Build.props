@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Version>8.5</Version>
+    <Version>9.0</Version>
     <OutputPath>bin/$(Configuration)</OutputPath>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -18,7 +18,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <WarningsAsErrors />
-    <PackageReleaseNotes>8.5 - JoinToStringBuilder and AggregateToStringBuilder improvements
+    <PackageReleaseNotes>9.0 - Immutable collections with value semantics, Result type redesign and new Option type, AppendItems replaces AggregateToStringBuilder and JoinToStringBuilder.
+8.5 - JoinToStringBuilder and AggregateToStringBuilder improvements
 8.4 - AllOrFailed extension for IEnumerable&lt;T&gt;
 8.3 - NamedFormatString and AsyncLazy improvements
 8.2 - ToEnumerable returns IReadOnlyCollection, Added Disposer ctors to avoid ambiguous calls
