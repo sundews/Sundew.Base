@@ -26,9 +26,9 @@ namespace Sundew.Base.UnitTests.Text
         [InlineData("Padding: {0,-10:N2}, {1,10:N4}, {One,-10:N3}, {Two,10:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Padding: 1.23      ,     9.8765, 1.235     ,       9.88")]
         public void FormatInvariant_Then_ResultShouldBeExpectedResult(string format, string[] names, object[] input, string expectedResult)
         {
-            var testee = new NamedFormatString(format, names);
+            var testee = NamedFormatString.CreateInvariant(format, names);
 
-            var result = testee.FormatInvariant(input);
+            var result = testee.Format(input);
 
             result.Should().Be(expectedResult);
         }
@@ -36,7 +36,7 @@ namespace Sundew.Base.UnitTests.Text
         [Fact]
         public void ImplicitFormatOperator_Then_ResultShouldBeExpectedResult()
         {
-            var testee = new NamedFormatString("{One}, {Two}, {0}", new[] { "One", "Two" });
+            var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", new[] { "One", "Two" });
 
             string result = testee;
 
@@ -48,7 +48,7 @@ namespace Sundew.Base.UnitTests.Text
         public void GetNullArguments_Then_NullNamesShouldBeExpectedResult()
         {
             var expectedResult = new List<(string Name, int Index)>() { ("Two", 1) };
-            var testee = new NamedFormatString("{One}, {Two}, {0}", new[] { "One", "Two" });
+            var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", new[] { "One", "Two" });
 
             var result = testee.GetNullArguments(1, null);
 
@@ -59,11 +59,11 @@ namespace Sundew.Base.UnitTests.Text
         [Fact]
         public void FormatInvariant_When_PassingNullArray_Then_ArgumentNullExceptionShouldBeThrown()
         {
-            var testee = new NamedFormatString("{One}", new[] { "One" });
+            var testee = NamedFormatString.CreateInvariant("{One}", new[] { "One" });
             object[]? array = null;
 
 #pragma warning disable CS8604 // Possible null reference argument.
-            Action act = () => testee.FormatInvariant(array);
+            Action act = () => testee.Format(array);
 #pragma warning restore CS8604 // Possible null reference argument.
 
             act.Should().Throw<ArgumentNullException>();

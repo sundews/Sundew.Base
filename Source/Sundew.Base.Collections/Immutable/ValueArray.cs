@@ -71,6 +71,28 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     }
 
     /// <summary>
+    /// Checks if the two sides are equal.
+    /// </summary>
+    /// <param name="left">The left.</param>
+    /// <param name="right">The right.</param>
+    /// <returns><c>true</c>, if the sides are equal otherwise <c>false</c>.</returns>
+    public static bool operator ==(ValueArray<TItem> left, ValueArray<TItem> right)
+    {
+        return left.Equals(right);
+    }
+
+    /// <summary>
+    /// Checks if the two sides differ.
+    /// </summary>
+    /// <param name="left">The left.</param>
+    /// <param name="right">The right.</param>
+    /// <returns><c>false</c>, if the sides are equal otherwise <c>true</c>.</returns>
+    public static bool operator !=(ValueArray<TItem> left, ValueArray<TItem> right)
+    {
+        return !(left == right);
+    }
+
+    /// <summary>
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>

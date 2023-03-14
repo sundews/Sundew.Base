@@ -228,15 +228,15 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     /// <param name="obj">The <see cref="object"/> to compare with this instance.</param>
     /// <returns>
     ///   <c>true</c> if the specified <see cref="object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return EqualityHelper.Equals(this, obj);
+        return Equality.Equals(this, obj);
     }
 
     /// <summary>Returns a hash code for this instance.</summary>
     /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
     public override int GetHashCode()
     {
-        return EqualityHelper.GetHashCode(this.HasValue.GetHashCode(), this.Value?.GetHashCode() ?? 0);
+        return Equality.GetHashCode(this.HasValue.GetHashCode(), this.Value?.GetHashCode() ?? 0);
     }
 }

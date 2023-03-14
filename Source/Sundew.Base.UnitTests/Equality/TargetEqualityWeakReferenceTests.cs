@@ -5,10 +5,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.WeakReferencing
+namespace Sundew.Base.UnitTests.Primitives.WeakReferencing
 {
     using FluentAssertions;
-    using Sundew.Base.Equality;
+    using Sundew.Base.Primitives.WeakReferencing;
     using Xunit;
 
     public class TargetEqualityWeakReferenceTests

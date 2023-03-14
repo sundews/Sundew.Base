@@ -27,37 +27,12 @@ public readonly struct NamedFormatString
         RegexOptions.Compiled);
 
     private readonly string format;
+    private readonly IFormatProvider formatProvider;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NamedFormatString" /> struct.
-    /// </summary>
-    /// <param name="format">The format.</param>
-    /// <param name="names">The names.</param>
-    public NamedFormatString(string format, params string[] names)
-        : this(format, (IReadOnlyList<string>)names)
-    {
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="NamedFormatString" /> struct.
-    /// </summary>
-    /// <param name="format">The format.</param>
-    /// <param name="names">The names.</param>
-    public NamedFormatString(string format, IReadOnlyList<string> names)
-    {
-        var (indexedFormat, formatNames, unknownNames) = ConvertToIndexedFormat(names, format);
-        if (unknownNames.Count > 0)
-        {
-            throw new FormatException($"The string was in an invalid format: {format}");
-        }
-
-        this.format = indexedFormat;
-        this.FormatNames = formatNames;
-    }
-
-    private NamedFormatString(string format, IReadOnlyCollection<(string Name, int Index)> formatNames)
+    private NamedFormatString(string format, IReadOnlyCollection<(string Name, int Index)> formatNames, IFormatProvider formatProvider)
     {
         this.format = format;
+        this.formatProvider = formatProvider;
         this.FormatNames = formatNames;
     }
 
@@ -90,6 +65,64 @@ public readonly struct NamedFormatString
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="NamedFormatString" /> struct.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="names">The names.</param>
+    /// <returns>The new <see cref="NamedFormatString"/>.</returns>
+    public static NamedFormatString Create(string format, IReadOnlyList<string> names)
+    {
+        if (!TryCreate(format, names, CultureInfo.CurrentCulture, out var namedFormattedString, out var unknownNames))
+        {
+            if (unknownNames.Count > 0)
+            {
+                throw new FormatException($"The string was in an invalid format: {format}");
+            }
+        }
+
+        return namedFormattedString;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NamedFormatString" /> struct.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="names">The names.</param>
+    /// <returns>The new <see cref="NamedFormatString"/>.</returns>
+    public static NamedFormatString CreateInvariant(string format, IReadOnlyList<string> names)
+    {
+        if (!TryCreate(format, names, CultureInfo.InvariantCulture, out var namedFormattedString, out var unknownNames))
+        {
+            if (unknownNames.Count > 0)
+            {
+                throw new FormatException($"The string was in an invalid format: {format}");
+            }
+        }
+
+        return namedFormattedString;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="NamedFormatString" /> struct.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="names">The names.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <returns>The new <see cref="NamedFormatString"/>.</returns>
+    public static NamedFormatString Create(string format, IReadOnlyList<string> names, IFormatProvider formatProvider)
+    {
+        if (!TryCreate(format, names, formatProvider, out var namedFormattedString, out var unknownNames))
+        {
+            if (unknownNames.Count > 0)
+            {
+                throw new FormatException($"The string was in an invalid format: {format}");
+            }
+        }
+
+        return namedFormattedString;
+    }
+
+    /// <summary>
     /// Tries the create.
     /// </summary>
     /// <param name="format">The format.</param>
@@ -99,9 +132,40 @@ public readonly struct NamedFormatString
     /// <returns>
     /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
     /// </returns>
-    public static bool TryCreate(string format, IReadOnlyList<string> names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+    public static bool TryCreateInvariant(string format, string[] names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
     {
-        var (indexedFormat, formatNames, actualUnknownNames) = ConvertToIndexedFormat(names, format);
+        return TryCreate(format, names, CultureInfo.InvariantCulture, out namedFormatString, out unknownNames);
+    }
+
+    /// <summary>
+    /// Tries the create.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="names">The names.</param>
+    /// <param name="namedFormatString">The named format string.</param>
+    /// <param name="unknownNames">The unknown names.</param>
+    /// <returns>
+    /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
+    /// </returns>
+    public static bool TryCreate(string format, string[] names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+    {
+        return TryCreate(format, names, CultureInfo.CurrentCulture, out namedFormatString, out unknownNames);
+    }
+
+    /// <summary>
+    /// Tries the create.
+    /// </summary>
+    /// <param name="format">The format.</param>
+    /// <param name="names">The names.</param>
+    /// <param name="formatProvider">The culture info.</param>
+    /// <param name="namedFormatString">The named format string.</param>
+    /// <param name="unknownNames">The unknown names.</param>
+    /// <returns>
+    /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
+    /// </returns>
+    public static bool TryCreate(string format, IReadOnlyList<string> names, IFormatProvider formatProvider, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+    {
+        var (indexedFormat, formatNames, actualUnknownNames) = ConvertToIndexedFormat(names, format, CreateStringComparer(formatProvider, false));
         unknownNames = actualUnknownNames;
         if (unknownNames.Count > 0)
         {
@@ -109,7 +173,7 @@ public readonly struct NamedFormatString
             return false;
         }
 
-        namedFormatString = new NamedFormatString(indexedFormat, formatNames);
+        namedFormatString = new NamedFormatString(indexedFormat, formatNames, formatProvider);
         return true;
     }
 
@@ -188,59 +252,6 @@ public readonly struct NamedFormatString
     }
 
     /// <summary>
-    /// Formats the specified format.
-    /// </summary>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="arguments">The arguments.</param>
-    /// <returns>
-    /// The formatted string.
-    /// </returns>
-    /// <exception cref="FormatException">$"The string was in an invalid format: {format}.</exception>
-    public string Format(IFormatProvider? formatProvider, params object?[] arguments)
-    {
-        return string.Format(formatProvider, this.format, arguments);
-    }
-
-    /// <summary>
-    /// Formats the invariant.
-    /// </summary>
-    /// <param name="arg0">The arg0.</param>
-    /// <returns>
-    /// The formatted string.
-    /// </returns>
-    public string FormatInvariant(object? arg0)
-    {
-        return string.Format(CultureInfo.InvariantCulture, this.format, arg0);
-    }
-
-    /// <summary>
-    /// Formats the align.
-    /// </summary>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="arg0">The arg0.</param>
-    /// <returns>
-    /// the formatted string.
-    /// </returns>
-    public string Format(IFormatProvider? formatProvider, object? arg0)
-    {
-        return string.Format(formatProvider, this.format, arg0);
-    }
-
-    /// <summary>
-    /// Formats the align.
-    /// </summary>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="arg0">The arg0.</param>
-    /// <param name="arg1">The arg1.</param>
-    /// <returns>
-    /// the formatted string.
-    /// </returns>
-    public string Format(IFormatProvider? formatProvider, object? arg0, object? arg1)
-    {
-        return string.Format(formatProvider, this.format, arg0, arg1);
-    }
-
-    /// <summary>
     /// Formats the align.
     /// </summary>
     /// <param name="arg0">The arg0.</param>
@@ -248,22 +259,9 @@ public readonly struct NamedFormatString
     /// <returns>
     /// the formatted string.
     /// </returns>
-    public string FormatInvariant(object? arg0, object? arg1)
+    public string Format(object? arg0, object? arg1)
     {
-        return string.Format(CultureInfo.InvariantCulture, this.format, arg0, arg1);
-    }
-
-    /// <summary>
-    /// Formats the align.
-    /// </summary>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="arg0">The arg0.</param>
-    /// <param name="arg1">The arg1.</param>
-    /// <param name="arg2">The arg2.</param>
-    /// <returns>The formatted string.</returns>
-    public string Format(IFormatProvider? formatProvider, object? arg0, object? arg1, object? arg2)
-    {
-        return string.Format(formatProvider, this.format, arg0, arg1, arg2);
+        return string.Format(this.formatProvider, this.format, arg0, arg1);
     }
 
     /// <summary>
@@ -272,12 +270,10 @@ public readonly struct NamedFormatString
     /// <param name="arg0">The arg0.</param>
     /// <param name="arg1">The arg1.</param>
     /// <param name="arg2">The arg2.</param>
-    /// <returns>
-    /// the formatted string.
-    /// </returns>
-    public string FormatInvariant(object? arg0, object? arg1, object? arg2)
+    /// <returns>The formatted string.</returns>
+    public string Format(object? arg0, object? arg1, object? arg2)
     {
-        return string.Format(CultureInfo.InvariantCulture, this.format, arg0, arg1, arg2);
+        return string.Format(this.formatProvider, this.format, arg0, arg1, arg2);
     }
 
     /// <summary>
@@ -289,19 +285,7 @@ public readonly struct NamedFormatString
     /// </returns>
     public string Format(params object?[] arguments)
     {
-        return string.Format(this.format, arguments);
-    }
-
-    /// <summary>
-    /// Formats the align.
-    /// </summary>
-    /// <param name="arguments">The arguments.</param>
-    /// <returns>
-    /// the formatted string.
-    /// </returns>
-    public string FormatInvariant(params object?[] arguments)
-    {
-        return string.Format(CultureInfo.InvariantCulture, this.format, arguments);
+        return string.Format(this.formatProvider, this.format, arguments);
     }
 
     /// <summary>
@@ -314,11 +298,11 @@ public readonly struct NamedFormatString
     public NullArguments GetNullArguments(params object?[] arguments)
     {
         var nullArguments = new List<(string Name, int Index)>(this.FormatNames.Count);
-        foreach (var pair in this.FormatNames.OrderBy(x => x.Index))
+        foreach (var (name, index) in this.FormatNames.OrderBy(x => x.Index))
         {
-            if (arguments[pair.Index] == null)
+            if (arguments[index] == null)
             {
-                nullArguments.Add((pair.Name, pair.Index));
+                nullArguments.Add((Name: name, Index: index));
             }
         }
 
@@ -345,7 +329,7 @@ public readonly struct NamedFormatString
             names.Write(namedString.Name);
         }
 
-        var result = TryCreate(format, names.ToFinalArray(), out var namedFormatString, out var unknownNames);
+        var result = TryCreate(format, names.ToFinalArray(), formatProvider, out var namedFormatString, out var unknownNames);
         if (result)
         {
             var argumentArray = arguments.ToFinalArray();
@@ -355,7 +339,7 @@ public readonly struct NamedFormatString
                 return FormattedStringResult.ArgumentsContainedNullValues(nullArguments);
             }
 
-            return FormattedStringResult.StringFormatted(namedFormatString.Format(formatProvider, argumentArray));
+            return FormattedStringResult.StringFormatted(namedFormatString.Format(argumentArray));
         }
 
         return FormattedStringResult.FormatContainedUnknownNames(unknownNames);
@@ -366,8 +350,9 @@ public readonly struct NamedFormatString
     /// </summary>
     /// <param name="names">The names.</param>
     /// <param name="namedFormat">The named format.</param>
+    /// <param name="stringComparer">The string comparer.</param>
     /// <returns>A tuple of the indexed format and name-index pairs.</returns>
-    private static (string Format, IReadOnlyCollection<(string Name, int Index)> Names, IReadOnlyList<string> UnknownNames) ConvertToIndexedFormat(IReadOnlyList<string> names, string namedFormat)
+    private static (string Format, IReadOnlyCollection<(string Name, int Index)> Names, IReadOnlyList<string> UnknownNames) ConvertToIndexedFormat(IReadOnlyList<string> names, string namedFormat, StringComparer stringComparer)
     {
         var unknownNames = new List<string>();
         var namesAndIndices = new HashSet<(string Name, int Index)>();
@@ -380,7 +365,7 @@ public readonly struct NamedFormatString
                     return match.Value;
                 }
 
-                if (TryGetIndex(names, match.Value, out var index))
+                if (TryGetIndex(names, match.Value, out var index, stringComparer))
                 {
                     namesAndIndices.Add((match.Value, index));
                     return index.ToString();
@@ -426,13 +411,28 @@ public readonly struct NamedFormatString
     /// <param name="names">The names.</param>
     /// <param name="name">The name.</param>
     /// <param name="index">The index.</param>
+    /// <param name="stringComparer">The string comparer.</param>
     /// <returns>
     /// A value indicating whether the index was found.
     /// </returns>
-    private static bool TryGetIndex(IReadOnlyList<string> names, string name, out int index)
+    private static bool TryGetIndex(IReadOnlyList<string> names, string name, out int index, StringComparer stringComparer)
     {
-        index = names.IndexOf(x => StringComparer.Ordinal.Equals(x, name));
+        index = names.IndexOf(x => stringComparer.Equals(x, name));
         return index != -1;
+    }
+
+    private static StringComparer CreateStringComparer(IFormatProvider formatProvider, bool ignoreCase)
+    {
+        if (formatProvider is CultureInfo cultureInfo)
+        {
+#if NETSTANDARD1_3
+            return new NetStringComparer(cultureInfo.CompareInfo, ignoreCase);
+#else
+            return StringComparer.Create(cultureInfo, ignoreCase);
+#endif
+        }
+
+        return ignoreCase ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
     }
 
     /// <summary>
@@ -505,4 +505,33 @@ public readonly struct NamedFormatString
             return this.GetEnumerator();
         }
     }
+
+#if NETSTANDARD1_3
+    private class NetStringComparer : StringComparer
+    {
+        private readonly CompareInfo compareInfo;
+        private readonly bool ignoreCase;
+
+        public NetStringComparer(CompareInfo compareInfo, bool ignoreCase)
+        {
+            this.compareInfo = compareInfo;
+            this.ignoreCase = ignoreCase;
+        }
+
+        public override int Compare(string x, string y)
+        {
+            return this.compareInfo.Compare(x, y, this.ignoreCase ? CompareOptions.IgnoreCase : CompareOptions.None);
+        }
+
+        public override bool Equals(string x, string y)
+        {
+            return this.Compare(x, y) == 0;
+        }
+
+        public override int GetHashCode(string obj)
+        {
+            return obj.GetHashCode();
+        }
+    }
+#endif
 }

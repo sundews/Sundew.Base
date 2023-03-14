@@ -98,6 +98,12 @@ public static class EnumExtensions
             return true;
         }
 #else
+        if (value == null)
+        {
+            result = default!;
+            return false;
+        }
+
         try
         {
             result = ParseEnum<TEnum>(value, ignoreCase);

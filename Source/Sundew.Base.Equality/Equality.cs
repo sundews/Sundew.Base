@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EqualityHelper.cs" company="Hukano">
+// <copyright file="Equality.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 /// <summary>
 /// Contains helper methods for implementing equality and get hashcodes.
 /// </summary>
-public static class EqualityHelper
+public static class Equality
 {
     private const int OrderingHashPrime = 397;
 
