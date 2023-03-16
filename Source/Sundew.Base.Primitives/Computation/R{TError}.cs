@@ -22,7 +22,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <summary>Initializes a new instance of the <see cref="R{TError}"/> struct.</summary>
     /// <param name="isSuccess">if set to <c>true</c> [is error].</param>
     /// <param name="error">The error.</param>
-    public R(bool isSuccess, TError? error)
+    internal R(bool isSuccess, TError? error)
     {
         this.IsSuccess = isSuccess;
         this.Error = error;
@@ -133,7 +133,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// </returns>
     public R<TValue, TError> To<TValue>(TValue value)
     {
-        return new R<TValue, TError>(this.IsSuccess, value, this.Error);
+        return new R<TValue, TError>(this.IsSuccess, this.IsSuccess ? value : default!, !this.IsSuccess ? this.Error : default!);
     }
 
     /// <summary>
@@ -241,15 +241,15 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <param name="obj">The <see cref="object"/> to compare with this instance.</param>
     /// <returns>
     ///   <c>true</c> if the specified <see cref="object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return EqualityHelper.Equals(this, obj);
+        return Equality.Equals(this, obj);
     }
 
     /// <summary>Returns a hash code for this instance.</summary>
     /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
     public override int GetHashCode()
     {
-        return EqualityHelper.GetHashCode(this.IsSuccess.GetHashCode(), this.Error?.GetHashCode() ?? 0);
+        return Equality.GetHashCode(this.IsSuccess.GetHashCode(), this.Error?.GetHashCode() ?? 0);
     }
 }

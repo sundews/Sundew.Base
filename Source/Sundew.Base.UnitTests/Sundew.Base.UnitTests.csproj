@@ -3,11 +3,27 @@
   <PropertyGroup>    
     <TargetFramework>net7.0</TargetFramework>
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
-    <Authors>Kim Hugener-Ohlsen</Authors>    
-    <Company>Hukano</Company>    
+    <Authors>Kim Hugener-Ohlsen</Authors>
+    <Company>Hukano</Company>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>SA0001</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <CodeAnalysisRuleSet />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CodeAnalysisRuleSet />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
+    <CodeAnalysisRuleSet />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Publish|AnyCPU'">
+    <CodeAnalysisRuleSet />
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,18 +34,17 @@
 
   <ItemGroup>
     <AdditionalFiles Include="stylecop.json" />
-    <AdditionalFiles Include="Sundew.Base.UnitTests.ruleset" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.10.0" />
     <PackageReference Include="JustMock" Version="2023.1.117.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.DiscriminatedUnions" Version="3.0.1-u20230309-230315-ci" />
+    <PackageReference Include="Sundew.DiscriminatedUnions" Version="3.0.1" />
     <PackageReference Include="System.Security.Permissions" Version="7.0.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -39,6 +54,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base\Sundew.Base.csproj" />
     <ProjectReference Include="..\Sundew.Test.Infrastructure\Sundew.Test.Infrastructure.csproj" />
   </ItemGroup>

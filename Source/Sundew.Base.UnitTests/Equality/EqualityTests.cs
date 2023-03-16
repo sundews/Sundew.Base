@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EqualityHelperTests.cs" company="Hukano">
+// <copyright file="EqualityTests.cs" company="Hukano">
 // Copyright (c) Hukano. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,7 +12,7 @@ namespace Sundew.Base.UnitTests.Equality
     using Sundew.Base.Equality;
     using Xunit;
 
-    public class EqualityHelperTests
+    public class EqualityTests
     {
         [Theory]
         [InlineData(1, 2, 1, 2, true)]
@@ -87,12 +87,12 @@ namespace Sundew.Base.UnitTests.Equality
 
             public override bool Equals(object? obj)
             {
-                return EqualityHelper.Equals(this, obj);
+                return Equality.Equals(this, obj);
             }
 
             public override int GetHashCode()
             {
-                return EqualityHelper.GetHashCode(this.X.GetHashCode(), this.Y.GetHashCode());
+                return Equality.GetHashCode(this.X.GetHashCode(), this.Y.GetHashCode());
             }
         }
 
@@ -110,17 +110,17 @@ namespace Sundew.Base.UnitTests.Equality
 
             public bool Equals(Vector? other)
             {
-                return EqualityHelper.Equals(this, other, rhs => this.X == rhs.X && this.Y == rhs.Y);
+                return Equality.Equals(this, other, rhs => this.X == rhs.X && this.Y == rhs.Y);
             }
 
             public override bool Equals(object? obj)
             {
-                return EqualityHelper.Equals(this, obj);
+                return Equality.Equals(this, obj);
             }
 
             public override int GetHashCode()
             {
-                return EqualityHelper.GetHashCode(this.X.GetHashCode(), this.Y.GetHashCode());
+                return Equality.GetHashCode(this.X.GetHashCode(), this.Y.GetHashCode());
             }
         }
     }

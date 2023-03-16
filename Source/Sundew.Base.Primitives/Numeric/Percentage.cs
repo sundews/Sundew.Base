@@ -485,9 +485,9 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <returns>
     ///   <c>true</c> if the specified <see cref="object" /> is equal to this instance; otherwise, <c>false</c>.
     /// </returns>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return EqualityHelper.Equals(this, obj);
+        return Equality.Equals(this, obj);
     }
 
     /// <summary>

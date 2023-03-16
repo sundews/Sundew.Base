@@ -5,28 +5,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Equality;
+namespace Sundew.Base.Primitives.WeakReferencing;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Sundew.Base.Equality;
 
 /// <summary>
 /// A weak reference that compares equality by reference on the target.
 /// </summary>
 /// <typeparam name="TTarget">The type of the target.</typeparam>
-public class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWeakReference<TTarget>>
+public sealed class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWeakReference<TTarget>>
     where TTarget : class
 {
     private readonly IEqualityComparer<TTarget> equalityComparer;
     private readonly WeakReference<TTarget> weakReference;
-    private readonly int hashCode;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TargetEqualityWeakReference{TTarget}"/> class.
     /// </summary>
     /// <param name="target">The target.</param>
-    public TargetEqualityWeakReference([AllowNull] TTarget target)
+    public TargetEqualityWeakReference(TTarget? target)
         : this(target, false)
     {
     }
@@ -37,13 +37,12 @@ public class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWea
     /// <param name="target">The target.</param>
     /// <param name="trackResurrection">if set to <c>true</c> [track resurrection].</param>
     /// <param name="equalityComparer">The equality comparer.</param>
-    public TargetEqualityWeakReference([AllowNull] TTarget target, bool trackResurrection, IEqualityComparer<TTarget>? equalityComparer = null)
+    public TargetEqualityWeakReference(TTarget? target, bool trackResurrection, IEqualityComparer<TTarget>? equalityComparer = null)
     {
         this.equalityComparer = equalityComparer ?? ReferenceEqualityComparer<TTarget>.Instance;
 #pragma warning disable CS8604 // Possible null reference argument.
         this.weakReference = new WeakReference<TTarget>(target, trackResurrection);
 #pragma warning restore CS8604 // Possible null reference argument.
-        this.hashCode = target == null ? 0 : this.equalityComparer.GetHashCode(target);
     }
 
     /// <summary>
@@ -51,7 +50,7 @@ public class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWea
     /// </summary>
     /// <param name="target">The target.</param>
     /// <returns>A value indicating whether the target is available.</returns>
-    public bool TryGetTarget(out TTarget target)
+    public bool TryGetTarget([NotNullWhen(true)] out TTarget? target)
     {
         return this.weakReference.TryGetTarget(out target);
     }
@@ -63,11 +62,11 @@ public class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWea
     /// <returns><c>true</c> if equal, otherwise <c>false</c>.</returns>
     public bool Equals(TargetEqualityWeakReference<TTarget>? other)
     {
-        return EqualityHelper.Equals(this, other, otherWeakReference =>
+        return Equality.Equals(this, other, otherWeakReference =>
         {
             var thisResult = this.weakReference.TryGetTarget(out var target);
             var otherResult = otherWeakReference.TryGetTarget(out var otherTarget);
-            return thisResult == otherResult && (!thisResult || this.equalityComparer.Equals(target, otherTarget));
+            return thisResult == otherResult && (!thisResult || this.equalityComparer.Equals(target, otherTarget!));
         });
     }
 
@@ -80,7 +79,7 @@ public class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWea
     /// </returns>
     public override bool Equals(object? obj)
     {
-        return EqualityHelper.Equals(this, obj);
+        return Equality.Equals(this, obj);
     }
 
     /// <summary>
@@ -91,6 +90,11 @@ public class TargetEqualityWeakReference<TTarget> : IEquatable<TargetEqualityWea
     /// </returns>
     public override int GetHashCode()
     {
-        return this.hashCode;
+        if (this.weakReference.TryGetTarget(out var target))
+        {
+            return this.equalityComparer.GetHashCode(target);
+        }
+
+        return 0;
     }
 }
