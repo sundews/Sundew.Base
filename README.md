@@ -48,8 +48,8 @@ IAsyncDisposable is only supported on .NETStandard2.1
 * AsyncLazy provides a cancellable async lazy implementation
 * AsyncLock provides async locking.
 * Flag is an Interlocked.Exchanged based flag.
-* CancellableJob is implmentation of a cancellable task.
-* ContinusJob is implmentation of a cancellable task that keeps running.
+* CancellableJob is implementation of a cancellable task.
+* ContinusJob is implementation of a cancellable task that keeps running.
 
 ## Timers
 * Timer is an easy to use and modify timer.
