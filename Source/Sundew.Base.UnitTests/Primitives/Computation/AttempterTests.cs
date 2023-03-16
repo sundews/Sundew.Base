@@ -32,6 +32,26 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         }
 
         [Fact]
+        public void Attempt_When_SucceedingAtFirstAttempt_Then_ResultShouldBeExpectedResult()
+        {
+            const int ExpectedResult = 5;
+            var testee = new Attempter(2);
+
+            var numberOfCalls = 0;
+            var result = testee.Attempt(
+                x =>
+                {
+                    numberOfCalls = x.CurrentAttempt;
+                    return ExpectedResult;
+                },
+                ExceptionFilter.HandleAll());
+
+            numberOfCalls.Should().Be(1);
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(ExpectedResult);
+        }
+
+        [Fact]
         public void Attempt_When_SucceedingAtSecondAttempt_Then_ResultShouldBeExpectedResult()
         {
             const int ExpectedResult = 5;
