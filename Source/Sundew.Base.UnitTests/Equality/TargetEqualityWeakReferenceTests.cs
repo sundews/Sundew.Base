@@ -74,7 +74,7 @@ namespace Sundew.Base.UnitTests.Primitives.WeakReferencing
         }
 
         [Fact]
-        public void GetHashCode_When_TargetisNull_Then_ResultShouldBe0()
+        public void GetHashCode_When_TargetIsNull_Then_ResultShouldBe0()
         {
             var testee = new TargetEqualityWeakReference<Target>(null!);
 
@@ -84,7 +84,7 @@ namespace Sundew.Base.UnitTests.Primitives.WeakReferencing
         }
 
         [Fact]
-        public void GetHashCode_When_TargetisNull_Then_ResultShouldNotBe0()
+        public void GetHashCode_When_TargetIsNull_Then_ResultShouldNotBe0()
         {
             var testee = new TargetEqualityWeakReference<Target>(new Target());
 

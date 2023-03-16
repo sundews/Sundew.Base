@@ -71,6 +71,17 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
+    /// Gets the result's success property.
+    /// </summary>
+    /// <param name="r">The result.</param>
+    /// <returns>A value indicating whether the result was successful.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator R<TError>(R<TValue, TError> r)
+    {
+        return new R<TError>(r.IsSuccess, r.IsSuccess ? default! : r.Error);
+    }
+
+    /// <summary>
     /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
     /// </summary>
     /// <param name="result">The result.</param>

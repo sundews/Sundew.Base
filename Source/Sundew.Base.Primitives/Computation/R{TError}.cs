@@ -22,7 +22,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <summary>Initializes a new instance of the <see cref="R{TError}"/> struct.</summary>
     /// <param name="isSuccess">if set to <c>true</c> [is error].</param>
     /// <param name="error">The error.</param>
-    public R(bool isSuccess, TError? error)
+    internal R(bool isSuccess, TError? error)
     {
         this.IsSuccess = isSuccess;
         this.Error = error;
@@ -133,7 +133,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// </returns>
     public R<TValue, TError> To<TValue>(TValue value)
     {
-        return new R<TValue, TError>(this.IsSuccess, value, this.Error);
+        return new R<TValue, TError>(this.IsSuccess, this.IsSuccess ? value : default!, !this.IsSuccess ? this.Error : default!);
     }
 
     /// <summary>

@@ -132,7 +132,7 @@ public readonly struct NamedFormatString
     /// <returns>
     /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
     /// </returns>
-    public static bool TryCreateInvariant(string format, string[] names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+    public static bool TryCreateInvariant(string format, IReadOnlyList<string> names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
     {
         return TryCreate(format, names, CultureInfo.InvariantCulture, out namedFormatString, out unknownNames);
     }
@@ -147,7 +147,7 @@ public readonly struct NamedFormatString
     /// <returns>
     /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
     /// </returns>
-    public static bool TryCreate(string format, string[] names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+    public static bool TryCreate(string format, IReadOnlyList<string> names, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
     {
         return TryCreate(format, names, CultureInfo.CurrentCulture, out namedFormatString, out unknownNames);
     }
