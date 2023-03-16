@@ -36,6 +36,7 @@ IAsyncDisposable is only supported on .NETStandard2.1
 * Percentage as a value type.
 * DateTime provider.
 * Result type (R) and Option type (O).
+* Attempter for implementing retry logic.
 
 ## Text
 * AlignedString and AlignAndLimitFormatProvider providers aligning and length limiting string formatting.
