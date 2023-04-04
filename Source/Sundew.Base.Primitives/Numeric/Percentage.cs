@@ -568,7 +568,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
                     nameof(input));
             }
 
-            return O.None();
+            return O.None;
         }
 
 #if NETSTANDARD2_1
@@ -626,7 +626,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
                             $"The number format was invalid: {numberFormatInfo.PercentNegativePattern}");
                     }
 
-                    return O.None();
+                    return O.None;
             }
 
             return O.Some(new Percentage(-double.Parse(input.Substring(start, input.Length - fromEnd), numberFormatInfo) / 100));
@@ -657,7 +657,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
                         $"The number format was invalid: {numberFormatInfo.PercentPositivePattern}");
                 }
 
-                return O.None();
+                return O.None;
         }
 
         return O.Some(new Percentage(double.Parse(input.Substring(start, input.Length - fromEnd), numberFormatInfo) / 100));

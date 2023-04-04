@@ -99,7 +99,7 @@ public sealed class CancellableJob<TState> : IJob
                 return O.Some(this.cancellationTokenSource.Token);
             }
 
-            return O.None();
+            return O.None;
         }
     }
 

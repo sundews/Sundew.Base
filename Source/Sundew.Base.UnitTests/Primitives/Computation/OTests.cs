@@ -28,7 +28,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         [Fact]
         public void ImplicitCast_When_OptionIsNone_Then_ValueShouldBeExpectedValue()
         {
-            O<int> result = O.None();
+            O<int> result = O.None;
 
             result.HasValue.Should().BeFalse();
         }
@@ -48,6 +48,26 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             result.IsSuccess.Should().Be(expectedResult);
             result.Value.Should().Be(expectedValue);
             result.Error.Should().Be((byte)expectedError);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true)]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, true, true, false)]
+        public void IsSuccess_Then_ResultShouldHaveExpectedValues(
+            bool option,
+            bool result,
+            bool expectedResult,
+            bool expectedHasValue)
+        {
+            var testee = O.From(option, R.From(result, 1, 2));
+
+            var actualResult = testee.IsSuccess(out var optionalValue, out var failedResult);
+
+            actualResult.Should().Be(expectedResult);
+            optionalValue.HasValue.Should().Be(expectedHasValue);
+            failedResult.IsSuccess.Should().Be(expectedResult);
         }
     }
 }
