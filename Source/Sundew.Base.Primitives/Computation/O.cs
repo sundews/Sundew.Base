@@ -15,13 +15,10 @@ using System.Threading.Tasks;
 public static partial class O
 {
     /// <summary>
-    /// Creates an none option.
+    /// Gets a none option.
     /// </summary>
     /// <returns>A new <see cref="R"/>.</returns>
-    public static NoneOption None()
-    {
-        return NoneOption.None;
-    }
+    public static NoneOption None => NoneOption.None;
 
     /// <summary>
     /// Creates a error result.
