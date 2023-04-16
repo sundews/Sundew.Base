@@ -7,6 +7,9 @@
 
 namespace Sundew.Base.Primitives.Computation;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -69,6 +72,20 @@ public static partial class O
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="hasValue">The is success.</param>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O" />.
+    /// </returns>
+    public static O<TValue> From<TValue>(bool hasValue, Func<TValue> value)
+    {
+        return new O<TValue>(hasValue, hasValue ? value() : default!);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
     /// A <see cref="O" />.
@@ -77,6 +94,20 @@ public static partial class O
         where TValue : class
     {
         return new O<TValue>(value != null, value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O" />.
+    /// </returns>
+    public static O<TValue> From<TValue>(TValue? value)
+        where TValue : struct
+    {
+        return value.HasValue ? new O<TValue>(true, value.Value) : None;
     }
 
     /// <summary>
@@ -105,5 +136,82 @@ public static partial class O
         where TValue : class
     {
         return new O<TValue>(value != null, value).ToValueTask();
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O" />.
+    /// </returns>
+    public static ValueTask<O<TValue>> FromAsync<TValue>(TValue? value)
+        where TValue : struct
+    {
+        return From(value);
+    }
+
+    /// <summary>
+    /// Converts a <see cref="O{R}"/> to a O{TSuccess} and a R{TError} and returns a value indicating which of the two to process.
+    /// </summary>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="optionalResult">The optional result.</param>
+    /// <param name="valueOption">The value option.</param>
+    /// <param name="failedResult">The failed result.</param>
+    /// <returns><c>true</c>, if the <paramref name="valueOption"/> should be processed, or <c>false</c> if the <paramref name="failedResult"/> should be processed.</returns>
+    public static bool IsSuccess<TSuccess, TError>(this in O<R<TSuccess, TError>> optionalResult, out O<TSuccess> valueOption, out R<TError> failedResult)
+    {
+        if (optionalResult.HasValue)
+        {
+            if (optionalResult.Value.IsSuccess)
+            {
+                valueOption = O.Some(optionalResult.Value.Value);
+                failedResult = R.Success();
+                return true;
+            }
+
+            valueOption = O.None;
+            failedResult = R.Error(optionalResult.Value.Error);
+            return false;
+        }
+
+        valueOption = O.None;
+        failedResult = R.Success();
+        return true;
+    }
+
+    /// <summary>
+    /// Converts the option to an <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="enumerableOption">The enumerable option.</param>
+    /// <returns>The enumerable if the option contains one, otherwise and empty enumerable.</returns>
+    public static IEnumerable<TValue> AsEnumerable<TValue>(this O<IEnumerable<TValue>> enumerableOption)
+    {
+        if (enumerableOption.HasValue)
+        {
+            return enumerableOption.Value;
+        }
+
+        return Enumerable.Empty<TValue>();
+    }
+
+    /// <summary>
+    /// Converts the option to an <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="option">The option.</param>
+    /// <returns>The enumerable if the option contains one, otherwise and empty enumerable.</returns>
+    public static TValue? AsNullable<TValue>(this O<TValue> option)
+        where TValue : struct
+    {
+        if (option.HasValue)
+        {
+            return option.Value;
+        }
+
+        return null;
     }
 }

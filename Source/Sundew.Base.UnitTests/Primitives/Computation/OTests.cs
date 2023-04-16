@@ -69,5 +69,59 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             optionalValue.HasValue.Should().Be(expectedHasValue);
             failedResult.IsSuccess.Should().Be(expectedResult);
         }
+
+        [Fact]
+        public void ImplicitConversion_When_TargetIsNullableInt_Then_ResultBeExpectedResult()
+        {
+            var intOption = O.Some(3);
+
+            int? result = intOption;
+
+            result.HasValue.Should().Be(true);
+            result.Value.Should().Be(3);
+        }
+
+        [Fact]
+        public void ExplicitConversion_When_TargetIsIntOption_Then_ResultBeExpectedResult()
+        {
+            int? nullableInt = 3;
+
+            var result = (O<int>)nullableInt;
+
+            result.HasValue.Should().Be(true);
+            result.Value.Should().Be(3);
+        }
+
+        [Fact]
+        public void ImplicitConversion_When_TargetIsNullableString_Then_ResultBeExpectedResult()
+        {
+            var intOption = O.Some("3");
+
+            string? result = intOption;
+
+            result.Should().Be("3");
+        }
+
+        [Fact]
+        public void ImplicitConversion_When_TargetIsStringOption_Then_ResultBeExpectedResult()
+        {
+            string? nullableInt = "3";
+
+            O<string> result = nullableInt;
+
+            result.HasValue.Should().Be(true);
+            result.Value.Should().Be("3");
+        }
+
+        [Fact]
+        public void From_When_TargetIsIntOption_Then_ResultBeExpectedResult()
+        {
+            int? nullableInt = 3;
+
+            var result = O.From(nullableInt);
+
+            result.HasValue.Should().Be(true);
+            result.Value.Should().Be(3);
+        }
     }
 }

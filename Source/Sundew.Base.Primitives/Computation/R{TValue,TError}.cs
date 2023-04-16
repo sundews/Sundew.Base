@@ -158,6 +158,21 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="valueFunc">The value function.</param>
+    /// <returns>
+    /// A new <see cref="R" />.
+    /// </returns>
+    public R<TNewValue, TError> WithValue<TParameter, TNewValue>(TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
+    {
+        return this.With(parameter, valueFunc, (error, _) => error);
+    }
+
+    /// <summary>
     /// Creates a result based on the specified result .
     /// </summary>
     /// <typeparam name="TNewError">The type of the new error.</typeparam>
@@ -168,6 +183,21 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     public R<TValue, TNewError> WithError<TNewError>(Func<TError, TNewError> errorFunc)
     {
         return this.With(value => value, errorFunc);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified result .
+    /// </summary>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewError">The type of the new error.</typeparam>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>
+    /// A new <see cref="R" />.
+    /// </returns>
+    public R<TValue, TNewError> WithError<TParameter, TNewError>(TParameter parameter, Func<TError, TParameter, TNewError> errorFunc)
+    {
+        return this.With(parameter, (value, _) => value, errorFunc);
     }
 
     /// <summary>
@@ -183,6 +213,23 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     public R<TNewValue, TNewError> With<TNewValue, TNewError>(Func<TValue, TNewValue> valueFunc, Func<TError, TNewError> errorFunc)
     {
         return this.IsSuccess ? new R<TNewValue, TNewError>(this.IsSuccess, valueFunc(this.Value), default!) : new R<TNewValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error));
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <typeparam name="TNewError">The type of the new error.</typeparam>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="valueFunc">The value function.</param>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>
+    /// A new <see cref="R" />.
+    /// </returns>
+    public R<TNewValue, TNewError> With<TParameter, TNewValue, TNewError>(TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc, Func<TError, TParameter, TNewError> errorFunc)
+    {
+        return this.IsSuccess ? new R<TNewValue, TNewError>(this.IsSuccess, valueFunc(this.Value, parameter), default!) : new R<TNewValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error, parameter));
     }
 
     /// <summary>

@@ -159,34 +159,4 @@ public static partial class R
     {
         return new R<TError>(error == null, error).ToValueTask();
     }
-
-    /// <summary>
-    /// Converts a <see cref="O{R}"/> to a O{TSuccess} and a R{TError} and returns a value indicating which of the two to process.
-    /// </summary>
-    /// <typeparam name="TSuccess">The success type.</typeparam>
-    /// <typeparam name="TError">The error type.</typeparam>
-    /// <param name="optionalResult">The optional result.</param>
-    /// <param name="valueOption">The value option.</param>
-    /// <param name="failedResult">The failed result.</param>
-    /// <returns><c>true</c>, if the <paramref name="valueOption"/> should be processed, or <c>false</c> if the <paramref name="failedResult"/> should be processed.</returns>
-    public static bool IsSuccess<TSuccess, TError>(this O<R<TSuccess, TError>> optionalResult, out O<TSuccess> valueOption, out R<TError> failedResult)
-    {
-        if (optionalResult.HasValue)
-        {
-            if (optionalResult.Value.IsSuccess)
-            {
-                valueOption = O.Some(optionalResult.Value.Value);
-                failedResult = R.Success();
-                return true;
-            }
-
-            valueOption = O.None;
-            failedResult = R.Error(optionalResult.Value.Error);
-            return false;
-        }
-
-        valueOption = O.None;
-        failedResult = R.Success();
-        return true;
-    }
 }

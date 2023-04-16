@@ -8,6 +8,8 @@
 namespace Sundew.Base.Primitives.Computation;
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -51,6 +53,17 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
         return result.HasValue;
     }
 
+    /// <summary>
+    /// Flattens the option.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>A value indicating whether the result was successful.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator O<TValue>(in O<O<TValue>> result)
+    {
+        return result.HasValue ? result.Value : O.None;
+    }
+
     /// <summary>Performs an implicit conversion from <see cref="O.NoneOption"/> to <see cref="O"/>.</summary>
     /// <param name="noneOption">The error result.</param>
     /// <returns>The result of the conversion.</returns>
@@ -61,12 +74,30 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     }
 
     /// <summary>Performs an implicit conversion from <see cref="O"/> to <see cref="ValueTask{O}"/>.</summary>
-    /// <param name="result">The result.</param>
+    /// <param name="option">The option.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator ValueTask<O<TValue>>(O<TValue> result)
+    public static implicit operator ValueTask<O<TValue>>(O<TValue> option)
     {
-        return result.ToValueTask();
+        return option.ToValueTask();
+    }
+
+    /// <summary>Performs an implicit conversion from <see cref="O"/> to <see cref="ValueTask{O}"/>.</summary>
+    /// <param name="option">The option.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator TValue?(O<TValue> option)
+    {
+        return option.HasValue ? option.Value : default;
+    }
+
+    /// <summary>Performs an implicit conversion from <see cref="O"/> to <see cref="ValueTask{O}"/>.</summary>
+    /// <param name="nullableValue">The nullable value.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator O<TValue>(TValue? nullableValue)
+    {
+        return nullableValue != null ? O.Some(nullableValue) : O.None;
     }
 
     /// <summary>Implements the operator ==.</summary>
@@ -121,6 +152,59 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     public O<TNewValue> With<TNewValue>(Func<TValue, TNewValue> valueFunc)
     {
         return new O<TNewValue>(this.HasValue, this.HasValue ? valueFunc(this.Value) : default!);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// A new <see cref="O" />.
+    /// </returns>
+    public O<TNewValue> With<TParameter, TNewValue>(TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
+    {
+        return new O<TNewValue>(this.HasValue, this.HasValue ? valueFunc(this.Value, parameter) : default!);
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <param name="defaultValue">The default value.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TValue GetValueOrDefault(TValue defaultValue)
+    {
+        return this.HasValue ? this.Value : defaultValue;
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <typeparam name="TTargetValue">The type of the parameter.</typeparam>
+    /// <param name="extractFunc">The extract value func.</param>
+    /// <param name="defaultValue">The default value.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TTargetValue GetValueOrDefault<TTargetValue>(Func<TValue, TTargetValue> extractFunc, TTargetValue defaultValue)
+    {
+        return this.HasValue ? extractFunc(this.Value) : defaultValue;
+    }
+
+    /// <summary>
+    /// Combines  a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TOtherValue">The type of the other value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="otherValue">The other value.</param>
+    /// <param name="getValueFunc">The value func.</param>
+    /// <returns>
+    /// A <see cref="O" />.
+    /// </returns>
+    public O<TNewValue> Combine<TOtherValue, TNewValue>(O<TOtherValue> otherValue, Func<TValue, TOtherValue, TNewValue> getValueFunc)
+    {
+        var hasValue = this.HasValue && otherValue.HasValue;
+        return new O<TNewValue>(hasValue, hasValue ? getValueFunc(this.Value, otherValue.Value) : default);
     }
 
     /// <summary>
@@ -189,7 +273,7 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     {
         if (this.HasValue)
         {
-            return $"Success: {this.Value}";
+            return $"Some: {this.Value}";
         }
 
         return NoneText;

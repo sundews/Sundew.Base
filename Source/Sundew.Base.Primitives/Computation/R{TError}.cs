@@ -165,6 +165,21 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewError">The type of the new error.</typeparam>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="errorFunc">The error func.</param>
+    /// <returns>
+    /// A new <see cref="R{TNewError}" />.
+    /// </returns>
+    public R<TNewError> With<TParameter, TNewError>(TParameter parameter, Func<TError, TParameter, TNewError> errorFunc)
+    {
+        return new R<TNewError>(this.IsSuccess, this.IsSuccess ? default! : errorFunc(this.Error, parameter));
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
     /// <typeparam name="TValue">The type of the new value.</typeparam>
     /// <typeparam name="TNewError">The type of the new error.</typeparam>
     /// <param name="value">The value.</param>
