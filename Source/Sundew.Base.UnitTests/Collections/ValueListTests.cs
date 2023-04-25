@@ -1,0 +1,24 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ValueListTests.cs" company="Hukano">
+// Copyright (c) Hukano. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Sundew.Base.UnitTests.Collections;
+
+using FluentAssertions;
+using Sundew.Base.Collections.Immutable;
+using Xunit;
+
+public class ValueListTests
+{
+    [Fact]
+    public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
+    {
+        ValueList<int> lhs = System.Collections.Immutable.ImmutableList.Create(4, 5, 6);
+        ValueList<int> rhs = System.Collections.Immutable.ImmutableList.Create(4, 5, 6);
+
+        ((object)lhs).Should().Be(rhs);
+    }
+}

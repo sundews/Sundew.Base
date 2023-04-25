@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 /// <summary>
@@ -59,15 +60,15 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <summary>
     /// Converts a <see cref="ValueList{TItem}"/> to an <see cref="ImmutableList{TItem}"/>.
     /// </summary>
-    /// <param name="valueDictionary">The value dictionary.</param>
-    public static implicit operator ImmutableList<TItem>(ValueList<TItem> valueDictionary)
+    /// <param name="valueList">The value dictionary.</param>
+    public static implicit operator ImmutableList<TItem>(ValueList<TItem> valueList)
     {
-        if (valueDictionary.inner is ImmutableList<TItem> immutableList)
+        if (valueList.inner is ImmutableList<TItem> immutableList)
         {
             return immutableList;
         }
 
-        return valueDictionary.inner.ToImmutableList();
+        return valueList.inner.ToImmutableList();
     }
 
     /// <summary>
@@ -96,7 +97,17 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns>The hashcode.</returns>
     public override int GetHashCode()
     {
-        return StructuralComparisons.StructuralEqualityComparer.GetHashCode(this.inner);
+#if NETSTANDARD1_3_OR_GREATER
+        var hashCode = default(HashCode);
+        foreach (var item in this.inner)
+        {
+            hashCode.Add(item?.GetHashCode() ?? 0);
+        }
+
+        return hashCode.ToHashCode();
+#else
+        return Equality.Equality.GetItemsHashCode(this.inner.Select(x => x?.GetHashCode() ?? 0));
+#endif
     }
 
     /// <summary>
@@ -106,7 +117,12 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns><c>true</c>, if the values are equal otherwise false.</returns>
     public bool Equals(ValueList<TItem> other)
     {
-        return StructuralComparisons.StructuralEqualityComparer.Equals(this.inner, other.inner);
+        if (this.inner == null && other.inner == null)
+        {
+            return true;
+        }
+
+        return this.inner?.SequenceEqual(other.inner) ?? false;
     }
 
     /// <summary>

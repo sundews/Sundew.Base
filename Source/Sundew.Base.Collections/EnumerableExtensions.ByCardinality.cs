@@ -27,7 +27,7 @@ public static partial class EnumerableExtensions
         {
             return count switch
             {
-                0 => ListCardinality<TItem>.Empty(),
+                0 => ListCardinality<TItem>.Empty,
                 1 => ListCardinality<TItem>.Single(enumerable.First()),
                 _ => ListCardinality<TItem>.Multiple(enumerable),
             };
@@ -43,7 +43,7 @@ public static partial class EnumerableExtensions
             }
             else
             {
-                return ListCardinality<TItem>.Empty();
+                return ListCardinality<TItem>.Empty;
             }
 
             if (enumerator.MoveNext())
@@ -56,7 +56,7 @@ public static partial class EnumerableExtensions
 
         return enumerable switch
         {
-            null => ListCardinality<TItem>.Empty(),
+            null => ListCardinality<TItem>.Empty,
             IReadOnlyCollection<TItem> readOnlyCollection => FromList(enumerable, readOnlyCollection.Count),
             ICollection<TItem> collection => FromList(enumerable, collection.Count),
             _ => FromEnumerable(enumerable),

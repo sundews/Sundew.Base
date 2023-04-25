@@ -8,8 +8,6 @@
 namespace Sundew.Base.Primitives.Computation;
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -182,13 +180,39 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     /// <summary>
     /// Gets the value or the default value.
     /// </summary>
-    /// <typeparam name="TTargetValue">The type of the parameter.</typeparam>
-    /// <param name="extractFunc">The extract value func.</param>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="newValueFunc">The new value func.</param>
     /// <param name="defaultValue">The default value.</param>
     /// <returns>The value if present, otherwise the specified default value.</returns>
-    public TTargetValue GetValueOrDefault<TTargetValue>(Func<TValue, TTargetValue> extractFunc, TTargetValue defaultValue)
+    public TNewValue GetValueOrDefault<TNewValue>(Func<TValue, TNewValue> newValueFunc, TNewValue defaultValue)
     {
-        return this.HasValue ? extractFunc(this.Value) : defaultValue;
+        return this.HasValue ? newValueFunc(this.Value) : defaultValue;
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="newValueFunc">The new value func.</param>
+    /// <param name="alternativeValueFunc">The alternative value func.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TNewValue Evaluate<TNewValue>(Func<TValue, TNewValue> newValueFunc, Func<TNewValue> alternativeValueFunc)
+    {
+        return this.HasValue ? newValueFunc(this.Value) : alternativeValueFunc();
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="newValueFunc">The new value func.</param>
+    /// <param name="alternativeValueFunc">The alternative value func.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TNewValue Evaluate<TParameter, TNewValue>(TParameter parameter, Func<TValue, TParameter, TNewValue> newValueFunc, Func<TParameter, TNewValue> alternativeValueFunc)
+    {
+        return this.HasValue ? newValueFunc(this.Value, parameter) : alternativeValueFunc(parameter);
     }
 
     /// <summary>
