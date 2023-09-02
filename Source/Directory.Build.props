@@ -2,11 +2,11 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Version>10.0</Version>
+    <Version>11.0</Version>
     <OutputPath>bin/$(Configuration)</OutputPath>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
-    <Company>Hukano</Company>
+    <Company>Sundews</Company>
     <Authors>Kim Hugener-Ohlsen</Authors>
     <Copyright>Kim Hugener-Ohlsen</Copyright>
     <RepositoryUrl>https://github.com/sundews/Sundew.Base</RepositoryUrl>
@@ -18,7 +18,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
     <WarningsAsErrors />
-    <PackageReleaseNotes>9.0 - Immutable collections with value semantics, Result type redesign and new Option type, AppendItems replaces AggregateToStringBuilder and JoinToStringBuilder.
+    <PackageReleaseNotes>11.0 - Unified Disposal and Initialization
+10.0 - O.None was changed to a property
+9.0 - Immutable collections with value semantics, Result type redesign and new Option type, AppendItems replaces AggregateToStringBuilder and JoinToStringBuilder.
 8.5 - JoinToStringBuilder and AggregateToStringBuilder improvements
 8.4 - AllOrFailed extension for IEnumerable&lt;T&gt;
 8.3 - NamedFormatString and AsyncLazy improvements

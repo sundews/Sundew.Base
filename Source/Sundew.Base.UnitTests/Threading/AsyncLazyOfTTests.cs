@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AsyncLazyOfTTests.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="AsyncLazyOfTTests.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -20,7 +20,7 @@ namespace Sundew.Base.UnitTests.Threading
         private const string ExpectedResult = "Computed";
 
         [Fact]
-        public async void Await_Then_TaskResultShouldBeExpectedResult()
+        public async Task Await_Then_TaskResultShouldBeExpectedResult()
         {
             var expectedResult = new List<int> { 3 };
             var asyncLazy = new AsyncLazy<IList<int>, List<int>>(() => Task.FromResult(expectedResult));

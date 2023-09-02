@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="R{TError}.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="R{TError}.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -34,10 +34,18 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="R"/> has an error.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if error is non default; otherwise, <c>false</c>.
+    /// </value>
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool HasError => !Equals(this.Error, default(TError));
+
     /// <summary>Gets the error.</summary>
     /// <value>The error.</value>
-    [AllowNull]
-    public TError Error { get; }
+    public TError? Error { get; }
 
     /// <summary>
     /// Gets the result's success property.
@@ -104,6 +112,18 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     }
 
     /// <summary>
+    /// Checks if the result is an error and passes the error through the out parameter.
+    /// </summary>
+    /// <param name="error">The error.</param>
+    /// <returns><c>true</c> if the result is an error otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool TryGetError([NotNullWhen(true)] out TError? error)
+    {
+        error = this.Error;
+        return !this.IsSuccess;
+    }
+
+    /// <summary>
     /// Converts this instance to a value task.
     /// </summary>
     /// <returns>The value task.</returns>
@@ -133,7 +153,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// </returns>
     public R<TValue, TError> To<TValue>(TValue value)
     {
-        return new R<TValue, TError>(this.IsSuccess, this.IsSuccess ? value : default!, !this.IsSuccess ? this.Error : default!);
+        return new R<TValue, TError>(this.IsSuccess, value, this.Error);
     }
 
     /// <summary>
@@ -189,7 +209,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// </returns>
     public R<TValue, TNewError> To<TValue, TNewError>(TValue value, Func<TError, TNewError> errorFunc)
     {
-        return this.IsSuccess ? new R<TValue, TNewError>(this.IsSuccess, value, default!) : new R<TValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error));
+        return this.IsSuccess ? new R<TValue, TNewError>(true, value, default!) : new R<TValue, TNewError>(false, default!, errorFunc(this.Error));
     }
 
     /// <summary>
@@ -204,7 +224,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// </returns>
     public R<TValue, TNewError> To<TValue, TNewError>(Func<TValue> valueFunc, Func<TError, TNewError> errorFunc)
     {
-        return this.IsSuccess ? new R<TValue, TNewError>(this.IsSuccess, valueFunc(), default!) : new R<TValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error));
+        return this.IsSuccess ? new R<TValue, TNewError>(true, valueFunc(), default!) : new R<TValue, TNewError>(false, default!, errorFunc(this.Error));
     }
 
     /// <summary>
@@ -228,7 +248,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// </summary>
     /// <param name="isSuccess">if set to <c>true</c> [is success].</param>
     /// <param name="error">The error.</param>
-    public void Deconstruct(out bool isSuccess, out TError error)
+    public void Deconstruct(out bool isSuccess, out TError? error)
     {
         isSuccess = this.IsSuccess;
         error = this.Error;

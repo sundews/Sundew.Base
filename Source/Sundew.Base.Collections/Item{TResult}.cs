@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Item{TResult}.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="Item{TResult}.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,6 +8,7 @@
 namespace Sundew.Base.Collections;
 
 using System.Diagnostics.CodeAnalysis;
+using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// Represents the result of selecting an ensured item.
@@ -37,6 +38,15 @@ public readonly record struct Item<TResult>
     /// </summary>
     [MemberNotNullWhen(true, nameof(SelectedItem))]
     public bool IsValid { get; }
+
+    /// <summary>
+    /// Converts a failed item to a failed select item.
+    /// </summary>
+    /// <param name="option">The option.</param>
+    public static implicit operator Item<TResult>(O<TResult> option)
+    {
+        return Item.From(option.HasValue, option.Value);
+    }
 
     /// <summary>
     /// Converts a failed item to a failed select item.

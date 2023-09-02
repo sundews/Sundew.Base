@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="O{TValue}.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="O{TValue}.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -127,6 +127,18 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     }
 
     /// <summary>
+    /// Checks if the option is has a value and passes the value through the out parameter.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns><c>true</c> if the result is a success otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Value))]
+    public bool TryGetValue([NotNullWhen(true)] out TValue? value)
+    {
+        value = this.Value;
+        return this.HasValue;
+    }
+
+    /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TNewValue">The type of the new value.</typeparam>
@@ -213,6 +225,22 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     public TNewValue Evaluate<TParameter, TNewValue>(TParameter parameter, Func<TValue, TParameter, TNewValue> newValueFunc, Func<TParameter, TNewValue> alternativeValueFunc)
     {
         return this.HasValue ? newValueFunc(this.Value, parameter) : alternativeValueFunc(parameter);
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <typeparam name="TParameter1">The type of the parameter 1.</typeparam>
+    /// <typeparam name="TParameter2">The type of the parameter 2.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="parameter1">The parameter 1.</param>
+    /// <param name="parameter2">The parameter 2.</param>
+    /// <param name="newValueFunc">The new value func.</param>
+    /// <param name="alternativeValueFunc">The alternative value func.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TNewValue Evaluate<TParameter1, TParameter2, TNewValue>(TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue> newValueFunc, Func<TParameter1, TParameter2, TNewValue> alternativeValueFunc)
+    {
+        return this.HasValue ? newValueFunc(this.Value, parameter1, parameter2) : alternativeValueFunc(parameter1, parameter2);
     }
 
     /// <summary>

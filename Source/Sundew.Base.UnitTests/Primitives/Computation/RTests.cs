@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RTests.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="RTests.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             bool expectedResult,
             int expectedError)
         {
-            var testee = R.FromError(expectedResult, expectedError);
+            var testee = R.From(expectedResult, expectedError);
 
             var result = testee.With(Convert.ToDouble);
 
@@ -75,7 +75,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             int expectedValue,
             int expectedError)
         {
-            var testee = R.FromError(expectedResult, expectedError);
+            var testee = R.From(expectedResult, () => expectedError);
 
             var result = testee.To(expectedValue);
 
@@ -89,9 +89,9 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const bool ExpectedIsSuccess = true;
             const double ExpectedValue = 65d;
-            const int ExpectedError = 0;
+            const int ExpectedError = 45;
 
-            var (isSuccess, value, error) = R.From(ExpectedIsSuccess, 65d, 45);
+            var (isSuccess, value, error) = R.From(ExpectedIsSuccess, 65d, ExpectedError);
 
             isSuccess.Should().Be(ExpectedIsSuccess);
             value.Should().Be(ExpectedValue);

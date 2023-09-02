@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ImmutableHashSetExtensions.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="ImmutableHashSetExtensions.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,6 +8,7 @@
 namespace Sundew.Base.Collections.Immutable;
 
 using System.Collections.Immutable;
+using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// Extension methods fro <see cref="ImmutableHashSet{TItem}"/>.
@@ -27,5 +28,33 @@ public static class ImmutableHashSetExtensions
     {
         var result = immutableHashSet.Add(item);
         return ((TSet)result, !Equals(immutableHashSet, result));
+    }
+
+    /// <summary>
+    /// Tries to add the option item if it has any.
+    /// </summary>
+    /// <typeparam name="TSet">The set type.</typeparam>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableSet">The immutable array.</param>
+    /// <param name="option">The option.</param>
+    /// <returns>The resulting array.</returns>
+    public static TSet TryAdd<TSet, TItem>(this TSet immutableSet, O<TItem> option)
+        where TSet : IImmutableSet<TItem>
+    {
+        return option.HasValue ? (TSet)immutableSet.Add(option.Value) : immutableSet;
+    }
+
+    /// <summary>
+    /// Tries to add the result item if it has any.
+    /// </summary>
+    /// <typeparam name="TSet">The set type.</typeparam>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableSet">The immutable array.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TSet TryAdd<TSet, TItem>(this TSet immutableSet, R<TItem> result)
+        where TSet : IImmutableSet<TItem>
+    {
+        return result.IsSuccess ? immutableSet : (TSet)immutableSet.Add(result.Error);
     }
 }
