@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AllOrFailed{TItem,TResult,TError}.All.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="AllOrFailed{TItem,TResult,TError}.All.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -14,16 +14,14 @@ using System.Linq;
 /// <summary>
 /// Represents ensured items.
 /// </summary>
-/// <typeparam name="TItem">The item type.</typeparam>
 /// <typeparam name="TResult">The result type.</typeparam>
-/// <typeparam name="TError">The error type.</typeparam>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1649:File name should match first type name", Justification = "Discriminated union")]
-public sealed class All<TItem, TResult, TError> : AllOrFailed<TItem, TResult, TError>, IReadOnlyList<TResult>
+public readonly record struct All<TResult> : IReadOnlyList<TResult>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="All{TItem, TResult, TError}" /> class.
+    /// Initializes a new instance of the <see cref="All{TResult}" /> struct.
     /// </summary>
     /// <param name="items">The items.</param>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1642:Constructor summary documentation should begin with standard text", Justification = "Bug")]
     public All(TResult[] items)
     {
         this.Items = items;

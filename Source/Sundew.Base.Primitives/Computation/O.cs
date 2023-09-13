@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="O.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="O.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -20,13 +20,13 @@ public static partial class O
     /// <summary>
     /// Gets a none option.
     /// </summary>
-    /// <returns>A new <see cref="R"/>.</returns>
+    /// <returns>A new <see cref="NoneOption"/>.</returns>
     public static NoneOption None => NoneOption.None;
 
     /// <summary>
     /// Creates a error result.
     /// </summary>
-    /// <returns>A new <see cref="R"/>.</returns>
+    /// <returns>A new <see cref="NoneOption"/>.</returns>
     public static ValueTask<NoneOption> NoneAsync()
     {
         return NoneOption.None.ToValueTask();
@@ -37,7 +37,7 @@ public static partial class O
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
-    /// <returns>A <see cref="O"/>.</returns>
+    /// <returns>A <see cref="O{TValue}"/>.</returns>
     public static O<TValue> Some<TValue>(TValue value)
     {
         return new O<TValue>(true, value);
@@ -48,7 +48,7 @@ public static partial class O
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
-    /// <returns>A <see cref="R.SuccessResult{TValue}"/>.</returns>
+    /// <returns>A <see cref="O{TValue}"/>.</returns>
     public static ValueTask<O<TValue>> SomeAsync<TValue>(TValue value)
     {
         return new O<TValue>(true, value).ToValueTask();
@@ -61,7 +61,7 @@ public static partial class O
     /// <param name="hasValue">The is success.</param>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static O<TValue> From<TValue>(bool hasValue, TValue value)
     {
@@ -75,7 +75,7 @@ public static partial class O
     /// <param name="hasValue">The is success.</param>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static O<TValue> From<TValue>(bool hasValue, Func<TValue> value)
     {
@@ -88,7 +88,7 @@ public static partial class O
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static O<TValue> From<TValue>(TValue? value)
         where TValue : class
@@ -102,7 +102,7 @@ public static partial class O
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static O<TValue> From<TValue>(TValue? value)
         where TValue : struct
@@ -117,7 +117,7 @@ public static partial class O
     /// <param name="hasValue">The is success.</param>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static ValueTask<O<TValue>> FromAsync<TValue>(bool hasValue, TValue value)
     {
@@ -128,9 +128,24 @@ public static partial class O
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="hasValue">The is success.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// A <see cref="O{TValue}" />.
+    /// </returns>
+    public static async ValueTask<O<TValue>> FromAsync<TValue>(bool hasValue, Func<Task<TValue>> valueFunc)
+    {
+        var value = hasValue ? await valueFunc().ConfigureAwait(false) : default;
+        return new O<TValue>(hasValue, value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static ValueTask<O<TValue>> FromAsync<TValue>(TValue? value)
         where TValue : class
@@ -144,7 +159,7 @@ public static partial class O
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="O" />.
+    /// A <see cref="O{TValue}" />.
     /// </returns>
     public static ValueTask<O<TValue>> FromAsync<TValue>(TValue? value)
         where TValue : struct

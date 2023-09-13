@@ -9,18 +9,6 @@
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
     <DebugType>None</DebugType>
     <NoWarn>NU5128</NoWarn>
-    <PackageReleaseNotes>8.0 - Added NamedFormatProvider, removed Text Split, use Memory.Split instead
-7.0 - Split into separate package and cleanup
-6.0 - Job support for error handling, StringBuilder extensions, IEnumerable to StringBuilder aggregations, Parallelizable Initializer, DisposableState for disposable pattern, IReporter support multiple interfaces. DirtyFlag replaced by Flag, NRT improvements, Minor cleanup.
-5.0 - Changed string split extension interface.
-4.2 - Result struct with same value and error type.
-4.1 - Added Non-allocating SplitMemory, Async support for Results and ToLower/ToUpper overloads
-4.0 - Multitargeting for netstandard2.1 and netstandard1.2. 2.1 version has support for IAsyncDisposable in Disposal API.
-3.3 - Added Memory extensions and Buffer&lt;TItem&gt;
-3.2 - Improved IDateTime, Result, StringExtensions, Added AsyncLock, Async Manual- and AutoResetEvents, Timer, CurrentThread
-3.1 - Added Linq style string split, char repeat, array and enum extensions.
-3.0 - Packaged as .NET Standard project
-    </PackageReleaseNotes>
     <Description>All in one package including:
 Sundew.Base.Collections
 Sundew.Base.Disposal
@@ -46,7 +34,7 @@ Sundew.Base.Timers
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.Packaging.Publish" Version="8.2.1">
+    <PackageReference Include="Sundew.Packaging.Publish" Version="8.2.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="R.ErrorResult{TError}.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="R.ErrorResult{TError}.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,6 +103,16 @@ public partial class R
         public ValueTask<ErrorResult<TNewError>> ToAsync<TNewError>(Func<TError, TNewError> errorFunc)
         {
             return new ErrorResult<TNewError>(errorFunc(this.Error)).ToValueTask();
+        }
+
+        /// <summary>
+        /// Converts this <see cref="ErrorResult{TError}"/> to a erroneous <see cref="R{TValue, TError}"/>.
+        /// </summary>
+        /// <typeparam name="TValue">The value type.</typeparam>
+        /// <returns>An erroneous result.</returns>
+        public R<TValue, TError> For<TValue>()
+        {
+            return new R<TValue, TError>(false, default, this.Error);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumerableExtensionsTests.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="EnumerableExtensionsTests.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -29,9 +29,9 @@ namespace Sundew.Base.UnitTests.Collections
         {
             var resultList = new List<int>();
 
-            this.numberList.ForEach(x => resultList.Add(x + 1));
+            this.numberList.ForEachItem(x => resultList.Add(x + 1));
 
-            resultList.ForEach((x, i) => x.Should().Be(this.numberList[i] + 1));
+            resultList.ForEachItem((x, i) => x.Should().Be(this.numberList[i] + 1));
         }
 
         [Fact]

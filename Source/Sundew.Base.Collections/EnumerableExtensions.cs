@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumerableExtensions.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="EnumerableExtensions.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -168,6 +168,39 @@ public static partial class EnumerableExtensions
     }
 
     /// <summary>
+    /// Iterates through the enumerable and executes the specified action on all items.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The original enumerable.</returns>
+    public static IEnumerable<TItem> ForEachItem<TItem>(this IEnumerable<TItem> enumerable, Action<TItem, int> action)
+    {
+        var i = 0;
+        foreach (var item in enumerable)
+        {
+            action(item, i++);
+            yield return item;
+        }
+    }
+
+    /// <summary>
+    /// Iterates through the enumerable and executes the specified action on all items.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The original enumerable.</returns>
+    public static IEnumerable<TItem> ForEachItem<TItem>(this IEnumerable<TItem> enumerable, Action<TItem> action)
+    {
+        foreach (var item in enumerable)
+        {
+            action(item);
+            yield return item;
+        }
+    }
+
+    /// <summary>
     /// Create an array from the specified enumerable.
     /// More efficient than Linq Select + ToArray if the enumerable is not deferred.
     /// </summary>
@@ -260,6 +293,36 @@ public static partial class EnumerableExtensions
         }
 
         return buffer.ToFinalArray();
+    }
+
+    /// <summary>
+    /// Gets the distinct items from the <see cref="IEnumerable{T}"/> while preserving the order.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>A enumerable containing items only once.</returns>
+    public static IEnumerable<TItem> DistinctInOrder<TItem>(this IEnumerable<TItem> enumerable)
+    {
+        return enumerable.DistinctInOrder(EqualityComparer<TItem>.Default);
+    }
+
+    /// <summary>
+    /// Gets the distinct items from the <see cref="IEnumerable{T}"/> while preserving the order.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="equalityComparer">The equality comparer.</param>
+    /// <returns>A enumerable containing items only once.</returns>
+    public static IEnumerable<TItem> DistinctInOrder<TItem>(this IEnumerable<TItem> enumerable, IEqualityComparer<TItem> equalityComparer)
+    {
+        var hashSet = new HashSet<TItem>(equalityComparer);
+        foreach (var item in enumerable)
+        {
+            if (hashSet.Add(item))
+            {
+                yield return item;
+            }
+        }
     }
 
     private static TOutItem[] ToArrayUnsafe<TInItem, TOutItem>(IReadOnlyList<TInItem> list, Func<TInItem, TOutItem> selectFunc)

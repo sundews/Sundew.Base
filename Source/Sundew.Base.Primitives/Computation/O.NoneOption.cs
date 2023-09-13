@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="O.NoneOption.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="O.NoneOption.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -52,6 +52,16 @@ public partial class O
         public ValueTask<NoneOption> ToValueTask()
         {
             return new ValueTask<NoneOption>(this);
+        }
+
+        /// <summary>
+        /// Converts the none option to an <see cref="O{TValue}"/>.
+        /// </summary>
+        /// <typeparam name="TValue">The value type.</typeparam>
+        /// <returns>The none option.</returns>
+        public O<TValue> For<TValue>()
+        {
+            return this;
         }
 
         /// <summary>

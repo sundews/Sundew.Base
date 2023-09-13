@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DisposingDictionary.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="DisposingDictionary.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -9,23 +9,26 @@ namespace Sundew.Base.Disposal;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
-using Sundew.Base.Disposal.Internal;
-using Sundew.Base.Reporting;
-using Sundew.Base.Threading;
+using System.Threading;
+using System.Threading.Tasks;
+using global::Disposal.Interfaces;
 
-#pragma warning disable CS1710 // XML comment has a duplicate typeparam tag
 /// <summary>
-/// Maps a key to a disposable for cleaning up unmanaged resources.
+/// An ordered collection of disposables that allows disposing by a key.
 /// </summary>
 /// <typeparam name="TKey">The type of the key.</typeparam>
-public sealed partial class DisposingDictionary<TKey> : IDisposable, IReportingDisposable
+public sealed class DisposingDictionary<TKey> :
+#if !NETSTANDARD1_3
+IDisposable, IAsyncDisposable
+#else
+IDisposable
+#endif
     where TKey : notnull
-#pragma warning restore CS1710 // XML comment has a duplicate typeparam tag
 {
-    private readonly AsyncLock asyncLock = new();
-    private readonly List<Item> disposables = new();
-    private IDisposableReporter? disposableReporter;
+    private readonly IDisposalReporter? disposableReporter;
+    private IImmutableList<Item> disposables = ImmutableList<Item>.Empty;
 
     /// <summary>Initializes a new instance of the <see cref="DisposingDictionary{TKey}"/> class.</summary>
     public DisposingDictionary()
@@ -33,21 +36,10 @@ public sealed partial class DisposingDictionary<TKey> : IDisposable, IReportingD
     }
 
     /// <summary>Initializes a new instance of the <see cref="DisposingDictionary{TKey}"/> class.</summary>
-    /// <param name="disposableReporter">The disposable reporter.</param>
-    public DisposingDictionary(IDisposableReporter? disposableReporter)
+    /// <param name="disposableReporter">The disposer reporter.</param>
+    public DisposingDictionary(IDisposalReporter? disposableReporter)
     {
         this.disposableReporter = disposableReporter;
-        this.disposableReporter?.SetSource(this);
-    }
-
-    /// <summary>Sets the reporter.</summary>
-    /// <param name="disposableReporter">The disposable reporter.</param>
-    void IReportingDisposable.SetReporter(IDisposableReporter? disposableReporter)
-    {
-        this.disposableReporter = this.disposableReporter != null
-            ? new NestedDisposableReporter(this.disposableReporter, disposableReporter)
-            : disposableReporter;
-        this.disposableReporter?.SetSource(this);
     }
 
     /// <summary>
@@ -55,15 +47,13 @@ public sealed partial class DisposingDictionary<TKey> : IDisposable, IReportingD
     /// </summary>
     /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
     /// <param name="key">The item.</param>
-    /// <param name="disposable">The disposable.</param>
-    /// <param name="disposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
-    /// <returns>
-    /// The added key.
-    /// </returns>
-    public TActualKey Add<TActualKey>(TActualKey key, IDisposable disposable, DisposeKey disposeKey)
+    /// <param name="disposable">The disposer.</param>
+    /// <param name="tryDisposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
+    /// <returns>The added key.</returns>
+    public TActualKey Add<TActualKey>(TActualKey key, IDisposable disposable, TryDisposeKey tryDisposeKey)
         where TActualKey : TKey, IDisposable
     {
-        return this.PrivateAdd(key, disposable, disposeKey);
+        return this.PrivateAdd(key, new Disposer.Synchronous(disposable), tryDisposeKey);
     }
 
     /// <summary>
@@ -71,14 +61,49 @@ public sealed partial class DisposingDictionary<TKey> : IDisposable, IReportingD
     /// </summary>
     /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
     /// <param name="key">The item.</param>
-    /// <param name="disposable">The disposable.</param>
-    /// <returns>
-    /// The added key.
-    /// </returns>
+    /// <param name="disposable">The disposer.</param>
+    /// <returns>The added key.</returns>
     public TActualKey Add<TActualKey>(TActualKey key, IDisposable disposable)
         where TActualKey : TKey
     {
-        return this.PrivateAdd(key, disposable, DisposeKey.No);
+        return this.PrivateAdd(key, new Disposer.Synchronous(disposable), TryDisposeKey.No);
+    }
+
+#if !NETSTANDARD1_3
+    /// <summary>
+    /// Adds the specified item.
+    /// </summary>
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposer.</param>
+    /// <param name="tryDisposeKey">if set to <c>true</c> the key will also be disposed when disposing (If it implements <see cref="IDisposable" />).</param>
+    /// <returns>The added key.</returns>
+    public TActualKey AddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable, TryDisposeKey tryDisposeKey)
+        where TActualKey : TKey
+    {
+        return this.PrivateAdd(key, new Disposer.Asynchronous(disposable), tryDisposeKey);
+    }
+
+    /// <summary>
+    /// Adds the specified item.
+    /// </summary>
+    /// <typeparam name="TActualKey">The type of the actual key.</typeparam>
+    /// <param name="key">The item.</param>
+    /// <param name="disposable">The disposer.</param>
+    /// <returns>The added key.</returns>
+    public TActualKey AddAsync<TActualKey>(TActualKey key, IAsyncDisposable disposable)
+        where TActualKey : TKey
+    {
+        return this.PrivateAdd(key, new Disposer.Asynchronous(disposable), TryDisposeKey.No);
+    }
+#endif
+
+    /// <summary>
+    /// Clears the disposables.
+    /// </summary>
+    public void Clear()
+    {
+        this.ReplaceList(disposables => disposables.Clear());
     }
 
     /// <summary>
@@ -87,14 +112,13 @@ public sealed partial class DisposingDictionary<TKey> : IDisposable, IReportingD
     /// <param name="key">The key.</param>
     public void Dispose(TKey key)
     {
-        using (this.asyncLock.Lock())
+        var (index, item) = this.FindAndRemove(this.disposables, key);
+        if (index > -1)
         {
-            var itemIndex = this.disposables.FindIndex(x => Equals(x.Key, key));
-            if (itemIndex > -1)
+            this.ReplaceList(disposables => disposables.RemoveAt(index));
+            foreach (var disposer in GetDisposers(item))
             {
-                var item = this.disposables[itemIndex];
-                DisposableHelper.Dispose(GetDisposables(item), this.disposableReporter);
-                this.disposables.RemoveAt(itemIndex);
+                disposer.Dispose(this.disposableReporter);
             }
         }
     }
@@ -104,62 +128,134 @@ public sealed partial class DisposingDictionary<TKey> : IDisposable, IReportingD
     /// </summary>
     public void Dispose()
     {
-        using (this.asyncLock.Lock())
+        var disposables = this.disposables;
+        this.Clear();
+        foreach (var disposer in GetDisposers(disposables))
         {
-            DisposableHelper.Dispose(GetDisposables(this.disposables), this.disposableReporter);
-            this.disposables.Clear();
+            disposer.Dispose(this.disposableReporter);
         }
-
-        this.asyncLock.Dispose();
     }
 
-    private static IEnumerable<object> GetDisposables(List<Item> items)
+#if !NETSTANDARD1_3
+    /// <summary>
+    /// Disposes the specified key.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <returns>An async task.</returns>
+    public async ValueTask DisposeAsync(TKey key)
     {
-        return items.SelectMany(GetDisposables);
-    }
-
-    private static IEnumerable<object> GetDisposables(Item item)
-    {
-        switch (item.DisposeKey)
+        var (index, item) = this.FindAndRemove(this.disposables, key);
+        if (index > -1)
         {
-            case DisposeKey.BeforeValue:
-                yield return item.Key;
-                yield return item.Disposable;
+            this.ReplaceList(disposables => disposables.RemoveAt(index));
+            foreach (var disposer in GetDisposers(item))
+            {
+                await disposer.DisposeAsync(this.disposableReporter).ConfigureAwait(false);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Releases unmanaged and - optionally - managed resources.
+    /// </summary>
+    /// <returns>An async task.</returns>
+    public async ValueTask DisposeAsync()
+    {
+        var disposables = this.disposables;
+        this.Clear();
+        foreach (var disposer in GetDisposers(disposables))
+        {
+            await disposer.DisposeAsync(this.disposableReporter).ConfigureAwait(false);
+        }
+    }
+#endif
+
+    internal IEnumerable<Disposer> GetDisposers()
+    {
+        return GetDisposers(this.disposables);
+    }
+
+    private static IEnumerable<Disposer> GetDisposers(IImmutableList<Item> disposers)
+    {
+        return disposers.SelectMany(GetDisposers);
+    }
+
+    private static IEnumerable<Disposer> GetDisposers(Item item)
+    {
+        switch (item.TryDisposeKey)
+        {
+            case TryDisposeKey.BeforeValue:
+                var disposerBeforeValue = Disposer.TryGet(item.Key);
+                if (disposerBeforeValue != null)
+                {
+                    yield return disposerBeforeValue;
+                }
+
+                yield return item.Disposer;
                 break;
-            case DisposeKey.AfterValue:
-                yield return item.Disposable;
-                yield return item.Key;
+            case TryDisposeKey.AfterValue:
+                yield return item.Disposer;
+                var disposerAfterValue = Disposer.TryGet(item.Key);
+                if (disposerAfterValue != null)
+                {
+                    yield return disposerAfterValue;
+                }
+
                 break;
             default:
-                yield return item.Disposable;
+                yield return item.Disposer;
                 break;
         }
     }
 
-    private TActualKey PrivateAdd<TActualKey>(TActualKey key, IDisposable disposable, DisposeKey disposeKey)
-        where TActualKey : TKey
+    private (int Index, Item Item) FindAndRemove(IImmutableList<Item> immutableList, TKey key)
     {
-        using (this.asyncLock.Lock())
+        for (var index = 0; index < immutableList.Count; index++)
         {
-            this.disposables.Add(new Item(key, disposable, disposeKey));
+            var item = immutableList[index];
+            if (Equals(item.Key, key))
+            {
+                return (index, item);
+            }
         }
 
+        return (-1, default);
+    }
+
+    private TActualKey PrivateAdd<TActualKey>(TActualKey key, Disposer disposer, TryDisposeKey tryDisposeKey)
+        where TActualKey : TKey
+    {
+        var item = new Item(key, disposer, tryDisposeKey);
+        this.ReplaceList(disposables => disposables.Add(item));
         return key;
+    }
+
+    private void ReplaceList(Func<IImmutableList<Item>, IImmutableList<Item>> newListFunc)
+    {
+        var disposables = this.disposables;
+        var newList = newListFunc(disposables);
+        Interlocked.CompareExchange(ref this.disposables, newList, disposables);
+        while (!ReferenceEquals(this.disposables, newList))
+        {
+            disposables = this.disposables;
+            newList = newListFunc(disposables);
+            Interlocked.CompareExchange(ref this.disposables, newList, disposables);
+        }
     }
 
     private readonly struct Item
     {
-        public Item(TKey key, object disposable, DisposeKey disposeKey)
+        public Item(TKey key, Disposer disposer, TryDisposeKey tryDisposeKey)
         {
             this.Key = key;
-            this.Disposable = disposable;
-            this.DisposeKey = disposeKey;
+            this.Disposer = disposer;
+            this.TryDisposeKey = tryDisposeKey;
         }
 
         public TKey Key { get; }
 
-        public object Disposable { get; }
+        public Disposer Disposer { get; }
 
-        public DisposeKey DisposeKey { get; }
+        public TryDisposeKey TryDisposeKey { get; }
     }
 }

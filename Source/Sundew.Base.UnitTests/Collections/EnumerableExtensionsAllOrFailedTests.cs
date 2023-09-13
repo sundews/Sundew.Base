@@ -1,13 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EnumerableExtensionsAllOrFailedTests.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="EnumerableExtensionsAllOrFailedTests.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace Sundew.Base.UnitTests.Collections;
 
-using System;
 using System.Linq;
 using FluentAssertions;
 using Sundew.Base.Collections;
@@ -29,8 +28,7 @@ public class EnumerableExtensionsAllOrFailedTests
             return Item.Fail();
         });
 
-        result.Should().BeOfType<All<int?, int>>().Which
-            .Items.Should().Equal(expectedItems.Cast<int>());
+        result.Value.Items.Should().Equal(expectedItems.Cast<int>());
     }
 
     [Fact]
@@ -46,7 +44,7 @@ public class EnumerableExtensionsAllOrFailedTests
             return Item.Fail();
         });
 
-        result.Should().BeOfType<Failed<int?, int>>().Which
+        result.Error.Should().BeOfType<Failed<int?>>().Which
             .Items.Should().Equal(new[] { new FailedItem<int?>(2, null), new FailedItem<int?>(4, null) });
     }
 
@@ -57,7 +55,7 @@ public class EnumerableExtensionsAllOrFailedTests
 
         var result = expectedItems.AllOrFailed(Item.PassIfNotNull);
 
-        result.Should().BeOfType<All<int?, int>>().Which
+        result.Value.Should().BeOfType<All<int>>().Which
             .Items.Should().Equal(expectedItems.Cast<int>());
     }
 
@@ -66,7 +64,7 @@ public class EnumerableExtensionsAllOrFailedTests
     {
         var result = new int?[] { 1, 2, null, 4, null }.AllOrFailed();
 
-        result.Should().BeOfType<Failed<int?, int>>().Which
+        result.Error.Should().BeOfType<Failed<int?>>().Which
             .Items.Should().Equal(new[] { new FailedItem<int?>(2, null), new FailedItem<int?>(4, null) });
     }
 
@@ -84,7 +82,7 @@ public class EnumerableExtensionsAllOrFailedTests
             return Item.Fail();
         });
 
-        result.Should().BeOfType<All<string?, string>>().Which
+        result.Value.Should().BeOfType<All<string>>().Which
             .Items.Should().Equal(expectedItems.Cast<string>());
     }
 
@@ -101,8 +99,7 @@ public class EnumerableExtensionsAllOrFailedTests
             return Item.Fail();
         });
 
-        result.Should().BeOfType<Failed<string?, string>>().Which
-            .Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
+        result.Error.Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
     }
 
     [Fact]
@@ -112,8 +109,7 @@ public class EnumerableExtensionsAllOrFailedTests
 
         var result = expectedItems.AllOrFailed(Item.PassIfNotNull);
 
-        result.Should().BeOfType<All<string?, string>>().Which
-            .Items.Should().Equal(expectedItems.Cast<string>());
+        result.Value.Items.Should().Equal(expectedItems.Cast<string>());
     }
 
     [Fact]
@@ -121,8 +117,7 @@ public class EnumerableExtensionsAllOrFailedTests
     {
         var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed();
 
-        result.Should().BeOfType<Failed<string?, string>>().Which
-            .Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
+        result.Error.Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
     }
 
     [Fact]
@@ -140,8 +135,7 @@ public class EnumerableExtensionsAllOrFailedTests
             return Item.Fail("Failed");
         });
 
-        result.Should().BeOfType<All<string?, double, string>>().Which
-        .Items.Should().Equal(expectedItems.Select(x => double.Parse(x!)));
+        result.Value.Items.Should().Equal(expectedItems.Select(x => double.Parse(x!)));
     }
 
     [Fact]
@@ -159,7 +153,6 @@ public class EnumerableExtensionsAllOrFailedTests
             return Item.Fail("Failed");
         });
 
-        result.Should().BeOfType<Failed<string?, double, string>>().Which
-            .Items.Should().Equal(new[] { new FailedItem<string?, string>(2, null, "Failed"), new FailedItem<string?, string>(4, null, "Failed") });
+        result.Error.Items.Should().Equal(new[] { new FailedItem<string?, string>(2, null, "Failed"), new FailedItem<string?, string>(4, null, "Failed") });
     }
 }

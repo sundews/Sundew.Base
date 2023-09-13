@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="R{TValue,TError}.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="R{TValue,TError}.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using Sundew.Base.Equality;
 
 /// <summary>
-/// R class for storing one value and a <see cref="bool" /> indicating whether the value is valid.
+/// Result type for storing a value and/or an error. The <see cref="IsSuccess"/> property indicates whether the result is considered a success or error.
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <typeparam name="TError">The type of the error.</typeparam>
@@ -26,7 +26,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <param name="isSuccess">If set to <c>true</c> [success].</param>
     /// <param name="value">The result value.</param>
     /// <param name="error">The error.</param>
-    internal R(bool isSuccess, TValue value, TError error)
+    internal R(bool isSuccess, TValue? value, TError? error)
     {
         this.IsSuccess = isSuccess;
         this.Value = value;
@@ -39,7 +39,18 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <value>
     ///   <c>true</c> if success; otherwise, <c>false</c>.
     /// </value>
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="R"/> has an error.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if error is non default; otherwise, <c>false</c>.
+    /// </value>
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool HasError => !Equals(this.Error, default(TError));
 
     /// <summary>
     /// Gets the value.
@@ -47,8 +58,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <value>
     /// The value.
     /// </value>
-    [AllowNull]
-    public TValue Value { get; }
+    public TValue? Value { get; }
 
     /// <summary>
     /// Gets the error.
@@ -56,8 +66,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <value>
     /// The error.
     /// </value>
-    [AllowNull]
-    public TError Error { get; }
+    public TError? Error { get; }
 
     /// <summary>
     /// Gets the result's success property.
@@ -132,6 +141,57 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     public static bool operator !=(R<TValue, TError> left, R<TValue, TError> right)
     {
         return !(left == right);
+    }
+
+    /// <summary>
+    /// Checks if the result is a success and passes the value through the out parameter.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <returns><c>true</c> if the result is a success otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Error))]
+    public bool TryGetValue([NotNullWhen(true)] out TValue? value)
+    {
+        value = this.Value;
+        return this.IsSuccess;
+    }
+
+    /// <summary>
+    /// Checks if the result is an error and passes the error through the out parameter.
+    /// </summary>
+    /// <param name="error">The error.</param>
+    /// <returns><c>true</c> if the result is an error otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Error))]
+    [MemberNotNullWhen(false, nameof(Value))]
+    public bool TryGetError([NotNullWhen(true)] out TError? error)
+    {
+        error = this.Error;
+        return !this.IsSuccess;
+    }
+
+    /// <summary>
+    /// Checks if the result is an error and passes the error through the out parameter.
+    /// </summary>
+    /// <param name="error">The error.</param>
+    /// <returns><c>true</c> if the result is an error otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool TryGetAnyError([NotNullWhen(true)] out TError? error)
+    {
+        error = this.Error;
+        return this.HasError;
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <param name="error">The error.</param>
+    /// <returns><c>true</c> if the result is an error otherwise <c>false</c>.</returns>
+    public bool TryGet([NotNullWhen(true)] out TValue? value, [NotNullWhen(false)] out TError? error)
+    {
+        value = this.Value;
+        error = this.Error;
+        return this.IsSuccess;
     }
 
     /// <summary>
@@ -254,7 +314,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <param name="isSuccess">if set to <c>true</c> [is success].</param>
     /// <param name="value">The value.</param>
     /// <param name="error">The error.</param>
-    public void Deconstruct(out bool isSuccess, out TValue value, out TError error)
+    public void Deconstruct(out bool isSuccess, out TValue? value, out TError? error)
     {
         isSuccess = this.IsSuccess;
         value = this.Value;

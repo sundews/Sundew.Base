@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AsyncEnumerableExtensions.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="AsyncEnumerableExtensions.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -42,5 +42,21 @@ public static class AsyncEnumerableExtensions
     public static Task ForEachAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, Task> action)
     {
         return Task.WhenAll(enumerable.Select(async x => await action(x).ConfigureAwait(false)));
+    }
+
+    /// <summary>
+    /// Runs an asynchronous for each.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The completion task.</returns>
+    public static async Task<IReadOnlyList<TItem>> ForEachItemAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, Task> action)
+    {
+        return await Task.WhenAll(enumerable.Select(async x =>
+        {
+            await action(x).ConfigureAwait(false);
+            return x;
+        }));
     }
 }

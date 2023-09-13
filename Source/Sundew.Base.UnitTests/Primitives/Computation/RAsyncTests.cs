@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RAsyncTests.cs" company="Hukano">
-// Copyright (c) Hukano. All rights reserved.
+// <copyright file="RAsyncTests.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             bool expectedResult,
             int expectedError)
         {
-            var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError)).ConfigureAwait(false);
+            var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError)).ConfigureAwait(false);
 
             var result = testee.With(Convert.ToDouble);
 
@@ -76,7 +76,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             int expectedValue,
             int expectedError)
         {
-            var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError)).ConfigureAwait(false);
+            var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError)).ConfigureAwait(false);
 
             var result = testee.To(expectedValue);
 
@@ -90,12 +90,13 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const bool ExpectedIsSuccess = true;
             const double ExpectedValue = 65d;
+            const double ExpectedError = 45d;
 
-            var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(ExpectedIsSuccess, ExpectedValue, 45)).ConfigureAwait(false);
+            var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(ExpectedIsSuccess, ExpectedValue, ExpectedError)).ConfigureAwait(false);
 
             isSuccess.Should().Be(ExpectedIsSuccess);
             value.Should().Be(ExpectedValue);
-            error.Should().Be(default);
+            error.Should().Be(ExpectedError);
         }
 
         [Fact]

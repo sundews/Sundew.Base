@@ -8,6 +8,9 @@ on:
       - "release*"
   pull_request:
 
+concurrency:
+  group: ${{ github.ref == 'refs/tags/release' && github.ref || github.run_id }}
+
 jobs:
   build:
     name: .NET
@@ -23,14 +26,10 @@ jobs:
       packages-to-push: 'logs/packages.push'
       source-packages-to-push: './Source/logs/packages.push'
     steps:
-    - name: 'Await other builds'
-      uses: softprops/turnstyle@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup .NET 7
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 7.x.x
     - name: Build setup
@@ -81,8 +80,8 @@ jobs:
     - name: 'Tag stable version'
       if: ${{ steps.stage-build.outputs.stage == 'production' }}
       run: |
-        git config user.email "sundew-dev@outlook.com"
-        git config user.name "sundew-build"
+        git config user.email "${{ secrets.BUILD_EMAIL }}"
+        git config user.name "${{ secrets.BUILD_USERNAME }}"
         git tag -a v.${{ steps.stage-build.outputs.version }} -m "v.${{ steps.stage-build.outputs.version }}"
         git push ${{ env.repository }} v.${{ steps.stage-build.outputs.version }}
 
