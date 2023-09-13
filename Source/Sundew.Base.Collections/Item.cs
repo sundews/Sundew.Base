@@ -17,6 +17,29 @@ public static class Item
     /// <summary>
     /// Converts the item into an item result.
     /// </summary>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>An Item result.</returns>
+    public static Item<TSuccess> PassIfHasValue<TSuccess>(O<TSuccess> result)
+    {
+        return new Item<TSuccess>(result.Value, result.HasValue);
+    }
+
+    /// <summary>
+    /// Converts the item into an item result.
+    /// </summary>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>An Item result.</returns>
+    public static Item<TSuccess, TError> PassIfSuccess<TSuccess, TError>(R<TSuccess, TError> result)
+    {
+        return new Item<TSuccess, TError>(result.Value, result.Error, result.IsSuccess);
+    }
+
+    /// <summary>
+    /// Converts the item into an item result.
+    /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An Item result.</returns>
@@ -153,21 +176,16 @@ public static class Item
     /// Represents a failed item.
     /// </summary>
     /// <typeparam name="TError">The error type.</typeparam>
-    public readonly struct FailedItem<TError>
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="FailedItem{TError}"/> struct.
+    /// </remarks>
+    /// <param name="error">The error.</param>
+    public readonly struct FailedItem<TError>(TError error)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FailedItem{TError}"/> struct.
-        /// </summary>
-        /// <param name="error">The error.</param>
-        public FailedItem(TError error)
-        {
-            this.Error = error;
-        }
-
         /// <summary>
         /// Gets the error.
         /// </summary>
-        public TError Error { get; }
+        public TError Error { get; } = error;
 
         /// <summary>
         /// Converts the <see cref="FailedItem{TError}"/> into a failed <see cref="Item{TResult,TError}"/>.

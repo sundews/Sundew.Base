@@ -87,6 +87,48 @@ public static partial class R
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="errorFunc">The error func.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    public static R<TValue, TError> From<TValue, TError>(TValue? value, Func<TError> errorFunc)
+        where TValue : class
+    {
+        if (value == null)
+        {
+            return R.Error(errorFunc());
+        }
+
+        return R.Success(value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="errorFunc">The error func.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    public static R<TValue, TError> FromValue<TValue, TError>(TValue value, Func<TError> errorFunc)
+        where TValue : struct, IEquatable<TValue>
+    {
+        if (value.Equals(default))
+        {
+            return R.Error(errorFunc());
+        }
+
+        return R.Success(value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="isSuccess">If set to <c>true</c> [success].</param>
     /// <param name="value">The result value.</param>
     /// <param name="error">The error.</param>

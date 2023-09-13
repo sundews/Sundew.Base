@@ -29,9 +29,9 @@ namespace Sundew.Base.UnitTests.Collections
         {
             var resultList = new List<int>();
 
-            this.numberList.ForEach(x => resultList.Add(x + 1));
+            this.numberList.ForEachItem(x => resultList.Add(x + 1));
 
-            resultList.ForEach((x, i) => x.Should().Be(this.numberList[i] + 1));
+            resultList.ForEachItem((x, i) => x.Should().Be(this.numberList[i] + 1));
         }
 
         [Fact]

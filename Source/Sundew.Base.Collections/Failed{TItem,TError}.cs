@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="AllOrFailed{TItem,TResult}.Failed.cs" company="Sundews">
+// <copyright file="AllOrFailed{TItem,TResult,TError}.Failed.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -14,15 +14,15 @@ using System.Collections.Generic;
 /// Represents the error causing items not to become ensured.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
-/// <typeparam name="TResult">The result type.</typeparam>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1649:File name should match first type name", Justification = "Discriminated union")]
-public sealed class Failed<TItem, TResult> : AllOrFailed<TItem, TResult>, IReadOnlyList<FailedItem<TItem>>
+/// <typeparam name="TError">The error type.</typeparam>
+public readonly record struct Failed<TItem, TError> : IReadOnlyList<FailedItem<TItem, TError>>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Failed{TItem, TResult}" /> class.
+    /// Initializes a new instance of the <see cref="Failed{TItem, TError}" /> struct.
     /// </summary>
     /// <param name="items">The failed items.</param>
-    public Failed(IReadOnlyList<FailedItem<TItem>> items)
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1642:Constructor summary documentation should begin with standard text", Justification = "Bug")]
+    public Failed(IReadOnlyList<FailedItem<TItem, TError>> items)
     {
         this.Items = items;
     }
@@ -30,7 +30,7 @@ public sealed class Failed<TItem, TResult> : AllOrFailed<TItem, TResult>, IReadO
     /// <summary>
     /// Gets the failed items.
     /// </summary>
-    public IReadOnlyList<FailedItem<TItem>> Items { get; }
+    public IReadOnlyList<FailedItem<TItem, TError>> Items { get; }
 
     /// <summary>
     /// Gets the count.
@@ -42,7 +42,7 @@ public sealed class Failed<TItem, TResult> : AllOrFailed<TItem, TResult>, IReadO
     /// </summary>
     /// <param name="index">The index.</param>
     /// <returns>The value.</returns>
-    public FailedItem<TItem> this[int index] => this.Items[index];
+    public FailedItem<TItem, TError> this[int index] => this.Items[index];
 
     /// <summary>
     /// Gets the items.
@@ -51,10 +51,16 @@ public sealed class Failed<TItem, TResult> : AllOrFailed<TItem, TResult>, IReadO
     public IReadOnlyList<TItem?> GetItems() => this.Items.ToArray(x => x.Item);
 
     /// <summary>
+    /// Gets the errors.
+    /// </summary>
+    /// <returns>The items.</returns>
+    public IReadOnlyList<TError> GetErrors() => this.Items.ToArray(x => x.Error);
+
+    /// <summary>
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    public IEnumerator<FailedItem<TItem>> GetEnumerator()
+    public IEnumerator<FailedItem<TItem, TError>> GetEnumerator()
     {
         return this.Items.GetEnumerator();
     }

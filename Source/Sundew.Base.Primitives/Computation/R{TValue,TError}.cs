@@ -182,6 +182,19 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <param name="value">The value.</param>
+    /// <param name="error">The error.</param>
+    /// <returns><c>true</c> if the result is an error otherwise <c>false</c>.</returns>
+    public bool TryGet([NotNullWhen(true)] out TValue? value, [NotNullWhen(false)] out TError? error)
+    {
+        value = this.Value;
+        error = this.Error;
+        return this.IsSuccess;
+    }
+
+    /// <summary>
     /// Converts this instance to a value task.
     /// </summary>
     /// <returns>The value task.</returns>
