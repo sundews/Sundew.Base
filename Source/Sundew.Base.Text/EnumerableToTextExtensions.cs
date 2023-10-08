@@ -173,7 +173,23 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, char separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, null, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, appendAction, appendAction, null, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append function.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> appendAction, char separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, appendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -188,7 +204,23 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, string separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, null, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, appendAction, appendAction, null, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> appendAction, string separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, appendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -204,7 +236,24 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, char separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, null, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, firstAppendAction, appendAction, null, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, char separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, firstAppendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -220,7 +269,24 @@ public static class EnumerableToTextExtensions
     /// </returns>
     public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, string separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, null, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, firstAppendAction, appendAction, null, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, string separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, firstAppendAction, appendAction, null, separator).ToString();
     }
 
     /// <summary>
@@ -229,14 +295,31 @@ public static class EnumerableToTextExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="appendAction">The append function.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, char separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, finalAppendAction, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, appendAction, appendAction, postAppendAction, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, char separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, appendAction, appendAction, postAppendAction, separator).ToString();
     }
 
     /// <summary>
@@ -245,14 +328,31 @@ public static class EnumerableToTextExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="appendAction">The append action.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, string separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, string separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, appendAction, appendAction, finalAppendAction, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, appendAction, appendAction, postAppendAction, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, string separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, appendAction, appendAction, postAppendAction, separator).ToString();
     }
 
     /// <summary>
@@ -262,14 +362,32 @@ public static class EnumerableToTextExtensions
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="firstAppendAction">The first append action.</param>
     /// <param name="appendAction">The append function.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, char separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, char separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, finalAppendAction, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, firstAppendAction, appendAction, postAppendAction, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append function.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, char separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, firstAppendAction, appendAction, postAppendAction, separator).ToString();
     }
 
     /// <summary>
@@ -279,13 +397,31 @@ public static class EnumerableToTextExtensions
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="firstAppendAction">The first append action.</param>
     /// <param name="appendAction">The append action.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> finalAppendAction, string separator)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, string separator)
     {
-        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, firstAppendAction, appendAction, finalAppendAction, separator).ToString();
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, null, firstAppendAction, appendAction, postAppendAction, separator).ToString();
+    }
+
+    /// <summary>
+    /// Joins the specified enumerable to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, Action<StringBuilder> preAppendAction, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> appendAction, Action<StringBuilder> postAppendAction, string separator)
+    {
+        return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, preAppendAction, firstAppendAction, appendAction, postAppendAction, separator).ToString();
     }
 }

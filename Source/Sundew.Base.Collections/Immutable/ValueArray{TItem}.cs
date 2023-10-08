@@ -27,6 +27,12 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     }
 
     /// <summary>
+    /// Gets an empty list.
+    /// </summary>
+    /// <returns>An empty list.</returns>
+    public static ValueArray<TItem> Empty { get; } = ImmutableArray<TItem>.Empty;
+
+    /// <summary>
     /// Gets the count.
     /// </summary>
     public int Count => this.inner.Length;

@@ -180,6 +180,56 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     }
 
     /// <summary>
+    /// Returns the same option if it has a value or tries to create an option from the alternative func.
+    /// </summary>
+    /// <param name="alternativeFunc">The alternative func.</param>
+    /// <returns>
+    /// A new <see cref="O" />.
+    /// </returns>
+    public O<TValue> Or(Func<O<TValue>> alternativeFunc)
+    {
+        return this.HasValue ? this : alternativeFunc();
+    }
+
+    /// <summary>
+    /// Returns the same option if it has a value or tries to create an option from the alternative func.
+    /// </summary>
+    /// <param name="alternativeFunc">The alternative func.</param>
+    /// <returns>
+    /// A new <see cref="O" />.
+    /// </returns>
+    public O<TValue> Or(Func<TValue?> alternativeFunc)
+    {
+        if (this.HasValue)
+        {
+            return this;
+        }
+
+        var alternativeValue = alternativeFunc();
+        return new O<TValue>(alternativeValue != null, alternativeValue);
+    }
+
+    /// <summary>
+    /// Returns the same option if it has a value or tries to create an option from the alternative func.
+    /// </summary>
+    /// <typeparam name="TStructValue">The type struct value.</typeparam>
+    /// <param name="alternativeFunc">The alternative func.</param>
+    /// <returns>
+    /// A new <see cref="O" />.
+    /// </returns>
+    public O<TValue> Or<TStructValue>(Func<TStructValue> alternativeFunc)
+        where TStructValue : struct, TValue
+    {
+        if (this.HasValue)
+        {
+            return this;
+        }
+
+        var alternativeValue = alternativeFunc();
+        return new O<TValue>(!alternativeValue.Equals(default), alternativeValue);
+    }
+
+    /// <summary>
     /// Gets the value or the default value.
     /// </summary>
     /// <param name="defaultValue">The default value.</param>
@@ -187,6 +237,28 @@ public readonly struct O<TValue> : IEquatable<O<TValue>>
     public TValue GetValueOrDefault(TValue defaultValue)
     {
         return this.HasValue ? this.Value : defaultValue;
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="newValueFunc">The new value func.</param>
+    /// <param name="defaultValueFunc">The default value func.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TNewValue GetValueOrDefault<TNewValue>(Func<TValue, TNewValue> newValueFunc, Func<TNewValue> defaultValueFunc)
+    {
+        return this.HasValue ? newValueFunc(this.Value) : defaultValueFunc();
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <param name="defaultValueFunc">The default value func.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    public TValue GetValueOrDefault(Func<TValue> defaultValueFunc)
+    {
+        return this.HasValue ? this.Value : defaultValueFunc();
     }
 
     /// <summary>

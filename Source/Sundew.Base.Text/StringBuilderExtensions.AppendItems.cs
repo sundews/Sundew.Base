@@ -190,7 +190,27 @@ public static partial class StringBuilderExtensions
         IEnumerable<TItem> enumerable,
         Action<StringBuilder, TItem> appendAction)
     {
-        return InternalAppendItems(stringBuilder, enumerable, appendAction, appendAction, null, string.Empty);
+        return InternalAppendItems(stringBuilder, enumerable, null, appendAction, appendAction, null, string.Empty);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
+        Action<StringBuilder, TItem> appendAction)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, appendAction, appendAction, null, string.Empty);
     }
 
     /// <summary>
@@ -210,7 +230,29 @@ public static partial class StringBuilderExtensions
         Action<StringBuilder, TItem> appendAction,
         char separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, appendAction, appendAction, null, separator);
+        return InternalAppendItems(stringBuilder, enumerable, null, appendAction, appendAction, null, separator);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
+        Action<StringBuilder, TItem> appendAction,
+        char separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, appendAction, appendAction, null, separator);
     }
 
     /// <summary>
@@ -230,7 +272,29 @@ public static partial class StringBuilderExtensions
         Action<StringBuilder, TItem> appendAction,
         string separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, appendAction, appendAction, null, separator);
+        return InternalAppendItems(stringBuilder, enumerable, null, appendAction, appendAction, null, separator);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
+        Action<StringBuilder, TItem> appendAction,
+        string separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, appendAction, appendAction, null, separator);
     }
 
     /// <summary>
@@ -252,7 +316,7 @@ public static partial class StringBuilderExtensions
         Action<StringBuilder, TItem> appendAction,
         char separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, firstAppendAction, appendAction, null, separator);
+        return InternalAppendItems(stringBuilder, enumerable, null, firstAppendAction, appendAction, null, separator);
     }
 
     /// <summary>
@@ -274,7 +338,7 @@ public static partial class StringBuilderExtensions
         Action<StringBuilder, TItem> appendAction,
         string separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, firstAppendAction, appendAction, null, separator);
+        return InternalAppendItems(stringBuilder, enumerable, null, firstAppendAction, appendAction, null, separator);
     }
 
     /// <summary>
@@ -284,7 +348,7 @@ public static partial class StringBuilderExtensions
     /// <param name="stringBuilder">The string builder.</param>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="appendAction">The append action.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
@@ -293,10 +357,10 @@ public static partial class StringBuilderExtensions
         this StringBuilder stringBuilder,
         IEnumerable<TItem> enumerable,
         Action<StringBuilder, TItem> appendAction,
-        Action<StringBuilder> finalAppendAction,
+        Action<StringBuilder> postAppendAction,
         char separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, appendAction, appendAction, finalAppendAction, separator);
+        return InternalAppendItems(stringBuilder, enumerable, null, appendAction, appendAction, postAppendAction, separator);
     }
 
     /// <summary>
@@ -305,8 +369,9 @@ public static partial class StringBuilderExtensions
     /// <typeparam name="TItem">The type of the item.</typeparam>
     /// <param name="stringBuilder">The string builder.</param>
     /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
     /// <param name="appendAction">The append action.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
@@ -314,35 +379,58 @@ public static partial class StringBuilderExtensions
     public static StringBuilder AppendItems<TItem>(
         this StringBuilder stringBuilder,
         IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
         Action<StringBuilder, TItem> appendAction,
-        Action<StringBuilder> finalAppendAction,
-        string separator)
-    {
-        return InternalAppendItems(stringBuilder, enumerable, appendAction, appendAction, finalAppendAction, separator);
-    }
-
-    /// <summary>
-    /// Aggregates to string builder.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="stringBuilder">The string builder.</param>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <param name="firstAppendAction">The first append action.</param>
-    /// <param name="appendAction">The append action.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
-    /// <param name="separator">The separator.</param>
-    /// <returns>
-    /// The result of the result function.
-    /// </returns>
-    public static StringBuilder AppendItems<TItem>(
-        this StringBuilder stringBuilder,
-        IEnumerable<TItem> enumerable,
-        Action<StringBuilder, TItem> firstAppendAction,
-        Action<StringBuilder, TItem> appendAction,
-        Action<StringBuilder> finalAppendAction,
+        Action<StringBuilder> postAppendAction,
         char separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, firstAppendAction, appendAction, finalAppendAction, separator);
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, appendAction, appendAction, postAppendAction, separator);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder, TItem> appendAction,
+        Action<StringBuilder> postAppendAction,
+        string separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, null, appendAction, appendAction, postAppendAction, separator);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
+        Action<StringBuilder, TItem> appendAction,
+        Action<StringBuilder> postAppendAction,
+        string separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, appendAction, appendAction, postAppendAction, separator);
     }
 
     /// <summary>
@@ -353,7 +441,7 @@ public static partial class StringBuilderExtensions
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="firstAppendAction">The first append action.</param>
     /// <param name="appendAction">The append action.</param>
-    /// <param name="finalAppendAction">The final append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
     /// <param name="separator">The separator.</param>
     /// <returns>
     /// The result of the result function.
@@ -363,13 +451,89 @@ public static partial class StringBuilderExtensions
         IEnumerable<TItem> enumerable,
         Action<StringBuilder, TItem> firstAppendAction,
         Action<StringBuilder, TItem> appendAction,
-        Action<StringBuilder> finalAppendAction,
-        string separator)
+        Action<StringBuilder> postAppendAction,
+        char separator)
     {
-        return InternalAppendItems(stringBuilder, enumerable, firstAppendAction, appendAction, finalAppendAction, separator);
+        return InternalAppendItems(stringBuilder, enumerable, null, firstAppendAction, appendAction, postAppendAction, separator);
     }
 
-    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> successiveAppendAction, Action<StringBuilder>? finalAppendAction, string separator)
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
+        Action<StringBuilder, TItem> firstAppendAction,
+        Action<StringBuilder, TItem> appendAction,
+        Action<StringBuilder> postAppendAction,
+        char separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, firstAppendAction, appendAction, postAppendAction, separator);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder, TItem> firstAppendAction,
+        Action<StringBuilder, TItem> appendAction,
+        Action<StringBuilder> postAppendAction,
+        string separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, null, firstAppendAction, appendAction, postAppendAction, separator);
+    }
+
+    /// <summary>
+    /// Aggregates to string builder.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="preAppendAction">The pre append action.</param>
+    /// <param name="firstAppendAction">The first append action.</param>
+    /// <param name="appendAction">The append action.</param>
+    /// <param name="postAppendAction">The post append action.</param>
+    /// <param name="separator">The separator.</param>
+    /// <returns>
+    /// The result of the result function.
+    /// </returns>
+    public static StringBuilder AppendItems<TItem>(
+        this StringBuilder stringBuilder,
+        IEnumerable<TItem> enumerable,
+        Action<StringBuilder> preAppendAction,
+        Action<StringBuilder, TItem> firstAppendAction,
+        Action<StringBuilder, TItem> appendAction,
+        Action<StringBuilder> postAppendAction,
+        string separator)
+    {
+        return InternalAppendItems(stringBuilder, enumerable, preAppendAction, firstAppendAction, appendAction, postAppendAction, separator);
+    }
+
+    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, Action<StringBuilder>? preAppendAction, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> successiveAppendAction, Action<StringBuilder>? postAppendAction, string separator)
     {
         using (IEnumerator<TItem> enumerator = enumerable.GetEnumerator())
         {
@@ -378,6 +542,7 @@ public static partial class StringBuilderExtensions
                 return stringBuilder;
             }
 
+            preAppendAction?.Invoke(stringBuilder);
             var value = enumerator.Current;
             if (value != null)
             {
@@ -395,11 +560,11 @@ public static partial class StringBuilderExtensions
             }
         }
 
-        finalAppendAction?.Invoke(stringBuilder);
+        postAppendAction?.Invoke(stringBuilder);
         return stringBuilder;
     }
 
-    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> successiveAppendAction, Action<StringBuilder>? finalAppendAction, char separator)
+    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, Action<StringBuilder>? preAppendAction, Action<StringBuilder, TItem> firstAppendAction, Action<StringBuilder, TItem> successiveAppendAction, Action<StringBuilder>? postAppendAction, char separator)
     {
         using (IEnumerator<TItem> enumerator = enumerable.GetEnumerator())
         {
@@ -408,6 +573,7 @@ public static partial class StringBuilderExtensions
                 return stringBuilder;
             }
 
+            preAppendAction?.Invoke(stringBuilder);
             var value = enumerator.Current;
             if (value != null)
             {
@@ -425,7 +591,7 @@ public static partial class StringBuilderExtensions
             }
         }
 
-        finalAppendAction?.Invoke(stringBuilder);
+        postAppendAction?.Invoke(stringBuilder);
         return stringBuilder;
     }
 

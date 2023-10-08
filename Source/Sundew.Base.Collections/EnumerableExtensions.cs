@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Collections.Internal;
 using Sundew.Base.Memory;
 using Sundew.Base.Primitives;
@@ -323,6 +324,83 @@ public static partial class EnumerableExtensions
                 yield return item;
             }
         }
+    }
+
+    /// <summary>
+    /// Gets the item if the enumerable contains exactly one item and otherwise returns the default value.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The item or the default value.</returns>
+    public static TItem? OnlyOneOrDefault<TItem>(this IEnumerable<TItem?>? enumerable)
+    {
+        if (enumerable == null)
+        {
+            return default;
+        }
+
+        using var enumerator = enumerable.GetEnumerator();
+        var item = enumerator.MoveNext() ? enumerator.Current : default;
+        item = enumerator.MoveNext() ? default : item;
+        return item;
+    }
+
+    /// <summary>
+    /// Gets the item if the enumerable contains exactly one item and otherwise returns the default value.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <returns>The item or the default value.</returns>
+    public static TItem? OnlyOneOrDefault<TItem>(this IEnumerable<TItem?>? enumerable, Func<TItem?, bool> predicate)
+    {
+        if (enumerable == null)
+        {
+            return default;
+        }
+
+        TItem? result = default;
+        var count = 0;
+        foreach (var item in enumerable)
+        {
+            if (!predicate(item))
+            {
+                continue;
+            }
+
+            if (count > 0)
+            {
+                result = default;
+                break;
+            }
+
+            result = item;
+            count++;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Converts the specified <see cref="ImmutableArray{T}"/> to a <see cref="ValueArray{TItem}"/>.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The value array.</returns>
+    public static ValueArray<TItem> ToValueArray<TItem>(this IEnumerable<TItem> enumerable)
+    {
+        return new ValueArray<TItem>(enumerable.ToImmutableArray());
+    }
+
+    /// <summary>
+    /// Converts the specified <see cref="IImmutableList{T}"/> to a <see cref="ValueList{TItem}"/>.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The value list.</returns>
+    public static ValueList<TItem> ToValueList<TItem>(this IEnumerable<TItem> enumerable)
+    {
+        return new ValueList<TItem>(enumerable.ToImmutableList());
     }
 
     private static TOutItem[] ToArrayUnsafe<TInItem, TOutItem>(IReadOnlyList<TInItem> list, Func<TInItem, TOutItem> selectFunc)

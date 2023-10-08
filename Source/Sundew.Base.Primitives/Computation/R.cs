@@ -48,6 +48,28 @@ public static partial class R
         return new ErrorResult<TError>(error);
     }
 
+    /// <summary>
+    /// Creates a successful result.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
+    public static SuccessResult<TValue> ToSuccess<TValue>(this TValue value)
+    {
+        return new SuccessResult<TValue>(value);
+    }
+
+    /// <summary>
+    /// Creates an erroneous result.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>A <see cref="R" />.</returns>
+    public static ErrorResult<TError> ToError<TError>(this TError error)
+    {
+        return new ErrorResult<TError>(error);
+    }
+
     /// <summary>Creates a result based on the specified values.</summary>
     /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="isSuccess">The is success.</param>
@@ -77,6 +99,20 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     public static R<TError> From<TError>(TError? error)
+        where TError : class
+    {
+        return new R<TError>(error == null, error);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    public static R<TError> ToResult<TError>(this TError? error)
         where TError : class
     {
         return new R<TError>(error == null, error);
@@ -211,12 +247,34 @@ public static partial class R
     }
 
     /// <summary>
+    /// Creates a successful result.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
+    public static ValueTask<SuccessResult<TValue>> ToSuccessAsync<TValue>(this TValue value)
+    {
+        return new SuccessResult<TValue>(value);
+    }
+
+    /// <summary>
     /// Creates an erroneous result.
     /// </summary>
     /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R" />.</returns>
     public static ValueTask<ErrorResult<TError>> ErrorAsync<TError>(TError error)
+    {
+        return new ErrorResult<TError>(error).ToValueTask();
+    }
+
+    /// <summary>
+    /// Creates an erroneous result.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>A <see cref="R" />.</returns>
+    public static ValueTask<ErrorResult<TError>> ToErrorAsync<TError>(this TError error)
     {
         return new ErrorResult<TError>(error).ToValueTask();
     }
@@ -250,6 +308,20 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     public static ValueTask<R<TError>> FromAsync<TError>(TError? error)
+        where TError : class
+    {
+        return new R<TError>(error == null, error).ToValueTask();
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    public static ValueTask<R<TError>> ToResultAsync<TError>(this TError? error)
         where TError : class
     {
         return new R<TError>(error == null, error).ToValueTask();

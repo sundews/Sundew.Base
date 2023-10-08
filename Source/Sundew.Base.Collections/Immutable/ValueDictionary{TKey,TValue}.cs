@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ValueDictionary.cs" company="Sundews">
+// <copyright file="ValueDictionary{TKey,TValue}.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -28,6 +28,12 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     {
         this.inner = inner;
     }
+
+    /// <summary>
+    /// Gets an empty dictionary.
+    /// </summary>
+    /// <returns>An empty dictionary.</returns>
+    public static ValueDictionary<TKey, TValue> Empty { get; } = ImmutableDictionary<TKey, TValue>.Empty;
 
     /// <summary>
     /// Gets the count.

@@ -26,6 +26,317 @@ public static partial class StringBuilderExtensions
     /// Appends the specified value.
     /// </summary>
     /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <param name="trueFunc">The called if condition is true.</param>
+    /// <param name="falseFunc">The called if condition is false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder If(this StringBuilder stringBuilder, bool condition, Func<StringBuilder, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
+    {
+        return condition ? trueFunc(stringBuilder) : falseFunc?.Invoke(stringBuilder) ?? stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">Value if not null.</param>
+    /// <param name="trueFunc">The called if condition is true.</param>
+    /// <param name="falseFunc">The called if condition is false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder If<TValue>(this StringBuilder stringBuilder, TValue? value, Func<StringBuilder, TValue, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
+        where TValue : class
+    {
+        return !Equals(value, default) ? trueFunc(stringBuilder, value) : falseFunc?.Invoke(stringBuilder) ?? stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">Value fs not default.</param>
+    /// <param name="trueFunc">The called if condition is true.</param>
+    /// <param name="falseFunc">The called if condition is false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder IfValue<TValue>(this StringBuilder stringBuilder, TValue value, Func<StringBuilder, TValue, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
+        where TValue : struct, IEquatable<TValue>
+    {
+        return !value.Equals(default) ? trueFunc(stringBuilder, value) : falseFunc?.Invoke(stringBuilder) ?? stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">Value fs not default.</param>
+    /// <param name="trueFunc">The called if condition is true.</param>
+    /// <param name="falseFunc">The called if condition is false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder If<TValue>(this StringBuilder stringBuilder, TValue? value, Func<StringBuilder, TValue, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
+        where TValue : struct, IEquatable<TValue>
+    {
+        return value.HasValue && !value.Value.Equals(default) ? trueFunc(stringBuilder, value.Value) : falseFunc?.Invoke(stringBuilder) ?? stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, byte value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, sbyte value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, char value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, char[] value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, string value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, short value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, ushort value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, int value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, uint value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, long value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, ulong value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, float value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, double value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, decimal value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, ReadOnlySpan<char> value, bool condition)
+    {
+        return condition ? stringBuilder.Append(value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
+    /// <param name="value">The value.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <param name="condition">If <c>true</c> the input is appended, otherwise false.</param>
+    /// <returns>
+    /// The <see cref="StringBuilder" />.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider formatProvider, bool condition)
+    {
+        return condition ? stringBuilder.AppendFormat(formatProvider, Format, value) : stringBuilder;
+    }
+
+    /// <summary>
+    /// Appends the specified value.
+    /// </summary>
+    /// <param name="stringBuilder">The string builder.</param>
     /// <param name="value">The value.</param>
     /// <param name="formatProvider">The format provider.</param>
     /// <returns>

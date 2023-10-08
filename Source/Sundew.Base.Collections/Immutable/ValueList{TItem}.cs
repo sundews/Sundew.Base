@@ -28,6 +28,12 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     }
 
     /// <summary>
+    /// Gets an empty list.
+    /// </summary>
+    /// <returns>An empty list.</returns>
+    public static ValueList<TItem> Empty { get; } = ImmutableList<TItem>.Empty;
+
+    /// <summary>
     /// Gets the count.
     /// </summary>
     public int Count => this.inner.Count;

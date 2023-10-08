@@ -55,6 +55,28 @@ public static partial class O
     }
 
     /// <summary>
+    /// Creates a option with a value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="O{TValue}"/>.</returns>
+    public static O<TValue> ToSome<TValue>(this TValue value)
+    {
+        return new O<TValue>(true, value);
+    }
+
+    /// <summary>
+    /// Creates a option with a value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="O{TValue}"/>.</returns>
+    public static ValueTask<O<TValue>> ToSomeAsync<TValue>(this TValue value)
+    {
+        return new O<TValue>(true, value).ToValueTask();
+    }
+
+    /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
@@ -104,7 +126,49 @@ public static partial class O
     /// <returns>
     /// A <see cref="O{TValue}" />.
     /// </returns>
+    public static O<TValue> FromValue<TValue>(TValue value)
+        where TValue : struct, IEquatable<TValue>
+    {
+        return !value.Equals(default) ? new O<TValue>(true, value) : None;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O{TValue}" />.
+    /// </returns>
     public static O<TValue> From<TValue>(TValue? value)
+        where TValue : struct, IEquatable<TValue>
+    {
+        return value.HasValue && !value.Value.Equals(default) ? new O<TValue>(true, value.Value) : None;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O{TValue}" />.
+    /// </returns>
+    public static O<TValue> ToOption<TValue>(this TValue? value)
+        where TValue : class
+    {
+        return new O<TValue>(value != null, value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O{TValue}" />.
+    /// </returns>
+    public static O<TValue> ToOption<TValue>(this TValue? value)
         where TValue : struct
     {
         return value.HasValue ? new O<TValue>(true, value.Value) : None;
@@ -164,7 +228,35 @@ public static partial class O
     public static ValueTask<O<TValue>> FromAsync<TValue>(TValue? value)
         where TValue : struct
     {
-        return From(value);
+        return value.ToOption();
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O{TValue}" />.
+    /// </returns>
+    public static ValueTask<O<TValue>> ToOptionAsync<TValue>(this TValue? value)
+        where TValue : class
+    {
+        return new O<TValue>(value != null, value).ToValueTask();
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="O{TValue}" />.
+    /// </returns>
+    public static ValueTask<O<TValue>> ToOptionAsync<TValue>(this TValue? value)
+        where TValue : struct
+    {
+        return value.ToOption();
     }
 
     /// <summary>
