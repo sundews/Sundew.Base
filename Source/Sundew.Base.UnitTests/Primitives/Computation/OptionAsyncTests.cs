@@ -21,7 +21,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             const int ExpectedValue = 34;
             int? value = ExpectedValue;
 
-            var result = await ComputeAsync(() => value.ToAsync()).ConfigureAwait(false);
+            var result = await ComputeAsync(() => value.ToAsync());
 
             result.HasValue.Should().BeTrue();
             result.GetValueOrDefault().Should().Be(ExpectedValue);
@@ -34,7 +34,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             const int ExpectedError = 0;
             int? value = ExpectedValue;
 
-            var option = await ComputeAsync(() => value.ToAsync()).ConfigureAwait(false);
+            var option = await ComputeAsync(() => value.ToAsync());
 
             var result = option.ToResult(87);
 
@@ -47,7 +47,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         public async Task ToResult_When_OptionIsNoneOption_Then_ErrorShouldBeExpectedError()
         {
             const string ExpectedError = "Failed";
-            var option = await ComputeAsync(() => default(string).ToAsync()).ConfigureAwait(false);
+            var option = await ComputeAsync(() => default(string).ToAsync());
 
             var result = option.ToResult(ExpectedError);
 
@@ -64,7 +64,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             string? option = expectedResult ? "34" : default;
 
-            var testee = await ComputeAsync(() => option.ToAsync()).ConfigureAwait(false);
+            var testee = await ComputeAsync(() => option.ToAsync());
 
             var result = testee.With(x => x + "1");
 
@@ -82,7 +82,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             int? option = expectedResult ? expectedValue : null;
 
-            var testee = await ComputeAsync(() => option.ToAsync()).ConfigureAwait(false);
+            var testee = await ComputeAsync(() => option.ToAsync());
 
             var result = testee.ToResult(Convert.ToDouble, expectedError);
 

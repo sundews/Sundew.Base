@@ -58,7 +58,7 @@ namespace Sundew.Base.UnitTests.Disposal
 
             var testee = new Disposer.SynchronousDisposables(disposable1, disposable2);
 
-            await testee.DisposeAsync(disposableReporter).ConfigureAwait(false);
+            await testee.DisposeAsync(disposableReporter);
 
             Mock.Assert(disposableReporter);
         }
@@ -73,7 +73,7 @@ namespace Sundew.Base.UnitTests.Disposal
             Mock.Arrange(() => disposableReporter.Disposed(Arg.AnyObject, asyncDisposable)).InOrder().Occurs(1);
             var disposer = new Disposer.Disposers(new Disposer.Synchronous(disposable), new Disposer.Asynchronous(asyncDisposable));
 
-            await disposer.DisposeAsync(disposableReporter).ConfigureAwait(false);
+            await disposer.DisposeAsync(disposableReporter);
 
             Mock.Assert(disposableReporter);
         }
