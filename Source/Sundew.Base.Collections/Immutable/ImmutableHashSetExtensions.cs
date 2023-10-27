@@ -38,10 +38,26 @@ public static class ImmutableHashSetExtensions
     /// <param name="immutableSet">The immutable array.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting array.</returns>
-    public static TSet TryAdd<TSet, TItem>(this TSet immutableSet, O<TItem> option)
+    public static TSet AddIfHasValue<TSet, TItem>(this TSet immutableSet, TItem? option)
         where TSet : IImmutableSet<TItem>
+        where TItem : struct
     {
         return option.HasValue ? (TSet)immutableSet.Add(option.Value) : immutableSet;
+    }
+
+    /// <summary>
+    /// Tries to add the option item if it has any.
+    /// </summary>
+    /// <typeparam name="TSet">The set type.</typeparam>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableSet">The immutable array.</param>
+    /// <param name="option">The option.</param>
+    /// <returns>The resulting array.</returns>
+    public static TSet AddIfHasValue<TSet, TItem>(this TSet immutableSet, TItem? option)
+        where TSet : IImmutableSet<TItem>
+        where TItem : class
+    {
+        return option.HasValue() ? (TSet)immutableSet.Add(option) : immutableSet;
     }
 
     /// <summary>

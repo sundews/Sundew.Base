@@ -33,9 +33,23 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable array.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting array.</returns>
-    public static ImmutableArray<TItem> TryAdd<TItem>(this ImmutableArray<TItem> immutableArray, O<TItem> option)
+    public static ImmutableArray<TItem> TryAdd<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
+        where TItem : struct
     {
         return option.HasValue ? immutableArray.Add(option.Value) : immutableArray;
+    }
+
+    /// <summary>
+    /// Tries to add the option item if it has any.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableArray">The immutable array.</param>
+    /// <param name="option">The option.</param>
+    /// <returns>The resulting array.</returns>
+    public static ImmutableArray<TItem> TryAdd<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
+        where TItem : class
+    {
+        return option.HasValue() ? immutableArray.Add(option) : immutableArray;
     }
 
     /// <summary>

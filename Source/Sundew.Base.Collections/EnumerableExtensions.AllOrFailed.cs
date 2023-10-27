@@ -22,17 +22,6 @@ public static partial class EnumerableExtensions
     /// Ensures that all items could be selected and otherwise returns a error result.
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
-    /// <param name="enumerable">The enumerable.</param>
-    /// <returns>A discriminated union of the ensured items or the error result.</returns>
-    public static R<All<TItem>, Failed<O<TItem>>> AllOrFailed<TItem>(this IEnumerable<O<TItem>> enumerable)
-    {
-        return enumerable.AllOrFailed(Item.PassIfHasValue);
-    }
-
-    /// <summary>
-    /// Ensures that all items could be selected and otherwise returns a error result.
-    /// </summary>
-    /// <typeparam name="TItem">The item type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>A discriminated union of the ensured items or the error result.</returns>
@@ -50,7 +39,7 @@ public static partial class EnumerableExtensions
     public static R<All<TItem>, Failed<TItem?>> AllOrFailed<TItem>(this IEnumerable<TItem?> enumerable)
         where TItem : struct
     {
-        return enumerable.AllOrFailed(Item.PassIfNotNull);
+        return enumerable.AllOrFailed(Item.PassIfHasValue);
     }
 
     /// <summary>
@@ -62,7 +51,7 @@ public static partial class EnumerableExtensions
     public static R<All<TItem>, Failed<TItem?>> AllOrFailed<TItem>(this IEnumerable<TItem?> enumerable)
         where TItem : class
     {
-        return enumerable.AllOrFailed(Item.PassIfNotNull);
+        return enumerable.AllOrFailed(Item.PassIfHasValue);
     }
 
     /// <summary>

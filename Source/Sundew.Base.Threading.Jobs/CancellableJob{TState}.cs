@@ -85,7 +85,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Starts the job.
     /// </summary>
     /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    public O<CancellationToken> Start()
+    public CancellationToken? Start()
     {
         lock (this.lockObject)
         {
@@ -96,10 +96,10 @@ public sealed class CancellableJob<TState> : IJob
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
                 this.jobContinuationTask = Task.Factory.StartNew(this.TaskAction, this.cancellationTokenSource.Token, taskCreationOptions, this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default);
 
-                return O.Some(this.cancellationTokenSource.Token);
+                return this.cancellationTokenSource.Token;
             }
 
-            return O.None;
+            return default;
         }
     }
 

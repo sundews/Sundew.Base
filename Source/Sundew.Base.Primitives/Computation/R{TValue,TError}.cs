@@ -98,9 +98,35 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator R<TValue?, TError>(R.SuccessResult result)
+    {
+        return new R<TValue?, TError>(true, default(TValue?), default!);
+    }
+
+    /// <summary>
+    /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator R<TValue, TError>(R.SuccessResult<TValue> result)
     {
         return new R<TValue, TError>(true, result.Value, default!);
+    }
+
+    /// <summary>
+    /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static implicit operator R<TValue?, TError>(R.SuccessResultOption<TValue?> result)
+    {
+        return new R<TValue?, TError>(true, result.Value, default!);
     }
 
     /// <summary>

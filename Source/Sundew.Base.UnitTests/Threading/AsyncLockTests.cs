@@ -87,7 +87,7 @@ namespace Sundew.Base.UnitTests.Threading
                 for (int i = 0; i < 100; i++)
                 {
                     var value = i;
-                    using (var result = await asyncLock.TryLockAsync(startResult.Value).ConfigureAwait(false))
+                    using (var result = await asyncLock.TryLockAsync(startResult.GetValueOrDefault(CancellationToken.None)).ConfigureAwait(false))
                     {
                         if (result)
                         {

@@ -33,8 +33,30 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     public static SuccessResult<TValue> Success<TValue>(TValue value)
+        where TValue : notnull
     {
         return new SuccessResult<TValue>(value);
+    }
+
+    /// <summary>
+    /// Creates a successful result.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
+    public static SuccessResultOption<TValue?> SuccessOption<TValue>()
+    {
+        return new SuccessResultOption<TValue?>(default);
+    }
+
+    /// <summary>
+    /// Creates a successful result.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
+    public static SuccessResultOption<TValue?> SuccessOption<TValue>(TValue? value)
+    {
+        return new SuccessResultOption<TValue?>(value);
     }
 
     /// <summary>
@@ -57,6 +79,17 @@ public static partial class R
     public static SuccessResult<TValue> ToSuccess<TValue>(this TValue value)
     {
         return new SuccessResult<TValue>(value);
+    }
+
+    /// <summary>
+    /// Creates a successful result.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
+    public static SuccessResult<TValue?> ToSuccessOption<TValue>(this TValue? value)
+    {
+        return new SuccessResult<TValue?>(value);
     }
 
     /// <summary>

@@ -296,7 +296,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     public static bool TryParse(string input, NumberFormatInfo numberFormatInfo, out Percentage percentage)
     {
         var result = TryParse(input, numberFormatInfo);
-        if (result)
+        if (result.HasValue)
         {
             percentage = result.Value;
             return true;
@@ -348,7 +348,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Percentage Parse(string input, NumberFormatInfo numberFormatInfo)
     {
-        return TryParse(input, numberFormatInfo, true).Value;
+        return TryParse(input, numberFormatInfo, true).GetValueOrDefault(default);
     }
 
     /// <summary>
@@ -357,7 +357,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <param name="input">The input.</param>
     /// <returns>A percentage result.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static O<Percentage> TryParse(string input)
+    public static Percentage? TryParse(string input)
     {
         return TryParse(input, CultureInfo.CurrentCulture);
     }
@@ -369,7 +369,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <param name="cultureInfo">The culture information.</param>
     /// <returns>A percentage result.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static O<Percentage> TryParse(string input, CultureInfo cultureInfo)
+    public static Percentage? TryParse(string input, CultureInfo cultureInfo)
     {
         return TryParse(input, cultureInfo.NumberFormat);
     }
@@ -381,7 +381,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <param name="numberFormatInfo">The number format information.</param>
     /// <returns>A percentage result.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static O<Percentage> TryParse(string input, NumberFormatInfo numberFormatInfo)
+    public static Percentage? TryParse(string input, NumberFormatInfo numberFormatInfo)
     {
         return TryParse(input, numberFormatInfo, false);
     }
@@ -557,7 +557,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <param name="numberFormatInfo">The number format information.</param>
     /// <param name="shouldThrow">if set to <c>true</c> [should throw].</param>
     /// <returns>A percentage result.</returns>
-    private static O<Percentage> TryParse(string input, NumberFormatInfo numberFormatInfo, bool shouldThrow)
+    private static Percentage? TryParse(string input, NumberFormatInfo numberFormatInfo, bool shouldThrow)
     {
         if (string.IsNullOrEmpty(input))
         {
@@ -568,7 +568,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
                     nameof(input));
             }
 
-            return O.None;
+            return default;
         }
 
 #if NETSTANDARD2_1
@@ -626,10 +626,10 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
                             $"The number format was invalid: {numberFormatInfo.PercentNegativePattern}");
                     }
 
-                    return O.None;
+                    return default;
             }
 
-            return O.Some(new Percentage(-double.Parse(input.Substring(start, input.Length - fromEnd), numberFormatInfo) / 100));
+            return new Percentage(-double.Parse(input.Substring(start, input.Length - fromEnd), numberFormatInfo) / 100);
         }
 
         switch (numberFormatInfo.PercentPositivePattern)
@@ -657,9 +657,9 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
                         $"The number format was invalid: {numberFormatInfo.PercentPositivePattern}");
                 }
 
-                return O.None;
+                return default;
         }
 
-        return O.Some(new Percentage(double.Parse(input.Substring(start, input.Length - fromEnd), numberFormatInfo) / 100));
+        return new Percentage(double.Parse(input.Substring(start, input.Length - fromEnd), numberFormatInfo) / 100);
     }
 }

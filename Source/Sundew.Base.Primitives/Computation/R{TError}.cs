@@ -75,7 +75,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
         return new R<TError>(false, errorResult.Error);
     }
 
-    /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="R{TValue}"/>.</summary>
+    /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="ValueTask{R}"/>.</summary>
     /// <param name="errorR">The error result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -84,7 +84,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
         return errorR.ToValueTask();
     }
 
-    /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="O"/>.</summary>
+    /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="Task{R}"/>.</summary>
     /// <param name="r">The result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
