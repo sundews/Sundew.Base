@@ -77,7 +77,7 @@ namespace Sundew.Base.UnitTests.Primitives
         [InlineData("One, Two, Four,Max", true, NumbersSbyte.One | NumbersSbyte.Four | NumbersSbyte.Max)]
         [InlineData("Two, Four,Max", true, NumbersSbyte.Two | NumbersSbyte.Four | NumbersSbyte.Max)]
         [InlineData(null, false, NumbersSbyte.One)]
-        public void TryParseFlagsEnum_When_EnumTypeIsSbyte_Then_ResultShouldBeExpectedResult(string value, bool expectedResult, NumbersSbyte expectedNumbers)
+        public void TryParseFlagsEnum_When_EnumTypeIsSbyte_Then_ResultShouldBeExpectedResult(string? value, bool expectedResult, NumbersSbyte expectedNumbers)
         {
             var result = value.TryParseFlagsEnum(out NumbersSbyte numbers);
 
@@ -89,7 +89,7 @@ namespace Sundew.Base.UnitTests.Primitives
         [InlineData("One", true, Number.One)]
         [InlineData("Two", true, Number.Two)]
         [InlineData(null, false, Number.One)]
-        public void TryParseEnum_Then_ResultShouldBeExpectedResult(string input, bool expectedResult, Number expectedNumber)
+        public void TryParseEnum_Then_ResultShouldBeExpectedResult(string? input, bool expectedResult, Number expectedNumber)
         {
             var result = input.TryParseEnum(out Number number);
 

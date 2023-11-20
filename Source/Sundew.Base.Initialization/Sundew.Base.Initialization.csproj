@@ -11,12 +11,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Initialization.Interfaces" Version="1.0.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.4">
+    <PackageReference Include="Initialization.Interfaces" Version="1.0.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -32,16 +32,16 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Collections.Immutable" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+  </ItemGroup>
+
+	<ItemGroup Condition="$(TargetFramework)=='netstandard1.3'">
+    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Update="System.Collections.Immutable" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup Condition="$(TargetFramework)=='netstandard1.3'">
-    <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup>
+	<ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
   </ItemGroup>
 
