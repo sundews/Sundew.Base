@@ -16,14 +16,15 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
     public class OAsyncTests
     {
         [Fact]
-        public async Task SomeAsync_Then_ValueShouldBeExpectedValue()
+        public async Task ToAsync_Then_ValueShouldBeExpectedValue()
         {
             const int ExpectedValue = 34;
+            int? value = ExpectedValue;
 
-            O<int> result = await ComputeAsync(() => O.SomeAsync(ExpectedValue)).ConfigureAwait(false);
+            var result = await ComputeAsync(() => value.ToAsync());
 
             result.HasValue.Should().BeTrue();
-            result.Value.Should().Be(ExpectedValue);
+            result.GetValueOrDefault().Should().Be(ExpectedValue);
         }
 
         [Fact]
@@ -31,8 +32,9 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const int ExpectedValue = 34;
             const int ExpectedError = 0;
+            int? value = ExpectedValue;
 
-            var option = await ComputeAsync(() => O.SomeAsync(ExpectedValue)).ConfigureAwait(false);
+            var option = await ComputeAsync(() => value.ToAsync());
 
             var result = option.ToResult(87);
 
@@ -45,7 +47,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         public async Task ToResult_When_OptionIsNoneOption_Then_ErrorShouldBeExpectedError()
         {
             const string ExpectedError = "Failed";
-            var option = await ComputeAsync(O.NoneAsync).ConfigureAwait(false);
+            var option = await ComputeAsync(() => default(string).ToAsync());
 
             var result = option.ToResult(ExpectedError);
 
@@ -54,18 +56,20 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         }
 
         [Theory]
-        [InlineData(true, 34)]
-        [InlineData(false, 0)]
+        [InlineData(true, "341")]
+        [InlineData(false, null)]
         public async Task With_Then_ResultValueShouldBeExpectedValue(
             bool expectedResult,
-            int expectedValue)
+            string? expectedValue)
         {
-            var testee = await ComputeAsync(() => O.FromAsync(expectedResult, 45)).ConfigureAwait(false);
+            string? option = expectedResult ? "34" : default;
 
-            var result = testee.With(expectedValue);
+            var testee = await ComputeAsync(() => option.ToAsync());
 
-            result.HasValue.Should().Be(expectedResult);
-            result.Value.Should().Be(expectedValue);
+            var result = testee.With(x => x + "1");
+
+            result.HasValue().Should().Be(expectedResult);
+            result.Should().Be(expectedValue);
         }
 
         [Theory]
@@ -76,27 +80,15 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             int expectedValue,
             int expectedError)
         {
-            var testee = await ComputeAsync(() => O.FromAsync(expectedResult, expectedValue)).ConfigureAwait(false);
+            int? option = expectedResult ? expectedValue : null;
+
+            var testee = await ComputeAsync(() => option.ToAsync());
 
             var result = testee.ToResult(Convert.ToDouble, expectedError);
 
             result.IsSuccess.Should().Be(expectedResult);
             result.Value.Should().Be(expectedValue);
             result.Error.Should().Be((byte)expectedError);
-        }
-
-        [Theory]
-        [InlineData(true, 34, 34)]
-        [InlineData(false, 45, 0)]
-        public async Task Deconstruction_When_DeconstructingAllParameters_Then_DeconstructedValuesShouldBedExpectedResult(
-            bool expectedResult,
-            int inputValue,
-            int expectedValue)
-        {
-            var (isSuccess, value) = await ComputeAsync(() => O.FromAsync(expectedResult, inputValue)).ConfigureAwait(false);
-
-            isSuccess.Should().Be(expectedResult);
-            value.Should().Be(expectedValue);
         }
 
         private static async ValueTask<TResult> ComputeAsync<TResult>(Func<ValueTask<TResult>> func)

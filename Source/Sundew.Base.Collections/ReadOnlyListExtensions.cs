@@ -163,7 +163,7 @@ public static class ReadOnlyListExtensions
     /// <returns>
     ///   <c>true</c> if the specified source array has any; otherwise, <c>false</c>.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static bool HasAny<TItem>(this IReadOnlyCollection<TItem> list)
     {
         return list.Count > 0;
@@ -177,7 +177,7 @@ public static class ReadOnlyListExtensions
     /// <returns>
     ///   <c>true</c> if the specified list is empty; otherwise, <c>false</c>.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsEmpty<TItem>(this IReadOnlyCollection<TItem> list)
     {
         return list.Count == 0;

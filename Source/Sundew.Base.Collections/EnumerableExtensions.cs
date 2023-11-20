@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Collections.Internal;
@@ -324,6 +325,33 @@ public static partial class EnumerableExtensions
                 yield return item;
             }
         }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether only one item exists in the enumerable and gets it.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="item">The item.</param>
+    /// <returns><c>true</c> if exactly one item exists otherwise <c>false</c>.</returns>
+    public static bool TryGetOnlyOne<TItem>(this IEnumerable<TItem?>? enumerable, [NotNullWhen(true)] out TItem? item)
+    {
+        item = OnlyOneOrDefault(enumerable);
+        return !EqualityComparer<TItem?>.Default.Equals(item, default);
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether only one item exists in the enumerable and gets it.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="item">The item.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <returns><c>true</c> if exactly one item exists otherwise <c>false</c>.</returns>
+    public static bool TryGetOnlyOne<TItem>(this IEnumerable<TItem?>? enumerable, [NotNullWhen(true)] out TItem? item, Func<TItem?, bool> predicate)
+    {
+        item = OnlyOneOrDefault(enumerable, predicate);
+        return !EqualityComparer<TItem?>.Default.Equals(item, default);
     }
 
     /// <summary>

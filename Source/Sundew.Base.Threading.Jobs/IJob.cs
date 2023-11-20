@@ -35,7 +35,7 @@ public interface IJob : IDisposable
     /// Starts the job.
     /// </summary>
     /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    O<CancellationToken> Start();
+    CancellationToken? Start();
 
     /// <summary>
     /// Stops the job and waits for it to complete.

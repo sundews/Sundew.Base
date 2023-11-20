@@ -73,7 +73,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// </summary>
     /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator bool(R<TValue, TError> r)
     {
         return r.IsSuccess;
@@ -84,7 +84,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// </summary>
     /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<TError>(R<TValue, TError> r)
     {
         return new R<TError>(r.IsSuccess, r.IsSuccess ? default! : r.Error);
@@ -97,10 +97,36 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <returns>
     /// The result of the conversion.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator R<TValue?, TError>(R.SuccessResult result)
+    {
+        return new R<TValue?, TError>(true, default(TValue?), default!);
+    }
+
+    /// <summary>
+    /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<TValue, TError>(R.SuccessResult<TValue> result)
     {
         return new R<TValue, TError>(true, result.Value, default!);
+    }
+
+    /// <summary>
+    /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator R<TValue?, TError>(R.SuccessResultOption<TValue?> result)
+    {
+        return new R<TValue?, TError>(true, result.Value, default!);
     }
 
     /// <summary>
@@ -110,7 +136,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <returns>
     /// The result of the conversion.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<TValue, TError>(R.ErrorResult<TError> result)
     {
         return new R<TValue, TError>(false, default!, result.Error);
@@ -119,7 +145,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <summary>Performs an implicit conversion from <see cref="ValueTask{R}"/> to <see cref="R"/>.</summary>
     /// <param name="r">The result.</param>
     /// <returns>The result of the conversion.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator ValueTask<R<TValue, TError>>(R<TValue, TError> r)
     {
         return r.ToValueTask();
@@ -198,7 +224,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// Converts this instance to a value task.
     /// </summary>
     /// <returns>The value task.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public ValueTask<R<TValue, TError>> ToValueTask()
     {
         return new ValueTask<R<TValue, TError>>(this);

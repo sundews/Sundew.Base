@@ -232,7 +232,7 @@ public class NaturalTextComparer : IComparer<string>
         return lhsSpan.Slice(lhsStart, lhsLength).CompareTo(rhsSpan.Slice(rhsStart, rhsLength), this.stringComparison);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static int CompareNumerically(ReadOnlySpan<char> lhsSpan, int lhsStart, int lhsLength, ReadOnlySpan<char> rhsSpan, int rhsStart, int rhsLength)
     {
         ReadOnlySpan<char> maxSpan = lhsSpan.Slice(lhsStart, lhsLength);

@@ -53,7 +53,7 @@ public class EnumerableExtensionsAllOrFailedTests
     {
         var expectedItems = new int?[] { 1, 2, 3, 4 };
 
-        var result = expectedItems.AllOrFailed(Item.PassIfNotNull);
+        var result = expectedItems.AllOrFailed(Item.PassIfHasValue);
 
         result.Value.Should().BeOfType<All<int>>().Which
             .Items.Should().Equal(expectedItems.Cast<int>());
@@ -107,7 +107,7 @@ public class EnumerableExtensionsAllOrFailedTests
     {
         var expectedItems = new string?[] { "1", "2", "3", "4" };
 
-        var result = expectedItems.AllOrFailed(Item.PassIfNotNull);
+        var result = expectedItems.AllOrFailed(Item.PassIfHasValue);
 
         result.Value.Items.Should().Equal(expectedItems.Cast<string>());
     }

@@ -21,7 +21,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             const int ExpectedValue = 34;
             const int ExpectedError = 0;
 
-            R<int, double> r = await ComputeAsync(() => R.SuccessAsync(ExpectedValue)).ConfigureAwait(false);
+            R<int, double> r = await ComputeAsync(() => R.SuccessAsync(ExpectedValue));
 
             r.IsSuccess.Should().BeTrue();
             r.Value.Should().Be(ExpectedValue);
@@ -33,7 +33,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const string ExpectedError = "Failed";
 
-            R<string> r = await ComputeAsync(() => R.ErrorAsync(ExpectedError)).ConfigureAwait(false);
+            R<string> r = await ComputeAsync(() => R.ErrorAsync(ExpectedError));
 
             r.IsSuccess.Should().BeFalse();
             r.Error.Should().Be(ExpectedError);
@@ -45,7 +45,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             const int ExpectedValue = default;
             const string ExpectedError = "Failed";
 
-            R<int, string> r = await ComputeAsync(() => R.ErrorAsync(ExpectedError)).ConfigureAwait(false);
+            R<int, string> r = await ComputeAsync(() => R.ErrorAsync(ExpectedError));
 
             r.IsSuccess.Should().BeFalse();
             r.Value.Should().Be(ExpectedValue);
@@ -59,7 +59,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             bool expectedResult,
             int expectedError)
         {
-            var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError)).ConfigureAwait(false);
+            var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError));
 
             var result = testee.With(Convert.ToDouble);
 
@@ -76,7 +76,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             int expectedValue,
             int expectedError)
         {
-            var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError)).ConfigureAwait(false);
+            var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError));
 
             var result = testee.To(expectedValue);
 
@@ -92,7 +92,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             const double ExpectedValue = 65d;
             const double ExpectedError = 45d;
 
-            var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(ExpectedIsSuccess, ExpectedValue, ExpectedError)).ConfigureAwait(false);
+            var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(ExpectedIsSuccess, ExpectedValue, ExpectedError));
 
             isSuccess.Should().Be(ExpectedIsSuccess);
             value.Should().Be(ExpectedValue);
@@ -104,7 +104,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const double ExpectedError = 65d;
 
-            R<double> r = await ComputeAsync(() => R.ErrorAsync(65d)).ConfigureAwait(false);
+            R<double> r = await ComputeAsync(() => R.ErrorAsync(65d));
 
             r.IsSuccess.Should().BeFalse();
             r.Error.Should().Be(ExpectedError);
@@ -115,7 +115,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const double ExpectedValue = 65d;
 
-            R<double, double> r = await ComputeAsync(() => R.SuccessAsync(65d)).ConfigureAwait(false);
+            R<double, double> r = await ComputeAsync(() => R.SuccessAsync(65d));
 
             r.IsSuccess.Should().BeTrue();
             r.Value.Should().Be(ExpectedValue);
@@ -127,7 +127,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             const double ExpectedError = 65d;
 
-            R<double, double> r = await ComputeAsync(() => R.ErrorAsync(65d)).ConfigureAwait(false);
+            R<double, double> r = await ComputeAsync(() => R.ErrorAsync(65d));
 
             r.IsSuccess.Should().BeFalse();
             r.Value.Should().Be(default);
@@ -136,7 +136,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
 
         private static async ValueTask<TResult> ComputeAsync<TResult>(Func<ValueTask<TResult>> func)
         {
-            return await func().ConfigureAwait(false);
+            return await func();
         }
     }
 }

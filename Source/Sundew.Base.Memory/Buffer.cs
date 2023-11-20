@@ -547,7 +547,7 @@ public class Buffer<TItem> : IBufferInternal<TItem>
     /// Writes the item without capacity checking.
     /// </summary>
     /// <param name="item">The item.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     void IBufferInternal<TItem>.WriteInternal(TItem item)
     {
         this.PrivateWrite(item);
@@ -582,7 +582,7 @@ public class Buffer<TItem> : IBufferInternal<TItem>
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private int PrivateWrite(TItem item)
     {
         this.InternalBuffer![this.Position++] = item;

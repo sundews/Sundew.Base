@@ -102,7 +102,7 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
         return ((IEnumerable<TItem>)this.inner).GetEnumerator();
@@ -112,7 +112,7 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public ImmutableArray<TItem>.Enumerator GetEnumerator()
     {
         return this.inner.GetEnumerator();
@@ -122,7 +122,7 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
     {
         return ((IEnumerable<TItem>)this.inner).GetEnumerator();

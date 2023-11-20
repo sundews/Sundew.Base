@@ -51,11 +51,31 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="option">The option.</param>
     /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
-    public static bool TryAdd<TItem>(this ICollection<TItem> collection, O<TItem> option)
+    public static bool TryAdd<TItem>(this ICollection<TItem> collection, TItem? option)
+        where TItem : struct
     {
         if (option.HasValue)
         {
             collection.Add(option.Value);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Adds the option value if it has one.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="collection">The collection.</param>
+    /// <param name="option">The option.</param>
+    /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
+    public static bool TryAdd<TItem>(this ICollection<TItem> collection, TItem? option)
+        where TItem : class
+    {
+        if (option.HasValue())
+        {
+            collection.Add(option);
             return true;
         }
 
@@ -126,8 +146,8 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="option">The option.</param>
     /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
-    public static bool TryAdd<TValue, TOptionList>(this ICollection<TValue> collection, O<TOptionList> option)
-        where TOptionList : IEnumerable<TValue>
+    public static bool TryAdd<TValue, TOptionList>(this ICollection<TValue> collection, TOptionList? option)
+        where TOptionList : struct, IEnumerable<TValue>
     {
         if (option.HasValue)
         {
@@ -143,10 +163,47 @@ public static class CollectionExtensions
     /// Adds the option value if it has one.
     /// </summary>
     /// <typeparam name="TValue">The value type.</typeparam>
+    /// <typeparam name="TOptionList">The result collection.</typeparam>
+    /// <param name="collection">The collection.</param>
+    /// <param name="option">The option.</param>
+    /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
+    public static bool TryAdd<TValue, TOptionList>(this ICollection<TValue> collection, TOptionList? option)
+        where TOptionList : class, IEnumerable<TValue>
+    {
+        if (option.HasValue())
+        {
+            var count = collection.Count;
+            collection.AddRange(option);
+            return count < collection.Count;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Adds the option value if it has one.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
     /// <param name="collection">The collection.</param>
     /// <param name="options">The options.</param>
     /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
-    public static bool TryAdd<TValue>(this ICollection<TValue> collection, IEnumerable<O<TValue>> options)
+    public static bool TryAdd<TValue>(this ICollection<TValue> collection, IEnumerable<TValue?> options)
+        where TValue : struct
+    {
+        var count = collection.Count;
+        collection.AddRange(options.GetValues());
+        return count < collection.Count;
+    }
+
+    /// <summary>
+    /// Adds the option value if it has one.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="collection">The collection.</param>
+    /// <param name="options">The options.</param>
+    /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
+    public static bool TryAdd<TValue>(this ICollection<TValue> collection, IEnumerable<TValue?> options)
+        where TValue : class
     {
         var count = collection.Count;
         collection.AddRange(options.GetValues());
@@ -161,8 +218,24 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="options">The options.</param>
     /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
-    public static bool TryAdd<TValue, TOptionList>(this ICollection<TValue> collection, IEnumerable<O<TOptionList>> options)
-        where TOptionList : IEnumerable<TValue>
+    public static bool TryAdd<TValue, TOptionList>(this ICollection<TValue> collection, IEnumerable<TOptionList?> options)
+        where TOptionList : struct, IEnumerable<TValue>
+    {
+        var count = collection.Count;
+        collection.AddRange(options.GetValues().SelectMany(x => x));
+        return count < collection.Count;
+    }
+
+    /// <summary>
+    /// Adds the option value if it has one.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <typeparam name="TOptionList">The result collection.</typeparam>
+    /// <param name="collection">The collection.</param>
+    /// <param name="options">The options.</param>
+    /// <returns><c>true</c>, if the value was added, otherwise <c>false</c>.</returns>
+    public static bool TryAdd<TValue, TOptionList>(this ICollection<TValue> collection, IEnumerable<TOptionList?> options)
+        where TOptionList : class, IEnumerable<TValue>
     {
         var count = collection.Count;
         collection.AddRange(options.GetValues().SelectMany(x => x));

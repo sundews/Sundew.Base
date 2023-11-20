@@ -171,7 +171,7 @@ public static class Equality
     /// <returns>
     /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static int GetHashCodeOrDefault<TObject>(this TObject? value)
         where TObject : class
     {
@@ -185,7 +185,7 @@ public static class Equality
     /// <returns>
     /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static int GetHashCode(params int[] hashcodes)
     {
         var hashCode = 0;
@@ -204,7 +204,7 @@ public static class Equality
     /// <returns>
     /// The hashcode.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static int GetUnorderedHashCode(params int[] hashcodes)
     {
         var hashCode = 0;
@@ -216,7 +216,7 @@ public static class Equality
         return hashCode;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static int CombineHashCode(int hashCode1, int hashcode2)
     {
         unchecked
@@ -225,7 +225,7 @@ public static class Equality
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static int CombineHashCodeUnordered(int hashCode1, int hashCode2)
     {
         return hashCode1 ^ hashCode2;

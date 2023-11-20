@@ -20,7 +20,7 @@ public static class Arrays
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <returns>An empty array.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static TItem[] Empty<TItem>()
     {
 #if NETSTANDARD1_3_OR_GREATER

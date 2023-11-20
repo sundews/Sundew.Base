@@ -88,7 +88,7 @@ public static class EnumExtensions
     /// <param name="result">The resulting enum.</param>
     /// <param name="ignoreCase">A value indicating whether character casing should be ignored.</param>
     /// <returns><c>true</c> if the specified value could be successfully parsed..</returns>
-    public static bool TryParseEnum<TEnum>(this string value, out TEnum result, bool ignoreCase = false)
+    public static bool TryParseEnum<TEnum>(this string? value, out TEnum result, bool ignoreCase = false)
         where TEnum : Enum
     {
 #if NETSTANDARD2_1
@@ -136,7 +136,7 @@ public static class EnumExtensions
     /// <returns>The parsed enum.</returns>
     /// <exception cref="ArgumentNullException">value.</exception>
     public static TEnum ParseFlagsEnum<TEnum>(
-        this string value,
+        this string? value,
         char separator = ',',
         bool ignoreCase = false)
         where TEnum : Enum
@@ -153,7 +153,7 @@ public static class EnumExtensions
     /// <returns>The parsed enum.</returns>
     /// <exception cref="ArgumentNullException">value.</exception>
     public static TEnum ParseFlagsEnum<TEnum>(
-        this string value,
+        this string? value,
         CultureInfo cultureInfo,
         char separator = ',',
         bool ignoreCase = false)
@@ -171,7 +171,7 @@ public static class EnumExtensions
     /// <param name="ignoreCase">if set to <c>true</c> [ignore case].</param>
     /// <returns>The parsed enum.</returns>
     public static bool TryParseFlagsEnum<TEnum>(
-        this string value,
+        this string? value,
         out TEnum result,
         char separator = ',',
         bool ignoreCase = false)
@@ -190,7 +190,7 @@ public static class EnumExtensions
     /// <returns>The parsed enum.</returns>
     /// <exception cref="ArgumentNullException">value.</exception>
     public static bool TryParseFlagsEnum<TEnum>(
-        this string value,
+        this string? value,
         CultureInfo cultureInfo,
         out TEnum result,
         char separator = ',',
@@ -201,7 +201,7 @@ public static class EnumExtensions
     }
 
     private static bool TryParseFlagsEnum<TEnum>(
-        this string value,
+        this string? value,
         CultureInfo cultureInfo,
         out TEnum result,
         bool throwOnError,

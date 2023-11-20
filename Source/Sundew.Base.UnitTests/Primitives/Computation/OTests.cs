@@ -14,25 +14,6 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
 
     public class OTests
     {
-        [Fact]
-        public void Some_Then_ValueShouldBeExpectedValue()
-        {
-            const int ExpectedValue = 34;
-
-            O<int> result = O.Some(ExpectedValue);
-
-            result.HasValue.Should().BeTrue();
-            result.Value.Should().Be(ExpectedValue);
-        }
-
-        [Fact]
-        public void ImplicitCast_When_OptionIsNone_Then_ValueShouldBeExpectedValue()
-        {
-            O<int> result = O.None;
-
-            result.HasValue.Should().BeFalse();
-        }
-
         [Theory]
         [InlineData(true, 34, 0)]
         [InlineData(false, 0, 23)]
@@ -41,7 +22,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             int expectedValue,
             int expectedError)
         {
-            var testee = O.From(expectedResult, expectedValue);
+            int? testee = expectedResult ? expectedValue : null;
 
             var result = testee.ToResult(Convert.ToDouble, expectedError);
 
@@ -61,7 +42,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             bool expectedResult,
             bool expectedHasValue)
         {
-            var testee = O.From(option, R.From(result, 1, 2));
+            R<int, int>? testee = option ? R.From(result, 1, 2) : null;
 
             var actualResult = testee.IsSuccess(out var optionalValue, out var failedResult);
 
@@ -70,58 +51,44 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             failedResult.IsSuccess.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public void ImplicitConversion_When_TargetIsNullableInt_Then_ResultBeExpectedResult()
+        [Theory]
+        [InlineData(true, 5, 5)]
+        [InlineData(false, 5, null)]
+        public void ToOption_When_OptionalValueIsStruct_Then_ResultShouldBeExpectedResult(bool option, int optionalValue, int? expectedResult)
         {
-            var intOption = O.Some(3);
+            var result = option.ToOption(optionalValue);
 
-            int? result = intOption;
-
-            result.HasValue.Should().Be(true);
-            result.Value.Should().Be(3);
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public void ExplicitConversion_When_TargetIsIntOption_Then_ResultBeExpectedResult()
+        [Theory]
+        [InlineData(true, "5", "5")]
+        [InlineData(false, "5", null)]
+        public void ToOption_When_OptionalValueIsClass_Then_ResultShouldBeExpectedResult(bool option, string optionalValue, string? expectedResult)
         {
-            int? nullableInt = 3;
+            var result = option.ToOption(optionalValue);
 
-            var result = (O<int>)nullableInt;
-
-            result.HasValue.Should().Be(true);
-            result.Value.Should().Be(3);
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public void ImplicitConversion_When_TargetIsNullableString_Then_ResultBeExpectedResult()
+        [Theory]
+        [InlineData(true, "5", "5")]
+        [InlineData(false, "5", null)]
+        public void From_Then_ResultShouldBeExpectedResult(bool option, string optionalValue, string? expectedResult)
         {
-            var intOption = O.Some("3");
+            var result = O.From(option, () => optionalValue);
 
-            string? result = intOption;
-
-            result.Should().Be("3");
+            result.Should().Be(expectedResult);
         }
 
-        [Fact]
-        public void ImplicitConversion_When_TargetIsStringOption_Then_ResultBeExpectedResult()
+        [Theory]
+        [InlineData(true, 5, 5)]
+        [InlineData(false, 5, default)]
+        public void FromValue_Then_ResultShouldBeExpectedResult2(bool option, int optionalValue, int? expectedResult)
         {
-            string? nullableInt = "3";
+            var result = O.FromValue(option, () => optionalValue);
 
-            O<string> result = nullableInt;
-
-            result.HasValue.Should().Be(true);
-            result.Value.Should().Be("3");
-        }
-
-        [Fact]
-        public void From_When_TargetIsIntOption_Then_ResultBeExpectedResult()
-        {
-            int? nullableInt = 3;
-
-            var result = O.From(nullableInt);
-
-            result.HasValue.Should().Be(true);
-            result.Value.Should().Be(3);
+            result.Should().Be(expectedResult);
         }
     }
 }

@@ -68,7 +68,7 @@ internal sealed class BufferSlice<TItem> : IBufferInternal<TItem>
         this.EnsureCapacity(this.Position + requiredAdditionalCapacity);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     void IBufferInternal<TItem>.WriteInternal(TItem item)
     {
         this.PrivateWrite(item);
@@ -252,7 +252,7 @@ internal sealed class BufferSlice<TItem> : IBufferInternal<TItem>
         return this.GetSpan(this.Position, sizeHint);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private int PrivateWrite(TItem item)
     {
         this[this.Position++] = item;

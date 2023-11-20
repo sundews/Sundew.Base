@@ -22,7 +22,7 @@ namespace Sundew.Base.UnitTests.Disposal
             var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
             var testee = new DisposableDerived();
 
-            await testee.DisposeAsync().ConfigureAwait(false);
+            await testee.DisposeAsync();
 
             testee.Calls.Should().Equal(expectedCalls);
         }
@@ -32,9 +32,9 @@ namespace Sundew.Base.UnitTests.Disposal
         {
             var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
             var testee = new DisposableDerived();
-            await testee.DisposeAsync().ConfigureAwait(false);
+            await testee.DisposeAsync();
 
-            await testee.DisposeAsync().ConfigureAwait(false);
+            await testee.DisposeAsync();
 
             testee.Calls.Should().Equal(expectedCalls);
         }

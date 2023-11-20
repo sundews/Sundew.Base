@@ -34,10 +34,26 @@ public static class ImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting list.</returns>
-    public static TList TryAdd<TList, TItem>(this TList immutableList, O<TItem> option)
+    public static TList TryAdd<TList, TItem>(this TList immutableList, TItem? option)
         where TList : IImmutableList<TItem>
+        where TItem : struct
     {
         return option.HasValue ? (TList)immutableList.Add(option.Value) : immutableList;
+    }
+
+    /// <summary>
+    /// Tries to add the option item if it has any.
+    /// </summary>
+    /// <typeparam name="TList">The list type.</typeparam>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableList">The immutable list.</param>
+    /// <param name="option">The option.</param>
+    /// <returns>The resulting list.</returns>
+    public static TList TryAdd<TList, TItem>(this TList immutableList, TItem? option)
+        where TList : IImmutableList<TItem>
+        where TItem : class
+    {
+        return option.HasValue() ? (TList)immutableList.Add(option) : immutableList;
     }
 
     /// <summary>

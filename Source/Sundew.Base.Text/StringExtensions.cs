@@ -30,7 +30,7 @@ public static class StringExtensions
     /// <returns>
     ///   <c>true</c> if [is null or empty] [the specified input]; otherwise, <c>false</c>.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsNullOrEmpty([NotNullWhen(false)] this string? input)
     {
         return string.IsNullOrEmpty(input);

@@ -32,7 +32,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder If(this StringBuilder stringBuilder, bool condition, Func<StringBuilder, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
     {
         return condition ? trueFunc(stringBuilder) : falseFunc?.Invoke(stringBuilder) ?? stringBuilder;
@@ -49,7 +49,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder If<TValue>(this StringBuilder stringBuilder, TValue? value, Func<StringBuilder, TValue, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
         where TValue : class
     {
@@ -67,7 +67,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder IfValue<TValue>(this StringBuilder stringBuilder, TValue value, Func<StringBuilder, TValue, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
         where TValue : struct, IEquatable<TValue>
     {
@@ -85,7 +85,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder If<TValue>(this StringBuilder stringBuilder, TValue? value, Func<StringBuilder, TValue, StringBuilder> trueFunc, Func<StringBuilder, StringBuilder>? falseFunc = null)
         where TValue : struct, IEquatable<TValue>
     {
@@ -101,7 +101,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, byte value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -116,7 +116,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, sbyte value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -131,7 +131,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, char value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -146,7 +146,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, char[] value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -161,7 +161,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, string value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -176,7 +176,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, short value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -191,7 +191,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, ushort value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -206,7 +206,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, int value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -221,7 +221,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, uint value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -236,7 +236,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, long value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -251,7 +251,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, ulong value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -266,7 +266,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, float value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -281,7 +281,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, double value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -296,7 +296,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, decimal value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -311,7 +311,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, ReadOnlySpan<char> value, bool condition)
     {
         return condition ? stringBuilder.Append(value) : stringBuilder;
@@ -327,7 +327,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider formatProvider, bool condition)
     {
         return condition ? stringBuilder.AppendFormat(formatProvider, Format, value) : stringBuilder;
@@ -342,7 +342,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The <see cref="StringBuilder" />.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider formatProvider)
     {
         return stringBuilder.AppendFormat(formatProvider, Format, value);
@@ -533,26 +533,26 @@ public static partial class StringBuilderExtensions
     }
 #endif
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static StringBuilder AppendRight(StringBuilder stringBuilder, string value, char paddingCharacter, int remainingCharacters)
     {
         return stringBuilder.Append(paddingCharacter, remainingCharacters).Append(value);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static StringBuilder AppendLeft(StringBuilder stringBuilder, string value, char paddingCharacter, int remainingCharacters)
     {
         return stringBuilder.Append(value).Append(paddingCharacter, remainingCharacters);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static StringBuilder AppendCenterLeft(StringBuilder stringBuilder, string value, char paddingCharacter, int remainingCharacters)
     {
         var remainingLeft = remainingCharacters / 2;
         return stringBuilder.Append(paddingCharacter, remainingLeft).Append(value).Append(paddingCharacter, remainingLeft + (remainingCharacters % 2));
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     private static StringBuilder AppendCenterRight(StringBuilder stringBuilder, string value, char paddingCharacter, int remainingCharacters)
     {
         var remainingRight = remainingCharacters / 2;

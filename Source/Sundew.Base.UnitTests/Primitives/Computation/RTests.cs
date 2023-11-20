@@ -97,5 +97,40 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
             value.Should().Be(ExpectedValue);
             error.Should().Be(ExpectedError);
         }
+
+        [Fact]
+        public void ImplicitCast_When_SuccessResultAndTargetIsOptionalStruct_Then_ResultShouldBeSuccessAndValueShouldBeNull()
+        {
+            var testee = R.Success();
+
+            R<int?, string> result = testee;
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().BeNull();
+        }
+
+        [Fact]
+        public void ImplicitCast_When_SuccessResultAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeNull()
+        {
+            var testee = R.Success();
+
+            R<string?, string> result = testee;
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().BeNull();
+        }
+
+        [Theory]
+        [InlineData("Value")]
+        [InlineData(null)]
+        public void ImplicitCast_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
+        {
+            var testee = R.SuccessOption(expectedResult);
+
+            R<string?, string> result = testee;
+
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(expectedResult);
+        }
     }
 }

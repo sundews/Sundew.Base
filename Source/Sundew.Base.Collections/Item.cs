@@ -18,17 +18,6 @@ public static class Item
     /// Converts the item into an item result.
     /// </summary>
     /// <typeparam name="TSuccess">The success type.</typeparam>
-    /// <param name="result">The result.</param>
-    /// <returns>An Item result.</returns>
-    public static Item<TSuccess> PassIfHasValue<TSuccess>(O<TSuccess> result)
-    {
-        return new Item<TSuccess>(result.Value, result.HasValue);
-    }
-
-    /// <summary>
-    /// Converts the item into an item result.
-    /// </summary>
-    /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="result">The result.</param>
     /// <returns>An Item result.</returns>
@@ -43,7 +32,7 @@ public static class Item
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An Item result.</returns>
-    public static Item<TItem> PassIfNotNull<TItem>(TItem? item)
+    public static Item<TItem> PassIfHasValue<TItem>(TItem? item)
     {
         return new Item<TItem>(item, !Equals(item, default));
     }
@@ -54,7 +43,7 @@ public static class Item
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An Item result.</returns>
-    public static Item<TItem> PassIfNotNull<TItem>(TItem? item)
+    public static Item<TItem> PassIfHasValue<TItem>(TItem? item)
         where TItem : struct
     {
         var hasValue = item.HasValue;
@@ -148,9 +137,22 @@ public static class Item
     /// <typeparam name="TValue">The value type.</typeparam>
     /// <param name="option">The option.</param>
     /// <returns>The new item.</returns>
-    public static Item<TValue> ToItem<TValue>(this O<TValue> option)
+    public static Item<TValue> ToItem<TValue>(this TValue? option)
+        where TValue : struct
     {
-        return new Item<TValue>(option.Value, option.HasValue);
+        return new Item<TValue>(option.GetValueOrDefault(default), option.HasValue);
+    }
+
+    /// <summary>
+    /// Converts the option to an item.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="option">The option.</param>
+    /// <returns>The new item.</returns>
+    public static Item<TValue> ToItem<TValue>(this TValue? option)
+        where TValue : class
+    {
+        return new Item<TValue>(option, option.HasValue());
     }
 
     /// <summary>

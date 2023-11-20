@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="R.SuccessResult{TValue}.cs" company="Sundews">
+// <copyright file="R.SuccessResultOption{TValue}.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -20,13 +20,13 @@ public partial class R
     /// A successful result.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public readonly struct SuccessResult<TValue>
+    public readonly struct SuccessResultOption<TValue>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SuccessResult{TValue}"/> struct.
+        /// Initializes a new instance of the <see cref="SuccessResultOption{TValue}"/> struct.
         /// </summary>
         /// <param name="value">The value.</param>
-        internal SuccessResult(TValue value)
+        internal SuccessResultOption(TValue value)
         {
             this.Value = value;
         }
@@ -45,7 +45,7 @@ public partial class R
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator bool(SuccessResult<TValue> result)
+        public static implicit operator bool(SuccessResultOption<TValue> result)
         {
             return true;
         }
@@ -56,7 +56,7 @@ public partial class R
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator TValue(SuccessResult<TValue> result)
+        public static implicit operator TValue(SuccessResultOption<TValue> result)
         {
             return result.Value;
         }
@@ -65,7 +65,7 @@ public partial class R
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator ValueTask<SuccessResult<TValue>>(SuccessResult<TValue> result)
+        public static implicit operator ValueTask<SuccessResultOption<TValue?>>(SuccessResultOption<TValue?> result)
         {
             return result.ToValueTask();
         }
@@ -74,9 +74,9 @@ public partial class R
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator SuccessResult<TValue?>(SuccessResult result)
+        public static implicit operator SuccessResultOption<TValue?>(SuccessResult result)
         {
-            return new SuccessResult<TValue?>(default(TValue?));
+            return new SuccessResultOption<TValue?>(default(TValue?));
         }
 
         /// <summary>
@@ -84,9 +84,9 @@ public partial class R
         /// </summary>
         /// <returns>The value task.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public ValueTask<SuccessResult<TValue>> ToValueTask()
+        public ValueTask<SuccessResultOption<TValue?>> ToValueTask()
         {
-            return new ValueTask<SuccessResult<TValue>>(this);
+            return new ValueTask<SuccessResultOption<TValue?>>(this);
         }
 
         /// <summary>
@@ -97,9 +97,9 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public SuccessResult<TNewValue> To<TNewValue>(Func<TValue, TNewValue> valueFunc)
+        public SuccessResultOption<TNewValue?> To<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
-            return new SuccessResult<TNewValue>(valueFunc(this.Value));
+            return new SuccessResultOption<TNewValue?>(valueFunc(this.Value));
         }
 
         /// <summary>
@@ -110,9 +110,9 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ValueTask<SuccessResult<TNewValue>> ToAsync<TNewValue>(Func<TValue, TNewValue> valueFunc)
+        public ValueTask<SuccessResultOption<TNewValue?>> ToAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
-            return new SuccessResult<TNewValue>(valueFunc(this.Value)).ToValueTask();
+            return new SuccessResultOption<TNewValue?>(valueFunc(this.Value)).ToValueTask();
         }
 
         /// <summary>

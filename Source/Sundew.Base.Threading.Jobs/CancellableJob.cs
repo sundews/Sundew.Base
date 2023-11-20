@@ -67,7 +67,7 @@ public sealed class CancellableJob : IJob
     /// Starts the job.
     /// </summary>
     /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    public O<CancellationToken> Start()
+    public CancellationToken? Start()
     {
         return this.cancellableJob.Start();
     }

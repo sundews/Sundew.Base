@@ -78,10 +78,32 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     }
 
     /// <summary>
+    /// Checks whether the two items are equal.
+    /// </summary>
+    /// <param name="left">The left.</param>
+    /// <param name="right">The right.</param>
+    /// <returns><c>true</c> if equal otherwise <c>false</c>.</returns>
+    public static bool operator ==(ValueList<TItem> left, ValueList<TItem> right)
+    {
+        return left.Equals(right);
+    }
+
+    /// <summary>
+    /// Checks whether the two items are inequal.
+    /// </summary>
+    /// <param name="left">The left.</param>
+    /// <param name="right">The right.</param>
+    /// <returns><c>true</c> if inequal otherwise <c>false</c>.</returns>
+    public static bool operator !=(ValueList<TItem> left, ValueList<TItem> right)
+    {
+        return !(left == right);
+    }
+
+    /// <summary>
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.inner.GetEnumerator();
@@ -91,7 +113,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
     {
         return this.inner.GetEnumerator();

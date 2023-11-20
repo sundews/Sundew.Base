@@ -13,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.0.4">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -30,7 +30,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Sundew.DiscriminatedUnions" Version="5.0.0" />
-    <PackageReference Include="Sundew.Packaging.Publish" Version="8.2.2">
+    <PackageReference Include="Sundew.Packaging.Publish" Version="8.2.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

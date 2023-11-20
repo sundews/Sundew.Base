@@ -50,7 +50,7 @@ namespace Sundew.Base.UnitTests.Text
         [InlineData("A long text that should be limited", "{0:10,-<>D}", @"/A long... \")]
         [InlineData("A long text             with space", "{0:18,-<>D}", @"/A long text...    \")]
         [InlineData("A long text             with space", "{0:18,-<>E}", @"/A long text…      \")]
-        public void Format_Then_ResultShouldBeExpectedResult(object value, string format, string expectedResult)
+        public void Format_Then_ResultShouldBeExpectedResult(object? value, string format, string expectedResult)
         {
             var result = AlignedString.FormatInvariant($@"/{format}\", value);
 

@@ -21,33 +21,32 @@ namespace Sundew.Base.UnitTests.Threading
         private const int ExpectedResult = 5;
 
         [Fact]
-        public void TryLockAsync_When_CheckIsNotCalled_Then_LockNotConfirmedExceptionShouldBeThrown()
+        public async Task TryLockAsync_When_CheckIsNotCalled_Then_LockNotConfirmedExceptionShouldBeThrown()
         {
             static async Task<int> LockTest()
             {
                 var testee = new AsyncLock();
-                using (await testee.TryLockAsync().ConfigureAwait(false))
+                using (await testee.TryLockAsync())
                 {
                     return ExpectedResult;
                 }
             }
 
-            var task = LockTest();
-            Action test = () =>
+            Func<Task> test = async () =>
             {
-                var ignored = task.Result;
+                var ignored = await LockTest();
             };
 
-            test.Should().Throw<LockNotConfirmedException>();
+            await test.Should().ThrowAsync<LockNotConfirmedException>();
         }
 
         [Fact]
-        public void TryLockAsync_When_CheckIsCalled_Then_ResultShouldBeExpectedResult()
+        public async Task TryLockAsync_When_CheckIsCalled_Then_ResultShouldBeExpectedResult()
         {
             static async Task<int> LockTest()
             {
                 var testee = new AsyncLock();
-                using (var lockResult = await testee.TryLockAsync().ConfigureAwait(false))
+                using (var lockResult = await testee.TryLockAsync())
                 {
                     if (lockResult)
                     {
@@ -58,7 +57,7 @@ namespace Sundew.Base.UnitTests.Threading
             }
 
             var task = LockTest();
-            var result = task.Result;
+            var result = await task;
 
             result.Should().Be(ExpectedResult);
         }
@@ -72,7 +71,7 @@ namespace Sundew.Base.UnitTests.Threading
             using (var testee = new ContinuousJob(
                 async c =>
                 {
-                    using (var result = await asyncLock.TryLockAsync(c).ConfigureAwait(false))
+                    using (var result = await asyncLock.TryLockAsync(c))
                     {
                         if (result)
                         {
@@ -87,7 +86,7 @@ namespace Sundew.Base.UnitTests.Threading
                 for (int i = 0; i < 100; i++)
                 {
                     var value = i;
-                    using (var result = await asyncLock.TryLockAsync(startResult.Value).ConfigureAwait(false))
+                    using (var result = await asyncLock.TryLockAsync(startResult.GetValueOrDefault(CancellationToken.None)))
                     {
                         if (result)
                         {
