@@ -20,7 +20,7 @@ public static class CharExtensions
     /// <param name="character">The character.</param>
     /// <param name="count">The count.</param>
     /// <returns>The string with repeated characters.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static string Repeat(this char character, int count)
     {
         if (count <= 0)

@@ -131,7 +131,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.inner.GetEnumerator();
@@ -141,7 +141,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
         return this.inner.GetEnumerator();
@@ -151,7 +151,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
     {
         return this.inner.GetEnumerator();

@@ -103,7 +103,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.inner.GetEnumerator();
@@ -113,7 +113,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// Gets the enumerator.
     /// </summary>
     /// <returns>The enumerator.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
     {
         return this.inner.GetEnumerator();

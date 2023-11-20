@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionTests.cs" company="Sundews">
+// <copyright file="OTests.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,7 +12,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
     using Sundew.Base.Primitives.Computation;
     using Xunit;
 
-    public class OptionTests
+    public class OTests
     {
         [Theory]
         [InlineData(true, 34, 0)]
@@ -54,9 +54,9 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         [Theory]
         [InlineData(true, 5, 5)]
         [InlineData(false, 5, null)]
-        public void ToOptionalValue_Then_ResultShouldBeExpectedResult(bool option, int optionalValue, int? expectedResult)
+        public void ToOption_When_OptionalValueIsStruct_Then_ResultShouldBeExpectedResult(bool option, int optionalValue, int? expectedResult)
         {
-            var result = option.ToOptionalValue(optionalValue);
+            var result = option.ToOption(optionalValue);
 
             result.Should().Be(expectedResult);
         }
@@ -64,9 +64,29 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         [Theory]
         [InlineData(true, "5", "5")]
         [InlineData(false, "5", null)]
-        public void ToOption_Then_ResultShouldBeExpectedResult(bool option, string optionalValue, string? expectedResult)
+        public void ToOption_When_OptionalValueIsClass_Then_ResultShouldBeExpectedResult(bool option, string optionalValue, string? expectedResult)
         {
             var result = option.ToOption(optionalValue);
+
+            result.Should().Be(expectedResult);
+        }
+
+        [Theory]
+        [InlineData(true, "5", "5")]
+        [InlineData(false, "5", null)]
+        public void From_Then_ResultShouldBeExpectedResult(bool option, string optionalValue, string? expectedResult)
+        {
+            var result = O.From(option, () => optionalValue);
+
+            result.Should().Be(expectedResult);
+        }
+
+        [Theory]
+        [InlineData(true, 5, 5)]
+        [InlineData(false, 5, default)]
+        public void FromValue_Then_ResultShouldBeExpectedResult2(bool option, int optionalValue, int? expectedResult)
+        {
+            var result = O.FromValue(option, () => optionalValue);
 
             result.Should().Be(expectedResult);
         }

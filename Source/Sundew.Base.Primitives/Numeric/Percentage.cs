@@ -263,7 +263,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <returns>
     ///   <c>true</c> if parsing was successful otherwise <c>false</c>.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static bool TryParse(string input, out Percentage percentage)
     {
         return TryParse(input, CultureInfo.CurrentCulture, out percentage);
@@ -278,7 +278,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <returns>
     ///   <c>true</c> if parsing was successful otherwise <c>false</c>.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static bool TryParse(string input, CultureInfo cultureInfo, out Percentage percentage)
     {
         return TryParse(input, cultureInfo.NumberFormat, out percentage);
@@ -315,7 +315,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// </returns>
     /// <exception cref="ArgumentException">percentage.</exception>
     /// <exception cref="FormatException">The culture info number format was invalid.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Percentage Parse(string input)
     {
         return Parse(input, CultureInfo.CurrentCulture);
@@ -331,7 +331,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// </returns>
     /// <exception cref="ArgumentException">percentage.</exception>
     /// <exception cref="FormatException">The culture info number format was invalid.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Percentage Parse(string input, CultureInfo cultureInfo)
     {
         return Parse(input, cultureInfo.NumberFormat);
@@ -345,7 +345,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <returns>
     /// A percentage.
     /// </returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Percentage Parse(string input, NumberFormatInfo numberFormatInfo)
     {
         return TryParse(input, numberFormatInfo, true).GetValueOrDefault(default);
@@ -356,7 +356,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// </summary>
     /// <param name="input">The input.</param>
     /// <returns>A percentage result.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Percentage? TryParse(string input)
     {
         return TryParse(input, CultureInfo.CurrentCulture);
@@ -368,7 +368,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <param name="input">The input.</param>
     /// <param name="cultureInfo">The culture information.</param>
     /// <returns>A percentage result.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Percentage? TryParse(string input, CultureInfo cultureInfo)
     {
         return TryParse(input, cultureInfo.NumberFormat);
@@ -380,7 +380,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
     /// <param name="input">The input.</param>
     /// <param name="numberFormatInfo">The number format information.</param>
     /// <returns>A percentage result.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Percentage? TryParse(string input, NumberFormatInfo numberFormatInfo)
     {
         return TryParse(input, numberFormatInfo, false);

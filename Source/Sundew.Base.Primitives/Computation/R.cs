@@ -87,9 +87,9 @@ public static partial class R
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
-    public static SuccessResult<TValue?> ToSuccessOption<TValue>(this TValue? value)
+    public static SuccessResultOption<TValue?> ToSuccessOption<TValue>(this TValue? value)
     {
-        return new SuccessResult<TValue?>(value);
+        return new SuccessResultOption<TValue?>(value);
     }
 
     /// <summary>
@@ -132,7 +132,6 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     public static R<TError> From<TError>(TError? error)
-        where TError : class
     {
         return new R<TError>(error == null, error);
     }
@@ -146,7 +145,6 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     public static R<TError> ToResult<TError>(this TError? error)
-        where TError : class
     {
         return new R<TError>(error == null, error);
     }
@@ -343,7 +341,7 @@ public static partial class R
     public static ValueTask<R<TError>> FromAsync<TError>(TError? error)
         where TError : class
     {
-        return new R<TError>(error == null, error).ToValueTask();
+        return new R<TError>(error == null, error);
     }
 
     /// <summary>
@@ -357,6 +355,6 @@ public static partial class R
     public static ValueTask<R<TError>> ToResultAsync<TError>(this TError? error)
         where TError : class
     {
-        return new R<TError>(error == null, error).ToValueTask();
+        return new R<TError>(error == null, error);
     }
 }

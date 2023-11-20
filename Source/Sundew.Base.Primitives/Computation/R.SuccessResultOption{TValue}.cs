@@ -44,7 +44,7 @@ public partial class R
         /// </summary>
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public static implicit operator bool(SuccessResultOption<TValue> result)
         {
             return true;
@@ -55,7 +55,7 @@ public partial class R
         /// </summary>
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public static implicit operator TValue(SuccessResultOption<TValue> result)
         {
             return result.Value;
@@ -64,7 +64,7 @@ public partial class R
         /// <summary>Performs an implicit conversion from <see cref="ValueTask{SuccessResult}"/> to <see cref="SuccessResult{TValue}"/>.</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public static implicit operator ValueTask<SuccessResultOption<TValue?>>(SuccessResultOption<TValue?> result)
         {
             return result.ToValueTask();
@@ -73,7 +73,7 @@ public partial class R
         /// <summary>Performs an implicit conversion from <see cref="ValueTask{SuccessResult}"/> to <see cref="SuccessResult{TValue}"/>.</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public static implicit operator SuccessResultOption<TValue?>(SuccessResult result)
         {
             return new SuccessResultOption<TValue?>(default(TValue?));
@@ -83,7 +83,7 @@ public partial class R
         /// Converts this instance to a value task.
         /// </summary>
         /// <returns>The value task.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public ValueTask<SuccessResultOption<TValue?>> ToValueTask()
         {
             return new ValueTask<SuccessResultOption<TValue?>>(this);
