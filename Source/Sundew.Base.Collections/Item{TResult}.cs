@@ -8,7 +8,6 @@
 namespace Sundew.Base.Collections;
 
 using System.Diagnostics.CodeAnalysis;
-using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// Represents the result of selecting an ensured item.
