@@ -34,7 +34,7 @@ Sundew.Base.Timers
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.Packaging.Publish" Version="8.2.4">
+    <PackageReference Include="Sundew.Packaging.Publish" Version="8.2.5-u20231124-235832-ci">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
