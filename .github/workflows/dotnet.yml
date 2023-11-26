@@ -87,9 +87,9 @@ jobs:
         git config user.name "${{ secrets.BUILD_USERNAME }}"
         git tag -a v.${{ steps.stage-build.outputs.version }} -m "v.${{ steps.stage-build.outputs.version }}"
         git push ${{ env.repository }} v.${{ steps.stage-build.outputs.version }}
-    - name: 'Await stable package publish'
-      if: ${{ steps.stage-build.outputs.stage == 'production' }}
-      run: cb -c "spt|await -s ${{ steps.stage-build.outputs.feedSource }} {0}.{2}" -bs NewLine -bvs '=' -bf ${{ env.source-packages-to-push }}
     - name: 'Summary'
       run: |
         echo '### Pushed version: ${{ steps.stage-build.outputs.fullVersion }}' >> $GITHUB_STEP_SUMMARY
+    - name: 'Await stable package publish'
+      if: ${{ steps.stage-build.outputs.stage == 'production' }}
+      run: cb -c "spt|await -s ${{ steps.stage-build.outputs.feedSource }} {0}.{2}" -bs NewLine -bvs '=' -bf ${{ env.source-packages-to-push }}
