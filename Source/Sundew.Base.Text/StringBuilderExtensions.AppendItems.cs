@@ -17,6 +17,7 @@ using System.Text;
 /// </summary>
 public static partial class StringBuilderExtensions
 {
+#if !Analyzer
     /// <summary>
     /// Joins the specified enumerable to string builder.
     /// </summary>
@@ -44,6 +45,7 @@ public static partial class StringBuilderExtensions
     {
         return AppendItems(stringBuilder, enumerable, separator, CultureInfo.CurrentCulture);
     }
+#endif
 
     /// <summary>
     /// Joins the specified enumerable to string builder.
@@ -107,6 +109,7 @@ public static partial class StringBuilderExtensions
         return InternalAppendItems(stringBuilder, enumerable, separator, CultureInfo.InvariantCulture, skipNullValues);
     }
 
+#if !Analyzer
     /// <summary>
     /// Joins the specified enumerable to string builder.
     /// </summary>
@@ -140,6 +143,7 @@ public static partial class StringBuilderExtensions
     {
         return InternalAppendItems(stringBuilder, enumerable, separator, CultureInfo.CurrentCulture, skipNullValues);
     }
+#endif
 
     /// <summary>
     /// Joins the specified enumerable to string builder.

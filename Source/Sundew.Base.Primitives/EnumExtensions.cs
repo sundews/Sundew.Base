@@ -128,6 +128,7 @@ public static class EnumExtensions
         return false;
     }
 
+#if !Analyzer
     /// <summary>Parses the value string to an enum with multiple values (flags).</summary>
     /// <typeparam name="TEnum">The type of the enum.</typeparam>
     /// <param name="value">The value.</param>
@@ -143,6 +144,7 @@ public static class EnumExtensions
     {
         return value.ParseFlagsEnum<TEnum>(CultureInfo.CurrentCulture, separator, ignoreCase);
     }
+#endif
 
     /// <summary>Parses the value string to an enum with multiple values (flags).</summary>
     /// <typeparam name="TEnum">The type of the enum.</typeparam>
@@ -163,6 +165,7 @@ public static class EnumExtensions
         return result;
     }
 
+#if !Analyzer
     /// <summary>Parses the value string to an enum with multiple values (flags).</summary>
     /// <typeparam name="TEnum">The type of the enum.</typeparam>
     /// <param name="value">The value.</param>
@@ -179,6 +182,7 @@ public static class EnumExtensions
     {
         return value.TryParseFlagsEnum(CultureInfo.CurrentCulture, out result, separator, ignoreCase);
     }
+#endif
 
     /// <summary>Parses the value string to an enum with multiple values (flags).</summary>
     /// <typeparam name="TEnum">The type of the enum.</typeparam>

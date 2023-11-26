@@ -162,4 +162,34 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     {
         return obj is ValueList<TItem> other && this.Equals(other);
     }
+
+    /// <summary>
+    /// Adds the item and returns a newly created list with containing the item.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueList<TItem> Add(TItem item)
+    {
+        return this.inner.Add(item).ToValueList();
+    }
+
+    /// <summary>
+    /// Removes the item and returns a newly created list.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueList<TItem> Remove(TItem item)
+    {
+        return this.inner.Remove(item).ToValueList();
+    }
+
+    /// <summary>
+    /// A value that indicates whether the item exists in the list.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <returns><c>true</c> if the item exists, otherwise <c>false</c>.</returns>
+    public bool Contains(TItem item)
+    {
+        return this.inner.Contains(item);
+    }
 }

@@ -156,4 +156,34 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     {
         return obj is ValueArray<TItem> other && this.Equals(other);
     }
+
+    /// <summary>
+    /// Adds the item and returns a newly created array with containing the item.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueArray<TItem> Add(TItem item)
+    {
+        return this.inner.Add(item);
+    }
+
+    /// <summary>
+    /// Removes the item and returns a newly created array.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueArray<TItem> Remove(TItem item)
+    {
+        return this.inner.Remove(item);
+    }
+
+    /// <summary>
+    /// A value that indicates whether the item exists in the array.
+    /// </summary>
+    /// <param name="item">The item.</param>
+    /// <returns><c>true</c> if the item exists, otherwise <c>false</c>.</returns>
+    public bool Contains(TItem item)
+    {
+        return this.inner.Contains(item);
+    }
 }

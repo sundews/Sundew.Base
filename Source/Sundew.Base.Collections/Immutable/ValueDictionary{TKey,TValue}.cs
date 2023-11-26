@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 /// <summary>
@@ -225,5 +226,15 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     public ValueDictionary<TKey, TValue> Add(TKey key, TValue value)
     {
         return new ValueDictionary<TKey, TValue>(this.inner.Add(key, value));
+    }
+
+    /// <summary>
+    /// Removes the item and returns a newly created array.
+    /// </summary>
+    /// <param name="key">The key.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueDictionary<TKey, TValue> Remove(TKey key)
+    {
+        return this.inner.Remove(key).ToValueDictionary();
     }
 }
