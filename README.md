@@ -35,7 +35,7 @@ IAsyncDisposable is only supported on .NETStandard2.1
 * Interval represents an interval of two values.
 * Percentage as a value type.
 * DateTime provider.
-* Result type (R) and Option type (O).
+* Result types (R\<T, E\> and R\<E\>) and Option type T? (through extension methods).
 * Attempter for implementing retry logic.
 
 ## Text
