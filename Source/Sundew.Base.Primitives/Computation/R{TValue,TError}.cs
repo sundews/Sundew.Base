@@ -319,6 +319,28 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TNewValue">The new value type.</typeparam>
+    /// <param name="successFunc">The success function.</param>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>The new value.</returns>
+    public TNewValue Evaluate<TNewValue>(Func<TValue, TNewValue> successFunc, Func<TError, TNewValue> errorFunc)
+    {
+        return this.IsSuccess ? successFunc(this.Value) : errorFunc(this.Error);
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>The new value.</returns>
+    public TValue Evaluate(Func<TError, TValue> errorFunc)
+    {
+        return this.IsSuccess ? this.Value : errorFunc(this.Error);
+    }
+
+    /// <summary>
     /// Returns a <see cref="string" /> that represents this instance.
     /// </summary>
     /// <returns>

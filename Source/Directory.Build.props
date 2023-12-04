@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Version>11.0</Version>
+    <Version>11.1</Version>
     <OutputPath>bin/$(Configuration)</OutputPath>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
