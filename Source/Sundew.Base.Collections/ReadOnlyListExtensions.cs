@@ -134,8 +134,8 @@ public static class ReadOnlyListExtensions
     {
         if (sourceArray == null)
         {
-#if NETSTANDARD2_1
-                return Array.Empty<TOutItem>();
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
+            return Array.Empty<TOutItem>();
 #else
             return new TOutItem[0];
 #endif

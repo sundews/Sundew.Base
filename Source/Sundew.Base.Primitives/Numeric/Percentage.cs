@@ -571,7 +571,7 @@ public readonly struct Percentage : IEquatable<Percentage>, IComparable<Percenta
             return default;
         }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
         var isNegative = input.Contains('-', StringComparison.Ordinal);
 #else
         const string dash = "-";

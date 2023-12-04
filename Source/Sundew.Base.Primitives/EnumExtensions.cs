@@ -9,6 +9,7 @@ namespace Sundew.Base.Primitives;
 
 using System;
 using System.Globalization;
+using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// Extends enumerations with easy to use methods.
@@ -91,11 +92,17 @@ public static class EnumExtensions
     public static bool TryParseEnum<TEnum>(this string? value, out TEnum result, bool ignoreCase = false)
         where TEnum : Enum
     {
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
         if (Enum.TryParse(typeof(TEnum), value, ignoreCase, out var actualValue))
         {
-            result = (TEnum)actualValue;
-            return true;
+            if (actualValue.HasValue())
+            {
+                result = (TEnum)actualValue;
+                return true;
+            }
+
+            result = default!;
+            return false;
         }
 #else
         if (value == null)

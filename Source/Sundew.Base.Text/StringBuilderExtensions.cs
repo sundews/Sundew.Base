@@ -398,7 +398,7 @@ public static partial class StringBuilderExtensions
         return stringBuilder.ToString(index, stringBuilder.Length - index - fromEnd.Value);
     }
 
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
     /// <summary>
     /// Converts to string.
     /// </summary>
