@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ImmutableTests.cs" company="Sundews">
+// <copyright file="ImmutableHashSetTests.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,7 +12,7 @@ using FluentAssertions;
 using Sundew.Base.Collections.Immutable;
 using Xunit;
 
-public class ImmutableTests
+public class ImmutableHashSetTests
 {
     [Fact]
     public void TryAdd_Then_IsNewShouldBeTrue()

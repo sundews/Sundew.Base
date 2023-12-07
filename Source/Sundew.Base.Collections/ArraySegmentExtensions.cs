@@ -23,7 +23,7 @@ public static class ArraySegmentExtensions
     /// <returns>The requested item.</returns>
     public static TItem GetValue<TItem>(this ArraySegment<TItem> arraySegment, int index)
     {
-        return arraySegment.Array[arraySegment.Offset + index];
+        return arraySegment.Array![arraySegment.Offset + index];
     }
 
     /// <summary>
@@ -38,7 +38,7 @@ public static class ArraySegmentExtensions
     /// </returns>
     public static TItem SetValue<TItem>(this ArraySegment<TItem> arraySegment, int index, TItem value)
     {
-        return arraySegment.Array[arraySegment.Offset + index] = value;
+        return arraySegment.Array![arraySegment.Offset + index] = value;
     }
 
     /// <summary>
@@ -51,7 +51,7 @@ public static class ArraySegmentExtensions
     /// <returns>The new <see cref="ArraySegment{TItem}"/>.</returns>
     public static ArraySegment<TItem> GetSegment<TItem>(this ArraySegment<TItem> arraySegment, int offset, int count)
     {
-        return new ArraySegment<TItem>(arraySegment.Array, arraySegment.Offset + offset, count);
+        return new ArraySegment<TItem>(arraySegment.Array!, arraySegment.Offset + offset, count);
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public static class ArraySegmentExtensions
     /// <param name="count">The count.</param>
     public static void CopyTo<TItem>(this ArraySegment<TItem> sourceArraySegment, int sourceIndex, TItem[] targetArray, int targetIndex, int count)
     {
-        sourceArraySegment.Array.CopyTo(sourceArraySegment.Offset + sourceIndex, targetArray, targetIndex, count);
+        sourceArraySegment.Array!.CopyTo(sourceArraySegment.Offset + sourceIndex, targetArray, targetIndex, count);
     }
 
     /// <summary>

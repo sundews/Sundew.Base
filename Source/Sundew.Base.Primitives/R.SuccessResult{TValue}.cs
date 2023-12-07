@@ -5,9 +5,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation;
+namespace Sundew.Base.Primitives;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -87,6 +88,19 @@ public partial class R
         public ValueTask<SuccessResult<TValue>> ToValueTask()
         {
             return new ValueTask<SuccessResult<TValue>>(this);
+        }
+
+        /// <summary>
+        /// Creates a result based on the specified values.
+        /// </summary>
+        /// <typeparam name="TError">The type of the error.</typeparam>
+        /// <returns>
+        /// A new <see cref="R" />.
+        /// </returns>
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
+        public R<TValue, TError> _<TError>()
+        {
+            return this;
         }
 
         /// <summary>

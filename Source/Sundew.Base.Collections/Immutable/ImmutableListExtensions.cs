@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ImmutableListExtensions.cs" company="Sundews">
+// <copyright file="ResultImmutableListExtensions.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -8,7 +8,7 @@
 namespace Sundew.Base.Collections.Immutable;
 
 using System.Collections.Immutable;
-using Sundew.Base.Primitives.Computation;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Extension methods for <see cref="IImmutableList{T}"/>.
@@ -27,7 +27,7 @@ public static class ImmutableListExtensions
     }
 
     /// <summary>
-    /// Tries to add the option item if it has any.
+    /// Add the option item if it has any.
     /// </summary>
     /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TItem">The item type.</typeparam>
@@ -42,7 +42,7 @@ public static class ImmutableListExtensions
     }
 
     /// <summary>
-    /// Tries to add the option item if it has any.
+    /// Add the option item if it has any.
     /// </summary>
     /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TItem">The item type.</typeparam>
@@ -57,21 +57,7 @@ public static class ImmutableListExtensions
     }
 
     /// <summary>
-    /// Tries to add the result item if it has any.
-    /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
-    /// <typeparam name="TItem">The item type.</typeparam>
-    /// <param name="immutableList">The immutable list.</param>
-    /// <param name="result">The result.</param>
-    /// <returns> The resulting list.</returns>
-    public static TList TryAdd<TList, TItem>(this TList immutableList, R<TItem> result)
-        where TList : IImmutableList<TItem>
-    {
-        return result.IsSuccess ? immutableList : (TList)immutableList.Add(result.Error);
-    }
-
-    /// <summary>
-    /// Tries to add the result item if it has any.
+    /// Add the result value if it succeeded.
     /// </summary>
     /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TSuccess">The success type.</typeparam>
@@ -86,7 +72,50 @@ public static class ImmutableListExtensions
     }
 
     /// <summary>
-    /// Tries to add the result item if it has any.
+    /// Add the result error if the result failed.
+    /// </summary>
+    /// <typeparam name="TList">The list type.</typeparam>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableList">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TList TryAddError<TList, TItem>(this TList immutableList, R<TItem> result)
+        where TList : IImmutableList<TItem>
+    {
+        return result.IsSuccess ? immutableList : (TList)immutableList.Add(result.Error);
+    }
+
+    /// <summary>
+    /// Add the result error if the result failed.
+    /// </summary>
+    /// <typeparam name="TList">The list type.</typeparam>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <typeparam name="TError">The item type.</typeparam>
+    /// <param name="immutableList">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TList TryAddError<TList, TSuccess, TError>(this TList immutableList, R<TSuccess, TError> result)
+        where TList : IImmutableList<TError>
+    {
+        return result.IsSuccess ? immutableList : (TList)immutableList.Add(result.Error);
+    }
+
+    /// <summary>
+    /// Add the result error if has any.
+    /// </summary>
+    /// <typeparam name="TList">The list type.</typeparam>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="immutableList">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TList TryAddAnyError<TList, TItem>(this TList immutableList, R<TItem> result)
+        where TList : IImmutableList<TItem>
+    {
+        return result.HasError ? (TList)immutableList.Add(result.Error) : immutableList;
+    }
+
+    /// <summary>
+    /// Add the result error if it has any.
     /// </summary>
     /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TSuccess">The success type.</typeparam>
@@ -94,7 +123,7 @@ public static class ImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddError<TList, TSuccess, TError>(this TList immutableList, R<TSuccess, TError> result)
+    public static TList TryAddAnyError<TList, TSuccess, TError>(this TList immutableList, R<TSuccess, TError> result)
         where TList : IImmutableList<TError>
     {
         return result.HasError ? (TList)immutableList.Add(result.Error) : immutableList;

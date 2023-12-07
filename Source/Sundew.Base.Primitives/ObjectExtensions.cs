@@ -35,7 +35,7 @@ public static class ObjectExtensions
     /// <typeparam name="TObject">The type of the object.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>A string.</returns>
-    public static string ToStringOrEmpty<TObject>(this TObject value)
+    public static string ToStringOrEmpty<TObject>(this TObject? value)
     {
         if (value == null)
         {

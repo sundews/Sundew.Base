@@ -32,7 +32,7 @@ public sealed class ReferenceEqualityComparer<TObject> : IEqualityComparer<TObje
     /// <param name="x">The x object.</param>
     /// <param name="y">The y object.</param>
     /// <returns><c>true</c>, if the specified objects are reference equal.</returns>
-    public bool Equals(TObject x, TObject y)
+    public bool Equals(TObject? x, TObject? y)
     {
         return ReferenceEquals(x, y);
     }

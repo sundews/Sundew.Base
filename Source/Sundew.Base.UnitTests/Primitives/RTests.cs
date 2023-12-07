@@ -5,11 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Primitives.Computation
+namespace Sundew.Base.UnitTests.Primitives
 {
     using System;
     using FluentAssertions;
-    using Sundew.Base.Primitives.Computation;
+    using Sundew.Base.Primitives;
     using Xunit;
 
     public class RTests
@@ -77,7 +77,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             var testee = R.From(expectedResult, () => expectedError);
 
-            var result = testee.To(expectedValue);
+            var result = testee.With(expectedValue);
 
             result.IsSuccess.Should().Be(expectedResult);
             result.Value.Should().Be(expectedValue);
@@ -131,6 +131,33 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
 
             result.IsSuccess.Should().BeTrue();
             result.Value.Should().Be(expectedResult);
+        }
+
+        [Fact]
+        public void ToOptionalResult_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+        {
+            var testee = R.SuccessOption(default(string));
+
+            R<string?, string> r = testee;
+
+            var result = r.ToOptionalResult();
+
+            result.HasValue.Should().BeFalse();
+            result.GetValueOrDefault().Value.Should().BeNull();
+        }
+
+        [Fact]
+        public void ToOptionalResult_When_NullAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+        {
+            var expectedResult = "Value";
+            var testee = R.SuccessOption(expectedResult);
+
+            R<string?, string> r = testee;
+
+            var result = r.ToOptionalResult();
+
+            result.HasValue.Should().BeTrue();
+            result.GetValueOrDefault().Value.Should().Be(expectedResult);
         }
     }
 }

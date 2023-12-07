@@ -5,11 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Primitives.Computation
+namespace Sundew.Base.UnitTests.Primitives
 {
     using System;
     using FluentAssertions;
-    using Sundew.Base.Primitives.Computation;
+    using Sundew.Base.Primitives;
     using Xunit;
 
     public class OTests

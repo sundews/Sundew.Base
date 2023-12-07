@@ -45,7 +45,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.DiscriminatedUnions" Version="5.1.0" />
+    <PackageReference Include="Sundew.DiscriminatedUnions" Version="5.2.0" />
     <PackageReference Include="Sundew.Packaging.Publish" Version="10.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -59,6 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Primitives.Computation\Sundew.Base.Primitives.Computation.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base\Sundew.Base.csproj" />
     <ProjectReference Include="..\Sundew.Test.Infrastructure\Sundew.Test.Infrastructure.csproj" />

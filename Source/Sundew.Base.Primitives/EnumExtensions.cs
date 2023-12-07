@@ -9,7 +9,6 @@ namespace Sundew.Base.Primitives;
 
 using System;
 using System.Globalization;
-using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// Extends enumerations with easy to use methods.

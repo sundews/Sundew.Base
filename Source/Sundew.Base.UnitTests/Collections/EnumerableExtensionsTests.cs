@@ -25,6 +25,28 @@ namespace Sundew.Base.UnitTests.Collections
         }
 
         [Fact]
+        public void WhereNotDefault_Then_ResultShouldBeExpectedResult()
+        {
+            var expectedResult = new[] { 0, 1 };
+            var list = new List<int?> { 0, null, 1 };
+
+            var result = list.WhereNotDefault();
+
+            result.Should().Equal(expectedResult);
+        }
+
+        [Fact]
+        public void WhereNotNull_Then_ResultShouldBeExpectedResult()
+        {
+            var expectedResult = new[] { "0", "1" };
+            var list = new List<string?> { "0", null, "1" };
+
+            var result = list.WhereNotNull();
+
+            result.Should().Equal(expectedResult);
+        }
+
+        [Fact]
         public void ForEach_When_PassingEnumerableWithAction_Then_ActionIsCalledForAllElements()
         {
             var resultList = new List<int>();

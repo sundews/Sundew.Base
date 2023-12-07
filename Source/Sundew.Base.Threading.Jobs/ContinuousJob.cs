@@ -11,7 +11,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Sundew.Base.Primitives;
-using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// A job that keeps running once started, until it is stopped or disposed.

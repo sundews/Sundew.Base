@@ -5,9 +5,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation;
+namespace Sundew.Base.Primitives;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -110,9 +111,10 @@ public partial class R
         /// </summary>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>An erroneous result.</returns>
-        public R<TValue, TError> For<TValue>()
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
+        public R<TValue, TError> _<TValue>()
         {
-            return new R<TValue, TError>(false, default, this.Error);
+            return this;
         }
 
         /// <summary>

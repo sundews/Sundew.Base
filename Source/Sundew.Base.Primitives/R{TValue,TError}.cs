@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation;
+namespace Sundew.Base.Primitives;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -87,7 +87,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<TError>(R<TValue, TError> r)
     {
-        return new R<TError>(r.IsSuccess, r.IsSuccess ? default! : r.Error);
+        return new R<TError>(r.IsSuccess, r.Error);
     }
 
     /// <summary>
@@ -128,6 +128,21 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     {
         return new R<TValue?, TError>(true, result.Value, default!);
     }
+
+#if NOT_SUPPORT_BY_LANGUAGE
+    /// <summary>
+    /// Performs an implicit conversion from <see cref="R{TValue, TError}"/> to <see cref="R{TValue, TError}"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator R<TValue, TError>?(R<TValue?, TError> result)
+    {
+        return result.ToOptionalResult();
+    }
+#endif
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="R.ErrorResult{TValue}"/> to <see cref="R"/>.
@@ -231,6 +246,17 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
+    /// Converts this instance to a <see cref="R{TError}"/>.
+    /// </summary>
+    /// <returns>The value task.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
+    public R<TError> _()
+    {
+        return this;
+    }
+
+    /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TNewValue">The type of the new value.</typeparam>
@@ -238,7 +264,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewValue, TError> WithValue<TNewValue>(Func<TValue, TNewValue> valueFunc)
+    public R<TNewValue, TError> With<TNewValue>(Func<TValue, TNewValue> valueFunc)
     {
         return this.With(valueFunc, error => error);
     }
@@ -253,7 +279,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewValue, TError> WithValue<TParameter, TNewValue>(TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
+    public R<TNewValue, TError> With<TParameter, TNewValue>(TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
     {
         return this.With(parameter, valueFunc, (error, _) => error);
     }
@@ -319,6 +345,55 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
+    /// Evaluates the value if it is a success result and otherwise returns the seed.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="successFunc">The success function.</param>
+    /// <returns>The result.</returns>
+    public TResult IfSuccess<TResult>(TResult seed, Func<TResult, TValue, TResult> successFunc)
+    {
+        return this.IsSuccess ? successFunc(seed, this.Value) : seed;
+    }
+
+    /// <summary>
+    /// Evaluates the error if it is an error result and otherwise returns the seed.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>The result.</returns>
+    public TResult IfError<TResult>(TResult seed, Func<TResult, TError, TResult> errorFunc)
+    {
+        return !this.IsSuccess ? errorFunc(seed, this.Error) : seed;
+    }
+
+    /// <summary>
+    /// Evaluates the error if it has any and otherwise returns the seed.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="successFunc">The success function.</param>
+    /// <returns>The result.</returns>
+    public TResult IfAnyError<TResult>(TResult seed, Func<TResult, TError, TResult> successFunc)
+    {
+        return this.HasError ? successFunc(seed, this.Error) : seed;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TResult">The new value type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="successFunc">The success function.</param>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>The new value.</returns>
+    public TResult Evaluate<TResult>(TResult seed, Func<TResult, TValue, TResult> successFunc, Func<TResult, TError, TResult> errorFunc)
+    {
+        return this.IsSuccess ? successFunc(seed, this.Value) : errorFunc(seed, this.Error);
+    }
+
+    /// <summary>
     /// Evaluates the result into a single value.
     /// </summary>
     /// <typeparam name="TNewValue">The new value type.</typeparam>
@@ -338,6 +413,20 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     public TValue Evaluate(Func<TError, TValue> errorFunc)
     {
         return this.IsSuccess ? this.Value : errorFunc(this.Error);
+    }
+
+    /// <summary>
+    /// Gets a new result that is successful, if both results were a success.
+    /// </summary>
+    /// <typeparam name="TOtherValue">The other value.</typeparam>
+    /// <typeparam name="TOtherError">The other error.</typeparam>
+    /// <param name="other">The other result.</param>
+    /// <returns>A new result.</returns>
+    public R<(TValue Left, TOtherValue Right), (R<TError> Left, R<TOtherError> Right)> Combine<TOtherValue, TOtherError>(in R<TOtherValue, TOtherError> other)
+    {
+        return this.IsSuccess && other.IsSuccess
+            ? R.Success((this.Value, other.Value))
+            : R.Error((this._(), other._()));
     }
 
     /// <summary>

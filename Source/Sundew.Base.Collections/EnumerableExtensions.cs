@@ -23,6 +23,32 @@ using Sundew.Base.Primitives;
 /// </summary>
 public static partial class EnumerableExtensions
 {
+    private static readonly Func<object?, bool> NotNullPredicate = x => x != default;
+    private static readonly Func<object?, object> NotNullFunc = x => x!;
+
+    /// <summary>
+    /// Finds the index based on the given predicate.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The index found by the matching predicate.</returns>
+    public static IEnumerable<TItem> WhereNotNull<TItem>(this IEnumerable<TItem?>? enumerable)
+    {
+        return enumerable == null ? Enumerable.Empty<TItem>() : enumerable.Where(x => x != null).Select(x => x!);
+    }
+
+    /// <summary>
+    /// Finds the index based on the given predicate.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The index found by the matching predicate.</returns>
+    public static IEnumerable<TItem> WhereNotDefault<TItem>(this IEnumerable<TItem?>? enumerable)
+        where TItem : struct
+    {
+        return enumerable == null ? Enumerable.Empty<TItem>() : enumerable.Where(x => x.HasValue).Select(x => x!.Value);
+    }
+
     /// <summary>
     /// Gets an <see cref="IEnumerable{TItem}"/> from an item.
     /// </summary>
@@ -47,7 +73,7 @@ public static partial class EnumerableExtensions
     /// <returns>
     /// The index found by the matching predicate.
     /// </returns>
-    public static object ElementAt(this IEnumerable enumerable, int index)
+    public static object? ElementAt(this IEnumerable enumerable, int index)
     {
         if (enumerable is IList list)
         {

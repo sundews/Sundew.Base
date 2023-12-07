@@ -11,7 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sundew.Base.Memory;
-using Sundew.Base.Primitives.Computation;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Extends arrays with easy to use methods.
@@ -24,7 +24,7 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <returns>A discriminated union of the ensured items or the error result.</returns>
+    /// <returns>A result of the ensured items or the error result.</returns>
     public static R<All<TItem>, Failed<R<TItem, TError>, TError>> AllOrFailed<TItem, TError>(this IEnumerable<R<TItem, TError>> enumerable)
     {
         return enumerable.AllOrFailed(Item.PassIfSuccess);
@@ -35,7 +35,7 @@ public static partial class EnumerableExtensions
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <returns>A discriminated union of the ensured items or the error result.</returns>
+    /// <returns>A result of the ensured items or the error result.</returns>
     public static R<All<TItem>, Failed<TItem?>> AllOrFailed<TItem>(this IEnumerable<TItem?> enumerable)
         where TItem : struct
     {
@@ -47,7 +47,7 @@ public static partial class EnumerableExtensions
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
-    /// <returns>A discriminated union of the ensured items or the error result.</returns>
+    /// <returns>A result of the ensured items or the error result.</returns>
     public static R<All<TItem>, Failed<TItem?>> AllOrFailed<TItem>(this IEnumerable<TItem?> enumerable)
         where TItem : class
     {
@@ -61,7 +61,7 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TResult">The result type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="selector">the selector.</param>
-    /// <returns>A discriminated union of the ensured items or the error result.</returns>
+    /// <returns>A result of the ensured items or the error result.</returns>
     public static R<All<TResult>, Failed<TItem>> AllOrFailed<TItem, TResult>(this IEnumerable<TItem> enumerable, Func<TItem, Item<TResult>> selector)
     {
         static R<All<TResult>, Failed<TItem>> EnsureEnumerableWithCount(IEnumerable<TItem> enumerable, int count, Func<TItem, Item<TResult>> selector)
@@ -89,7 +89,7 @@ public static partial class EnumerableExtensions
                 return R.Error(new Failed<TItem>(failedItems.ToFinalArray()));
             }
 
-            return R.Success(new All<TResult>(result));
+            return R.From(true, new All<TResult>(result), new Failed<TItem>(failedItems.ToFinalArray()));
         }
 
         static R<All<TResult>, Failed<TItem>> EnsureEnumerable(IEnumerable<TItem> enumerable, Func<TItem, Item<TResult>> selector)
@@ -117,7 +117,7 @@ public static partial class EnumerableExtensions
                 return R.Error(new Failed<TItem>(failedIndices.ToFinalArray()));
             }
 
-            return R.Success(new All<TResult>(buffer.ToFinalArray()));
+            return R.From(true, new All<TResult>(buffer.ToFinalArray()), new Failed<TItem>(failedIndices.ToFinalArray()));
         }
 
         return enumerable switch
@@ -137,7 +137,7 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TError">The failed item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="selector">the selector.</param>
-    /// <returns>A discriminated union of the ensured items or the error result.</returns>
+    /// <returns>A result of the ensured items or the error result.</returns>
     public static R<All<TResult>, Failed<TItem, TError>> AllOrFailed<TItem, TResult, TError>(
         this IEnumerable<TItem> enumerable, Func<TItem, Item<TResult, TError>> selector)
     {
@@ -146,14 +146,17 @@ public static partial class EnumerableExtensions
             var result = new TResult[count];
             var failedItems = new Buffer<FailedItem<TItem, TError>>();
             var index = 0;
+            var success = 0;
             foreach (var item in enumerable)
             {
                 var itemResult = selector(item);
                 if (itemResult.IsValid)
                 {
                     result[index] = itemResult.SelectedItem;
+                    success++;
                 }
-                else
+
+                if (itemResult.HasError)
                 {
                     failedItems.Write(new FailedItem<TItem, TError>(index, item, itemResult.ErrorItem));
                 }
@@ -161,12 +164,12 @@ public static partial class EnumerableExtensions
                 index += 1;
             }
 
-            if (failedItems.Length > 0)
+            if (success == index)
             {
-                return R.Error(new Failed<TItem, TError>(failedItems.ToFinalArray()));
+                return R.From(true, new All<TResult>(result), new Failed<TItem, TError>(failedItems.ToFinalArray()));
             }
 
-            return R.Success(new All<TResult>(result));
+            return R.Error(new Failed<TItem, TError>(failedItems.ToFinalArray()));
         }
 
         static R<All<TResult>, Failed<TItem, TError>> EnsureEnumerable(IEnumerable<TItem> enumerable, Func<TItem, Item<TResult, TError>> selector)
@@ -181,7 +184,8 @@ public static partial class EnumerableExtensions
                 {
                     buffer.Write(itemResult.SelectedItem);
                 }
-                else
+
+                if (itemResult.HasError)
                 {
                     failedItems.Write(new FailedItem<TItem, TError>(index, item, itemResult.ErrorItem));
                 }
@@ -189,12 +193,12 @@ public static partial class EnumerableExtensions
                 index += 1;
             }
 
-            if (failedItems.Length > 0)
+            if (buffer.Length == index)
             {
-                return R.Error(new Failed<TItem, TError>(failedItems.ToFinalArray()));
+                return R.From(true, new All<TResult>(buffer.ToFinalArray()), new Failed<TItem, TError>(failedItems.ToFinalArray()));
             }
 
-            return R.Success(new All<TResult>(buffer.ToFinalArray()));
+            return R.Error(new Failed<TItem, TError>(failedItems.ToFinalArray()));
         }
 
         return enumerable switch

@@ -67,8 +67,13 @@ public class AlignAndLimitFormatProvider : IFormatProvider, ICustomFormatter
     /// <returns>
     /// The string representation of the value of <paramref name="arg" />, formatted as specified by <paramref name="format" /> and <paramref name="formatProvider" />.
     /// </returns>
-    public string Format(string format, object arg, IFormatProvider formatProvider)
+    public string Format(string? format, object? arg, IFormatProvider? formatProvider)
     {
+        if (format == null)
+        {
+            return string.Empty;
+        }
+
         var match = AlignmentRegex.Match(format);
         if (!match.Success)
         {
@@ -99,7 +104,7 @@ public class AlignAndLimitFormatProvider : IFormatProvider, ICustomFormatter
     /// <returns>
     /// An instance of the object specified by <paramref name="formatType" />, if the <see cref="T:System.IFormatProvider" /> implementation can supply that type of object; otherwise, <see langword="null" />.
     /// </returns>
-    public object GetFormat(Type formatType)
+    public object GetFormat(Type? formatType)
     {
         if (formatType == typeof(ICustomFormatter))
         {

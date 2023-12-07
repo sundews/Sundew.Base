@@ -1,15 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard1.3;netstandard1.1;netstandard2.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0;netstandard2.1;netstandard2.0;netstandard1.3;netstandard1.1</TargetFrameworks>
     <Description>Primitives types and extension methods.</Description>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Computation\O.NoneOption.cs" />
-    <Compile Remove="Computation\O{TValue}.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />

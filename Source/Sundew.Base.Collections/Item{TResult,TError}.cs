@@ -8,7 +8,7 @@
 namespace Sundew.Base.Collections;
 
 using System.Diagnostics.CodeAnalysis;
-using Sundew.Base.Primitives.Computation;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Represents the result of selecting an ensured item.
@@ -47,6 +47,15 @@ public readonly record struct Item<TResult, TError>
     [MemberNotNullWhen(true, nameof(SelectedItem))]
     [MemberNotNullWhen(false, nameof(ErrorItem))]
     public bool IsValid { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="R"/> has an error.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if error is non default; otherwise, <c>false</c>.
+    /// </value>
+    [MemberNotNullWhen(true, nameof(ErrorItem))]
+    public bool HasError => !Equals(this.ErrorItem, default(TError)) || !this.IsValid;
 
     /// <summary>
     /// Converts a result to an item.

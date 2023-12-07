@@ -11,7 +11,6 @@ using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using Sundew.Base.Equality;
-using Sundew.Base.Primitives.Computation;
 
 /// <summary>
 /// Represents a percentage.

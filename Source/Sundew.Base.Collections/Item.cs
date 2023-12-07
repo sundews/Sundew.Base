@@ -7,7 +7,9 @@
 
 namespace Sundew.Base.Collections;
 
-using Sundew.Base.Primitives.Computation;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Represents the result of selecting an ensured item.
@@ -21,9 +23,10 @@ public static class Item
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="result">The result.</param>
     /// <returns>An Item result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TSuccess, TError> PassIfSuccess<TSuccess, TError>(R<TSuccess, TError> result)
     {
-        return new Item<TSuccess, TError>(result.Value, result.Error, result.IsSuccess);
+        return result.ToItem();
     }
 
     /// <summary>
@@ -32,6 +35,7 @@ public static class Item
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An Item result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TItem> PassIfHasValue<TItem>(TItem? item)
     {
         return new Item<TItem>(item, !Equals(item, default));
@@ -43,6 +47,7 @@ public static class Item
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="item">The item.</param>
     /// <returns>An Item result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TItem> PassIfHasValue<TItem>(TItem? item)
         where TItem : struct
     {
@@ -56,6 +61,7 @@ public static class Item
     /// <param name="item">The item.</param>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <returns>The result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TItem> Pass<TItem>(TItem item)
     {
         return new Item<TItem>(item, true);
@@ -68,6 +74,7 @@ public static class Item
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <returns>The result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TItem, TError> Pass<TItem, TError>(TItem item)
     {
         return new Item<TItem, TError>(item, default, true);
@@ -80,6 +87,7 @@ public static class Item
     /// <param name="isValid">A value that indicates whether the item is valid.</param>
     /// <param name="item">The item.</param>
     /// <returns>The created item.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TItem> From<TItem>(bool isValid, TItem item)
     {
         return new Item<TItem>(item, isValid);
@@ -94,6 +102,7 @@ public static class Item
     /// <param name="item">The item.</param>
     /// <param name="error">The error.</param>
     /// <returns>The created item.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TItem, TError> From<TItem, TError>(bool isValid, TItem item, TError error)
     {
         return new Item<TItem, TError>(item, error, isValid);
@@ -103,6 +112,7 @@ public static class Item
     /// Create an error result.
     /// </summary>
     /// <returns>The result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static FailedItem Fail()
     {
         return default;
@@ -114,6 +124,7 @@ public static class Item
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="error">The error.</param>
     /// <returns>The result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static FailedItem<TError> Fail<TError>(TError error)
     {
         return new FailedItem<TError>(error);
@@ -126,6 +137,7 @@ public static class Item
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="error">The error.</param>
     /// <returns>The result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TResult, TError> Fail<TResult, TError>(TError error)
     {
         return new Item<TResult, TError>(default, error, false);
@@ -137,6 +149,7 @@ public static class Item
     /// <typeparam name="TValue">The value type.</typeparam>
     /// <param name="option">The option.</param>
     /// <returns>The new item.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TValue> ToItem<TValue>(this TValue? option)
         where TValue : struct
     {
@@ -149,6 +162,7 @@ public static class Item
     /// <typeparam name="TValue">The value type.</typeparam>
     /// <param name="option">The option.</param>
     /// <returns>The new item.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TValue> ToItem<TValue>(this TValue? option)
         where TValue : class
     {
@@ -162,6 +176,7 @@ public static class Item
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="result">The result.</param>
     /// <returns>The new item.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static Item<TResult, TError> ToItem<TResult, TError>(this R<TResult, TError> result)
     {
         return new Item<TResult, TError>(result.Value, result.Error, result.IsSuccess);
@@ -194,7 +209,8 @@ public static class Item
         /// </summary>
         /// <typeparam name="TResult">The result type.</typeparam>
         /// <returns>The failed item.</returns>
-        public Item<TResult, TError> For<TResult>()
+        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
+        public Item<TResult, TError> _<TResult>()
         {
             return new Item<TResult, TError>(default, this.Error, false);
         }

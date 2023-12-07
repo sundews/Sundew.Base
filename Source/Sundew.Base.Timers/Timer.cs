@@ -31,7 +31,7 @@ public sealed class Timer : TimerBase, ITimer
     /// Occurs when the timer ticks.
     /// </summary>
     /// <param name="state">The state.</param>
-    protected override void OnTick(object state)
+    protected override void OnTick(object? state)
     {
         this.Tick?.Invoke(this);
     }

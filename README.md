@@ -6,8 +6,37 @@ Sundew.Base is a collection of smaller NuGet packages that work on various .NETS
 Contains various Linq style extension methods for collection types suchs IEnumerable, IReadOnlyList etc.
 * For, ForEach, ForReverse, IndexOf, ToReadOnly.
 * AllOrFailed extension allows seemless conversion from IEnumerable<TItem?> to IEnumerable\<TItem\>.
+* OnlyOneOrDefault similar to SingleOrDefault, but never throws.
+* DistinctInOrder items only appear once, while preserving order.
 * ByCardinality extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
 * Value-Array, List and Dictionary* wrappers for Immutable collections with value semantics. (* Not on NETStandard1.2)
+
+## Primitives
+* Result types (R\<T, E\> and R\<E\>)
+* Option type T? (through extension methods).
+
+## Primitives.Computation
+* Attempter for implementing retry logic.
+* Progress reporting
+
+## Primitives.Numeric
+* Interval represents an interval of two values.
+* Percentage as a value type.
+
+## Primitives.Time
+* DateTime provider.
+
+## Text
+* AlignedString and AlignAndLimitFormatProvider providers aligning and length limiting string formatting.
+* NamedFormatString allows to define a string format using names rather than indices.
+* NaturalTextComparer does logical text comparison for all platforms with performance similar to the Windows specific StrCmpLogicalW.
+* AppendItems allows joining items into a StringBuilder.
+
+## Initialization
+* IInitializable for implementing async initialization logic.
+* InitializeAction for wrapping an Action in an IInitializable.
+* Initializer provides initialization of IInitializables.
+* InitializeFlag for keeping tracking whether initialization is completed.
 
 ## Disposal
 * DisposeAction for wrapping an Action in an IDisposable.
@@ -21,28 +50,9 @@ IAsyncDisposable is only supported on .NETStandard2.1
 * ReferenceEqualityComparer compares objects by reference.
 * TargetEqualityWeakReference is a weak reference that implements equality based on target equality.
 
-## Initialization
-* IInitializable for implementing async initialization logic.
-* InitializeAction for wrapping an Action in an IInitializable.
-* Initializer provides initialization of IInitializables.
-* InitializeFlag for keeping tracking whether initialization is completed.
-
 ## Memory
 * Buffer allows building arrays
 * Split extensions allows Linq style splitting memory in to segments.
-
-## Primitives
-* Interval represents an interval of two values.
-* Percentage as a value type.
-* DateTime provider.
-* Result types (R\<T, E\> and R\<E\>) and Option type T? (through extension methods).
-* Attempter for implementing retry logic.
-
-## Text
-* AlignedString and AlignAndLimitFormatProvider providers aligning and length limiting string formatting.
-* NamedFormatString allows to define a string format using names rather than indices.
-* NaturalTextComparer does logical text comparison for all platforms with performance similar to the Windows specific StrCmpLogicalW.
-* AppendItems allows joining items into a StringBuilder.
 
 ## Threading and Threading.Jobs
 * AsyncLazy provides a cancellable async lazy implementation

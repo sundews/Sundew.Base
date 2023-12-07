@@ -11,6 +11,7 @@ using System;
 using System.Buffers;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Sundew.Base.Primitives;
 
 internal sealed class BufferSlice<TItem> : IBufferInternal<TItem>
 {
@@ -90,7 +91,7 @@ internal sealed class BufferSlice<TItem> : IBufferInternal<TItem>
 
     public int Write(ICollection<TItem> items)
     {
-        if (items.Count == 0)
+        if (items.Count == 0 || this.parentBuffer.InternalBuffer == null)
         {
             return 0;
         }
@@ -229,6 +230,11 @@ internal sealed class BufferSlice<TItem> : IBufferInternal<TItem>
     /// <returns>The new array.</returns>
     public TItem[] ToArray()
     {
+        if (this.parentBuffer.InternalBuffer == null)
+        {
+            return Arrays.Empty<TItem>();
+        }
+
         var newArray = new TItem[this.Length];
         Array.Copy(this.parentBuffer.InternalBuffer, this.StartIndex, newArray, 0, this.Length);
         return newArray;

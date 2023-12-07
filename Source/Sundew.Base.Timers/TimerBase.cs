@@ -104,7 +104,7 @@ public abstract class TimerBase : ITimerControl
     /// Called when [tick].
     /// </summary>
     /// <param name="state">The state.</param>
-    protected abstract void OnTick(object state);
+    protected abstract void OnTick(object? state);
 
     /// <summary>Releases unmanaged and - optionally - managed resources.</summary>
     /// <param name="disposing">
@@ -120,7 +120,7 @@ public abstract class TimerBase : ITimerControl
         }
     }
 
-    private void PrivateOnTick(object state)
+    private void PrivateOnTick(object? state)
     {
         lock (this.lockObject)
         {

@@ -10,7 +10,7 @@ namespace Sundew.Base.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Sundew.Base.Primitives.Computation;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Defines extension methods for the generic ICollection interface.
@@ -337,7 +337,7 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// Tries to add the result errors if the result failed.
+    /// Adds the result errors if the result failed.
     /// </summary>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
@@ -352,17 +352,17 @@ public static class CollectionExtensions
     }
 
     /// <summary>
-    /// Tries to add all the result errors if there are any.
+    /// Adds all the result errors if there are any.
     /// </summary>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="collection">The collection.</param>
     /// <param name="results">The results.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool TryAddAllErrors<TSuccess, TError>(this ICollection<TError> collection, IEnumerable<R<TSuccess, TError>> results)
+    public static bool TryAddAnyErrors<TSuccess, TError>(this ICollection<TError> collection, IEnumerable<R<TSuccess, TError>> results)
     {
         var count = collection.Count;
-        collection.AddRange(results.GetAllErrors());
+        collection.AddRange(results.GetAnyErrors());
         return count < collection.Count;
     }
 
@@ -425,11 +425,11 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="results">The results.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool TryAddAllErrors<TSuccess, TError, TErrorList>(this ICollection<TError> collection, IEnumerable<R<TSuccess, TErrorList>> results)
+    public static bool TryAddAnyErrors<TSuccess, TError, TErrorList>(this ICollection<TError> collection, IEnumerable<R<TSuccess, TErrorList>> results)
         where TErrorList : IEnumerable<TError>
     {
         var count = collection.Count;
-        collection.AddRange(results.GetAllErrors().SelectMany(x => x));
+        collection.AddRange(results.GetAnyErrors().SelectMany(x => x));
         return count < collection.Count;
     }
 }

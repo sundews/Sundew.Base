@@ -518,6 +518,7 @@ public class Buffer<TItem> : IBufferInternal<TItem>
 
         var newArray = new TItem[this.Length];
         Array.Copy(this.internalBuffer, 0, newArray, 0, this.Length);
+
         return newArray;
     }
 

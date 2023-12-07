@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation;
+namespace Sundew.Base.Primitives;
 
 using System;
 using System.Runtime.CompilerServices;
@@ -86,7 +86,22 @@ public partial class R
         [MethodImpl((MethodImplOptions)0x300)]
         public ValueTask<SuccessResultOption<TValue?>> ToValueTask()
         {
-            return new ValueTask<SuccessResultOption<TValue?>>(this);
+            return new ValueTask<SuccessResultOption<TValue?>>(new SuccessResultOption<TValue?>(this.Value));
+        }
+
+        /// <summary>
+        /// Creates a result based on the specified values.
+        /// </summary>
+        /// <typeparam name="TError">The type of the error.</typeparam>
+        /// <returns>
+        /// A new <see cref="R" />.
+        /// </returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+#pragma warning disable SA1300 // Element should begin with upper-case letter
+        public R<TValue?, TError> _<TError>()
+#pragma warning restore SA1300 // Element should begin with upper-case letter
+        {
+            return new R<TValue?, TError>(true, this.Value, default);
         }
 
         /// <summary>

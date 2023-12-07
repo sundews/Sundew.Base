@@ -5,12 +5,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Primitives.Computation
+namespace Sundew.Base.UnitTests.Primitives
 {
     using System;
     using System.Threading.Tasks;
     using FluentAssertions;
-    using Sundew.Base.Primitives.Computation;
+    using Sundew.Base.Primitives;
     using Xunit;
 
     public class RAsyncTests
@@ -78,7 +78,7 @@ namespace Sundew.Base.UnitTests.Primitives.Computation
         {
             var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError));
 
-            var result = testee.To(expectedValue);
+            var result = testee.With(expectedValue);
 
             result.IsSuccess.Should().Be(expectedResult);
             result.Value.Should().Be(expectedValue);

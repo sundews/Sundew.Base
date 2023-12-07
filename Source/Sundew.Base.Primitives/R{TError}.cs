@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation;
+namespace Sundew.Base.Primitives;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -151,9 +151,9 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TValue, TError> To<TValue>(TValue value)
+    public R<TValue, TError> With<TValue>(TValue value)
     {
-        return new R<TValue, TError>(this.IsSuccess, value, this.Error);
+        return new R<TValue, TError>(this.IsSuccess, this.IsSuccess ? value : default!, this.Error);
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TValue, TError> To<TValue>(Func<TValue> valueFunc)
+    public R<TValue, TError> With<TValue>(Func<TValue> valueFunc)
     {
         return new R<TValue, TError>(this.IsSuccess, this.IsSuccess ? valueFunc() : default!, this.Error);
     }
@@ -207,7 +207,7 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TValue, TNewError> To<TValue, TNewError>(TValue value, Func<TError, TNewError> errorFunc)
+    public R<TValue, TNewError> With<TValue, TNewError>(TValue value, Func<TError, TNewError> errorFunc)
     {
         return this.IsSuccess ? new R<TValue, TNewError>(true, value, default!) : new R<TValue, TNewError>(false, default!, errorFunc(this.Error));
     }
@@ -222,9 +222,33 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TValue, TNewError> To<TValue, TNewError>(Func<TValue> valueFunc, Func<TError, TNewError> errorFunc)
+    public R<TValue, TNewError> With<TValue, TNewError>(Func<TValue> valueFunc, Func<TError, TNewError> errorFunc)
     {
         return this.IsSuccess ? new R<TValue, TNewError>(true, valueFunc(), default!) : new R<TValue, TNewError>(false, default!, errorFunc(this.Error));
+    }
+
+    /// <summary>
+    /// Evaluates the error if it is an error result and otherwise returns the seed.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="errorFunc">The error function.</param>
+    /// <returns>The result.</returns>
+    public TResult IfError<TResult>(TResult seed, Func<TResult, TError, TResult> errorFunc)
+    {
+        return !this.IsSuccess ? errorFunc(seed, this.Error) : seed;
+    }
+
+    /// <summary>
+    /// Evaluates the error if it has any and otherwise returns the seed.
+    /// </summary>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="successFunc">The success function.</param>
+    /// <returns>The result.</returns>
+    public TResult IfAnyError<TResult>(TResult seed, Func<TResult, TError, TResult> successFunc)
+    {
+        return this.HasError ? successFunc(seed, this.Error) : seed;
     }
 
     /// <summary>

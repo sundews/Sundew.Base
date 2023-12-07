@@ -8,7 +8,7 @@
 namespace Sundew.Base.Collections.Immutable;
 
 using System.Collections.Immutable;
-using Sundew.Base.Primitives.Computation;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Extension methods for <see cref="ImmutableArray{T}"/>.
@@ -78,7 +78,19 @@ public static class ImmutableArrayExtensions
     }
 
     /// <summary>
-    /// Tries to add the result error if there are any.
+    /// Adds the result error if the result failed.
+    /// </summary>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="immutableArray">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static ImmutableArray<TError> TryAddError<TError>(this ImmutableArray<TError> immutableArray, R<TError> result)
+    {
+        return result.IsSuccess ? immutableArray : immutableArray.Add(result.Error);
+    }
+
+    /// <summary>
+    /// Adds the result error if the result failed.
     /// </summary>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
@@ -86,6 +98,31 @@ public static class ImmutableArrayExtensions
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
     public static ImmutableArray<TError> TryAddError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, R<TSuccess, TError> result)
+    {
+        return result.IsSuccess ? immutableArray : immutableArray.Add(result.Error);
+    }
+
+    /// <summary>
+    /// Adds the result error if there are any.
+    /// </summary>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="immutableArray">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static ImmutableArray<TError> TryAddAnyError<TError>(this ImmutableArray<TError> immutableArray, R<TError> result)
+    {
+        return result.HasError ? immutableArray.Add(result.Error) : immutableArray;
+    }
+
+    /// <summary>
+    /// Adds the result error if there are any.
+    /// </summary>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="immutableArray">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static ImmutableArray<TError> TryAddAnyError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, R<TSuccess, TError> result)
     {
         return result.HasError ? immutableArray.Add(result.Error) : immutableArray;
     }

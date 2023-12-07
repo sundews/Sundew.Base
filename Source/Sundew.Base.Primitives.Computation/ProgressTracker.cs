@@ -135,25 +135,16 @@ public class ProgressTracker<TReport> : IProgressTracker<TReport>
         }
     }
 
-    private class State
+    private sealed class State(int totalItems, bool hasCompletedAdding, int completedItems, TReport? previousReport, TReport? currentReport)
     {
-        public State(int totalItems, bool hasCompletedAdding, int completedItems, TReport? previousReport, TReport? currentReport)
-        {
-            this.TotalItems = totalItems;
-            this.HasCompletedAdding = hasCompletedAdding;
-            this.CompletedItems = completedItems;
-            this.PreviousReport = previousReport;
-            this.CurrentReport = currentReport;
-        }
+        public int TotalItems { get; } = totalItems;
 
-        public int TotalItems { get; }
+        public int CompletedItems { get; } = completedItems;
 
-        public int CompletedItems { get; }
+        public bool HasCompletedAdding { get; } = hasCompletedAdding;
 
-        public bool HasCompletedAdding { get; }
+        public TReport? PreviousReport { get; } = previousReport;
 
-        public TReport? PreviousReport { get; }
-
-        public TReport? CurrentReport { get; }
+        public TReport? CurrentReport { get; } = currentReport;
     }
 }

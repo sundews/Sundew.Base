@@ -8,7 +8,7 @@
 namespace Sundew.Base.Collections.Immutable;
 
 using System.Collections.Immutable;
-using Sundew.Base.Primitives.Computation;
+using Sundew.Base.Primitives;
 
 /// <summary>
 /// Extension methods fro <see cref="ImmutableHashSet{TItem}"/>.

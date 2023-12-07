@@ -31,7 +31,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// Gets an empty list.
     /// </summary>
     /// <returns>An empty list.</returns>
-    public static ValueList<TItem> Empty { get; } = ImmutableList<TItem>.Empty;
+    public static ValueList<TItem> Empty => ImmutableList<TItem>.Empty;
 
     /// <summary>
     /// Gets the count.
@@ -125,7 +125,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns>The hashcode.</returns>
     public override int GetHashCode()
     {
-#if NETSTANDARD1_3_OR_GREATER
+#if NETSTANDARD1_3_OR_GREATER || NET6_0_OR_GREATER
         var hashCode = default(HashCode);
         foreach (var item in this.inner)
         {

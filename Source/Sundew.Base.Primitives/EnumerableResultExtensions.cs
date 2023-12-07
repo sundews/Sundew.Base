@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.Computation;
+namespace Sundew.Base.Primitives;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +75,7 @@ public static class EnumerableResultExtensions
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="results">The results.</param>
     /// <returns>An enumerable containing all errors.</returns>
-    public static IEnumerable<TError> GetAllErrors<TSuccess, TError>(this IEnumerable<R<TSuccess, TError>> results)
+    public static IEnumerable<TError> GetAnyErrors<TSuccess, TError>(this IEnumerable<R<TSuccess, TError>> results)
     {
         foreach (var result in results)
         {

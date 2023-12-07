@@ -23,7 +23,7 @@ public static class Arrays
     [MethodImpl((MethodImplOptions)0x300)]
     public static TItem[] Empty<TItem>()
     {
-#if NETSTANDARD1_3_OR_GREATER
+#if NETSTANDARD1_3_OR_GREATER || NET6_0_OR_GREATER
         return Array.Empty<TItem>();
 #else
             return new TItem[0];
