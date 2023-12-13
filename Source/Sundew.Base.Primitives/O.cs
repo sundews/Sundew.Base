@@ -435,6 +435,7 @@ public static class O
     /// <param name="option">The value indicating whether the option has a value.</param>
     /// <param name="optionalValue">The optional value.</param>
     /// <returns>An optional value.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static TValue? ToOption<TValue>(this bool option, TValue optionalValue)
         where TValue : class
     {
@@ -448,6 +449,7 @@ public static class O
     /// <param name="option">The value indicating whether the option has a value.</param>
     /// <param name="optionalValueFunc">The optional value func.</param>
     /// <returns>An optional value.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static TValue? ToOption<TValue>(this bool option, Func<TValue> optionalValueFunc)
         where TValue : class
     {
@@ -461,6 +463,7 @@ public static class O
     /// <param name="option">The value indicating whether the option has a value.</param>
     /// <param name="optionalValueFunc">The optional value func.</param>
     /// <returns>An optional value.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static TValue? From<TValue>(bool option, Func<TValue> optionalValueFunc)
         where TValue : class
     {
@@ -474,9 +477,43 @@ public static class O
     /// <param name="option">The value indicating whether the option has a value.</param>
     /// <param name="optionalValueFunc">The optional value func.</param>
     /// <returns>An optional value.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
     public static TValue? FromValue<TValue>(bool option, Func<TValue> optionalValueFunc)
         where TValue : struct
     {
         return option ? optionalValueFunc() : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TError> ToResult<TError>(this TError? error)
+    {
+        return new R<TError>(error == null, error);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ValueTask<R<TError>> ToResultAsync<TError>(this TError? error)
+        where TError : class
+    {
+        int? d = 3;
+        var r = R.SuccessOption(d)._<string>();
+        var d2 = r.ToOptionalResult();
+
+        return new R<TError>(error == null, error);
     }
 }

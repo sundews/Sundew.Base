@@ -50,9 +50,9 @@ Sundew.Base.Timers
     <ProjectReference Include="..\Sundew.Base.Initialization\Sundew.Base.Initialization.csproj" />
     <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.Computation.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.Numeric.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.Time.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Primitives.Computation\Sundew.Base.Primitives.Computation.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Primitives.Numeric\Sundew.Base.Primitives.Numeric.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Primitives.Time\Sundew.Base.Primitives.Time.csproj" />
     <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
     <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
     <ProjectReference Include="..\Sundew.Base.Threading.Jobs\Sundew.Base.Threading.Jobs.csproj" />

@@ -43,6 +43,11 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     public bool IsDefault => this.inner.IsDefault;
 
     /// <summary>
+    /// Gets a value indicating whether this array is default.
+    /// </summary>
+    public bool IsEmpty => this.inner.IsEmpty;
+
+    /// <summary>
     /// Gets the index at the specified index.
     /// </summary>
     /// <param name="index">The index.</param>

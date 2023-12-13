@@ -42,6 +42,11 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     public int Count => this.inner.Count;
 
     /// <summary>
+    /// Gets a value indicating whether this array is empty.
+    /// </summary>
+    public bool IsEmpty => this.inner.IsEmpty();
+
+    /// <summary>
     /// Gets the keys.
     /// </summary>
     /// <returns>The keys.</returns>

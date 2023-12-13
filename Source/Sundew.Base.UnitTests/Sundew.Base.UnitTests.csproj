@@ -3,8 +3,6 @@
   <PropertyGroup>    
     <TargetFramework>net7.0</TargetFramework>
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
-    <Authors>Kim Hugener-Ohlsen</Authors>
-    <Company>Hukano</Company>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>SA0001</NoWarn>
