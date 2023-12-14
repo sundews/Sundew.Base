@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives;
+namespace Sundew.Base;
 
 /// <summary>
 /// Empty struct for use in generic types where a type parameter is required but not needed.

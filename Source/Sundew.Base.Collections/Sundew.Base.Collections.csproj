@@ -7,11 +7,6 @@
     <NoWarn>1701;1702;SA1633</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <Compile Remove="Immutable\ValueDictionary{TKey,TValue}.cs" />
-    <Compile Remove="Immutable\ImmutableDictionaryExtensions.cs" />
-  </ItemGroup>
-
   <ItemGroup>
     <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
@@ -58,6 +53,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Collections.Linq\Sundew.Base.Collections.Linq.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Collections.Immutable\Sundew.Base.Collections.Immutable.csproj" />
   </ItemGroup>
 
 </Project>

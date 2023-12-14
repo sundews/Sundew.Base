@@ -11,7 +11,6 @@ using System.Collections.Immutable;
 using System.Globalization;
 using FluentAssertions;
 using Sundew.Base.Collections;
-using Sundew.Base.Collections.Immutable;
 using Xunit;
 
 public class ImmutableListTests

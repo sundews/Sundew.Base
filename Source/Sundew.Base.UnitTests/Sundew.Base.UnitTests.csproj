@@ -8,21 +8,6 @@
     <NoWarn>SA0001</NoWarn>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CodeAnalysisRuleSet />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug-Publish|AnyCPU'">
-    <CodeAnalysisRuleSet />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release-Publish|AnyCPU'">
-    <CodeAnalysisRuleSet />
-  </PropertyGroup>
 
   <ItemGroup>
     <Compile Remove="Properties\**" />
@@ -48,6 +33,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Sundew.Testing" Version="0.1.0-u20231204-231215-local" />
     <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
     <PackageReference Include="xunit" Version="2.6.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.4">
@@ -57,7 +43,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sundew.Base.Primitives.Computation\Sundew.Base.Primitives.Computation.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Computation\Sundew.Base.Computation.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base\Sundew.Base.csproj" />
     <ProjectReference Include="..\Sundew.Test.Infrastructure\Sundew.Test.Infrastructure.csproj" />

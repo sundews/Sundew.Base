@@ -43,7 +43,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Equality\Sundew.Base.Equality.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives.Numeric\Sundew.Base.Primitives.Numeric.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
   </ItemGroup>

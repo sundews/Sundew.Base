@@ -5,13 +5,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives;
+namespace Sundew.Base;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
-using Sundew.Base.Equality;
 
 /// <summary>Represents a result that if it is erroneous has error information.</summary>
 /// <typeparam name="TError">The type of the error.</typeparam>
@@ -302,13 +301,13 @@ public readonly struct R<TError> : IEquatable<R<TError>>
     ///   <c>true</c> if the specified <see cref="object"/> is equal to this instance; otherwise, <c>false</c>.</returns>
     public override bool Equals(object? obj)
     {
-        return Equality.Equals(this, obj);
+        return Equality.Equality.Equals(this, obj);
     }
 
     /// <summary>Returns a hash code for this instance.</summary>
     /// <returns>A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.</returns>
     public override int GetHashCode()
     {
-        return Equality.GetHashCode(this.IsSuccess.GetHashCode(), this.Error?.GetHashCode() ?? 0);
+        return Equality.Equality.GetHashCode(this.IsSuccess.GetHashCode(), this.Error?.GetHashCode() ?? 0);
     }
 }

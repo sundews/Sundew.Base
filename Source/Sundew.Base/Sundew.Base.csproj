@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net6.0;netstandard2.1;netstandard2.0;netstandard1.3</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0;netstandard2.1;netstandard2.0;netstandard1.5</TargetFrameworks>
     <IncludeSymbols>false</IncludeSymbols>
     <SymbolPackageFormat></SymbolPackageFormat>
     <DebugSymbols>false</DebugSymbols>
@@ -16,9 +16,10 @@ Sundew.Base.Equality
 Sundew.Base.Initialization
 Sundew.Base.Memory
 Sundew.Base.Primitives
-Sundew.Base.Primitives.Computation
-Sundew.Base.Primitives.Numeric
-Sundew.Base.Primitives.Time
+Sundew.Base.Computation
+Sundew.Base.Numeric
+Sundew.Base.Time
+Sundew.Base.IO
 Sundew.Base.Reporting
 Sundew.Base.Text
 Sundew.Base.Threading.Jobs
@@ -50,9 +51,10 @@ Sundew.Base.Timers
     <ProjectReference Include="..\Sundew.Base.Initialization\Sundew.Base.Initialization.csproj" />
     <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives.Computation\Sundew.Base.Primitives.Computation.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives.Numeric\Sundew.Base.Primitives.Numeric.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives.Time\Sundew.Base.Primitives.Time.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Computation\Sundew.Base.Computation.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />
+    <ProjectReference Include="..\Sundew.Base.IO\Sundew.Base.IO.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Time\Sundew.Base.Time.csproj" />
     <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
     <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
     <ProjectReference Include="..\Sundew.Base.Threading.Jobs\Sundew.Base.Threading.Jobs.csproj" />

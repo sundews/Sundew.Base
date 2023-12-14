@@ -12,8 +12,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Sundew.Base.Memory.Internal;
-using Sundew.Base.Primitives;
-using Sundew.Base.Primitives.Numeric;
+using Sundew.Base.Numeric;
 using Sundew.Base.Reporting;
 
 /// <summary>

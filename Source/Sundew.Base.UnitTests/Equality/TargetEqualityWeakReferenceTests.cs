@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Primitives.WeakReferencing
+namespace Sundew.Base.UnitTests.Equality
 {
     using FluentAssertions;
     using Sundew.Base.Primitives.WeakReferencing;

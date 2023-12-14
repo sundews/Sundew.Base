@@ -5,12 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives;
-
-using System;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+namespace Sundew.Base;
 
 #if NOT_SUPPORT_BY_LANGUAGE
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member

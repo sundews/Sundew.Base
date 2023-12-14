@@ -15,16 +15,19 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 * Result types (R\<T, E\> and R\<E\>)
 * Option type T? (through extension methods).
 
-## Primitives.Computation
+## Computation
 * Attempter for implementing retry logic.
 * Progress reporting
 
-## Primitives.Numeric
+## Numeric
 * Interval represents an interval of two values.
-* Percentage as a value type.
+* Percentage value type.
 
-## Primitives.Time
+## Time
 * DateTime provider.
+
+## IO
+* Paths - search upwards for relative paths.
 
 ## Text
 * AlignedString and AlignAndLimitFormatProvider providers aligning and length limiting string formatting.
