@@ -58,7 +58,7 @@ public class ImmutableArrayTests
                 return Item.Pass(result);
             }
 
-            return Item.Fail(x).Over<int>();
+            return Item.Fail(x).ToItem<int>();
         });
 
         var result = immutableArray.TryAddErrors(allPositiveResult);

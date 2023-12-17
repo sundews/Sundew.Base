@@ -88,7 +88,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ErrorResult<TNewError> To<TNewError>(Func<TError, TNewError> errorFunc)
+        public ErrorResult<TNewError> With<TNewError>(Func<TError, TNewError> errorFunc)
         {
             return new ErrorResult<TNewError>(errorFunc(this.Error));
         }
@@ -101,7 +101,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ValueTask<ErrorResult<TNewError>> ToAsync<TNewError>(Func<TError, TNewError> errorFunc)
+        public ValueTask<ErrorResult<TNewError>> WithAsync<TNewError>(Func<TError, TNewError> errorFunc)
         {
             return new ErrorResult<TNewError>(errorFunc(this.Error)).ToValueTask();
         }
@@ -111,7 +111,7 @@ public partial class R
         /// </summary>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>An erroneous result.</returns>
-        public R<TValue, TError> Over<TValue>()
+        public R<TValue, TError> ToResult<TValue>()
         {
             return this;
         }
