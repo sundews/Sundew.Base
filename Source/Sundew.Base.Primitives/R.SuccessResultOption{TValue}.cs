@@ -97,9 +97,7 @@ public partial class R
         /// A new <see cref="R" />.
         /// </returns>
         [MethodImpl((MethodImplOptions)0x300)]
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-        public R<TValue?, TError> _<TError>()
-#pragma warning restore SA1300 // Element should begin with upper-case letter
+        public R<TValue?, TError> Over<TError>()
         {
             return new R<TValue?, TError>(true, this.Value, default);
         }
@@ -112,7 +110,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public SuccessResultOption<TNewValue?> To<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
+        public SuccessResultOption<TNewValue?> With<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
             return new SuccessResultOption<TNewValue?>(valueFunc(this.Value));
         }
@@ -125,7 +123,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ValueTask<SuccessResultOption<TNewValue?>> ToAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
+        public ValueTask<SuccessResultOption<TNewValue?>> WithAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
             return new SuccessResultOption<TNewValue?>(valueFunc(this.Value)).ToValueTask();
         }

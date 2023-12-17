@@ -209,8 +209,7 @@ public static class Item
         /// </summary>
         /// <typeparam name="TResult">The result type.</typeparam>
         /// <returns>The failed item.</returns>
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
-        public Item<TResult, TError> _<TResult>()
+        public Item<TResult, TError> Over<TResult>()
         {
             return new Item<TResult, TError>(default, this.Error, false);
         }

@@ -91,14 +91,13 @@ public partial class R
         }
 
         /// <summary>
-        /// Creates a result based on the specified values.
+        /// Converts this result to a <see cref="R{TValue, TError}"/>.
         /// </summary>
         /// <typeparam name="TError">The type of the error.</typeparam>
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
-        public R<TValue, TError> _<TError>()
+        public R<TValue, TError> Over<TError>()
         {
             return this;
         }

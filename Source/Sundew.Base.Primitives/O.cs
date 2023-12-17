@@ -510,10 +510,6 @@ public static class O
     public static ValueTask<R<TError>> ToResultAsync<TError>(this TError? error)
         where TError : class
     {
-        int? d = 3;
-        var r = R.SuccessOption(d)._<string>();
-        var d2 = r.ToOptionalResult();
-
         return new R<TError>(error == null, error);
     }
 }

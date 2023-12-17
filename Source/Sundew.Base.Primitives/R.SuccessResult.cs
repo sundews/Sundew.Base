@@ -65,8 +65,7 @@ public partial class R
         /// </summary>
         /// <typeparam name="TError">The error type.</typeparam>
         /// <returns>An erroneous result.</returns>
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
-        public R<TError> _<TError>()
+        public R<TError> Over<TError>()
         {
             return this;
         }

@@ -111,8 +111,7 @@ public partial class R
         /// </summary>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>An erroneous result.</returns>
-        [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
-        public R<TValue, TError> _<TValue>()
+        public R<TValue, TError> Over<TValue>()
         {
             return this;
         }
