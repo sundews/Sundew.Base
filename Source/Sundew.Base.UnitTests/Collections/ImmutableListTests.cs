@@ -56,7 +56,7 @@ public class ImmutableListTests
                 return Item.Pass(result);
             }
 
-            return Item.Fail(x).ToItem<int>();
+            return Item.Fail(x).Omits<int>();
         });
 
         var result = immutableList.TryAddErrors(allPositiveResult);

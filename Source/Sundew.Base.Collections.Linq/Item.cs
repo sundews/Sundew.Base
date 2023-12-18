@@ -209,7 +209,7 @@ public static class Item
         /// </summary>
         /// <typeparam name="TResult">The result type.</typeparam>
         /// <returns>The failed item.</returns>
-        public Item<TResult, TError> ToItem<TResult>()
+        public Item<TResult, TError> Omits<TResult>()
         {
             return new Item<TResult, TError>(default, this.Error, false);
         }

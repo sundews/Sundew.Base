@@ -111,7 +111,7 @@ public partial class R
         /// </summary>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>An erroneous result.</returns>
-        public R<TValue, TError> ToResult<TValue>()
+        public R<TValue, TError> Omits<TValue>()
         {
             return this;
         }

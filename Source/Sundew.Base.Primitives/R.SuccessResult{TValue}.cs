@@ -97,7 +97,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public R<TValue, TError> ToResult<TError>()
+        public R<TValue, TError> Omits<TError>()
         {
             return this;
         }

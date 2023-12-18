@@ -65,7 +65,7 @@ public partial class R
         /// </summary>
         /// <typeparam name="TError">The error type.</typeparam>
         /// <returns>An erroneous result.</returns>
-        public R<TError> ToResult<TError>()
+        public R<TError> Omits<TError>()
         {
             return this;
         }

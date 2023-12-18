@@ -97,7 +97,7 @@ public partial class R
         /// A new <see cref="R" />.
         /// </returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public R<TValue?, TError> ToResult<TError>()
+        public R<TValue?, TError> Omits<TError>()
         {
             return new R<TValue?, TError>(true, this.Value, default);
         }
