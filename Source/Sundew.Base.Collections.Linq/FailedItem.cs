@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections;
+namespace Sundew.Base.Collections.Linq;
 
 /// <summary>
 /// Represents a failed items and its index in the list.

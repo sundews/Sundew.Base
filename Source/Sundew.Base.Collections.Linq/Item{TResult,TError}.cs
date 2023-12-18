@@ -5,10 +5,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections;
+namespace Sundew.Base.Collections.Linq;
 
 using System.Diagnostics.CodeAnalysis;
-using Sundew.Base.Primitives;
 
 /// <summary>
 /// Represents the result of selecting an ensured item.

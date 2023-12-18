@@ -10,7 +10,7 @@ namespace Sundew.Base.UnitTests.Collections;
 using System.Collections.Immutable;
 using System.Globalization;
 using FluentAssertions;
-using Sundew.Base.Collections;
+using Sundew.Base.Collections.Linq;
 using Xunit;
 
 public class ImmutableListTests

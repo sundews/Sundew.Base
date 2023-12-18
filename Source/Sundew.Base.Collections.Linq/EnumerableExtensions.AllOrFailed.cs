@@ -5,13 +5,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections;
+namespace Sundew.Base.Collections.Linq;
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using Sundew.Base.Memory;
-using Sundew.Base.Primitives;
 
 /// <summary>
 /// Extends arrays with easy to use methods.

@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Collections;
 
 using System.Linq;
 using FluentAssertions;
-using Sundew.Base.Collections;
+using Sundew.Base.Collections.Linq;
 using Xunit;
 
 public class EnumerableExtensionsOnlyOneTests

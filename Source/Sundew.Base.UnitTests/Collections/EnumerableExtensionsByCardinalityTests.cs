@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
-using Sundew.Base.Collections;
+using Sundew.Base.Collections.Linq;
 using Xunit;
 
 public class EnumerableExtensionsByCardinalityTests

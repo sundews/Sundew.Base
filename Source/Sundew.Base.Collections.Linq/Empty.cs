@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections;
+namespace Sundew.Base.Collections.Linq;
 
 using System.Collections.Generic;
 

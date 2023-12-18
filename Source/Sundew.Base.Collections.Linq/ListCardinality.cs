@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Collections;
+namespace Sundew.Base.Collections.Linq;
 
 /// <summary>
 /// Represents a discriminated union of either none, a single or multiple items.

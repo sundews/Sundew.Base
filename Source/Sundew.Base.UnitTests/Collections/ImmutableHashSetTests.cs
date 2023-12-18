@@ -10,6 +10,7 @@ namespace Sundew.Base.UnitTests.Collections;
 using System.Collections.Immutable;
 using FluentAssertions;
 using Sundew.Base.Collections;
+using Sundew.Base.Collections.Immutable;
 using Xunit;
 
 public class ImmutableHashSetTests
