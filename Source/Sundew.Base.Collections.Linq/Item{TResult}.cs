@@ -37,15 +37,6 @@ public readonly record struct Item<TResult>
     /// </summary>
     [MemberNotNullWhen(true, nameof(SelectedItem))]
     public bool IsValid { get; }
-    /*
-    /// <summary>
-    /// Converts a failed item to a failed select item.
-    /// </summary>
-    /// <param name="option">The option.</param>
-    public static implicit operator Item<TResult>(TResult option)
-    {
-        return Item.From(!Equals(option, default), option);
-    }*/
 
     /// <summary>
     /// Converts a failed item to a failed select item.
@@ -54,5 +45,15 @@ public readonly record struct Item<TResult>
     public static implicit operator Item<TResult>(Item.FailedItem failedItem)
     {
         return new Item<TResult>(default, false);
+    }
+
+    /// <summary>
+    /// Converts a failed item to a failed select item.
+    /// </summary>
+    /// <typeparam name="TError">The error.</typeparam>
+    /// <returns>The item with the omitted error.</returns>
+    public Item<TResult, TError> Omits<TError>()
+    {
+        return this;
     }
 }
