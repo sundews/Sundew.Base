@@ -7,6 +7,7 @@
 
 namespace Sundew.Base.IO;
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
@@ -16,8 +17,16 @@ using System.Reflection;
 /// Contains various methods for working with Paths.
 /// </summary>
 /// <param name="FileSystemPaths">The file system paths.</param>
-public readonly record struct Paths(params string[] FileSystemPaths)
+public sealed record class Paths(params string[] FileSystemPaths)
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Paths"/> class.
+    /// </summary>
+    public Paths()
+        : this(Array.Empty<string>())
+    {
+    }
+
     /// <summary>
     /// Searches upwards from the current directory, to find an absolute path based on the specified relative path.
     /// </summary>
