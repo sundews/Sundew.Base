@@ -17,7 +17,7 @@ using System.Reflection;
 /// Contains various methods for working with Paths.
 /// </summary>
 /// <param name="FileSystemPaths">The file system paths.</param>
-public sealed record class Paths(params string[] FileSystemPaths)
+public readonly record struct Paths(params string[] FileSystemPaths)
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Paths"/> class.
