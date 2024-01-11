@@ -12,6 +12,11 @@ namespace Sundew.Base.Collections.Linq;
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
 [Sundew.DiscriminatedUnions.DiscriminatedUnion]
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public abstract partial record ListCardinality<TItem>
+#else
 public abstract partial class ListCardinality<TItem>
+
+#endif
 {
 }

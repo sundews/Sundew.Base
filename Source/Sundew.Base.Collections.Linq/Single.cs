@@ -11,13 +11,17 @@ namespace Sundew.Base.Collections.Linq;
 /// Represents a single item.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public sealed record Single<TItem> : ListCardinality<TItem>
+#else
 public sealed class Single<TItem> : ListCardinality<TItem>
+#endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Single{TItem}"/> class.
     /// </summary>
     /// <param name="item">The item.</param>
-    internal Single(TItem item)
+    public Single(TItem item)
     {
         this.Item = item;
     }

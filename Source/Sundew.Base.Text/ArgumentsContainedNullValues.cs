@@ -12,7 +12,11 @@ using System.Collections.Generic;
 /// <summary>
 /// Represents a failed formatted string due to arguments containing null values.
 /// </summary>
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public sealed record ArgumentsContainedNullValues : FormattedStringResult
+#else
 public sealed class ArgumentsContainedNullValues : FormattedStringResult
+#endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ArgumentsContainedNullValues"/> class.

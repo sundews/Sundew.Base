@@ -13,6 +13,10 @@ using System.Collections.Generic;
 /// Represents an empty <see cref="IEnumerable{T}"/>.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public sealed record Empty<TItem> : ListCardinality<TItem>
+#else
 public sealed class Empty<TItem> : ListCardinality<TItem>
+#endif
 {
 }

@@ -12,7 +12,11 @@ using System.Collections.Generic;
 /// <summary>
 /// Represents a failed formatted string due to unknown names in format string.
 /// </summary>
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public sealed record FormatContainedUnknownNames : FormattedStringResult
+#else
 public sealed class FormatContainedUnknownNames : FormattedStringResult
+#endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FormatContainedUnknownNames"/> class.

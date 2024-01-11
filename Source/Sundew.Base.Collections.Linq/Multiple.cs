@@ -14,7 +14,11 @@ using System.Collections.Generic;
 /// Represents an <see cref="IEnumerable{T}"/> with multiple items.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public sealed record Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
+#else
 public sealed class Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
+#endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="Multiple{TItem}"/> class.

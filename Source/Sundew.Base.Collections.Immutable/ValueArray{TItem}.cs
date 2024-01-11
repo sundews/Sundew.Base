@@ -82,6 +82,15 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     }
 
     /// <summary>
+    /// Converts from a  <see cref="ValueArray{TItem}"/> to an <see cref="ImmutableArray{T}"/>.
+    /// </summary>
+    /// <param name="valueArray">The value array.</param>
+    public static implicit operator ValueList<TItem>(ValueArray<TItem> valueArray)
+    {
+        return valueArray.inner;
+    }
+
+    /// <summary>
     /// Checks if the two sides are equal.
     /// </summary>
     /// <param name="left">The left.</param>
@@ -190,5 +199,14 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     public bool Contains(TItem item)
     {
         return this.inner.Contains(item);
+    }
+
+    /// <summary>
+    /// Converts the array to a <see cref="ValueList{TItem}"/>.
+    /// </summary>
+    /// <returns>The value list.</returns>
+    public ValueList<TItem> ToValueList()
+    {
+        return new ValueList<TItem>(this.inner);
     }
 }

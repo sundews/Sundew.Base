@@ -28,7 +28,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Sundew.DiscriminatedUnions" Version="5.2.3" />
+    <PackageReference Include="Sundew.DiscriminatedUnions" Version="5.2.5" />
     <PackageReference Include="Sundew.Packaging.Publish" Version="10.0.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

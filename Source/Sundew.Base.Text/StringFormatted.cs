@@ -10,7 +10,11 @@ namespace Sundew.Base.Text;
 /// <summary>
 /// Represents a successfully formatted string.
 /// </summary>
+#if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+public sealed record StringFormatted : FormattedStringResult
+#else
 public sealed class StringFormatted : FormattedStringResult
+#endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="StringFormatted"/> class.

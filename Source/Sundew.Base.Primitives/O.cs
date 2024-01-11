@@ -169,6 +169,21 @@ public static class O
     /// Gets the value or the default value.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="newValueFunc">The new value func.</param>
+    /// <returns>The value if present, otherwise the specified default value.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? GetValueOrDefault<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> newValueFunc)
+        where TValue : class
+    {
+        return value != null ? newValueFunc(value) : default;
+    }
+
+    /// <summary>
+    /// Gets the value or the default value.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <typeparam name="TParameter">The type of the parameter.</typeparam>
     /// <typeparam name="TNewValue">The type of the new value.</typeparam>
     /// <param name="value">The value.</param>
