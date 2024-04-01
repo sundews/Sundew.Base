@@ -154,16 +154,6 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     }
 
     /// <summary>
-    /// Gets the enumerator.
-    /// </summary>
-    /// <returns>The enumerator.</returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
-    {
-        return this.inner.GetEnumerator();
-    }
-
-    /// <summary>
     /// Gets the hashcode.
     /// </summary>
     /// <returns>The hashcode.</returns>
