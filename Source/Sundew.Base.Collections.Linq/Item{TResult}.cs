@@ -16,7 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 public readonly record struct Item<TResult>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Item{TResult}" /> class.
+    /// Initializes a new instance of the <see cref="Item{TResult}" /> struct.
     /// Use <see cref="Item"/> class to create <see cref="Item{TResult}"/>.
     /// </summary>
     /// <param name="selectedItem">The success item.</param>

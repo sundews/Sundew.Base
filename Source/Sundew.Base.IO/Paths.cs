@@ -20,7 +20,7 @@ using System.Reflection;
 public readonly record struct Paths(params string[] FileSystemPaths)
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Paths"/> class.
+    /// Initializes a new instance of the <see cref="Paths"/> struct.
     /// </summary>
     public Paths()
         : this(Array.Empty<string>())

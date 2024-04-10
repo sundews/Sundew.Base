@@ -17,7 +17,7 @@ using System.Collections.Generic;
 public readonly record struct Failed<TItem> : IReadOnlyList<FailedItem<TItem>>
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="Failed{TItem}" /> class.
+    /// Initializes a new instance of the <see cref="Failed{TItem}" /> struct.
     /// </summary>
     /// <param name="items">The failed items.</param>
     public Failed(IReadOnlyList<FailedItem<TItem>> items)
