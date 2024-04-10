@@ -5,47 +5,46 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Initialization
+namespace Sundew.Base.UnitTests.Initialization;
+
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Sundew.Base.Initialization;
+using Xunit;
+
+public class InitializeAsyncActionTests
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using FluentAssertions;
-    using Sundew.Base.Initialization;
-    using Xunit;
-
-    public class InitializeAsyncActionTests
+    [Fact]
+    public async Task InitializeAsync_When_Awaiting_Then_ManualResetEventShouldBeSet()
     {
-        [Fact]
-        public async Task InitializeAsync_When_Awaiting_Then_ManualResetEventShouldBeSet()
-        {
-            var manualResetEvent = new ManualResetEventSlim(false);
-            var testee = new InitializeAsyncAction(
-                () =>
-                {
-                    Thread.Sleep(10);
-                    manualResetEvent.Set();
-                    return default;
-                });
+        var manualResetEvent = new ManualResetEventSlim(false);
+        var testee = new InitializeAsyncAction(
+            () =>
+            {
+                Thread.Sleep(10);
+                manualResetEvent.Set();
+                return default;
+            });
 
-            await testee.InitializeAsync();
+        await testee.InitializeAsync();
 
-            manualResetEvent.IsSet.Should().BeTrue();
-        }
+        manualResetEvent.IsSet.Should().BeTrue();
+    }
 
-        [Fact]
-        public void InitializeAsync_When_NotAwaitingAndUsingYield_Then_ManualResetEventShouldNotYetHaveBeenSet()
-        {
-            var manualResetEvent = new ManualResetEventSlim(false);
-            var testee = new InitializeAsyncAction(
-                async () =>
-                {
-                    await Task.Delay(10);
-                    manualResetEvent.Set();
-                });
+    [Fact]
+    public void InitializeAsync_When_NotAwaitingAndUsingYield_Then_ManualResetEventShouldNotYetHaveBeenSet()
+    {
+        var manualResetEvent = new ManualResetEventSlim(false);
+        var testee = new InitializeAsyncAction(
+            async () =>
+            {
+                await Task.Delay(10);
+                manualResetEvent.Set();
+            });
 
-            testee.InitializeAsync();
+        testee.InitializeAsync();
 
-            manualResetEvent.IsSet.Should().BeFalse();
-        }
+        manualResetEvent.IsSet.Should().BeFalse();
     }
 }

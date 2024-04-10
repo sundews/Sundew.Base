@@ -5,15 +5,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Infrastructure
-{
-    using System;
+namespace Sundew.Base.UnitTests.Infrastructure;
 
-    public static class TemporarilySet
+using System;
+
+public static class TemporarilySet
+{
+    public static TemporarilySet<TValue> Create<TValue>(TValue temporaryValue, Action<TValue> setValueFunc, Func<TValue> getValueFunc)
     {
-        public static TemporarilySet<TValue> Create<TValue>(TValue temporaryValue, Action<TValue> setValueFunc, Func<TValue> getValueFunc)
-        {
-            return new TemporarilySet<TValue>(temporaryValue, setValueFunc, getValueFunc);
-        }
+        return new TemporarilySet<TValue>(temporaryValue, setValueFunc, getValueFunc);
     }
 }

@@ -5,113 +5,112 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Disposal
+namespace Sundew.Base.UnitTests.Disposal;
+
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Sundew.Base.Disposal;
+using Xunit;
+
+public class DisposableStateTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using FluentAssertions;
-    using Sundew.Base.Disposal;
-    using Xunit;
-
-    public class DisposableStateTests
+    [Fact]
+    public async Task DisposeAsync_WhenDisposableDerivedIsUsed_Then_DisposableDerivedShouldBeCalledFirst()
     {
-        [Fact]
-        public async Task DisposeAsync_WhenDisposableDerivedIsUsed_Then_DisposableDerivedShouldBeCalledFirst()
-        {
-            var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
-            var testee = new DisposableDerived();
+        var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
+        var testee = new DisposableDerived();
 
-            await testee.DisposeAsync();
+        await testee.DisposeAsync();
 
-            testee.Calls.Should().Equal(expectedCalls);
-        }
+        testee.Calls.Should().Equal(expectedCalls);
+    }
 
-        [Fact]
-        public async Task DisposeAsync_WhenDisposableDerivedIsUsedAndDisposeAsyncIsCalledTwice_Then_DisposeShouldOnlyBeCalledOnce()
-        {
-            var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
-            var testee = new DisposableDerived();
-            await testee.DisposeAsync();
+    [Fact]
+    public async Task DisposeAsync_WhenDisposableDerivedIsUsedAndDisposeAsyncIsCalledTwice_Then_DisposeShouldOnlyBeCalledOnce()
+    {
+        var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
+        var testee = new DisposableDerived();
+        await testee.DisposeAsync();
 
-            await testee.DisposeAsync();
+        await testee.DisposeAsync();
 
-            testee.Calls.Should().Equal(expectedCalls);
-        }
+        testee.Calls.Should().Equal(expectedCalls);
+    }
 
-        internal class DisposableBase :
+    internal class DisposableBase :
 #if NET6_0_OR_GREATER
-IDisposable, IAsyncDisposable
+        IDisposable, IAsyncDisposable
 #else
 IDisposable
 #endif
+    {
+        private readonly DisposableState disposer;
+
+        public DisposableBase()
         {
-            private readonly DisposableState disposer;
+            this.disposer = new DisposableState(this);
+        }
 
-            public DisposableBase()
+        ~DisposableBase()
+        {
+            this.disposer.Dispose(false, this.Dispose);
+        }
+
+        public List<string> Calls { get; } = new List<string>();
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:TryDispose methods should call SuppressFinalize", Justification = "It is done by disposer.")]
+        public void Dispose()
+        {
+            this.disposer.Dispose(true, this.Dispose);
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:TryDispose methods should call SuppressFinalize", Justification = "It is done by disposer.")]
+        public ValueTask DisposeAsync()
+        {
+            return this.disposer.DisposeAsync(true, this.DisposeAsync);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
             {
-                this.disposer = new DisposableState(this);
-            }
-
-            ~DisposableBase()
-            {
-                this.disposer.Dispose(false, this.Dispose);
-            }
-
-            public List<string> Calls { get; } = new List<string>();
-
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:TryDispose methods should call SuppressFinalize", Justification = "It is done by disposer.")]
-            public void Dispose()
-            {
-                this.disposer.Dispose(true, this.Dispose);
-            }
-
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:TryDispose methods should call SuppressFinalize", Justification = "It is done by disposer.")]
-            public ValueTask DisposeAsync()
-            {
-                return this.disposer.DisposeAsync(true, this.DisposeAsync);
-            }
-
-            protected virtual void Dispose(bool isDisposing)
-            {
-                if (isDisposing)
-                {
-                    this.Calls.Add(nameof(DisposableBase));
-                }
-            }
-
-            protected virtual ValueTask DisposeAsync(bool isDisposing)
-            {
-                if (isDisposing)
-                {
-                    this.Calls.Add(nameof(DisposableBase));
-                }
-
-                return default;
+                this.Calls.Add(nameof(DisposableBase));
             }
         }
 
-        internal class DisposableDerived : DisposableBase
+        protected virtual ValueTask DisposeAsync(bool isDisposing)
         {
-            protected override void Dispose(bool isDisposing)
+            if (isDisposing)
             {
-                if (isDisposing)
-                {
-                    this.Calls.Add(nameof(DisposableDerived));
-                }
-
-                base.Dispose(isDisposing);
+                this.Calls.Add(nameof(DisposableBase));
             }
 
-            protected override async ValueTask DisposeAsync(bool isDisposing)
-            {
-                if (isDisposing)
-                {
-                    this.Calls.Add(nameof(DisposableDerived));
-                }
+            return default;
+        }
+    }
 
-                await base.DisposeAsync(isDisposing).ConfigureAwait(false);
+    internal class DisposableDerived : DisposableBase
+    {
+        protected override void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
+            {
+                this.Calls.Add(nameof(DisposableDerived));
             }
+
+            base.Dispose(isDisposing);
+        }
+
+        protected override async ValueTask DisposeAsync(bool isDisposing)
+        {
+            if (isDisposing)
+            {
+                this.Calls.Add(nameof(DisposableDerived));
+            }
+
+            await base.DisposeAsync(isDisposing).ConfigureAwait(false);
         }
     }
 }

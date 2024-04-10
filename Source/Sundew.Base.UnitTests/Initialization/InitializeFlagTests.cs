@@ -5,54 +5,53 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Initialization
+namespace Sundew.Base.UnitTests.Initialization;
+
+using FluentAssertions;
+using Sundew.Base.Initialization;
+using Xunit;
+
+public class InitializeFlagTests
 {
-    using FluentAssertions;
-    using Sundew.Base.Initialization;
-    using Xunit;
-
-    public class InitializeFlagTests
+    [Fact]
+    public void Initialize_Then_ResultShouldBeTrue()
     {
-        [Fact]
-        public void Initialize_Then_ResultShouldBeTrue()
-        {
-            var testee = new InitializeFlag();
+        var testee = new InitializeFlag();
 
-            var result = testee.Initialize();
+        var result = testee.Initialize();
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void IsInitialize_Then_ResultShouldBeFalse()
-        {
-            var testee = new InitializeFlag();
+    [Fact]
+    public void IsInitialize_Then_ResultShouldBeFalse()
+    {
+        var testee = new InitializeFlag();
 
-            var result = testee.IsInitialized;
+        var result = testee.IsInitialized;
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void IsInitialize_When_Initialize_Then_ResultShouldBeTrue()
-        {
-            var testee = new InitializeFlag();
-            testee.Initialize();
+    [Fact]
+    public void IsInitialize_When_Initialize_Then_ResultShouldBeTrue()
+    {
+        var testee = new InitializeFlag();
+        testee.Initialize();
 
-            var result = testee.IsInitialized;
+        var result = testee.IsInitialized;
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Initialize_When_Initialize_Then_ResultShouldBeFalse()
-        {
-            var testee = new InitializeFlag();
-            testee.Initialize();
+    [Fact]
+    public void Initialize_When_Initialize_Then_ResultShouldBeFalse()
+    {
+        var testee = new InitializeFlag();
+        testee.Initialize();
 
-            var result = testee.Initialize();
+        var result = testee.Initialize();
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
     }
 }

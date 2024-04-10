@@ -5,76 +5,75 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Collections
+namespace Sundew.Base.UnitTests.Collections;
+
+using System;
+using System.Collections.Generic;
+using FluentAssertions;
+using Sundew.Base.Collections;
+using Xunit;
+
+public class ReadOnlyListExtensionsTests
 {
-    using System;
-    using System.Collections.Generic;
-    using FluentAssertions;
-    using Sundew.Base.Collections;
-    using Xunit;
-
-    public class ReadOnlyListExtensionsTests
+    [Fact]
+    public void ConvertAll_Then_SourceIsArray_Then_ResultShouldBeExpectedResult()
     {
-        [Fact]
-        public void ConvertAll_Then_SourceIsArray_Then_ResultShouldBeExpectedResult()
-        {
-            var array = new[] { 0, 1, 2, 3, 4 };
-            var expectedResult = new long[] { 0, 1, 2, 3, 4 };
+        var array = new[] { 0, 1, 2, 3, 4 };
+        var expectedResult = new long[] { 0, 1, 2, 3, 4 };
 
-            var result = array.ConvertAll(x => (long)x);
+        var result = array.ConvertAll(x => (long)x);
 
-            result.Should().Equal(expectedResult);
-        }
+        result.Should().Equal(expectedResult);
+    }
 
-        [Fact]
-        public void ConvertAll_Then_SourceIsList_Then_ResultShouldBeExpectedResult()
-        {
-            var list = new List<int> { 0, 1, 2, 3, 4 };
-            var expectedResult = new long[] { 0, 1, 2, 3, 4 };
+    [Fact]
+    public void ConvertAll_Then_SourceIsList_Then_ResultShouldBeExpectedResult()
+    {
+        var list = new List<int> { 0, 1, 2, 3, 4 };
+        var expectedResult = new long[] { 0, 1, 2, 3, 4 };
 
-            var result = list.ConvertAll(x => (long)x);
+        var result = list.ConvertAll(x => (long)x);
 
-            result.Should().Equal(expectedResult);
-        }
+        result.Should().Equal(expectedResult);
+    }
 
-        [Fact]
-        public void HasAny_When_SourceIsListAndHasItems_Then_ResultShouldBeTrue()
-        {
-            var list = new List<int> { 0, 1, 2, 3, 4 };
+    [Fact]
+    public void HasAny_When_SourceIsListAndHasItems_Then_ResultShouldBeTrue()
+    {
+        var list = new List<int> { 0, 1, 2, 3, 4 };
 
-            var result = list.HasAny();
+        var result = list.HasAny();
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void HasAny_When_SourceIsArrayAndHasItems_Then_ResultShouldBeTrue()
-        {
-            var list = new int[] { 0, 1, 2, 3, 4 };
+    [Fact]
+    public void HasAny_When_SourceIsArrayAndHasItems_Then_ResultShouldBeTrue()
+    {
+        var list = new int[] { 0, 1, 2, 3, 4 };
 
-            var result = list.HasAny();
+        var result = list.HasAny();
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void IsEmpty_When_SourceIsListAndHasItems_Then_ResultShouldBeTrue()
-        {
-            var list = new List<int>();
+    [Fact]
+    public void IsEmpty_When_SourceIsListAndHasItems_Then_ResultShouldBeTrue()
+    {
+        var list = new List<int>();
 
-            var result = list.IsEmpty();
+        var result = list.IsEmpty();
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void IsEmpty_When_SourceIsArrayAndHasItems_Then_ResultShouldBeTrue()
-        {
-            var list = Array.Empty<int>();
+    [Fact]
+    public void IsEmpty_When_SourceIsArrayAndHasItems_Then_ResultShouldBeTrue()
+    {
+        var list = Array.Empty<int>();
 
-            var result = list.IsEmpty();
+        var result = list.IsEmpty();
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
     }
 }

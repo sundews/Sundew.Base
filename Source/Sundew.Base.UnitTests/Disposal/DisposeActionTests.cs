@@ -5,29 +5,28 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Disposal
+namespace Sundew.Base.UnitTests.Disposal;
+
+using System.Threading;
+using FluentAssertions;
+using Sundew.Base.Disposal;
+using Xunit;
+
+public class DisposeActionTests
 {
-    using System.Threading;
-    using FluentAssertions;
-    using Sundew.Base.Disposal;
-    using Xunit;
-
-    public class DisposeActionTests
+    [Fact]
+    public void Dispose_When_Awaiting_Then_ManualResetEventShouldBeSet()
     {
-        [Fact]
-        public void Dispose_When_Awaiting_Then_ManualResetEventShouldBeSet()
-        {
-            var manualResetEvent = new ManualResetEventSlim(false);
-            var testee = new DisposeAction(
-                () =>
-                {
-                    Thread.Sleep(10);
-                    manualResetEvent.Set();
-                });
+        var manualResetEvent = new ManualResetEventSlim(false);
+        var testee = new DisposeAction(
+            () =>
+            {
+                Thread.Sleep(10);
+                manualResetEvent.Set();
+            });
 
-            testee.Dispose();
+        testee.Dispose();
 
-            manualResetEvent.IsSet.Should().BeTrue();
-        }
+        manualResetEvent.IsSet.Should().BeTrue();
     }
 }

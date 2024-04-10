@@ -28,7 +28,7 @@ IDisposable
 {
     private static readonly Task<bool> CompletedTrueTask = Task.FromResult(true);
     private readonly bool concurrentDisposal;
-    private IDisposalReporter? disposalReporter;
+    private readonly IDisposalReporter? disposalReporter;
     private IImmutableList<Disposer> disposers = ImmutableList<Disposer>.Empty;
 
     /// <summary>

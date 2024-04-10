@@ -5,27 +5,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Infrastructure
+namespace Sundew.Base.UnitTests.Infrastructure;
+
+using System;
+
+public sealed class TemporarilySet<TValue> : IDisposable
 {
-    using System;
+    private readonly TValue originalValue;
+    private readonly Func<TValue> getValueFunc;
+    private readonly Action<TValue> setValueFunc;
 
-    public sealed class TemporarilySet<TValue> : IDisposable
+    internal TemporarilySet(TValue temporaryValue, Action<TValue> setValueFunc, Func<TValue> getValueFunc)
     {
-        private readonly TValue originalValue;
-        private readonly Func<TValue> getValueFunc;
-        private readonly Action<TValue> setValueFunc;
+        this.getValueFunc = getValueFunc;
+        this.setValueFunc = setValueFunc;
+        this.originalValue = this.getValueFunc();
+        this.setValueFunc(temporaryValue);
+    }
 
-        internal TemporarilySet(TValue temporaryValue, Action<TValue> setValueFunc, Func<TValue> getValueFunc)
-        {
-            this.getValueFunc = getValueFunc;
-            this.setValueFunc = setValueFunc;
-            this.originalValue = this.getValueFunc();
-            this.setValueFunc(temporaryValue);
-        }
-
-        public void Dispose()
-        {
-            this.setValueFunc(this.originalValue);
-        }
+    public void Dispose()
+    {
+        this.setValueFunc(this.originalValue);
     }
 }

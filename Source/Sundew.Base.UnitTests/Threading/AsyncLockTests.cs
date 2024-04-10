@@ -5,109 +5,108 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Threading
+namespace Sundew.Base.UnitTests.Threading;
+
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Sundew.Base.Threading;
+using Sundew.Base.Threading.Jobs;
+using Xunit;
+
+public class AsyncLockTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using FluentAssertions;
-    using Sundew.Base.Threading;
-    using Sundew.Base.Threading.Jobs;
-    using Xunit;
+    private const int ExpectedResult = 5;
 
-    public class AsyncLockTests
+    [Fact]
+    public async Task TryLockAsync_When_CheckIsNotCalled_Then_LockNotConfirmedExceptionShouldBeThrown()
     {
-        private const int ExpectedResult = 5;
-
-        [Fact]
-        public async Task TryLockAsync_When_CheckIsNotCalled_Then_LockNotConfirmedExceptionShouldBeThrown()
+        static async Task<int> LockTest()
         {
-            static async Task<int> LockTest()
+            var testee = new AsyncLock();
+            using (await testee.TryLockAsync())
             {
-                var testee = new AsyncLock();
-                using (await testee.TryLockAsync())
-                {
-                    return ExpectedResult;
-                }
+                return ExpectedResult;
             }
-
-            Func<Task> test = async () =>
-            {
-                var ignored = await LockTest();
-            };
-
-            await test.Should().ThrowAsync<LockNotConfirmedException>();
         }
 
-        [Fact]
-        public async Task TryLockAsync_When_CheckIsCalled_Then_ResultShouldBeExpectedResult()
+        Func<Task> test = async () =>
         {
-            static async Task<int> LockTest()
+            var ignored = await LockTest();
+        };
+
+        await test.Should().ThrowAsync<LockNotConfirmedException>();
+    }
+
+    [Fact]
+    public async Task TryLockAsync_When_CheckIsCalled_Then_ResultShouldBeExpectedResult()
+    {
+        static async Task<int> LockTest()
+        {
+            var testee = new AsyncLock();
+            using (var lockResult = await testee.TryLockAsync())
             {
-                var testee = new AsyncLock();
-                using (var lockResult = await testee.TryLockAsync())
+                if (lockResult)
                 {
-                    if (lockResult)
-                    {
-                    }
-
-                    return ExpectedResult;
                 }
+
+                return ExpectedResult;
             }
-
-            var task = LockTest();
-            var result = await task;
-
-            result.Should().Be(ExpectedResult);
         }
 
-        [Fact]
-        public async Task TryLockAsync_When_AddingAnItemTwiceForEachOfTwoThreads_Then_ResultShouldContainItemsWhereTwoConsecutiveItemsAreEqual()
+        var task = LockTest();
+        var result = await task;
+
+        result.Should().Be(ExpectedResult);
+    }
+
+    [Fact]
+    public async Task TryLockAsync_When_AddingAnItemTwiceForEachOfTwoThreads_Then_ResultShouldContainItemsWhereTwoConsecutiveItemsAreEqual()
+    {
+        var list = new List<int>();
+        var asyncLock = new AsyncLock();
+        var count = int.MaxValue;
+        using (var testee = new ContinuousJob(
+                   async c =>
+                   {
+                       using (var result = await asyncLock.TryLockAsync(c))
+                       {
+                           if (result)
+                           {
+                               list.Add(count);
+                               list.Add(count);
+                               count--;
+                           }
+                       }
+                   }))
         {
-            var list = new List<int>();
-            var asyncLock = new AsyncLock();
-            var count = int.MaxValue;
-            using (var testee = new ContinuousJob(
-                async c =>
-                {
-                    using (var result = await asyncLock.TryLockAsync(c))
-                    {
-                        if (result)
-                        {
-                            list.Add(count);
-                            list.Add(count);
-                            count--;
-                        }
-                    }
-                }))
+            var startResult = testee.Start();
+            for (int i = 0; i < 100; i++)
             {
-                var startResult = testee.Start();
-                for (int i = 0; i < 100; i++)
+                var value = i;
+                using (var result = await asyncLock.TryLockAsync(startResult.GetValueOrDefault(CancellationToken.None)))
                 {
-                    var value = i;
-                    using (var result = await asyncLock.TryLockAsync(startResult.GetValueOrDefault(CancellationToken.None)))
+                    if (result)
                     {
-                        if (result)
-                        {
-                            list.Add(value);
-                            list.Add(value);
-                            Thread.Sleep(1);
-                        }
+                        list.Add(value);
+                        list.Add(value);
+                        Thread.Sleep(1);
                     }
                 }
             }
-
-            list.Contains(int.MaxValue).Should().BeTrue();
-            AssertEachTwoItemShouldBeEqual(list);
         }
 
-        private static void AssertEachTwoItemShouldBeEqual(List<int> list)
+        list.Contains(int.MaxValue).Should().BeTrue();
+        AssertEachTwoItemShouldBeEqual(list);
+    }
+
+    private static void AssertEachTwoItemShouldBeEqual(List<int> list)
+    {
+        for (int i = 0; i < list.Count; i += 2)
         {
-            for (int i = 0; i < list.Count; i += 2)
-            {
-                list[i].Should().Be(list[i + 1]);
-            }
+            list[i].Should().Be(list[i + 1]);
         }
     }
 }

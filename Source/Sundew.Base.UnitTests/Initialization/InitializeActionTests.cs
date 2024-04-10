@@ -5,30 +5,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Initialization
+namespace Sundew.Base.UnitTests.Initialization;
+
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Sundew.Base.Initialization;
+using Xunit;
+
+public class InitializeActionTests
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using FluentAssertions;
-    using Sundew.Base.Initialization;
-    using Xunit;
-
-    public class InitializeActionTests
+    [Fact]
+    public void Initialize_When_Awaiting_Then_ManualResetEventShouldBeSet()
     {
-        [Fact]
-        public void Initialize_When_Awaiting_Then_ManualResetEventShouldBeSet()
-        {
-            var manualResetEvent = new ManualResetEventSlim(false);
-            var testee = new InitializeAction(
-                () =>
-                {
-                    Thread.Sleep(10);
-                    manualResetEvent.Set();
-                });
+        var manualResetEvent = new ManualResetEventSlim(false);
+        var testee = new InitializeAction(
+            () =>
+            {
+                Thread.Sleep(10);
+                manualResetEvent.Set();
+            });
 
-            testee.Initialize();
+        testee.Initialize();
 
-            manualResetEvent.IsSet.Should().BeTrue();
-        }
+        manualResetEvent.IsSet.Should().BeTrue();
     }
 }

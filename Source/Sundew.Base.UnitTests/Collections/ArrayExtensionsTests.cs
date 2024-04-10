@@ -5,23 +5,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Collections
+namespace Sundew.Base.UnitTests.Collections;
+
+using FluentAssertions;
+using Sundew.Base.Collections;
+using Xunit;
+
+public class ArrayExtensionsTests
 {
-    using FluentAssertions;
-    using Sundew.Base.Collections;
-    using Xunit;
-
-    public class ArrayExtensionsTests
+    [Fact]
+    public void GetSegment_Then_ResultShouldBeEqualToExpectedResult()
     {
-        [Fact]
-        public void GetSegment_Then_ResultShouldBeEqualToExpectedResult()
-        {
-            var values = new[] { 0, 1, 2, 3, 4, 5 };
-            var expectedResult = new[] { 3, 4, 5 };
+        var values = new[] { 0, 1, 2, 3, 4, 5 };
+        var expectedResult = new[] { 3, 4, 5 };
 
-            var result = values.GetSegment(3);
+        var result = values.GetSegment(3);
 
-            result.Should().Equal(expectedResult);
-        }
+        result.Should().Equal(expectedResult);
     }
 }

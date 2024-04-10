@@ -5,51 +5,50 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Threading
+namespace Sundew.Base.UnitTests.Threading;
+
+using System.Diagnostics;
+using System.Threading;
+using FluentAssertions;
+using Sundew.Base.Threading;
+using Xunit;
+
+public class CurrentThreadTests
 {
-    using System.Diagnostics;
-    using System.Threading;
-    using FluentAssertions;
-    using Sundew.Base.Threading;
-    using Xunit;
-
-    public class CurrentThreadTests
+    [Fact]
+    public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange()
     {
-        [Fact]
-        public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange()
-        {
-            var testee = new CurrentThread();
-            var stopwatch = Stopwatch.StartNew();
-            using var cancellationTokenSource = new CancellationTokenSource(20);
+        var testee = new CurrentThread();
+        var stopwatch = Stopwatch.StartNew();
+        using var cancellationTokenSource = new CancellationTokenSource(20);
 
-            testee.Sleep(60, cancellationTokenSource.Token);
+        testee.Sleep(60, cancellationTokenSource.Token);
 
-            stopwatch.Stop();
-            stopwatch.ElapsedMilliseconds.Should().BeInRange(20, 60);
-        }
+        stopwatch.Stop();
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(20, 60);
+    }
 
-        [Fact]
-        public void Sleep_When_NotCancelled_Then_ElapsedTimeShouldBeWithInRange()
-        {
-            var testee = new CurrentThread();
-            var stopwatch = Stopwatch.StartNew();
+    [Fact]
+    public void Sleep_When_NotCancelled_Then_ElapsedTimeShouldBeWithInRange()
+    {
+        var testee = new CurrentThread();
+        var stopwatch = Stopwatch.StartNew();
 
-            testee.Sleep(10, CancellationToken.None);
+        testee.Sleep(10, CancellationToken.None);
 
-            stopwatch.Stop();
-            stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
-        }
+        stopwatch.Stop();
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
+    }
 
-        [Fact]
-        public void Sleep_Then_ElapsedTimeShouldBeWithInRange()
-        {
-            var testee = new CurrentThread();
-            var stopwatch = Stopwatch.StartNew();
+    [Fact]
+    public void Sleep_Then_ElapsedTimeShouldBeWithInRange()
+    {
+        var testee = new CurrentThread();
+        var stopwatch = Stopwatch.StartNew();
 
-            testee.Sleep(10);
+        testee.Sleep(10);
 
-            stopwatch.Stop();
-            stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
-        }
+        stopwatch.Stop();
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
     }
 }

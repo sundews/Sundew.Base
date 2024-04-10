@@ -5,48 +5,47 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Threading
+namespace Sundew.Base.UnitTests.Threading;
+
+using FluentAssertions;
+using Sundew.Base.Threading;
+using Xunit;
+
+public class FlagTests
 {
-    using FluentAssertions;
-    using Sundew.Base.Threading;
-    using Xunit;
+    private readonly Flag testee = new();
 
-    public class FlagTests
+    [Fact]
+    public void IsSet_When_Set_Then_ResultShouldBeTrue()
     {
-        private readonly Flag testee = new();
+        this.testee.Set();
 
-        [Fact]
-        public void IsSet_When_Set_Then_ResultShouldBeTrue()
-        {
-            this.testee.Set();
+        this.testee.IsSet.Should().BeTrue();
+    }
 
-            this.testee.IsSet.Should().BeTrue();
-        }
+    [Fact]
+    public void IsSet_Then_ResultShouldBeFalse()
+    {
+        this.testee.IsSet.Should().BeFalse();
+    }
 
-        [Fact]
-        public void IsSet_Then_ResultShouldBeFalse()
-        {
-            this.testee.IsSet.Should().BeFalse();
-        }
+    [Fact]
+    public void Clear_When_Set_Then_ResultShouldBeTrue()
+    {
+        this.testee.Set();
 
-        [Fact]
-        public void Clear_When_Set_Then_ResultShouldBeTrue()
-        {
-            this.testee.Set();
+        var result = this.testee.Clear();
 
-            var result = this.testee.Clear();
+        result.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+    }
 
-            result.Should().BeTrue();
-            this.testee.IsSet.Should().BeFalse();
-        }
+    [Fact]
+    public void Clear_Then_ResultShouldBeFalse()
+    {
+        var result = this.testee.Clear();
 
-        [Fact]
-        public void Clear_Then_ResultShouldBeFalse()
-        {
-            var result = this.testee.Clear();
-
-            result.Should().BeFalse();
-            this.testee.IsSet.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+        this.testee.IsSet.Should().BeFalse();
     }
 }

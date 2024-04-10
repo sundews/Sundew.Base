@@ -5,20 +5,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Text
+namespace Sundew.Base.UnitTests.Text;
+
+using FluentAssertions;
+using Sundew.Base.Text;
+using Xunit;
+
+public class CharExtensionsTests
 {
-    using FluentAssertions;
-    using Sundew.Base.Text;
-    using Xunit;
-
-    public class CharExtensionsTests
+    [Fact]
+    public void Repeat_Then_ResultShouldContainRepeatedCharacters()
     {
-        [Fact]
-        public void Repeat_Then_ResultShouldContainRepeatedCharacters()
-        {
-            var result = ' '.Repeat(5);
+        var result = ' '.Repeat(5);
 
-            result.Should().Be("     ");
-        }
+        result.Should().Be("     ");
     }
 }

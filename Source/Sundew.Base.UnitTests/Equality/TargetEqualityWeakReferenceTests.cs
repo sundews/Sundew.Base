@@ -5,96 +5,95 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Equality
+namespace Sundew.Base.UnitTests.Equality;
+
+using FluentAssertions;
+using Sundew.Base.Primitives.WeakReferencing;
+using Xunit;
+
+public class TargetEqualityWeakReferenceTests
 {
-    using FluentAssertions;
-    using Sundew.Base.Primitives.WeakReferencing;
-    using Xunit;
-
-    public class TargetEqualityWeakReferenceTests
+    [Fact]
+    public void Equals_When_BothTargetsAreNull_Then_ResultShouldBeTrue()
     {
-        [Fact]
-        public void Equals_When_BothTargetsAreNull_Then_ResultShouldBeTrue()
-        {
-            var testee = new TargetEqualityWeakReference<Target>(null!);
-            var testee2 = new TargetEqualityWeakReference<Target>(null!);
+        var testee = new TargetEqualityWeakReference<Target>(null!);
+        var testee2 = new TargetEqualityWeakReference<Target>(null!);
 
-            var result = testee.Equals(testee2);
+        var result = testee.Equals(testee2);
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Equals_When_TargetsAreTheSame_Then_ResultShouldBeTrue()
-        {
-            var target = new Target();
-            var testee = new TargetEqualityWeakReference<Target>(target);
-            var testee2 = new TargetEqualityWeakReference<Target>(target);
+    [Fact]
+    public void Equals_When_TargetsAreTheSame_Then_ResultShouldBeTrue()
+    {
+        var target = new Target();
+        var testee = new TargetEqualityWeakReference<Target>(target);
+        var testee2 = new TargetEqualityWeakReference<Target>(target);
 
-            var result = testee.Equals(testee2);
+        var result = testee.Equals(testee2);
 
-            result.Should().BeTrue();
-        }
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Equals_When_TargetsDiffer_Then_ResultShouldBeFalse()
-        {
-            var target1 = new Target();
-            var target2 = new Target();
-            var testee = new TargetEqualityWeakReference<Target>(target1);
-            var testee2 = new TargetEqualityWeakReference<Target>(target2);
+    [Fact]
+    public void Equals_When_TargetsDiffer_Then_ResultShouldBeFalse()
+    {
+        var target1 = new Target();
+        var target2 = new Target();
+        var testee = new TargetEqualityWeakReference<Target>(target1);
+        var testee2 = new TargetEqualityWeakReference<Target>(target2);
 
-            var result = testee.Equals(testee2);
+        var result = testee.Equals(testee2);
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void Equals_When_Target2IsNull_Then_ResultShouldBeFalse()
-        {
-            var target1 = new Target();
-            var testee = new TargetEqualityWeakReference<Target>(target1);
-            var testee2 = new TargetEqualityWeakReference<Target>(null!);
+    [Fact]
+    public void Equals_When_Target2IsNull_Then_ResultShouldBeFalse()
+    {
+        var target1 = new Target();
+        var testee = new TargetEqualityWeakReference<Target>(target1);
+        var testee2 = new TargetEqualityWeakReference<Target>(null!);
 
-            var result = testee.Equals(testee2);
+        var result = testee.Equals(testee2);
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void Equals_When_Target1IsNull_Then_ResultShouldBeFalse()
-        {
-            var target2 = new Target();
-            var testee = new TargetEqualityWeakReference<Target>(null!);
-            var testee2 = new TargetEqualityWeakReference<Target>(target2);
+    [Fact]
+    public void Equals_When_Target1IsNull_Then_ResultShouldBeFalse()
+    {
+        var target2 = new Target();
+        var testee = new TargetEqualityWeakReference<Target>(null!);
+        var testee2 = new TargetEqualityWeakReference<Target>(target2);
 
-            var result = testee.Equals(testee2);
+        var result = testee.Equals(testee2);
 
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
+    }
 
-        [Fact]
-        public void GetHashCode_When_TargetIsNull_Then_ResultShouldBe0()
-        {
-            var testee = new TargetEqualityWeakReference<Target>(null!);
+    [Fact]
+    public void GetHashCode_When_TargetIsNull_Then_ResultShouldBe0()
+    {
+        var testee = new TargetEqualityWeakReference<Target>(null!);
 
-            var result = testee.GetHashCode();
+        var result = testee.GetHashCode();
 
-            result.Should().Be(0);
-        }
+        result.Should().Be(0);
+    }
 
-        [Fact]
-        public void GetHashCode_When_TargetIsNull_Then_ResultShouldNotBe0()
-        {
-            var testee = new TargetEqualityWeakReference<Target>(new Target());
+    [Fact]
+    public void GetHashCode_When_TargetIsNull_Then_ResultShouldNotBe0()
+    {
+        var testee = new TargetEqualityWeakReference<Target>(new Target());
 
-            var result = testee.GetHashCode();
+        var result = testee.GetHashCode();
 
-            result.Should().NotBe(0);
-        }
+        result.Should().NotBe(0);
+    }
 
-        private class Target
-        {
-        }
+    private class Target
+    {
     }
 }

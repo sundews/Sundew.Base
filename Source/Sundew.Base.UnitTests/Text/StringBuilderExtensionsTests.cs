@@ -5,66 +5,65 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Text
+namespace Sundew.Base.UnitTests.Text;
+
+using System.Linq;
+using System.Text;
+using FluentAssertions;
+using Sundew.Base.Collections;
+using Sundew.Base.Text;
+using Xunit;
+
+public class StringBuilderExtensionsTests
 {
-    using System.Linq;
-    using System.Text;
-    using FluentAssertions;
-    using Sundew.Base.Collections;
-    using Sundew.Base.Text;
-    using Xunit;
-
-    public class StringBuilderExtensionsTests
+    [Fact]
+    public void ToString_When_PassingRange_Then_ResultShouldBeExpectedResult()
     {
-        [Fact]
-        public void ToString_When_PassingRange_Then_ResultShouldBeExpectedResult()
-        {
-            const string ExpectedResult = "1,2,3,4";
-            var values = new[] { 1, 2, 3, 4 };
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendItems(values, (builder, i) => builder.Append(i).Append(','));
+        const string ExpectedResult = "1,2,3,4";
+        var values = new[] { 1, 2, 3, 4 };
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendItems(values, (builder, i) => builder.Append(i).Append(','));
 
-            var result = stringBuilder.ToString(..^1);
+        var result = stringBuilder.ToString(..^1);
 
-            result.Should().Be(ExpectedResult);
-        }
+        result.Should().Be(ExpectedResult);
+    }
 
-        [Fact]
-        public void ToStringWithoutLast_Then_ResultShouldBeExpectedResult()
-        {
-            const string ExpectedResult = "1,2,3,4";
-            var values = new[] { 1, 2, 3, 4 };
-            var stringBuilder = new StringBuilder().AppendItems(values, (builder, i) => builder.Append(i).Append(','));
+    [Fact]
+    public void ToStringWithoutLast_Then_ResultShouldBeExpectedResult()
+    {
+        const string ExpectedResult = "1,2,3,4";
+        var values = new[] { 1, 2, 3, 4 };
+        var stringBuilder = new StringBuilder().AppendItems(values, (builder, i) => builder.Append(i).Append(','));
 
-            var result = stringBuilder.ToStringWithoutLast(0);
+        var result = stringBuilder.ToStringWithoutLast(0);
 
-            result.Should().Be(ExpectedResult);
-        }
+        result.Should().Be(ExpectedResult);
+    }
 
-        [Fact]
-        public void ToString_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
-        {
-            const string ExpectedResult = "1, 2, 3, 4";
-            var values = new[] { 1, 2, 3, 4 };
-            const string separator = ", ";
-            var stringBuilder = new StringBuilder().AppendItems(values, (builder, i) => builder.Append(i).Append(separator));
+    [Fact]
+    public void ToString_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
+    {
+        const string ExpectedResult = "1, 2, 3, 4";
+        var values = new[] { 1, 2, 3, 4 };
+        const string separator = ", ";
+        var stringBuilder = new StringBuilder().AppendItems(values, (builder, i) => builder.Append(i).Append(separator));
 
-            var result = stringBuilder.ToString(0, separator);
+        var result = stringBuilder.ToString(0, separator);
 
-            result.Should().Be(ExpectedResult);
-        }
+        result.Should().Be(ExpectedResult);
+    }
 
-        [Fact]
-        public void Remove_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
-        {
-            const string ExpectedResult = "1, 2, 3, 4";
-            var values = new[] { 1, 2, 3, 4 };
-            const string separator = ", ";
-            var stringBuilder = new StringBuilder().AppendItems(values, (builder, i) => builder.Append(i).Append(separator));
+    [Fact]
+    public void Remove_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
+    {
+        const string ExpectedResult = "1, 2, 3, 4";
+        var values = new[] { 1, 2, 3, 4 };
+        const string separator = ", ";
+        var stringBuilder = new StringBuilder().AppendItems(values, (builder, i) => builder.Append(i).Append(separator));
 
-            var result = stringBuilder.Remove(separator);
+        var result = stringBuilder.Remove(separator);
 
-            result.ToString().Should().Be(ExpectedResult);
-        }
+        result.ToString().Should().Be(ExpectedResult);
     }
 }

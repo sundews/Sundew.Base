@@ -5,46 +5,45 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Disposal
+namespace Sundew.Base.UnitTests.Disposal;
+
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Sundew.Base.Disposal;
+using Xunit;
+
+public class DisposeAsyncActionTests
 {
-    using System.Threading;
-    using System.Threading.Tasks;
-    using FluentAssertions;
-    using Sundew.Base.Disposal;
-    using Xunit;
-
-    public class DisposeAsyncActionTests
+    [Fact]
+    public async Task DisposeAsync_When_UsedWithAsyncAwait_Then_DisposeShouldBeCompleted()
     {
-        [Fact]
-        public async Task DisposeAsync_When_UsedWithAsyncAwait_Then_DisposeShouldBeCompleted()
+        var manualResetEvent = new ManualResetEventSlim(false);
+
+        var testee = new DisposeAsyncAction(async () =>
         {
-            var manualResetEvent = new ManualResetEventSlim(false);
+            await Task.Delay(20);
+            manualResetEvent.Set();
+        });
 
-            var testee = new DisposeAsyncAction(async () =>
-            {
-                await Task.Delay(20);
-                manualResetEvent.Set();
-            });
+        await testee.DisposeAsync();
 
-            await testee.DisposeAsync();
+        manualResetEvent.IsSet.Should().BeTrue();
+    }
 
-            manualResetEvent.IsSet.Should().BeTrue();
-        }
+    [Fact]
+    public void DisposeAsync_When_UsedWithAsyncAwait_Then_DisposeShouldNotBeCompleted()
+    {
+        var manualResetEvent = new ManualResetEventSlim(false);
 
-        [Fact]
-        public void DisposeAsync_When_UsedWithAsyncAwait_Then_DisposeShouldNotBeCompleted()
+        var testee = new DisposeAsyncAction(async () =>
         {
-            var manualResetEvent = new ManualResetEventSlim(false);
+            await Task.Delay(20);
+            manualResetEvent.Set();
+        });
 
-            var testee = new DisposeAsyncAction(async () =>
-            {
-                await Task.Delay(20);
-                manualResetEvent.Set();
-            });
+        _ = testee.DisposeAsync();
 
-            _ = testee.DisposeAsync();
-
-            manualResetEvent.IsSet.Should().BeFalse();
-        }
+        manualResetEvent.IsSet.Should().BeFalse();
     }
 }

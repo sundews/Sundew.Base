@@ -5,42 +5,41 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Disposal
+namespace Sundew.Base.UnitTests.Disposal;
+
+using System.Collections.Generic;
+using FluentAssertions;
+using Sundew.Base.Disposal;
+using Xunit;
+
+public class DisposingListTests
 {
-    using System.Collections.Generic;
-    using FluentAssertions;
-    using Sundew.Base.Disposal;
-    using Xunit;
-
-    public class DisposingListTests
+    [Fact]
+    public void Dispose_Then_ItemsShouldBeDisposedInExpectedOrder()
     {
-        [Fact]
-        public void Dispose_Then_ItemsShouldBeDisposedInExpectedOrder()
-        {
-            var expectedOrder = new[] { 1, 2 };
-            var testee = new DisposingList();
-            var disposeOrder = new List<int>();
-            testee.Add(new DisposeAction(() => disposeOrder.Add(1)));
-            testee.Add(new DisposeAction(() => disposeOrder.Add(2)));
+        var expectedOrder = new[] { 1, 2 };
+        var testee = new DisposingList();
+        var disposeOrder = new List<int>();
+        testee.Add(new DisposeAction(() => disposeOrder.Add(1)));
+        testee.Add(new DisposeAction(() => disposeOrder.Add(2)));
 
-            testee.Dispose();
+        testee.Dispose();
 
-            testee.GetDisposers().Should().BeEmpty();
-            disposeOrder.Should().Equal(expectedOrder);
-        }
+        testee.GetDisposers().Should().BeEmpty();
+        disposeOrder.Should().Equal(expectedOrder);
+    }
 
-        [Fact]
-        public void Dispose_When_AddedThroughAddRange_Then_ItemsShouldBeDisposedInExpectedOrder()
-        {
-            var expectedOrder = new[] { 1, 2 };
-            var testee = new DisposingList<DisposeAction>();
-            var disposeOrder = new List<int>();
-            testee.AddRange(new[] { new DisposeAction(() => disposeOrder.Add(1)), new DisposeAction(() => disposeOrder.Add(2)) });
+    [Fact]
+    public void Dispose_When_AddedThroughAddRange_Then_ItemsShouldBeDisposedInExpectedOrder()
+    {
+        var expectedOrder = new[] { 1, 2 };
+        var testee = new DisposingList<DisposeAction>();
+        var disposeOrder = new List<int>();
+        testee.AddRange(new[] { new DisposeAction(() => disposeOrder.Add(1)), new DisposeAction(() => disposeOrder.Add(2)) });
 
-            testee.Dispose();
+        testee.Dispose();
 
-            testee.GetDisposers().Should().BeEmpty();
-            disposeOrder.Should().Equal(expectedOrder);
-        }
+        testee.GetDisposers().Should().BeEmpty();
+        disposeOrder.Should().Equal(expectedOrder);
     }
 }

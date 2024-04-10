@@ -5,145 +5,144 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Numeric
+namespace Sundew.Base.UnitTests.Numeric;
+
+using FluentAssertions;
+using Sundew.Base.Numeric;
+using Xunit;
+
+public class ComparableExtensionsTests
 {
-    using FluentAssertions;
-    using Sundew.Base.Numeric;
-    using Xunit;
+    private const double AValue = 4;
+    private const double AHigherComparisionValue = 5;
+    private const double ALowerComparisionValue = 3;
+    private const double AEqualComparisionValue = 4;
 
-    public class ComparableExtensionsTests
+    [Fact]
+    public void IsGreaterThanOrEqualTo_When_ValueIsLower_Then_ResultShouldBeTrue()
     {
-        private const double AValue = 4;
-        private const double AHigherComparisionValue = 5;
-        private const double ALowerComparisionValue = 3;
-        private const double AEqualComparisionValue = 4;
+        var result = AValue.IsGreaterThanOrEqualTo(ALowerComparisionValue);
 
-        [Fact]
-        public void IsGreaterThanOrEqualTo_When_ValueIsLower_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsGreaterThanOrEqualTo(ALowerComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsGreaterThanOrEqualTo_When_ValueIsGreater_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsGreaterThanOrEqualTo(AHigherComparisionValue);
 
-        [Fact]
-        public void IsGreaterThanOrEqualTo_When_ValueIsGreater_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsGreaterThanOrEqualTo(AHigherComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsGreaterThanOrEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsGreaterThanOrEqualTo(AEqualComparisionValue);
 
-        [Fact]
-        public void IsGreaterThanOrEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsGreaterThanOrEqualTo(AEqualComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsLessThanOrEqualTo_When_ValueIsLower_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsLessThanOrEqualTo(ALowerComparisionValue);
 
-        [Fact]
-        public void IsLessThanOrEqualTo_When_ValueIsLower_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsLessThanOrEqualTo(ALowerComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsLessThanOrEqualTo_When_ValueIsGreater_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsLessThanOrEqualTo(AHigherComparisionValue);
 
-        [Fact]
-        public void IsLessThanOrEqualTo_When_ValueIsGreater_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsLessThanOrEqualTo(AHigherComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsLessThanOrEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsLessThanOrEqualTo(AEqualComparisionValue);
 
-        [Fact]
-        public void IsLessThanOrEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsLessThanOrEqualTo(AEqualComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsLessThan_When_ValueIsLower_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsLessThan(ALowerComparisionValue);
 
-        [Fact]
-        public void IsLessThan_When_ValueIsLower_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsLessThan(ALowerComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsLessThan_When_ValueIsGreater_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsLessThan(AHigherComparisionValue);
 
-        [Fact]
-        public void IsLessThan_When_ValueIsGreater_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsLessThan(AHigherComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsLessThan_When_ValuesAreEqual_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsLessThan(AEqualComparisionValue);
 
-        [Fact]
-        public void IsLessThan_When_ValuesAreEqual_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsLessThan(AEqualComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsGreaterThan_When_ValueIsLower_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsGreaterThan(ALowerComparisionValue);
 
-        [Fact]
-        public void IsGreaterThan_When_ValueIsLower_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsGreaterThan(ALowerComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsGreaterThan_When_ValueIsGreater_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsGreaterThan(AHigherComparisionValue);
 
-        [Fact]
-        public void IsGreaterThan_When_ValueIsGreater_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsGreaterThan(AHigherComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsGreaterThan_When_ValuesAreEqual_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsGreaterThan(AEqualComparisionValue);
 
-        [Fact]
-        public void IsGreaterThan_When_ValuesAreEqual_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsGreaterThan(AEqualComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsEqualTo(AEqualComparisionValue);
 
-        [Fact]
-        public void IsEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsEqualTo(AEqualComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsEqualTo_When_ValuesAreNotEqual_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsEqualTo(ALowerComparisionValue);
 
-        [Fact]
-        public void IsEqualTo_When_ValuesAreNotEqual_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsEqualTo(ALowerComparisionValue);
+        result.Should().BeFalse();
+    }
 
-            result.Should().BeFalse();
-        }
+    [Fact]
+    public void IsNotEqualTo_When_ValuesAreNotEqual_Then_ResultShouldBeTrue()
+    {
+        var result = AValue.IsNotEqualTo(ALowerComparisionValue);
 
-        [Fact]
-        public void IsNotEqualTo_When_ValuesAreNotEqual_Then_ResultShouldBeTrue()
-        {
-            var result = AValue.IsNotEqualTo(ALowerComparisionValue);
+        result.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-        }
+    [Fact]
+    public void IsNotEqualTo_When_ValuesAreEqual_Then_ResultShouldBeFalse()
+    {
+        var result = AValue.IsNotEqualTo(AEqualComparisionValue);
 
-        [Fact]
-        public void IsNotEqualTo_When_ValuesAreEqual_Then_ResultShouldBeFalse()
-        {
-            var result = AValue.IsNotEqualTo(AEqualComparisionValue);
-
-            result.Should().BeFalse();
-        }
+        result.Should().BeFalse();
     }
 }

@@ -5,16 +5,15 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.PerformanceTests
-{
-    using BenchmarkDotNet.Configs;
-    using BenchmarkDotNet.Running;
+namespace Sundew.Base.PerformanceTests;
 
-    public class Program
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Running;
+
+public class Program
+{
+    public static void Main()
     {
-        public static void Main()
-        {
-            BenchmarkRunner.Run(typeof(Program).Assembly, ManualConfig.Create(DefaultConfig.Instance));
-        }
+        BenchmarkRunner.Run(typeof(Program).Assembly, ManualConfig.Create(DefaultConfig.Instance));
     }
 }

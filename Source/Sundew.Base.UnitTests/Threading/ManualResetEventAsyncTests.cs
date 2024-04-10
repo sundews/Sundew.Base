@@ -5,91 +5,90 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.UnitTests.Threading
+namespace Sundew.Base.UnitTests.Threading;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentAssertions;
+using Sundew.Base.Threading;
+using Xunit;
+
+public class ManualResetEventAsyncTests
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using FluentAssertions;
-    using Sundew.Base.Threading;
-    using Xunit;
+    private readonly ManualResetEventAsync testee;
 
-    public class ManualResetEventAsyncTests
+    public ManualResetEventAsyncTests()
     {
-        private readonly ManualResetEventAsync testee;
+        this.testee = new ManualResetEventAsync();
+    }
 
-        public ManualResetEventAsyncTests()
+    [Fact]
+    public async Task WaitAsync_When_Set_Then_ResultShouldBeTrue()
+    {
+        this.testee.Set();
+
+        var result = await this.testee.WaitAsync();
+
+        result.Should().BeTrue();
+        this.testee.IsSet.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Set_When_Waiting_Then_ResultShouldBeTrue()
+    {
+        var waitTask = Task.Run(async () =>
         {
-            this.testee = new ManualResetEventAsync();
-        }
+            await Task.Delay(5);
+            return await this.testee.WaitAsync();
+        });
 
-        [Fact]
-        public async Task WaitAsync_When_Set_Then_ResultShouldBeTrue()
-        {
-            this.testee.Set();
+        this.testee.Set();
 
-            var result = await this.testee.WaitAsync();
+        var result = await waitTask;
+        result.Should().BeTrue();
+        this.testee.IsSet.Should().BeTrue();
+    }
 
-            result.Should().BeTrue();
-            this.testee.IsSet.Should().BeTrue();
-        }
+    [Fact]
+    public async Task WaitAsync_When_Cancelled_Then_ResultShouldBeFalse()
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
 
-        [Fact]
-        public async Task Set_When_Waiting_Then_ResultShouldBeTrue()
-        {
-            var waitTask = Task.Run(async () =>
-            {
-                await Task.Delay(5);
-                return await this.testee.WaitAsync();
-            });
+        var waitTask = Task.Run(async () => await this.testee.WaitAsync(cancellationTokenSource.Token));
+        await cancellationTokenSource.CancelAsync();
 
-            this.testee.Set();
+        var result = await waitTask;
+        result.Should().BeFalse();
+        this.testee.IsSet.Should().BeFalse();
+    }
 
-            var result = await waitTask;
-            result.Should().BeTrue();
-            this.testee.IsSet.Should().BeTrue();
-        }
+    [Fact]
+    public async Task WaitAsync_When_Timedout_Then_ResultShouldBeFalse()
+    {
+        var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1)));
+        await Task.Delay(10);
 
-        [Fact]
-        public async Task WaitAsync_When_Cancelled_Then_ResultShouldBeFalse()
-        {
-            var cancellationTokenSource = new CancellationTokenSource();
+        var result = await waitTask;
+        result.Should().BeFalse();
+        this.testee.IsSet.Should().BeFalse();
+    }
 
-            var waitTask = Task.Run(async () => await this.testee.WaitAsync(cancellationTokenSource.Token));
-            cancellationTokenSource.Cancel();
+    [Fact]
+    public void Reset_When_Set_Then_IsSetShouldBeFalse()
+    {
+        this.testee.Set();
 
-            var result = await waitTask;
-            result.Should().BeFalse();
-            this.testee.IsSet.Should().BeFalse();
-        }
+        this.testee.Reset();
 
-        [Fact]
-        public async Task WaitAsync_When_Timedout_Then_ResultShouldBeFalse()
-        {
-            var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1)));
-            await Task.Delay(10);
+        this.testee.IsSet.Should().BeFalse();
+    }
 
-            var result = await waitTask;
-            result.Should().BeFalse();
-            this.testee.IsSet.Should().BeFalse();
-        }
+    [Fact]
+    public void Set_Then_IsSetShouldBeTrue()
+    {
+        this.testee.Set();
 
-        [Fact]
-        public void Reset_When_Set_Then_IsSetShouldBeFalse()
-        {
-            this.testee.Set();
-
-            this.testee.Reset();
-
-            this.testee.IsSet.Should().BeFalse();
-        }
-
-        [Fact]
-        public void Set_Then_IsSetShouldBeTrue()
-        {
-            this.testee.Set();
-
-            this.testee.IsSet.Should().BeTrue();
-        }
+        this.testee.IsSet.Should().BeTrue();
     }
 }
