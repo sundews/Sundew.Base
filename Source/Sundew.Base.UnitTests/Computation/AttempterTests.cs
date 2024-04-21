@@ -34,7 +34,7 @@ public class AttempterTests
     [Fact]
     public void Attempt_When_SucceedingAtFirstAttempt_Then_ResultShouldBeExpectedResult()
     {
-        const int ExpectedResult = 5;
+        const int expectedResult = 5;
         var testee = new Attempter(2);
 
         var numberOfCalls = 0;
@@ -42,19 +42,19 @@ public class AttempterTests
             x =>
             {
                 numberOfCalls = x.CurrentAttempt;
-                return ExpectedResult;
+                return expectedResult;
             },
             ExceptionFilter.HandleAll());
 
         numberOfCalls.Should().Be(1);
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(ExpectedResult);
+        result.Value.Should().Be(expectedResult);
     }
 
     [Fact]
     public void Attempt_When_SucceedingAtSecondAttempt_Then_ResultShouldBeExpectedResult()
     {
-        const int ExpectedResult = 5;
+        const int expectedResult = 5;
         var testee = new Attempter(2);
 
         var numberOfCalls = 0;
@@ -67,13 +67,13 @@ public class AttempterTests
                     throw new InvalidOperationException("Something went right");
                 }
 
-                return ExpectedResult;
+                return expectedResult;
             },
             ExceptionFilter.HandleOnly(typeof(SystemException)));
 
         numberOfCalls.Should().Be(2);
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(ExpectedResult);
+        result.Value.Should().Be(expectedResult);
     }
 
     [Fact]

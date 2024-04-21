@@ -32,7 +32,7 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable array.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting array.</returns>
-    public static ImmutableArray<TItem> TryAdd<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
+    public static ImmutableArray<TItem> AddIfHasValue<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
         where TItem : struct
     {
         return option.HasValue ? immutableArray.Add(option.Value) : immutableArray;
@@ -45,22 +45,10 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable array.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting array.</returns>
-    public static ImmutableArray<TItem> TryAdd<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
+    public static ImmutableArray<TItem> AddIfHasValue<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
         where TItem : class
     {
         return option.HasValue() ? immutableArray.Add(option) : immutableArray;
-    }
-
-    /// <summary>
-    /// Tries to add the result item if it has any.
-    /// </summary>
-    /// <typeparam name="TItem">The item type.</typeparam>
-    /// <param name="immutableArray">The immutable array.</param>
-    /// <param name="result">The result.</param>
-    /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TItem> TryAdd<TItem>(this ImmutableArray<TItem> immutableArray, R<TItem> result)
-    {
-        return result.IsSuccess ? immutableArray : immutableArray.Add(result.Error);
     }
 
     /// <summary>
@@ -71,7 +59,19 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TSuccess> TryAddSuccess<TSuccess, TError>(this ImmutableArray<TSuccess> immutableArray, R<TSuccess, TError> result)
+    public static ImmutableArray<TSuccess> AddIfSuccess<TSuccess, TError>(this ImmutableArray<TSuccess> immutableArray, R<TSuccess, TError> result)
+    {
+        return result.IsSuccess ? immutableArray.Add(result.Value) : immutableArray;
+    }
+
+    /// <summary>
+    /// Adds the result error if the result failed.
+    /// </summary>
+    /// <typeparam name="TSuccess">The error type.</typeparam>
+    /// <param name="immutableArray">The immutable list.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static ImmutableArray<TSuccess> AddIfSuccess<TSuccess>(this ImmutableArray<TSuccess> immutableArray, RwV<TSuccess> result)
     {
         return result.IsSuccess ? immutableArray.Add(result.Value) : immutableArray;
     }
@@ -83,7 +83,7 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddError<TError>(this ImmutableArray<TError> immutableArray, R<TError> result)
+    public static ImmutableArray<TError> AddIfError<TError>(this ImmutableArray<TError> immutableArray, RwE<TError> result)
     {
         return result.IsSuccess ? immutableArray : immutableArray.Add(result.Error);
     }
@@ -96,7 +96,7 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, R<TSuccess, TError> result)
+    public static ImmutableArray<TError> AddIfError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, R<TSuccess, TError> result)
     {
         return result.IsSuccess ? immutableArray : immutableArray.Add(result.Error);
     }
@@ -108,7 +108,7 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddAnyError<TError>(this ImmutableArray<TError> immutableArray, R<TError> result)
+    public static ImmutableArray<TError> AddIfAnyError<TError>(this ImmutableArray<TError> immutableArray, RwE<TError> result)
     {
         return result.HasError ? immutableArray.Add(result.Error) : immutableArray;
     }
@@ -121,7 +121,7 @@ public static class ImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddAnyError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, R<TSuccess, TError> result)
+    public static ImmutableArray<TError> AddIfAnyError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, R<TSuccess, TError> result)
     {
         return result.HasError ? immutableArray.Add(result.Error) : immutableArray;
     }

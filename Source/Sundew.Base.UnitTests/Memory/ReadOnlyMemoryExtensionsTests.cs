@@ -129,9 +129,9 @@ public class ReadOnlyMemoryExtensionsTests
     [Fact]
     public void Split_When_SplittingOnLastCharacterAndRemoveEmptyEntriesIsSet_Then_LastEntryShouldBeRemoved()
     {
-        const string Input = "m:s:t:";
+        const string input = "m:s:t:";
 
-        var result = Input.AsMemory().Split(
+        var result = input.AsMemory().Split(
             (character, _, _) =>
             {
                 return character switch

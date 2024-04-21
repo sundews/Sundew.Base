@@ -11,17 +11,34 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Extends <see cref="IEnumerable"/> interface for the result structs <see cref="R{TValue}"/> and <see cref="R{TValue,TError}"/>.
+/// Extends <see cref="IEnumerable"/> interface for the result structs <see cref="RwE{TError}"/> and <see cref="R{TValue,TError}"/>.
 /// </summary>
 public static class EnumerableResultExtensions
 {
     /// <summary>
-    /// Gets all non successful item errors from the specified enumerable.
+    /// Gets all non-successful item errors from the specified enumerable.
+    /// </summary>
+    /// <typeparam name="TSuccess">The error type.</typeparam>
+    /// <param name="results">The results.</param>
+    /// <returns>An enumerable containing all errors.</returns>
+    public static IEnumerable<TSuccess> GetSuccesses<TSuccess>(this IEnumerable<RwV<TSuccess>> results)
+    {
+        foreach (var result in results)
+        {
+            if (result.IsSuccess)
+            {
+                yield return result.Value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets all non-successful item errors from the specified enumerable.
     /// </summary>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="results">The results.</param>
     /// <returns>An enumerable containing all errors.</returns>
-    public static IEnumerable<TError> GetErrors<TError>(this IEnumerable<R<TError>> results)
+    public static IEnumerable<TError> GetErrors<TError>(this IEnumerable<RwE<TError>> results)
     {
         foreach (var result in results)
         {
@@ -51,7 +68,7 @@ public static class EnumerableResultExtensions
     }
 
     /// <summary>
-    /// Gets all non successful item errors from the specified enumerable.
+    /// Gets all non-successful item errors from the specified enumerable.
     /// </summary>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>

@@ -9,7 +9,6 @@ namespace Sundew.Base.UnitTests.Primitives;
 
 using System;
 using FluentAssertions;
-using Sundew.Base.Primitives;
 using Xunit;
 
 public class OTests
@@ -32,23 +31,24 @@ public class OTests
     }
 
     [Theory]
-    [InlineData(true, true, true, true)]
-    [InlineData(true, false, false, false)]
-    [InlineData(false, false, true, false)]
-    [InlineData(false, true, true, false)]
+    [InlineData(true, true, true, true, false)]
+    [InlineData(true, false, false, false, true)]
+    [InlineData(false, false, true, false, false)]
+    [InlineData(false, true, true, false, false)]
     public void IsSuccess_Then_ResultShouldHaveExpectedValues(
         bool option,
         bool result,
         bool expectedResult,
-        bool expectedHasValue)
+        bool expectedSuccessHasValue,
+        bool expectedErrorHasValue)
     {
         R<int, int>? testee = option ? R.From(result, 1, 2) : null;
 
         var actualResult = testee.IsSuccess(out var optionalValue, out var failedResult);
 
         actualResult.Should().Be(expectedResult);
-        optionalValue.HasValue.Should().Be(expectedHasValue);
-        failedResult.IsSuccess.Should().Be(expectedResult);
+        optionalValue.HasValue.Should().Be(expectedSuccessHasValue);
+        failedResult.HasValue.Should().Be(expectedErrorHasValue);
     }
 
     [Theory]
@@ -84,7 +84,7 @@ public class OTests
     [Theory]
     [InlineData(true, 5, 5)]
     [InlineData(false, 5, default)]
-    public void FromValue_Then_ResultShouldBeExpectedResult2(bool option, int optionalValue, int? expectedResult)
+    public void FromValue_Then_ResultShouldBeExpectedResult(bool option, int optionalValue, int? expectedResult)
     {
         var result = O.FromValue(option, () => optionalValue);
 

@@ -57,8 +57,64 @@ public static class O
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
+        where TValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value) : default;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
+        where TValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value, parameter) : default;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TParameter1">The type of the parameter 1.</typeparam>
+    /// <typeparam name="TParameter2">The type of the parameter 2.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="parameter1">The parameter 1.</param>
+    /// <param name="parameter2">The parameter 2.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue> valueFunc)
+        where TValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value, parameter1, parameter2) : default;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
         where TValue : class
-        where TNewValue : class
     {
         return value != null ? valueFunc(value) : default;
     }
@@ -78,7 +134,6 @@ public static class O
     [MethodImpl((MethodImplOptions)0x300)]
     public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
         where TValue : class
-        where TNewValue : class
     {
         return value != null ? valueFunc(value, parameter) : default;
     }
@@ -100,7 +155,6 @@ public static class O
     [MethodImpl((MethodImplOptions)0x300)]
     public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue> valueFunc)
         where TValue : class
-        where TNewValue : class
     {
         return value != null ? valueFunc(value, parameter1, parameter2) : default;
     }
@@ -387,7 +441,7 @@ public static class O
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
-    /// A <see cref="ValueTask{TValue}" />.
+    /// A <see cref="ValueTask" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static ValueTask<TValue?> ToAsync<TValue>(this TValue? value)
@@ -405,7 +459,7 @@ public static class O
     /// <param name="valueOption">The value option.</param>
     /// <param name="failedResult">The failed result.</param>
     /// <returns><c>true</c>, if the <paramref name="valueOption"/> should be processed, or <c>false</c> if the <paramref name="failedResult"/> should be processed.</returns>
-    public static bool IsSuccess<TSuccess, TError>(this in R<TSuccess, TError>? optionalResult, out TSuccess? valueOption, out R<TError> failedResult)
+    public static bool IsSuccess<TSuccess, TError>(this in R<TSuccess, TError>? optionalResult, out TSuccess? valueOption, [NotNullWhen(false)] out TError? failedResult)
         where TSuccess : class
     {
         if (optionalResult.HasValue)
@@ -413,17 +467,17 @@ public static class O
             if (optionalResult.Value.IsSuccess)
             {
                 valueOption = optionalResult.Value.Value;
-                failedResult = R.Success();
+                failedResult = default;
                 return true;
             }
 
             valueOption = default;
-            failedResult = R.Error(optionalResult.Value.Error);
+            failedResult = optionalResult.Value.Error;
             return false;
         }
 
         valueOption = default;
-        failedResult = R.Success();
+        failedResult = default;
         return true;
     }
 
@@ -502,15 +556,30 @@ public static class O
     /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
-    /// <typeparam name="TError">The type of the error.</typeparam>
-    /// <param name="error">The error.</param>
+    /// <typeparam name="TSuccess">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
     /// <returns>
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TError> ToResult<TError>(this TError? error)
+    public static RwV<TSuccess> ToValueResult<TSuccess>(this TSuccess? value)
     {
-        return new R<TError>(error == null, error);
+        return new RwV<TSuccess>(value != null, value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the value.</typeparam>
+    /// <param name="value">The error.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ValueTask<RwV<TSuccess>> ToValueResultAsync<TSuccess>(this TSuccess? value)
+        where TSuccess : class
+    {
+        return new RwV<TSuccess>(value != null, value);
     }
 
     /// <summary>
@@ -522,9 +591,23 @@ public static class O
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TError>> ToResultAsync<TError>(this TError? error)
+    public static RwE<TError> ToErrorResult<TError>(this TError? error)
+    {
+        return new RwE<TError>(error == null, error);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="error">The error.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ValueTask<RwE<TError>> ToErrorResultAsync<TError>(this TError? error)
         where TError : class
     {
-        return new R<TError>(error == null, error);
+        return new RwE<TError>(error == null, error);
     }
 }

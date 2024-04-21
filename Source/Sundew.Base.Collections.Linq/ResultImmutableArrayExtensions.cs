@@ -23,7 +23,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TSuccess> TryAddAll<TSuccess, TError>(this ImmutableArray<TSuccess> immutableArray, in R<All<TSuccess>, Failed<TError>> result)
+    public static ImmutableArray<TSuccess> AddAllIfSuccess<TSuccess, TError>(this ImmutableArray<TSuccess> immutableArray, in R<All<TSuccess>, Failed<TError>> result)
     {
         return result.IsSuccess ? immutableArray.AddRange(result.Value) : immutableArray;
     }
@@ -37,7 +37,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TSuccess> TryAddAll<TSuccess, TItem, TError>(this ImmutableArray<TSuccess> immutableArray, in R<All<TSuccess>, Failed<TItem, TError>> result)
+    public static ImmutableArray<TSuccess> AddAllIfSuccess<TSuccess, TItem, TError>(this ImmutableArray<TSuccess> immutableArray, in R<All<TSuccess>, Failed<TItem, TError>> result)
     {
         return result.IsSuccess ? immutableArray.AddRange(result.Value) : immutableArray;
     }
@@ -49,7 +49,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddErrors<TError>(this ImmutableArray<TError> immutableArray, in R<Failed<TError>> result)
+    public static ImmutableArray<TError> AddFailedIfError<TError>(this ImmutableArray<TError> immutableArray, in RwE<Failed<TError>> result)
     {
         return result.IsSuccess ? immutableArray : immutableArray.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!));
     }
@@ -63,7 +63,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddErrors<TSuccess, TItem, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TError>> result)
+    public static ImmutableArray<TError> AddFailedIfError<TSuccess, TItem, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TError>> result)
     {
         return result.IsSuccess ? immutableArray : immutableArray.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!));
     }
@@ -77,7 +77,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddErrors<TSuccess, TItem, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TItem, TError>> result)
+    public static ImmutableArray<TError> AddFailedIfError<TSuccess, TItem, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TItem, TError>> result)
     {
         return result.IsSuccess ? immutableArray : immutableArray.AddRange(result.Error.GetErrors());
     }
@@ -89,7 +89,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddAnyErrors<TError>(this ImmutableArray<TError> immutableArray, in R<Failed<TError>> result)
+    public static ImmutableArray<TError> AddFailedIfAnyError<TError>(this ImmutableArray<TError> immutableArray, in RwE<Failed<TError>> result)
     {
         return result.HasError ? immutableArray.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!)) : immutableArray;
     }
@@ -102,7 +102,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddAnyErrors<TSuccess, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TError>> result)
+    public static ImmutableArray<TError> AddFailedIfAnyError<TSuccess, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TError>> result)
     {
         return result.HasError ? immutableArray.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!)) : immutableArray;
     }
@@ -116,7 +116,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> TryAddAnyErrors<TSuccess, TItem, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TItem, TError>> result)
+    public static ImmutableArray<TError> AddFailedIfAnyError<TSuccess, TItem, TError>(this ImmutableArray<TError> immutableArray, in R<All<TSuccess>, Failed<TItem, TError>> result)
     {
         return result.HasError ? immutableArray.AddRange(result.Error.GetErrors()) : immutableArray;
     }

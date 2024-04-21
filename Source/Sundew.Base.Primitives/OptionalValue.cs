@@ -301,25 +301,58 @@ public static class OptionalValue
     /// <param name="valueOption">The value option.</param>
     /// <param name="failedResult">The failed result.</param>
     /// <returns><c>true</c>, if the <paramref name="valueOption"/> should be processed, or <c>false</c> if the <paramref name="failedResult"/> should be processed.</returns>
-    public static bool IsSuccess<TSuccess, TError>(this in R<TSuccess, TError>? optionalResult, out TSuccess? valueOption, out R<TError> failedResult)
+    public static bool IsSuccess<TSuccess, TError>(this in R<TSuccess, TError>? optionalResult, out TSuccess? valueOption, [NotNullWhen(false)] out TError? failedResult)
         where TSuccess : struct
+        where TError : class
     {
         if (optionalResult.HasValue)
         {
             if (optionalResult.Value.IsSuccess)
             {
                 valueOption = optionalResult.Value.Value;
-                failedResult = R.Success();
+                failedResult = default;
                 return true;
             }
 
             valueOption = default;
-            failedResult = R.Error(optionalResult.Value.Error);
+            failedResult = optionalResult.Value.Error;
             return false;
         }
 
         valueOption = default;
-        failedResult = R.Success();
+        failedResult = default;
+        return true;
+    }
+
+    /// <summary>
+    /// Converts a <see cref="R{TSuccess, TError}"/>? to a TSuccess? and a R{TError} and returns a value indicating which of the two to process.
+    /// </summary>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="optionalResult">The optional result.</param>
+    /// <param name="valueOption">The value option.</param>
+    /// <param name="failedResult">The failed result.</param>
+    /// <returns><c>true</c>, if the <paramref name="valueOption"/> should be processed, or <c>false</c> if the <paramref name="failedResult"/> should be processed.</returns>
+    public static bool IsSuccess<TSuccess, TError>(this in R<TSuccess, TError>? optionalResult, out TSuccess? valueOption, [NotNullWhen(false)] out TError? failedResult)
+        where TSuccess : struct
+        where TError : struct
+    {
+        if (optionalResult.HasValue)
+        {
+            if (optionalResult.Value.IsSuccess)
+            {
+                valueOption = optionalResult.Value.Value;
+                failedResult = default;
+                return true;
+            }
+
+            valueOption = default;
+            failedResult = optionalResult.Value.Error;
+            return false;
+        }
+
+        valueOption = default;
+        failedResult = default;
         return true;
     }
 

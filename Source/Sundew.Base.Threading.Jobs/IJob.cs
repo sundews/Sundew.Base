@@ -10,7 +10,6 @@ namespace Sundew.Base.Threading.Jobs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Sundew.Base.Primitives;
 
 /// <summary>
 /// Interface for implementing a job.
@@ -41,13 +40,13 @@ public interface IJob : IDisposable
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    R<AggregateException> Stop();
+    RwE<AggregateException> Stop();
 
     /// <summary>
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    Task<R<AggregateException>> StopAsync();
+    Task<RwE<AggregateException>> StopAsync();
 
     /// <summary>
     /// Waits for the job to finish asynchronously.
@@ -55,10 +54,10 @@ public interface IJob : IDisposable
     /// <returns>
     /// An async task.
     /// </returns>
-    Task<R<AggregateException>> WaitAsync();
+    Task<RwE<AggregateException>> WaitAsync();
 
     /// <summary>
     /// Waits for the job to finish.
     /// </summary>
-    R<AggregateException> Wait();
+    RwE<AggregateException> Wait();
 }

@@ -43,6 +43,16 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     public bool IsSuccess { get; }
 
     /// <summary>
+    /// Gets a value indicating whether this <see cref="R"/> is an error.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if success; otherwise, <c>false</c>.
+    /// </value>
+    [MemberNotNullWhen(false, nameof(Value))]
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool IsError => !this.IsSuccess;
+
+    /// <summary>
     /// Gets a value indicating whether this <see cref="R"/> has an error.
     /// </summary>
     /// <value>
@@ -84,9 +94,20 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator R<TError>(R<TValue, TError> r)
+    public static implicit operator RwV<TValue>(R<TValue, TError> r)
     {
-        return new R<TError>(r.IsSuccess, r.Error);
+        return new RwV<TValue>(r.IsSuccess, r.Value);
+    }
+
+    /// <summary>
+    /// Gets the result's success property.
+    /// </summary>
+    /// <param name="r">The result.</param>
+    /// <returns>A value indicating whether the result was successful.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator RwE<TError>(R<TValue, TError> r)
+    {
+        return new RwE<TError>(r.IsSuccess, r.Error);
     }
 
     /// <summary>
@@ -139,7 +160,7 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<TValue, TError>?(R<TValue?, TError> result)
     {
-        return result.ToOptionalResult();
+        return result.ToResultOption();
     }
 #endif
 
@@ -245,12 +266,21 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     }
 
     /// <summary>
-    /// Converts this instance to a <see cref="R{TError}"/>.
+    /// Converts this instance to a <see cref="RwV{TError}"/>.
     /// </summary>
     /// <returns>The value task.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:Element should begin with upper-case letter", Justification = "Design choice")]
-    public R<TError> _()
+    public RwV<TValue> ToWithValue()
+    {
+        return this;
+    }
+
+    /// <summary>
+    /// Converts this instance to a <see cref="RwE{TError}"/>.
+    /// </summary>
+    /// <returns>The value task.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public RwE<TError> ToWithError()
     {
         return this;
     }
@@ -421,11 +451,11 @@ public readonly struct R<TValue, TError> : IEquatable<R<TValue, TError>>
     /// <typeparam name="TOtherError">The other error.</typeparam>
     /// <param name="other">The other result.</param>
     /// <returns>A new result.</returns>
-    public R<(TValue Left, TOtherValue Right), (R<TError> Left, R<TOtherError> Right)> Combine<TOtherValue, TOtherError>(in R<TOtherValue, TOtherError> other)
+    public R<(TValue Left, TOtherValue Right), (RwE<TError> Left, RwE<TOtherError> Right)> Combine<TOtherValue, TOtherError>(in R<TOtherValue, TOtherError> other)
     {
         return this.IsSuccess && other.IsSuccess
             ? R.Success((this.Value, other.Value))
-            : R.Error((this._(), other._()));
+            : R.Error((this.ToWithError(), other.ToWithError()));
     }
 
     /// <summary>

@@ -10,7 +10,6 @@ namespace Sundew.Base.Threading.Jobs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Sundew.Base.Primitives;
 using Sundew.Base.Threading.Internal;
 
 /// <summary>
@@ -107,7 +106,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    public R<AggregateException> Stop()
+    public RwE<AggregateException> Stop()
     {
         var task = this.StopAsync();
         task.Wait();
@@ -118,7 +117,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    public async Task<R<AggregateException>> StopAsync()
+    public async Task<RwE<AggregateException>> StopAsync()
     {
         var actualTask = this.jobContinuationTask;
         this.cancellationTokenSource?.Cancel();
@@ -128,7 +127,7 @@ public sealed class CancellableJob<TState> : IJob
             await actualTask.ConfigureAwait(false);
         }
 
-        return R.From(this.aggregateException);
+        return R.FromError(this.aggregateException);
     }
 
     /// <summary>
@@ -137,21 +136,21 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>
     /// An async task.
     /// </returns>
-    public async Task<R<AggregateException>> WaitAsync()
+    public async Task<RwE<AggregateException>> WaitAsync()
     {
         if (this.jobContinuationTask != null)
         {
             await this.jobContinuationTask.ConfigureAwait(false);
         }
 
-        return R.From(this.aggregateException);
+        return R.FromError(this.aggregateException);
     }
 
     /// <summary>
     /// Waits for the job to finish.
     /// </summary>
     /// <returns>A result.</returns>
-    public R<AggregateException> Wait()
+    public RwE<AggregateException> Wait()
     {
         var task = this.WaitAsync();
         task.Wait();

@@ -10,12 +10,12 @@ namespace Sundew.Base.Collections.Immutable;
 using System.Collections.Immutable;
 
 /// <summary>
-/// Extension methods fro <see cref="ImmutableHashSet{TItem}"/>.
+/// Extension methods for <see cref="ImmutableHashSet{TItem}"/>.
 /// </summary>
 public static class ImmutableHashSetExtensions
 {
     /// <summary>
-    /// Tries to a the item and returns the new immutable hash set and a value indicating whether the value was added.
+    /// Tries to add the item and returns the new immutable hash set and a value indicating whether the value was added.
     /// </summary>
     /// <typeparam name="TSet">The set type.</typeparam>
     /// <typeparam name="TItem">The item type.</typeparam>
@@ -63,12 +63,56 @@ public static class ImmutableHashSetExtensions
     /// Tries to add the result item if it has any.
     /// </summary>
     /// <typeparam name="TSet">The set type.</typeparam>
-    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <typeparam name="TSuccess">The value type.</typeparam>
     /// <param name="immutableSet">The immutable array.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TSet TryAdd<TSet, TItem>(this TSet immutableSet, R<TItem> result)
-        where TSet : IImmutableSet<TItem>
+    public static TSet AddIfSuccess<TSet, TSuccess>(this TSet immutableSet, RwV<TSuccess> result)
+        where TSet : IImmutableSet<TSuccess>
+    {
+        return result.IsSuccess ? (TSet)immutableSet.Add(result.Value) : immutableSet;
+    }
+
+    /// <summary>
+    /// Tries to add the result item if it has any.
+    /// </summary>
+    /// <typeparam name="TSet">The set type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="immutableSet">The immutable array.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TSet AddIfError<TSet, TError>(this TSet immutableSet, RwE<TError> result)
+        where TSet : IImmutableSet<TError>
+    {
+        return result.IsSuccess ? immutableSet : (TSet)immutableSet.Add(result.Error);
+    }
+
+    /// <summary>
+    /// Tries to add the result item if it has any.
+    /// </summary>
+    /// <typeparam name="TSet">The set type.</typeparam>
+    /// <typeparam name="TSuccess">The value type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="immutableSet">The immutable array.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TSet AddIfSuccess<TSet, TSuccess, TError>(this TSet immutableSet, R<TSuccess, TError> result)
+        where TSet : IImmutableSet<TSuccess>
+    {
+        return result.IsSuccess ? (TSet)immutableSet.Add(result.Value) : immutableSet;
+    }
+
+    /// <summary>
+    /// Tries to add the result item if it has any.
+    /// </summary>
+    /// <typeparam name="TSet">The set type.</typeparam>
+    /// <typeparam name="TSuccess">The value type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="immutableSet">The immutable array.</param>
+    /// <param name="result">The result.</param>
+    /// <returns> The resulting list.</returns>
+    public static TSet AddIfError<TSet, TSuccess, TError>(this TSet immutableSet, R<TSuccess, TError> result)
+        where TSet : IImmutableSet<TError>
     {
         return result.IsSuccess ? immutableSet : (TSet)immutableSet.Add(result.Error);
     }

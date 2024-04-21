@@ -10,7 +10,6 @@ namespace Sundew.Base.UnitTests.Primitives;
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Sundew.Base.Primitives;
 using Xunit;
 
 public class RAsyncTests
@@ -18,38 +17,38 @@ public class RAsyncTests
     [Fact]
     public async Task ImplicitCast_When_CastingToResult_Then_ValueShouldBeExpectedValue()
     {
-        const int ExpectedValue = 34;
-        const int ExpectedError = 0;
+        const int expectedValue = 34;
+        const int expectedError = 0;
 
-        R<int, double> r = await ComputeAsync(() => R.SuccessAsync(ExpectedValue));
+        R<int, double> r = await ComputeAsync(() => R.SuccessAsync(expectedValue));
 
         r.IsSuccess.Should().BeTrue();
-        r.Value.Should().Be(ExpectedValue);
-        r.Error.Should().Be(ExpectedError);
+        r.Value.Should().Be(expectedValue);
+        r.Error.Should().Be(expectedError);
     }
 
     [Fact]
     public async Task ImplicitCast_WhenCastingToIfError_Then_ErrorShouldBeExpectedError()
     {
-        const string ExpectedError = "Failed";
+        const string expectedError = "Failed";
 
-        R<string> r = await ComputeAsync(() => R.ErrorAsync(ExpectedError));
+        RwE<string> r = await ComputeAsync(() => R.ErrorAsync(expectedError));
 
         r.IsSuccess.Should().BeFalse();
-        r.Error.Should().Be(ExpectedError);
+        r.Error.Should().Be(expectedError);
     }
 
     [Fact]
     public async Task ImplicitCast_WhenCastingToResult_Then_ErrorShouldBeExpectedError()
     {
-        const int ExpectedValue = default;
-        const string ExpectedError = "Failed";
+        const int expectedValue = default;
+        const string expectedError = "Failed";
 
-        R<int, string> r = await ComputeAsync(() => R.ErrorAsync(ExpectedError));
+        R<int, string> r = await ComputeAsync(() => R.ErrorAsync(expectedError));
 
         r.IsSuccess.Should().BeFalse();
-        r.Value.Should().Be(ExpectedValue);
-        r.Error.Should().Be(ExpectedError);
+        r.Value.Should().Be(expectedValue);
+        r.Error.Should().Be(expectedError);
     }
 
     [Theory]
@@ -59,7 +58,7 @@ public class RAsyncTests
         bool expectedResult,
         int expectedError)
     {
-        var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError));
+        var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError));
 
         var result = testee.With(Convert.ToDouble);
 
@@ -76,7 +75,7 @@ public class RAsyncTests
         int expectedValue,
         int expectedError)
     {
-        var testee = await ComputeAsync(() => R.FromAsync(expectedResult, expectedError));
+        var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError));
 
         var result = testee.With(expectedValue);
 
@@ -88,50 +87,50 @@ public class RAsyncTests
     [Fact]
     public async Task Deconstruction_When_DeconstructingAllParameters_Then_DeconstructedValuesShouldBedExpectedResult()
     {
-        const bool ExpectedIsSuccess = true;
-        const double ExpectedValue = 65d;
-        const double ExpectedError = 45d;
+        const bool expectedIsSuccess = true;
+        const double expectedValue = 65d;
+        const double expectedError = 45d;
 
-        var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(ExpectedIsSuccess, ExpectedValue, ExpectedError));
+        var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(expectedIsSuccess, expectedValue, expectedError));
 
-        isSuccess.Should().Be(ExpectedIsSuccess);
-        value.Should().Be(ExpectedValue);
-        error.Should().Be(ExpectedError);
+        isSuccess.Should().Be(expectedIsSuccess);
+        value.Should().Be(expectedValue);
+        error.Should().Be(expectedError);
     }
 
     [Fact]
     public async Task ErrorAsync_When_PassingResultIntoValueTaskAsyncMethod_Then_ResultShouldBeValueTaskOfResult()
     {
-        const double ExpectedError = 65d;
+        const double expectedError = 65d;
 
-        R<double> r = await ComputeAsync(() => R.ErrorAsync(65d));
+        RwE<double> r = await ComputeAsync(() => R.ErrorAsync(65d));
 
         r.IsSuccess.Should().BeFalse();
-        r.Error.Should().Be(ExpectedError);
+        r.Error.Should().Be(expectedError);
     }
 
     [Fact]
     public async Task SuccessAsync_When_PassingResultIntoValueTaskAsyncMethodAndReturningToResult_Then_ResultShouldBeValueTaskOfResult()
     {
-        const double ExpectedValue = 65d;
+        const double expectedValue = 65d;
 
         R<double, double> r = await ComputeAsync(() => R.SuccessAsync(65d));
 
         r.IsSuccess.Should().BeTrue();
-        r.Value.Should().Be(ExpectedValue);
+        r.Value.Should().Be(expectedValue);
         r.Error.Should().Be(default);
     }
 
     [Fact]
     public async Task ErrorAsync_When_PassingResultIntoValueTaskAsyncMethodAndReturningToResult_Then_ResultShouldBeValueTaskOfResult()
     {
-        const double ExpectedError = 65d;
+        const double expectedError = 65d;
 
         R<double, double> r = await ComputeAsync(() => R.ErrorAsync(65d));
 
         r.IsSuccess.Should().BeFalse();
         r.Value.Should().Be(default);
-        r.Error.Should().Be(ExpectedError);
+        r.Error.Should().Be(expectedError);
     }
 
     private static async ValueTask<TResult> ComputeAsync<TResult>(Func<ValueTask<TResult>> func)

@@ -16,21 +16,21 @@ using Xunit;
 public class ImmutableArrayTests
 {
     [Fact]
-    public void TryAddSuccesses_Then_ResultShouldBeExpectedResult()
+    public void AddSuccesses_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { 1, 4 };
         var immutableArray = ImmutableArray.Create<int>();
 
         var allPositiveResult = expectedResult.AllOrFailed(x => Item.From(x > 0, x));
 
-        var result = immutableArray.TryAddAll(allPositiveResult);
+        var result = immutableArray.AddAllIfSuccess(allPositiveResult);
 
         allPositiveResult.IsSuccess.Should().BeTrue();
         result.Should().Equal(expectedResult);
     }
 
     [Fact]
-    public void TryAddError_When_InputIsStruct_Then_ResultShouldBeExpectedResult()
+    public void AddFailedIfError_When_InputIsStruct_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { -1 };
         var input = new[] { -1, 4 };
@@ -38,14 +38,14 @@ public class ImmutableArrayTests
 
         var allPositiveResult = input.AllOrFailed(x => Item.From(x > 0, x));
 
-        var result = immutableArray.TryAddErrors(allPositiveResult);
+        var result = immutableArray.AddFailedIfError(allPositiveResult);
 
         allPositiveResult.IsSuccess.Should().BeFalse();
         result.Should().Equal(expectedResult);
     }
 
     [Fact]
-    public void TryAddError_When_InputIsClass_Then_ResultShouldBeExpectedResult()
+    public void AddFailedIfError_When_InputIsClass_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { "-1" };
         var input = new[] { "-1", "4" };
@@ -61,14 +61,14 @@ public class ImmutableArrayTests
             return Item.Fail(x).Omits<int>();
         });
 
-        var result = immutableArray.TryAddErrors(allPositiveResult);
+        var result = immutableArray.AddFailedIfError(allPositiveResult);
 
         allPositiveResult.IsSuccess.Should().BeFalse();
         result.Should().Equal(expectedResult);
     }
 
     [Fact]
-    public void TryAddAnyError_When_InputIsClass_Then_ResultShouldBeExpectedResult()
+    public void AddFailedIfAnyError_When_InputIsClass_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { "0" };
         var input = new[] { "0", "4" };
@@ -84,7 +84,7 @@ public class ImmutableArrayTests
             return Item.From(true, result, x);
         });
 
-        var result = immutableArray.TryAddAnyErrors(allPositiveResult);
+        var result = immutableArray.AddFailedIfAnyError(allPositiveResult);
 
         allPositiveResult.IsSuccess.Should().BeTrue();
         result.Should().Equal(expectedResult);

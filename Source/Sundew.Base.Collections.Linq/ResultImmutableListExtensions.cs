@@ -24,7 +24,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddSuccesses<TList, TSuccess, TError>(this TList immutableList, R<All<TSuccess>, Failed<TError>> result)
+    public static TList AddAllIfSuccess<TList, TSuccess, TError>(this TList immutableList, R<All<TSuccess>, Failed<TError>> result)
         where TList : IImmutableList<TSuccess>
     {
         return result.IsSuccess ? (TList)immutableList.AddRange(result.Value) : immutableList;
@@ -40,7 +40,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddSuccesses<TList, TSuccess, TItem, TError>(this TList immutableList, R<All<TSuccess>, Failed<TItem, TError>> result)
+    public static TList AddAllIfSuccess<TList, TSuccess, TItem, TError>(this TList immutableList, R<All<TSuccess>, Failed<TItem, TError>> result)
         where TList : IImmutableList<TSuccess>
     {
         return result.IsSuccess ? (TList)immutableList.AddRange(result.Value) : immutableList;
@@ -54,7 +54,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddErrors<TList, TItem>(this TList immutableList, R<Failed<TItem>> result)
+    public static TList AddFailedIfError<TList, TItem>(this TList immutableList, RwE<Failed<TItem>> result)
         where TList : IImmutableList<TItem>
     {
         return result.IsSuccess ? immutableList : (TList)immutableList.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!));
@@ -69,7 +69,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddErrors<TList, TSuccess, TError>(this TList immutableList, R<All<TSuccess>, Failed<TError>> result)
+    public static TList AddFailedIfError<TList, TSuccess, TError>(this TList immutableList, R<All<TSuccess>, Failed<TError>> result)
         where TList : IImmutableList<TError>
     {
         return result.IsSuccess ? immutableList : (TList)immutableList.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!));
@@ -85,21 +85,21 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddErrors<TList, TSuccess, TItem, TError>(this TList immutableList, R<All<TSuccess>, Failed<TItem, TError>> result)
+    public static TList AddFailedIfError<TList, TSuccess, TItem, TError>(this TList immutableList, R<All<TSuccess>, Failed<TItem, TError>> result)
         where TList : IImmutableList<TError>
     {
         return result.IsSuccess ? immutableList : (TList)immutableList.AddRange(result.Error.GetErrors());
     }
 
     /// <summary>
-    /// Add the result error if has any.
+    /// Add the failed results if it has any error.
     /// </summary>
     /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddAnyErrors<TList, TItem>(this TList immutableList, R<Failed<TItem>> result)
+    public static TList AddFailedIfAnyError<TList, TItem>(this TList immutableList, RwE<Failed<TItem>> result)
         where TList : IImmutableList<TItem>
     {
         return result.HasError ? (TList)immutableList.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!)) : immutableList;
@@ -114,7 +114,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddAnyErrors<TList, TSuccess, TError>(this TList immutableList, R<All<TSuccess>, Failed<TError>> result)
+    public static TList AddFailedIfHasError<TList, TSuccess, TError>(this TList immutableList, R<All<TSuccess>, Failed<TError>> result)
         where TList : IImmutableList<TError>
     {
         return result.HasError ? (TList)immutableList.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!)) : immutableList;
@@ -130,7 +130,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList TryAddAnyErrors<TList, TSuccess, TItem, TError>(this TList immutableList, R<All<TSuccess>, Failed<TItem, TError>> result)
+    public static TList AddFailedIfAnyError<TList, TSuccess, TItem, TError>(this TList immutableList, R<All<TSuccess>, Failed<TItem, TError>> result)
         where TList : IImmutableList<TError>
     {
         return result.HasError ? (TList)immutableList.AddRange(result.Error.GetErrors()) : immutableList;

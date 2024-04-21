@@ -26,14 +26,36 @@ public class EnumerableExtensionsTests
     }
 
     [Fact]
-    public void WhereNotDefault_Then_ResultShouldBeExpectedResult()
+    public void WhereNotDefault_When_InputIsNullable_Then_ResultShouldBeExpectedResult()
     {
-        var expectedResult = new[] { 0, 1 };
+        var expectedResult = new[] { 1 };
         var list = new List<int?> { 0, null, 1 };
 
         var result = list.WhereNotDefault();
 
         result.Should().Equal(expectedResult);
+    }
+
+    [Fact]
+    public void WhereNotDefault_Then_ResultShouldBeExpectedResult()
+    {
+        var expectedResult = new[] { 1 };
+        var list = new List<int> { 0, 1 };
+
+        var result = list.WhereNotDefault();
+
+        result.Should().Equal(expectedResult);
+    }
+
+    [Fact]
+    public void WhereNotNull_When_InputIsNullableValueType_Then_ResultShouldBeExpectedResult()
+    {
+        var expectedResult = new[] { 0, 1 };
+        var list = new List<int?> { 0, null, 1 };
+
+        var result = list.WhereNotNull();
+
+        result.Should().Equal((IEnumerable<int>)expectedResult);
     }
 
     [Fact]

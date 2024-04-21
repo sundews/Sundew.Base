@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="R.SuccessResult.cs" company="Sundews">
+// <copyright file="R.ErrorResult.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -16,35 +16,34 @@ using System.Threading.Tasks;
 public partial class R
 {
     /// <summary>
-    /// A successful result.
+    /// R for indicating an error.
     /// </summary>
-    public readonly struct SuccessResult
+    public readonly struct ErrorResult
     {
-        private const string SuccessText = "Success";
+        private const string ErrorText = "Error";
 
         /// <summary>Gets a value indicating whether this instance is success.</summary>
         /// <value>
         ///   <c>true</c> if this instance is success; otherwise, <c>false</c>.</value>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Alternative to implicit boolean operator.")]
-        public bool IsSuccess => true;
-
-        internal static SuccessResult Result => default;
+        public bool IsSuccess => false;
 
         /// <summary>
         /// Always returns false.
         /// </summary>
         /// <param name="result">The result.</param>
-        /// <returns>Always true.</returns>
-        public static implicit operator bool(SuccessResult result)
+        /// <returns>A value indicating whether the result was successful.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "By design.")]
+        public static implicit operator bool(ErrorResult result)
         {
-            return true;
+            return false;
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="SuccessResult"/> to <see cref="ValueTask{SuccessResult}"/>.</summary>
+        /// <summary>Performs an implicit conversion from <see cref="ValueTask{ErrorResult}"/> to <see cref="ErrorResult{TValue}"/>.</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator ValueTask<SuccessResult>(SuccessResult result)
+        public static implicit operator ValueTask<ErrorResult>(ErrorResult result)
         {
             return result.ToValueTask();
         }
@@ -54,9 +53,9 @@ public partial class R
         /// </summary>
         /// <returns>The value task.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public ValueTask<SuccessResult> ToValueTask()
+        public ValueTask<ErrorResult> ToValueTask()
         {
-            return new ValueTask<SuccessResult>(this);
+            return new ValueTask<ErrorResult>(this);
         }
 
         /// <summary>
@@ -67,7 +66,7 @@ public partial class R
         /// </returns>
         public override string ToString()
         {
-            return SuccessText;
+            return ErrorText;
         }
     }
 }

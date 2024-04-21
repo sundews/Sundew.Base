@@ -10,7 +10,6 @@ namespace Sundew.Base.Threading.Jobs;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Sundew.Base.Primitives;
 using Sundew.Base.Threading.Internal;
 
 /// <summary>
@@ -86,7 +85,7 @@ public sealed class ContinuousJob<TState> : IJob
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    public R<AggregateException> Stop()
+    public RwE<AggregateException> Stop()
     {
         return this.cancellableJob.Stop();
     }
@@ -95,7 +94,7 @@ public sealed class ContinuousJob<TState> : IJob
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    public Task<R<AggregateException>> StopAsync()
+    public Task<RwE<AggregateException>> StopAsync()
     {
         return this.cancellableJob.StopAsync();
     }
@@ -106,7 +105,7 @@ public sealed class ContinuousJob<TState> : IJob
     /// <returns>
     /// An async task.
     /// </returns>
-    public Task<R<AggregateException>> WaitAsync()
+    public Task<RwE<AggregateException>> WaitAsync()
     {
         return this.cancellableJob.WaitAsync();
     }
@@ -115,7 +114,7 @@ public sealed class ContinuousJob<TState> : IJob
     /// Waits for the job to finish.
     /// </summary>
     /// <returns>The result.</returns>
-    public R<AggregateException> Wait()
+    public RwE<AggregateException> Wait()
     {
         return this.cancellableJob.Wait();
     }

@@ -18,41 +18,41 @@ public class OAsyncTests
     [Fact]
     public async Task ToAsync_Then_ValueShouldBeExpectedValue()
     {
-        const int ExpectedValue = 34;
-        int? value = ExpectedValue;
+        const int expectedValue = 34;
+        int? value = expectedValue;
 
         var result = await ComputeAsync(() => value.ToAsync());
 
         result.HasValue.Should().BeTrue();
-        result.GetValueOrDefault().Should().Be(ExpectedValue);
+        result.GetValueOrDefault().Should().Be(expectedValue);
     }
 
     [Fact]
     public async Task ToResult_When_CastingToResult_Then_ValueShouldBeExpectedValue()
     {
-        const int ExpectedValue = 34;
-        const int ExpectedError = 0;
-        int? value = ExpectedValue;
+        const int expectedValue = 34;
+        const int expectedError = 0;
+        int? value = expectedValue;
 
         var option = await ComputeAsync(() => value.ToAsync());
 
         var result = option.ToResult(87);
 
         result.IsSuccess.Should().BeTrue();
-        result.Value.Should().Be(ExpectedValue);
-        result.Error.Should().Be(ExpectedError);
+        result.Value.Should().Be(expectedValue);
+        result.Error.Should().Be(expectedError);
     }
 
     [Fact]
     public async Task ToResult_When_OptionIsNoneOption_Then_ErrorShouldBeExpectedError()
     {
-        const string ExpectedError = "Failed";
+        const string expectedError = "Failed";
         var option = await ComputeAsync(() => default(string).ToAsync());
 
-        var result = option.ToResult(ExpectedError);
+        var result = option.ToResult(expectedError);
 
         result.IsSuccess.Should().BeFalse();
-        result.Error.Should().Be(ExpectedError);
+        result.Error.Should().Be(expectedError);
     }
 
     [Theory]

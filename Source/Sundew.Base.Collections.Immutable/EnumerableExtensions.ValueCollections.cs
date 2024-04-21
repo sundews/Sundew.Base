@@ -16,14 +16,14 @@ using System.Collections.Immutable;
 public static partial class EnumerableExtensions
 {
     /// <summary>
-    /// Converts the specified <see cref="ImmutableArray{T}"/> to a <see cref="ValueArray{TItem}"/>.
+    /// Converts the specified <see cref="ImmutableArray"/> to a <see cref="ValueArray{TItem}"/>.
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>The value array.</returns>
-    public static ValueArray<TItem> ToValueArray<TItem>(this IEnumerable<TItem> enumerable)
+    public static ValueArray<TItem> ToValueArray<TItem>(this IEnumerable<TItem>? enumerable)
     {
-        return new ValueArray<TItem>(enumerable.ToImmutableArray());
+        return new ValueArray<TItem>(enumerable?.ToImmutableArray() ?? ImmutableArray<TItem>.Empty);
     }
 
     /// <summary>
@@ -32,8 +32,8 @@ public static partial class EnumerableExtensions
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>The value list.</returns>
-    public static ValueList<TItem> ToValueList<TItem>(this IEnumerable<TItem> enumerable)
+    public static ValueList<TItem> ToValueList<TItem>(this IEnumerable<TItem>? enumerable)
     {
-        return new ValueList<TItem>(enumerable.ToImmutableList());
+        return new ValueList<TItem>(enumerable?.ToImmutableList() ?? ImmutableList<TItem>.Empty);
     }
 }

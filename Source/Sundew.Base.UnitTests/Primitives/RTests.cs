@@ -9,7 +9,6 @@ namespace Sundew.Base.UnitTests.Primitives;
 
 using System;
 using FluentAssertions;
-using Sundew.Base.Primitives;
 using Xunit;
 
 public class RTests
@@ -17,38 +16,38 @@ public class RTests
     [Fact]
     public void ImplicitCast_When_CastingToResult_Then_ValueShouldBeExpectedValue()
     {
-        const int ExpectedValue = 34;
-        const int ExpectedError = 0;
+        const int expectedValue = 34;
+        const int expectedError = 0;
 
-        R<int, double> r = R.Success(ExpectedValue);
+        R<int, double> r = R.Success(expectedValue);
 
         r.IsSuccess.Should().BeTrue();
-        r.Value.Should().Be(ExpectedValue);
-        r.Error.Should().Be(ExpectedError);
+        r.Value.Should().Be(expectedValue);
+        r.Error.Should().Be(expectedError);
     }
 
     [Fact]
     public void ImplicitCast_WhenCastingToIfError_Then_ErrorShouldBeExpectedError()
     {
-        const string ExpectedError = "Failed";
+        const string expectedError = "Failed";
 
-        R<string> r = R.Error(ExpectedError);
+        RwE<string> r = R.Error(expectedError);
 
         r.IsSuccess.Should().BeFalse();
-        r.Error.Should().Be(ExpectedError);
+        r.Error.Should().Be(expectedError);
     }
 
     [Fact]
     public void ImplicitCast_WhenCastingToResult_Then_ErrorShouldBeExpectedError()
     {
-        const int ExpectedValue = 0;
-        const string ExpectedError = "Failed";
+        const int expectedValue = 0;
+        const string expectedError = "Failed";
 
-        R<int, string> r = R.Error(ExpectedError);
+        R<int, string> r = R.Error(expectedError);
 
         r.IsSuccess.Should().BeFalse();
-        r.Value.Should().Be(ExpectedValue);
-        r.Error.Should().Be(ExpectedError);
+        r.Value.Should().Be(expectedValue);
+        r.Error.Should().Be(expectedError);
     }
 
     [Theory]
@@ -58,7 +57,7 @@ public class RTests
         bool expectedResult,
         int expectedError)
     {
-        var testee = R.From(expectedResult, expectedError);
+        var testee = R.FromError(expectedResult, expectedError);
 
         var result = testee.With(Convert.ToDouble);
 
@@ -75,7 +74,7 @@ public class RTests
         int expectedValue,
         int expectedError)
     {
-        var testee = R.From(expectedResult, () => expectedError);
+        var testee = R.FromError(expectedResult, () => expectedError);
 
         var result = testee.With(expectedValue);
 
@@ -87,15 +86,15 @@ public class RTests
     [Fact]
     public void Deconstruction_When_DeconstructingAllParameters_Then_DeconstructedValuesShouldBedExpectedResult()
     {
-        const bool ExpectedIsSuccess = true;
-        const double ExpectedValue = 65d;
-        const int ExpectedError = 45;
+        const bool expectedIsSuccess = true;
+        const double expectedValue = 65d;
+        const int expectedError = 45;
 
-        var (isSuccess, value, error) = R.From(ExpectedIsSuccess, 65d, ExpectedError);
+        var (isSuccess, value, error) = R.From(expectedIsSuccess, 65d, expectedError);
 
-        isSuccess.Should().Be(ExpectedIsSuccess);
-        value.Should().Be(ExpectedValue);
-        error.Should().Be(ExpectedError);
+        isSuccess.Should().Be(expectedIsSuccess);
+        value.Should().Be(expectedValue);
+        error.Should().Be(expectedError);
     }
 
     [Fact]
@@ -134,29 +133,72 @@ public class RTests
     }
 
     [Fact]
-    public void ToOptionalResult_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public void ToOption_When_SuccessResultAndTargetIsReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    {
+        const string expectedResult = "Value";
+        var testee = R.Success(expectedResult);
+
+        R<string, string> r = testee;
+
+        var result = r.ToOption();
+
+        result.HasValue.Should().BeTrue();
+        result.GetValueOrDefault().Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void ToResultOption_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var testee = R.SuccessOption(default(string));
 
         R<string?, string> r = testee;
 
-        var result = r.ToOptionalResult();
+        var result = r.ToResultOption();
 
         result.HasValue.Should().BeFalse();
         result.GetValueOrDefault().Value.Should().BeNull();
     }
 
     [Fact]
-    public void ToOptionalResult_When_NullAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public void ToResultOption_When_NullAndTargetIsOptionalReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var expectedResult = "Value";
         var testee = R.SuccessOption(expectedResult);
 
         R<string?, string> r = testee;
 
-        var result = r.ToOptionalResult();
+        var result = r.ToResultOption();
 
         result.HasValue.Should().BeTrue();
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void ToOptionResult_When_NullAndTargetIsReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    {
+        var expectedResult = "Value";
+        var testee = R.Success(expectedResult);
+
+        R<string, string> r = testee;
+
+        var result = r.ToOptionResult();
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void ToOptionResult_When_NullAndTargetIsValueType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    {
+        var expectedResult = 4;
+        var testee = R.Success(expectedResult);
+
+        R<int, string> r = testee;
+
+        var result = r.ToValueOptionResult();
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.HasValue.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
     }
 }

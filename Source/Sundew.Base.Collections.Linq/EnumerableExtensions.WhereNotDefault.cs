@@ -7,6 +7,7 @@
 
 namespace Sundew.Base.Collections.Linq;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -23,7 +24,19 @@ public static partial class EnumerableExtensions
     /// <returns>The index found by the matching predicate.</returns>
     public static IEnumerable<TItem> WhereNotNull<TItem>(this IEnumerable<TItem?>? enumerable)
     {
-        return enumerable == null ? Enumerable.Empty<TItem>() : enumerable.Where(x => x != null).Select(x => x!);
+        return enumerable == null ? [] : enumerable.Where(x => x != null).Select(x => x!);
+    }
+
+    /// <summary>
+    /// Finds the index based on the given predicate.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The index found by the matching predicate.</returns>
+    public static IEnumerable<TItem> WhereNotNull<TItem>(this IEnumerable<TItem?>? enumerable)
+        where TItem : struct
+    {
+        return enumerable == null ? [] : enumerable.Where(x => x.HasValue).Select(x => x!.Value);
     }
 
     /// <summary>
@@ -33,8 +46,20 @@ public static partial class EnumerableExtensions
     /// <param name="enumerable">The enumerable.</param>
     /// <returns>The index found by the matching predicate.</returns>
     public static IEnumerable<TItem> WhereNotDefault<TItem>(this IEnumerable<TItem?>? enumerable)
-        where TItem : struct
+        where TItem : struct, IEquatable<TItem>
     {
-        return enumerable == null ? Enumerable.Empty<TItem>() : enumerable.Where(x => x.HasValue).Select(x => x!.Value);
+        return enumerable == null ? [] : enumerable.Where(x => x.HasValue && !x.Value.Equals(default)).Select(x => x!.Value);
+    }
+
+    /// <summary>
+    /// Finds the index based on the given predicate.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <returns>The index found by the matching predicate.</returns>
+    public static IEnumerable<TItem> WhereNotDefault<TItem>(this IEnumerable<TItem>? enumerable)
+        where TItem : struct, IEquatable<TItem>
+    {
+        return enumerable == null ? [] : enumerable.Where(x => !x.Equals(default));
     }
 }
