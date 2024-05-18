@@ -20,6 +20,7 @@ public class SynchronizationContextTests
     public async Task SendAsync()
     {
         var currentThread = new CurrentThread();
+        var expectedThreadId = currentThread.ManagedThreadId;
         var currentThreadList = new List<int> { currentThread.ManagedThreadId };
         var synchronizationContext = new SingleThreadedSynchronizationContext();
         var frame = new SingleThreadedSynchronizationContext.Frame();
@@ -34,8 +35,11 @@ public class SynchronizationContextTests
 
         synchronizationContext.PushFrame(frame);
         await task.ConfigureAwait(true);
-        currentThreadList.Add(currentThread.ManagedThreadId);
+        await synchronizationContext.SendAsync(() =>
+        {
+            currentThreadList.Add(currentThread.ManagedThreadId);
+        });
 
-        currentThreadList.Should().Equal(new List<int> { currentThread.ManagedThreadId, currentThread.ManagedThreadId, currentThread.ManagedThreadId });
+        currentThreadList.Should().Equal(new List<int> { expectedThreadId, expectedThreadId, expectedThreadId });
     }
 }
