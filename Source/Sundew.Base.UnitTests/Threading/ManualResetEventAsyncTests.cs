@@ -39,7 +39,7 @@ public class ManualResetEventAsyncTests
     {
         var waitTask = Task.Run(async () =>
         {
-            await Task.Delay(5);
+            await Task.Delay(500);
             return await this.testee.WaitAsync();
         });
 
