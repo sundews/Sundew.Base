@@ -25,13 +25,12 @@ public delegate void JobExceptionHandler(Exception exception, ref bool retry);
 /// <typeparam name="TState">The type of the state.</typeparam>
 public sealed class CancellableJob<TState> : IJob
 {
-    private readonly object lockObject = new();
+    private readonly AsyncLock @lock = new();
     private readonly Func<TState, CancellationToken, Task> taskAction;
     private readonly JobExceptionHandler? onException;
     private readonly TaskScheduler? taskScheduler;
 
-    private CancellationTokenSource? cancellationTokenSource;
-    private Task? jobContinuationTask;
+    private JobContext? jobContext;
     private AggregateException? aggregateException;
 
     /// <summary>
@@ -83,22 +82,38 @@ public sealed class CancellableJob<TState> : IJob
     /// <summary>
     /// Starts the job.
     /// </summary>
-    /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    public CancellationToken? Start()
+    /// <returns>The job start result.</returns>
+    public JobStartResult Start()
     {
-        lock (this.lockObject)
+        return this.StartAsync().Result;
+    }
+
+    /// <summary>
+    /// Starts the job.
+    /// </summary>
+    /// <returns>The job start result.</returns>
+    public async Task<JobStartResult> StartAsync()
+    {
+        using (await this.@lock.LockAsync())
         {
-            if (this.jobContinuationTask == null)
+            if (!this.jobContext.HasValue())
             {
                 this.aggregateException = null;
-                this.cancellationTokenSource = new CancellationTokenSource();
+                var cancellationTokenSource = new CancellationTokenSource();
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
-                this.jobContinuationTask = Task.Factory.StartNew(this.TaskAction, this.cancellationTokenSource.Token, taskCreationOptions, this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default);
+                this.jobContext = new JobContext(
+                    cancellationTokenSource,
+                    Task.Factory
+                        .StartNew(
+                            () => this.TaskAction(cancellationTokenSource.Token),
+                            cancellationTokenSource.Token,
+                            taskCreationOptions,
+                            this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default));
 
-                return this.cancellationTokenSource.Token;
+                return new JobStartResult(this.jobContext.CancellationTokenSource.Token, false);
             }
 
-            return default;
+            return new JobStartResult(this.jobContext.CancellationTokenSource.Token, true);
         }
     }
 
@@ -119,12 +134,26 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>An async task.</returns>
     public async Task<RwE<AggregateException>> StopAsync()
     {
-        var actualTask = this.jobContinuationTask;
-        this.cancellationTokenSource?.Cancel();
-        this.jobContinuationTask = null;
-        if (actualTask != null)
+        Task? task = null;
+        using (var lockResult = await this.@lock.TryLockAsync(this.jobContext?.CancellationTokenSource.Token ?? CancellationToken.None))
         {
-            await actualTask.ConfigureAwait(false);
+            if (lockResult.Check())
+            {
+                if (this.jobContext.HasValue())
+                {
+#if NET7_0_OR_GREATER
+                    await this.jobContext.CancellationTokenSource.CancelAsync();
+#else
+                    this.jobContext.CancellationTokenSource.Cancel();
+#endif
+                    task = this.jobContext.JobContinuationTask;
+                }
+            }
+        }
+
+        if (task.HasValue())
+        {
+            await task.ConfigureAwait(false);
         }
 
         return R.FromError(this.aggregateException);
@@ -138,9 +167,15 @@ public sealed class CancellableJob<TState> : IJob
     /// </returns>
     public async Task<RwE<AggregateException>> WaitAsync()
     {
-        if (this.jobContinuationTask != null)
+        using (var lockResult = await this.@lock.TryLockAsync(this.jobContext?.CancellationTokenSource.Token ?? CancellationToken.None))
         {
-            await this.jobContinuationTask.ConfigureAwait(false);
+            if (lockResult.Check())
+            {
+                if (this.jobContext.HasValue())
+                {
+                    await this.jobContext.JobContinuationTask.ConfigureAwait(false);
+                }
+            }
         }
 
         return R.FromError(this.aggregateException);
@@ -176,18 +211,20 @@ public sealed class CancellableJob<TState> : IJob
 
     private void DisposeTask(Task jobTask)
     {
-        lock (this.lockObject)
+        using (var lockResult = this.@lock.TryLock())
         {
-            this.cancellationTokenSource?.Dispose();
-            this.cancellationTokenSource = null;
-            this.aggregateException = jobTask.Exception;
+            if (lockResult.Check())
+            {
+                this.jobContext?.CancellationTokenSource.Dispose();
+                this.aggregateException = jobTask.Exception;
+                this.jobContext = null;
+            }
         }
     }
 
-    private async Task TaskAction()
+    private async Task TaskAction(CancellationToken cancellationToken)
     {
         this.IsRunning = true;
-        var cancellationToken = this.cancellationTokenSource!.Token;
         try
         {
             while (!cancellationToken.IsCancellationRequested)
@@ -218,5 +255,18 @@ public sealed class CancellableJob<TState> : IJob
         {
             this.IsRunning = false;
         }
+    }
+
+    private sealed class JobContext
+    {
+        public JobContext(CancellationTokenSource cancellationTokenSource, Task jobContinuationTask)
+        {
+            this.CancellationTokenSource = cancellationTokenSource;
+            this.JobContinuationTask = jobContinuationTask;
+        }
+
+        public CancellationTokenSource CancellationTokenSource { get; }
+
+        public Task JobContinuationTask { get; }
     }
 }

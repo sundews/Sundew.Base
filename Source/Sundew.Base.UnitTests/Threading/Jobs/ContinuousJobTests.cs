@@ -16,6 +16,16 @@ using Xunit;
 public class ContinuousJobTests
 {
     [Fact]
+    public void Start_When_AlreadyStarted_Then_ResultShouldBeAlreadyStarted()
+    {
+        using var testee = new ContinuousJob(_ => { });
+        var result = testee.Start();
+        result = testee.Start();
+
+        result.WasAlreadyRunning.Should().BeTrue();
+    }
+
+    [Fact]
     public void Stop_When_NotStarted_Then_ResultShouldBeSuccess()
     {
         using var testee = new ContinuousJob(_ => { });
@@ -33,11 +43,12 @@ public class ContinuousJobTests
             _ => throw new InvalidOperationException(),
             (Exception _, ref bool handled) => handled = errorCounter++ < 4);
 
-        testee.Start();
+        var startResult = testee.Start();
         testee.Wait();
 
         Thread.Sleep(1);
 
+        startResult.WasAlreadyRunning.Should().BeFalse();
         testee.Exception!.InnerException.Should().BeOfType<InvalidOperationException>();
     }
 
@@ -50,12 +61,14 @@ public class ContinuousJobTests
             resetEvent.Set();
             throw new InvalidOperationException();
         });
-        testee.Start();
+
+        var startResult = testee.Start();
         resetEvent.Wait();
         Thread.Sleep(1);
 
         var result = testee.Stop();
 
+        startResult.WasAlreadyRunning.Should().BeFalse();
         result.Error!.InnerException.Should().BeOfType<InvalidOperationException>();
     }
 
@@ -64,12 +77,13 @@ public class ContinuousJobTests
     {
         using var resetEvent = new ManualResetEventSlim();
         using var testee = new ContinuousJob(_ => resetEvent.Set());
-        testee.Start();
+        var startResult = testee.Start();
         resetEvent.Wait();
         Thread.Sleep(1);
 
         var result = testee.Stop();
 
+        startResult.WasAlreadyRunning.Should().BeFalse();
         ((bool)result).Should().BeTrue();
     }
 }

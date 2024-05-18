@@ -75,8 +75,17 @@ public sealed class ContinuousJob<TState> : IJob
     /// <summary>
     /// Starts the job.
     /// </summary>
-    /// <returns><c>true</c>, if the job was started, otherwise <c>false</c>, meaning the job is already running.</returns>
-    public CancellationToken? Start()
+    /// <returns>The job start result.</returns>
+    public Task<JobStartResult> StartAsync()
+    {
+        return this.cancellableJob.StartAsync();
+    }
+
+    /// <summary>
+    /// Starts the job.
+    /// </summary>
+    /// <returns>The job start result.</returns>
+    public JobStartResult Start()
     {
         return this.cancellableJob.Start();
     }

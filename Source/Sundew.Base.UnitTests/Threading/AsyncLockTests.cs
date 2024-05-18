@@ -66,12 +66,12 @@ public class AsyncLockTests
     public async Task TryLockAsync_When_AddingAnItemTwiceForEachOfTwoThreads_Then_ResultShouldContainItemsWhereTwoConsecutiveItemsAreEqual()
     {
         var list = new List<int>();
-        var asyncLock = new AsyncLock();
+        var testee = new AsyncLock();
         var count = int.MaxValue;
-        using (var testee = new ContinuousJob(
+        using (var job = new ContinuousJob(
                    async c =>
                    {
-                       using (var result = await asyncLock.TryLockAsync(c))
+                       using (var result = await testee.TryLockAsync(c))
                        {
                            if (result)
                            {
@@ -82,11 +82,11 @@ public class AsyncLockTests
                        }
                    }))
         {
-            var startResult = testee.Start();
+            var startResult = await job.StartAsync();
             for (int i = 0; i < 100; i++)
             {
                 var value = i;
-                using (var result = await asyncLock.TryLockAsync(startResult.GetValueOrDefault(CancellationToken.None)))
+                using (var result = await testee.TryLockAsync(startResult.CancellationToken))
                 {
                     if (result)
                     {
@@ -96,6 +96,8 @@ public class AsyncLockTests
                     }
                 }
             }
+
+            await job.StopAsync();
         }
 
         list.Contains(int.MaxValue).Should().BeTrue();
