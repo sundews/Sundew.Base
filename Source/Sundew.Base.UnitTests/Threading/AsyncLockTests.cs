@@ -82,7 +82,7 @@ public class AsyncLockTests
                        }
                    }))
         {
-            var startResult = await job.StartAsync();
+            var startResult = await job.StartAsync().ConfigureAwait(true);
             for (int i = 0; i < 100; i++)
             {
                 var value = i;
@@ -97,7 +97,7 @@ public class AsyncLockTests
                 }
             }
 
-            await job.StopAsync();
+            await job.StopAsync().ConfigureAwait(true);
         }
 
         list.Contains(int.MaxValue).Should().BeTrue();
