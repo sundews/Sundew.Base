@@ -135,19 +135,16 @@ public sealed class CancellableJob<TState> : IJob
     public async Task<RwE<AggregateException>> StopAsync()
     {
         Task? task = null;
-        using (var lockResult = await this.@lock.TryLockAsync(this.jobContext?.CancellationTokenSource.Token ?? CancellationToken.None))
+        using (await this.@lock.LockAsync())
         {
-            if (lockResult.Check())
+            if (this.jobContext.HasValue())
             {
-                if (this.jobContext.HasValue())
-                {
 #if NET7_0_OR_GREATER
-                    await this.jobContext.CancellationTokenSource.CancelAsync();
+                await this.jobContext.CancellationTokenSource.CancelAsync();
 #else
-                    this.jobContext.CancellationTokenSource.Cancel();
+                this.jobContext.CancellationTokenSource.Cancel();
 #endif
-                    task = this.jobContext.JobContinuationTask;
-                }
+                task = this.jobContext.JobContinuationTask;
             }
         }
 
@@ -167,15 +164,18 @@ public sealed class CancellableJob<TState> : IJob
     /// </returns>
     public async Task<RwE<AggregateException>> WaitAsync()
     {
-        using (var lockResult = await this.@lock.TryLockAsync(this.jobContext?.CancellationTokenSource.Token ?? CancellationToken.None))
+        Task? task = null;
+        using (await this.@lock.LockAsync())
         {
-            if (lockResult.Check())
+            if (this.jobContext.HasValue())
             {
-                if (this.jobContext.HasValue())
-                {
-                    await this.jobContext.JobContinuationTask.ConfigureAwait(false);
-                }
+                task = this.jobContext.JobContinuationTask;
             }
+        }
+
+        if (task.HasValue())
+        {
+            await task.ConfigureAwait(false);
         }
 
         return R.FromError(this.aggregateException);
