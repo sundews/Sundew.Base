@@ -8,7 +8,6 @@
 namespace Sundew.Base.UnitTests.Threading;
 
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Sundew.Base.Threading;
@@ -34,7 +33,7 @@ public class SynchronizationContextTests
         });
 
         synchronizationContext.PushFrame(frame);
-        await task;
+        await task.ConfigureAwait(true);
         currentThreadList.Add(currentThread.ManagedThreadId);
 
         currentThreadList.Should().Equal(new List<int> { currentThread.ManagedThreadId, currentThread.ManagedThreadId, currentThread.ManagedThreadId });
