@@ -22,7 +22,7 @@ public class DisposeAsyncActionTests
 
         var testee = new DisposeAsyncAction(async () =>
         {
-            await Task.Delay(20);
+            await Task.Delay(200);
             manualResetEvent.Set();
         });
 
@@ -38,7 +38,7 @@ public class DisposeAsyncActionTests
 
         var testee = new DisposeAsyncAction(async () =>
         {
-            await Task.Delay(20);
+            await Task.Delay(200);
             manualResetEvent.Set();
         });
 
