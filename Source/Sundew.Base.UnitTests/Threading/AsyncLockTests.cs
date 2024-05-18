@@ -100,8 +100,9 @@ public class AsyncLockTests
             await job.StopAsync().ConfigureAwait(true);
         }
 
-        list.Contains(int.MaxValue).Should().BeTrue();
-        AssertEachTwoItemShouldBeEqual(list);
+        Assert.Multiple(
+            () => list.Should().Contain(int.MaxValue),
+            () => AssertEachTwoItemShouldBeEqual(list));
     }
 
     private static void AssertEachTwoItemShouldBeEqual(List<int> list)
