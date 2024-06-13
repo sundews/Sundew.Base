@@ -81,6 +81,16 @@ public static partial class R
     /// <summary>
     /// Creates an erroneous result.
     /// </summary>
+    /// <returns>A <see cref="R" />.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ErrorResult Error()
+    {
+        return default;
+    }
+
+    /// <summary>
+    /// Creates an erroneous result.
+    /// </summary>
     /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R" />.</returns>
