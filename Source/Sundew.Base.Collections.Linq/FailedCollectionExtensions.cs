@@ -40,7 +40,7 @@ public static class FailedCollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="results">The results.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool AddAnyFailed<TError>(this ICollection<TError> collection, RwE<Failed<TError>> results)
+    public static bool AddAnyFailed<TError>(this ICollection<TError> collection, RoE<Failed<TError>> results)
     {
         var count = collection.Count;
         if (results.HasError)

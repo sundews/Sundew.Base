@@ -67,7 +67,7 @@ public static class ImmutableHashSetExtensions
     /// <param name="immutableSet">The immutable array.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TSet AddIfSuccess<TSet, TSuccess>(this TSet immutableSet, RwV<TSuccess> result)
+    public static TSet AddIfSuccess<TSet, TSuccess>(this TSet immutableSet, R<TSuccess> result)
         where TSet : IImmutableSet<TSuccess>
     {
         return result.IsSuccess ? (TSet)immutableSet.Add(result.Value) : immutableSet;
@@ -81,7 +81,7 @@ public static class ImmutableHashSetExtensions
     /// <param name="immutableSet">The immutable array.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TSet AddIfError<TSet, TError>(this TSet immutableSet, RwE<TError> result)
+    public static TSet AddIfError<TSet, TError>(this TSet immutableSet, RoE<TError> result)
         where TSet : IImmutableSet<TError>
     {
         return result.IsSuccess ? immutableSet : (TSet)immutableSet.Add(result.Error);

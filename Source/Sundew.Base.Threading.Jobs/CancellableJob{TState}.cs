@@ -121,7 +121,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    public RwE<AggregateException> Stop()
+    public RoE<AggregateException> Stop()
     {
         var task = this.StopAsync();
         task.Wait();
@@ -132,7 +132,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    public async Task<RwE<AggregateException>> StopAsync()
+    public async Task<RoE<AggregateException>> StopAsync()
     {
         Task? task = null;
         using (await this.@lock.LockAsync())
@@ -162,7 +162,7 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>
     /// An async task.
     /// </returns>
-    public async Task<RwE<AggregateException>> WaitAsync()
+    public async Task<RoE<AggregateException>> WaitAsync()
     {
         Task? task = null;
         using (await this.@lock.LockAsync())
@@ -185,7 +185,7 @@ public sealed class CancellableJob<TState> : IJob
     /// Waits for the job to finish.
     /// </summary>
     /// <returns>A result.</returns>
-    public RwE<AggregateException> Wait()
+    public RoE<AggregateException> Wait()
     {
         var task = this.WaitAsync();
         task.Wait();

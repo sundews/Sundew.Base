@@ -83,7 +83,7 @@ public sealed class ContinuousJob : IJob
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    public RwE<AggregateException> Stop()
+    public RoE<AggregateException> Stop()
     {
         return this.continuousJob.Stop();
     }
@@ -92,7 +92,7 @@ public sealed class ContinuousJob : IJob
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    public Task<RwE<AggregateException>> StopAsync()
+    public Task<RoE<AggregateException>> StopAsync()
     {
         return this.continuousJob.StopAsync();
     }
@@ -103,7 +103,7 @@ public sealed class ContinuousJob : IJob
     /// <returns>
     /// An async task.
     /// </returns>
-    public Task<RwE<AggregateException>> WaitAsync()
+    public Task<RoE<AggregateException>> WaitAsync()
     {
         return this.continuousJob.WaitAsync();
     }
@@ -112,7 +112,7 @@ public sealed class ContinuousJob : IJob
     /// Waits for the job to finish.
     /// </summary>
     /// <returns>The result.</returns>
-    public RwE<AggregateException> Wait()
+    public RoE<AggregateException> Wait()
     {
         return this.continuousJob.Wait();
     }

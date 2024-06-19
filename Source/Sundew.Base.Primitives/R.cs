@@ -119,9 +119,9 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwV<TSuccess> FromValue<TSuccess>(bool isSuccess, TSuccess value)
+    public static R<TSuccess> FromValue<TSuccess>(bool isSuccess, TSuccess value)
     {
-        return new RwV<TSuccess>(isSuccess, value);
+        return new R<TSuccess>(isSuccess, value);
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
@@ -130,9 +130,9 @@ public static partial class R
     /// <param name="valueFunc">The value function.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwV<TSuccess> FromValue<TSuccess>(bool isSuccess, Func<TSuccess> valueFunc)
+    public static R<TSuccess> FromValue<TSuccess>(bool isSuccess, Func<TSuccess> valueFunc)
     {
-        return new RwV<TSuccess>(isSuccess, isSuccess ? valueFunc() : default!);
+        return new R<TSuccess>(isSuccess, isSuccess ? valueFunc() : default!);
     }
 
     /// <summary>
@@ -144,9 +144,9 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwV<TSuccess> FromValue<TSuccess>(TSuccess? value)
+    public static R<TSuccess> FromValue<TSuccess>(TSuccess? value)
     {
-        return new RwV<TSuccess>(value != null, value);
+        return new R<TSuccess>(value != null, value);
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
@@ -155,9 +155,9 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwE<TError> FromError<TError>(bool isSuccess, TError error)
+    public static RoE<TError> FromError<TError>(bool isSuccess, TError error)
     {
-        return new RwE<TError>(isSuccess, error);
+        return new RoE<TError>(isSuccess, error);
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
@@ -166,9 +166,9 @@ public static partial class R
     /// <param name="errorFunc">The error func.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwE<TError> FromError<TError>(bool isSuccess, Func<TError> errorFunc)
+    public static RoE<TError> FromError<TError>(bool isSuccess, Func<TError> errorFunc)
     {
-        return new RwE<TError>(isSuccess, isSuccess ? default! : errorFunc());
+        return new RoE<TError>(isSuccess, isSuccess ? default! : errorFunc());
     }
 
     /// <summary>
@@ -180,9 +180,9 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwE<TError> FromError<TError>(TError? error)
+    public static RoE<TError> FromError<TError>(TError? error)
     {
-        return new RwE<TError>(error == null, error);
+        return new RoE<TError>(error == null, error);
     }
 
     /// <summary>
@@ -369,9 +369,9 @@ public static partial class R
     /// <param name="valueFunc">The value func.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static async ValueTask<RwV<TSuccess>> FromValueAsync<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
+    public static async ValueTask<R<TSuccess>> FromValueAsync<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
     {
-        return new RwV<TSuccess>(isSuccess, isSuccess ? await valueFunc().ConfigureAwait(false) : default!);
+        return new R<TSuccess>(isSuccess, isSuccess ? await valueFunc().ConfigureAwait(false) : default!);
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
@@ -380,9 +380,9 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RwV<TError>> FromValueAsync<TError>(bool isSuccess, TError error)
+    public static ValueTask<R<TError>> FromValueAsync<TError>(bool isSuccess, TError error)
     {
-        return new RwV<TError>(isSuccess, error);
+        return new R<TError>(isSuccess, error);
     }
 
     /// <summary>
@@ -394,10 +394,10 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RwV<TSuccess>> FromValueAsync<TSuccess>(TSuccess? value)
+    public static ValueTask<R<TSuccess>> FromValueAsync<TSuccess>(TSuccess? value)
         where TSuccess : class
     {
-        return new RwV<TSuccess>(value != null, value);
+        return new R<TSuccess>(value != null, value);
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
@@ -406,9 +406,9 @@ public static partial class R
     /// <param name="valueFunc">The value function.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static async ValueTask<RwE<TSuccess>> FromErrorAsync<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
+    public static async ValueTask<RoE<TSuccess>> FromErrorAsync<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
     {
-        return new RwE<TSuccess>(isSuccess, isSuccess ? await valueFunc().ConfigureAwait(false) : default!);
+        return new RoE<TSuccess>(isSuccess, isSuccess ? await valueFunc().ConfigureAwait(false) : default!);
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
@@ -417,9 +417,9 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RwE<TError>> FromErrorAsync<TError>(bool isSuccess, TError error)
+    public static ValueTask<RoE<TError>> FromErrorAsync<TError>(bool isSuccess, TError error)
     {
-        return new RwE<TError>(isSuccess, error);
+        return new RoE<TError>(isSuccess, error);
     }
 
     /// <summary>
@@ -431,10 +431,10 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RwE<TError>> FromErrorAsync<TError>(TError? error)
+    public static ValueTask<RoE<TError>> FromErrorAsync<TError>(TError? error)
         where TError : class
     {
-        return new RwE<TError>(error == null, error);
+        return new RoE<TError>(error == null, error);
     }
 
     /// <summary>

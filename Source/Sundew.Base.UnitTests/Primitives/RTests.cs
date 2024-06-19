@@ -31,7 +31,7 @@ public class RTests
     {
         const string expectedError = "Failed";
 
-        RwE<string> r = R.Error(expectedError);
+        RoE<string> r = R.Error(expectedError);
 
         r.IsSuccess.Should().BeFalse();
         r.Error.Should().Be(expectedError);

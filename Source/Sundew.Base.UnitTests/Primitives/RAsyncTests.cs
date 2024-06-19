@@ -32,7 +32,7 @@ public class RAsyncTests
     {
         const string expectedError = "Failed";
 
-        RwE<string> r = await ComputeAsync(() => R.ErrorAsync(expectedError));
+        RoE<string> r = await ComputeAsync(() => R.ErrorAsync(expectedError));
 
         r.IsSuccess.Should().BeFalse();
         r.Error.Should().Be(expectedError);
@@ -103,7 +103,7 @@ public class RAsyncTests
     {
         const double expectedError = 65d;
 
-        RwE<double> r = await ComputeAsync(() => R.ErrorAsync(65d));
+        RoE<double> r = await ComputeAsync(() => R.ErrorAsync(65d));
 
         r.IsSuccess.Should().BeFalse();
         r.Error.Should().Be(expectedError);

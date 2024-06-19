@@ -78,7 +78,7 @@ public static class ImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfSuccess<TList, TSuccess>(this TList immutableList, RwV<TSuccess> result)
+    public static TList AddIfSuccess<TList, TSuccess>(this TList immutableList, R<TSuccess> result)
         where TList : IImmutableList<TSuccess>
     {
         return result.IsSuccess ? (TList)immutableList.Add(result.Value) : immutableList;
@@ -92,7 +92,7 @@ public static class ImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfError<TList, TError>(this TList immutableList, RwE<TError> result)
+    public static TList AddIfError<TList, TError>(this TList immutableList, RoE<TError> result)
         where TList : IImmutableList<TError>
     {
         return result.IsSuccess ? immutableList : (TList)immutableList.Add(result.Error);
@@ -121,7 +121,7 @@ public static class ImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfAnyError<TList, TError>(this TList immutableList, RwE<TError> result)
+    public static TList AddIfAnyError<TList, TError>(this TList immutableList, RoE<TError> result)
         where TList : IImmutableList<TError>
     {
         return result.HasError ? (TList)immutableList.Add(result.Error) : immutableList;

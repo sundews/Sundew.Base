@@ -45,13 +45,13 @@ public interface IJob : IDisposable
     /// Stops the job and waits for it to complete.
     /// </summary>
     /// <returns>A result containing the exception in case of an error.</returns>
-    RwE<AggregateException> Stop();
+    RoE<AggregateException> Stop();
 
     /// <summary>
     /// Stops the job and awaits its completion.
     /// </summary>
     /// <returns>An async task.</returns>
-    Task<RwE<AggregateException>> StopAsync();
+    Task<RoE<AggregateException>> StopAsync();
 
     /// <summary>
     /// Waits for the job to finish asynchronously.
@@ -59,10 +59,10 @@ public interface IJob : IDisposable
     /// <returns>
     /// An async task.
     /// </returns>
-    Task<RwE<AggregateException>> WaitAsync();
+    Task<RoE<AggregateException>> WaitAsync();
 
     /// <summary>
     /// Waits for the job to finish.
     /// </summary>
-    RwE<AggregateException> Wait();
+    RoE<AggregateException> Wait();
 }

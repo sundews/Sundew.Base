@@ -54,7 +54,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddFailedIfError<TList, TItem>(this TList immutableList, RwE<Failed<TItem>> result)
+    public static TList AddFailedIfError<TList, TItem>(this TList immutableList, RoE<Failed<TItem>> result)
         where TList : IImmutableList<TItem>
     {
         return result.IsSuccess ? immutableList : (TList)immutableList.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!));
@@ -99,7 +99,7 @@ public static class ResultImmutableListExtensions
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddFailedIfAnyError<TList, TItem>(this TList immutableList, RwE<Failed<TItem>> result)
+    public static TList AddFailedIfAnyError<TList, TItem>(this TList immutableList, RoE<Failed<TItem>> result)
         where TList : IImmutableList<TItem>
     {
         return result.HasError ? (TList)immutableList.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!)) : immutableList;

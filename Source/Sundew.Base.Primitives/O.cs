@@ -562,9 +562,9 @@ public static class O
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwV<TSuccess> ToValueResult<TSuccess>(this TSuccess? value)
+    public static R<TSuccess> ToValueResult<TSuccess>(this TSuccess? value)
     {
-        return new RwV<TSuccess>(value != null, value);
+        return new R<TSuccess>(value != null, value);
     }
 
     /// <summary>
@@ -576,10 +576,10 @@ public static class O
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RwV<TSuccess>> ToValueResultAsync<TSuccess>(this TSuccess? value)
+    public static ValueTask<R<TSuccess>> ToValueResultAsync<TSuccess>(this TSuccess? value)
         where TSuccess : class
     {
-        return new RwV<TSuccess>(value != null, value);
+        return new R<TSuccess>(value != null, value);
     }
 
     /// <summary>
@@ -591,9 +591,9 @@ public static class O
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static RwE<TError> ToErrorResult<TError>(this TError? error)
+    public static RoE<TError> ToErrorResult<TError>(this TError? error)
     {
-        return new RwE<TError>(error == null, error);
+        return new RoE<TError>(error == null, error);
     }
 
     /// <summary>
@@ -605,9 +605,9 @@ public static class O
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RwE<TError>> ToErrorResultAsync<TError>(this TError? error)
+    public static ValueTask<RoE<TError>> ToErrorResultAsync<TError>(this TError? error)
         where TError : class
     {
-        return new RwE<TError>(error == null, error);
+        return new RoE<TError>(error == null, error);
     }
 }

@@ -11,7 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Extends <see cref="IEnumerable"/> interface for the result structs <see cref="RwE{TError}"/> and <see cref="R{TValue,TError}"/>.
+/// Extends <see cref="IEnumerable"/> interface for the result structs <see cref="RoE{TError}"/> and <see cref="R{TValue,TError}"/>.
 /// </summary>
 public static class EnumerableResultExtensions
 {
@@ -21,7 +21,7 @@ public static class EnumerableResultExtensions
     /// <typeparam name="TSuccess">The error type.</typeparam>
     /// <param name="results">The results.</param>
     /// <returns>An enumerable containing all errors.</returns>
-    public static IEnumerable<TSuccess> GetSuccesses<TSuccess>(this IEnumerable<RwV<TSuccess>> results)
+    public static IEnumerable<TSuccess> GetSuccesses<TSuccess>(this IEnumerable<R<TSuccess>> results)
     {
         foreach (var result in results)
         {
@@ -38,7 +38,7 @@ public static class EnumerableResultExtensions
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="results">The results.</param>
     /// <returns>An enumerable containing all errors.</returns>
-    public static IEnumerable<TError> GetErrors<TError>(this IEnumerable<RwE<TError>> results)
+    public static IEnumerable<TError> GetErrors<TError>(this IEnumerable<RoE<TError>> results)
     {
         foreach (var result in results)
         {

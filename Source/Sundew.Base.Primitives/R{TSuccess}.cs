@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RwV.cs" company="Sundews">
+// <copyright file="R{TSuccess}.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -14,14 +14,14 @@ using System.Threading.Tasks;
 
 /// <summary>Represents a result that if it is successful has a value.</summary>
 /// <typeparam name="TSuccess">The type of the success value.</typeparam>
-public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
+public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
 {
     private const string ErrorText = "Error";
 
-    /// <summary>Initializes a new instance of the <see cref="RwV{TSuccess}"/> struct.</summary>
+    /// <summary>Initializes a new instance of the <see cref="R{TSuccess}"/> struct.</summary>
     /// <param name="isSuccess"><c>true</c> if success otherwise <c>false</c>.</param>
     /// <param name="value">The value.</param>
-    internal RwV(bool isSuccess, TSuccess? value)
+    internal R(bool isSuccess, TSuccess? value)
     {
         this.IsSuccess = isSuccess;
         this.Value = value;
@@ -32,6 +32,15 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     [MemberNotNullWhen(true, nameof(Value))]
     public bool IsSuccess { get; }
 
+    /// <summary>
+    /// Gets a value indicating whether this <see cref="R"/> is an error.
+    /// </summary>
+    /// <value>
+    ///   <c>true</c> if success; otherwise, <c>false</c>.
+    /// </value>
+    [MemberNotNullWhen(false, nameof(Value))]
+    public bool IsError => !this.IsSuccess;
+
     /// <summary>Gets the value.</summary>
     /// <value>The value.</value>
     public TSuccess? Value { get; }
@@ -41,7 +50,7 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// </summary>
     /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
-    public static implicit operator bool(RwV<TSuccess> r)
+    public static implicit operator bool(R<TSuccess> r)
     {
         return r.IsSuccess;
     }
@@ -50,25 +59,25 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <param name="errorResult">The error result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator RwV<TSuccess>(R.ErrorResult errorResult)
+    public static implicit operator R<TSuccess>(R.ErrorResult errorResult)
     {
-        return new RwV<TSuccess>(errorResult.IsSuccess, default!);
+        return new R<TSuccess>(errorResult.IsSuccess, default!);
     }
 
-    /// <summary>Performs an implicit conversion from <see cref="R.ErrorResult{TError}"/> to <see cref="RwV{TSuccess}"/>.</summary>
+    /// <summary>Performs an implicit conversion from <see cref="R.ErrorResult{TError}"/> to <see cref="R{TSuccess}"/>.</summary>
     /// <param name="successResult">The success result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator RwV<TSuccess>(R.SuccessResult<TSuccess> successResult)
+    public static implicit operator R<TSuccess>(R.SuccessResult<TSuccess> successResult)
     {
-        return new RwV<TSuccess>(true, successResult.Value);
+        return new R<TSuccess>(true, successResult.Value);
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="ValueTask{R}"/>.</summary>
     /// <param name="resultWithValue">The error result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator ValueTask<RwV<TSuccess>>(RwV<TSuccess> resultWithValue)
+    public static implicit operator ValueTask<R<TSuccess>>(R<TSuccess> resultWithValue)
     {
         return resultWithValue.ToValueTask();
     }
@@ -77,7 +86,7 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <param name="r">The result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator Task<RwV<TSuccess>>(RwV<TSuccess> r)
+    public static implicit operator Task<R<TSuccess>>(R<TSuccess> r)
     {
         return r.ToTask();
     }
@@ -86,7 +95,7 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <param name="left">The left.</param>
     /// <param name="right">The right.</param>
     /// <returns>The result of the operator.</returns>
-    public static bool operator ==(RwV<TSuccess> left, RwV<TSuccess> right)
+    public static bool operator ==(R<TSuccess> left, R<TSuccess> right)
     {
         return left.Equals(right);
     }
@@ -95,9 +104,53 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <param name="left">The left.</param>
     /// <param name="right">The right.</param>
     /// <returns>The result of the operator.</returns>
-    public static bool operator !=(RwV<TSuccess> left, RwV<TSuccess> right)
+    public static bool operator !=(R<TSuccess> left, R<TSuccess> right)
     {
         return !(left == right);
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="resultIfIsErroneous">The value if the result is erroneous.</param>
+    /// <returns>The new value.</returns>
+    public TSuccess Evaluate(TSuccess resultIfIsErroneous)
+    {
+        return this.IsSuccess ? this.Value : resultIfIsErroneous;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="resultIfIsErroneousFunc">The error function.</param>
+    /// <returns>The new value.</returns>
+    public TSuccess Evaluate(Func<TSuccess> resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? this.Value : resultIfIsErroneousFunc();
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="resultFunc">The result function.</param>
+    /// <param name="resultIfIsErroneousFunc">The result if is erroneous function.</param>
+    /// <returns>The new value.</returns>
+    public TResult Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, TResult resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneousFunc;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="resultFunc">The result function.</param>
+    /// <param name="resultIfIsErroneousFunc">The result if is erroneous function.</param>
+    /// <returns>The new value.</returns>
+    public TResult Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, Func<TResult> resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneousFunc();
     }
 
     /// <summary>
@@ -117,9 +170,9 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// </summary>
     /// <returns>The value task.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public ValueTask<RwV<TSuccess>> ToValueTask()
+    public ValueTask<R<TSuccess>> ToValueTask()
     {
-        return new ValueTask<RwV<TSuccess>>(this);
+        return new ValueTask<R<TSuccess>>(this);
     }
 
     /// <summary>
@@ -127,7 +180,7 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// </summary>
     /// <returns>The value task.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public Task<RwV<TSuccess>> ToTask()
+    public Task<R<TSuccess>> ToTask()
     {
         return Task.FromResult(this);
     }
@@ -135,7 +188,7 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
-    /// <typeparam name="TError">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="error">The value.</param>
     /// <returns>
     /// A new <see cref="R" />.
@@ -164,11 +217,11 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <typeparam name="TNewSuccess">The type of the new value.</typeparam>
     /// <param name="valueFunc">The value func.</param>
     /// <returns>
-    /// A new <see cref="RwV{TSuccess}" />.
+    /// A new <see cref="R{TSuccess}" />.
     /// </returns>
-    public RwV<TNewSuccess> With<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
+    public R<TNewSuccess> With<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
     {
-        return new RwV<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default!);
+        return new R<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default!);
     }
 
     /// <summary>
@@ -179,11 +232,11 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     /// <param name="parameter">The parameter.</param>
     /// <param name="valueFunc">The value function.</param>
     /// <returns>
-    /// A new <see cref="RwV{TSuccess}" />.
+    /// A new <see cref="R{TSuccess}" />.
     /// </returns>
-    public RwV<TNewSuccess> With<TParameter, TNewSuccess>(TParameter parameter, Func<TSuccess, TParameter, TNewSuccess> valueFunc)
+    public R<TNewSuccess> With<TParameter, TNewSuccess>(TParameter parameter, Func<TSuccess, TParameter, TNewSuccess> valueFunc)
     {
-        return new RwV<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value, parameter) : default!);
+        return new R<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value, parameter) : default!);
     }
 
     /// <summary>
@@ -268,7 +321,7 @@ public readonly struct RwV<TSuccess> : IEquatable<RwV<TSuccess>>
     ///   <span class="nu">
     ///     <span class="keyword">true</span> (<span class="keyword">True</span> in Visual Basic)</span> if the current object is equal to the <paramref name="other" /> parameter; otherwise, <span class="keyword"><span class="languageSpecificText"><span class="cs">false</span><span class="vb">False</span><span class="cpp">false</span></span></span><span class="nu"><span class="keyword">false</span> (<span class="keyword">False</span> in Visual Basic)</span>.
     /// </returns>
-    public bool Equals(RwV<TSuccess> other)
+    public bool Equals(R<TSuccess> other)
     {
         return this.IsSuccess == other.IsSuccess && Equals(this.Value, other.Value);
     }

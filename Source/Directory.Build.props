@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Version>13.0</Version>
+    <Version>14.0</Version>
     <OutputPath>bin/$(Configuration)</OutputPath>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -18,7 +18,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
-    <PackageReleaseNotes>13.0 - Results improvements
+    <PackageReleaseNotes>14.0 - Result improvements
+13.0 - Results improvements
 12.0 - Restructing into smaller packages
 11.0 - Unified Disposal and Initialization
 10.0 - O.None was changed to a property

@@ -88,7 +88,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool AddIfSuccess<TSuccess>(this ICollection<TSuccess> collection, RwV<TSuccess> result)
+    public static bool AddIfSuccess<TSuccess>(this ICollection<TSuccess> collection, R<TSuccess> result)
     {
         if (result.IsSuccess)
         {
@@ -125,7 +125,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool AddIfError<TError>(this ICollection<TError> collection, RwE<TError> result)
+    public static bool AddIfError<TError>(this ICollection<TError> collection, RoE<TError> result)
     {
         if (result.IsSuccess)
         {
@@ -143,7 +143,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool AddIfHasError<TError>(this ICollection<TError> collection, RwE<TError> result)
+    public static bool AddIfHasError<TError>(this ICollection<TError> collection, RoE<TError> result)
     {
         if (result.HasError)
         {
@@ -285,7 +285,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if the success was added, otherwise <c>false</c>.</returns>
-    public static bool AddSuccesses<TSuccess, TSuccessList>(this ICollection<TSuccess> collection, RwV<TSuccessList> result)
+    public static bool AddSuccesses<TSuccess, TSuccessList>(this ICollection<TSuccess> collection, R<TSuccessList> result)
         where TSuccessList : IEnumerable<TSuccess>
     {
         if (result.IsSuccess)
@@ -306,7 +306,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if the error was added, otherwise <c>false</c>.</returns>
-    public static bool AddErrors<TError, TErrorList>(this ICollection<TError> collection, RwE<TErrorList> result)
+    public static bool AddErrors<TError, TErrorList>(this ICollection<TError> collection, RoE<TErrorList> result)
         where TErrorList : IEnumerable<TError>
     {
         if (result.IsSuccess)
@@ -370,7 +370,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if successes were added, otherwise <c>false</c>.</returns>
-    public static bool AddSuccesses<TSuccess>(this ICollection<TSuccess> collection, IEnumerable<RwV<TSuccess>> result)
+    public static bool AddSuccesses<TSuccess>(this ICollection<TSuccess> collection, IEnumerable<R<TSuccess>> result)
     {
         var count = collection.Count;
         collection.AddRange(result.GetSuccesses());
@@ -384,7 +384,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="result">The result.</param>
     /// <returns><c>true</c>, if errors were added, otherwise <c>false</c>.</returns>
-    public static bool AddErrors<TError>(this ICollection<TError> collection, IEnumerable<RwE<TError>> result)
+    public static bool AddErrors<TError>(this ICollection<TError> collection, IEnumerable<RoE<TError>> result)
     {
         var count = collection.Count;
         collection.AddRange(result.GetErrors());
@@ -444,7 +444,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="results">The results.</param>
     /// <returns><c>true</c>, if successes were added, otherwise <c>false</c>.</returns>
-    public static bool AddSuccesses<TSuccess, TSuccessList>(this ICollection<TSuccess> collection, IEnumerable<RwV<TSuccessList>> results)
+    public static bool AddSuccesses<TSuccess, TSuccessList>(this ICollection<TSuccess> collection, IEnumerable<R<TSuccessList>> results)
         where TSuccessList : IEnumerable<TSuccess>
     {
         var count = collection.Count;
@@ -460,7 +460,7 @@ public static class CollectionExtensions
     /// <param name="collection">The collection.</param>
     /// <param name="results">The results.</param>
     /// <returns><c>true</c>, if errors were added, otherwise <c>false</c>.</returns>
-    public static bool AddErrors<TError, TErrorList>(this ICollection<TError> collection, IEnumerable<RwE<TErrorList>> results)
+    public static bool AddErrors<TError, TErrorList>(this ICollection<TError> collection, IEnumerable<RoE<TErrorList>> results)
         where TErrorList : IEnumerable<TError>
     {
         var count = collection.Count;

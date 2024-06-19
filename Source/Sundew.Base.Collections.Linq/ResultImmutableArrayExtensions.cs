@@ -49,7 +49,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> AddFailedIfError<TError>(this ImmutableArray<TError> immutableArray, in RwE<Failed<TError>> result)
+    public static ImmutableArray<TError> AddFailedIfError<TError>(this ImmutableArray<TError> immutableArray, in RoE<Failed<TError>> result)
     {
         return result.IsSuccess ? immutableArray : immutableArray.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!));
     }
@@ -89,7 +89,7 @@ public static class ResultImmutableArrayExtensions
     /// <param name="immutableArray">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static ImmutableArray<TError> AddFailedIfAnyError<TError>(this ImmutableArray<TError> immutableArray, in RwE<Failed<TError>> result)
+    public static ImmutableArray<TError> AddFailedIfAnyError<TError>(this ImmutableArray<TError> immutableArray, in RoE<Failed<TError>> result)
     {
         return result.HasError ? immutableArray.AddRange(result.Error.GetItems().Where(x => x != null).Select(x => x!)) : immutableArray;
     }
