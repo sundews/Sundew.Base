@@ -15,7 +15,6 @@ using BenchmarkDotNet.Jobs;
 
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net48, baseline: true)]
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
 [SimpleJob(RuntimeMoniker.Net50)]
 public class CommandLineSplitBenchmark
 {

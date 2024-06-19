@@ -16,7 +16,6 @@ using Sundew.Test.Infrastructure.Text;
 
 [MemoryDiagnoser]
 [SimpleJob(RuntimeMoniker.Net48, baseline: true)]
-[SimpleJob(RuntimeMoniker.NetCoreApp31)]
 [SimpleJob(RuntimeMoniker.Net70)]
 public class NaturalText
 {
