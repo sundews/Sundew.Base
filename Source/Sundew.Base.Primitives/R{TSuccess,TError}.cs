@@ -437,18 +437,6 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <summary>
     /// Evaluates the result into a single value.
     /// </summary>
-    /// <typeparam name="TResult">The new success type.</typeparam>
-    /// <param name="successFunc">The success function.</param>
-    /// <param name="resultIfIsErroneous">The result if erroneous.</param>
-    /// <returns>The new value.</returns>
-    public TResult Evaluate<TResult>(Func<TSuccess, TResult> successFunc, TResult resultIfIsErroneous)
-    {
-        return this.IsSuccess ? successFunc(this.Value) : resultIfIsErroneous;
-    }
-
-    /// <summary>
-    /// Evaluates the result into a single value.
-    /// </summary>
     /// <param name="resultIfIsErroneousFunc">The result if erroneous function.</param>
     /// <returns>The new value.</returns>
     public TSuccess Evaluate(Func<TError, TSuccess> resultIfIsErroneousFunc)
@@ -459,11 +447,60 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <summary>
     /// Evaluates the result into a single value.
     /// </summary>
+    /// <typeparam name="TResult">The new success type.</typeparam>
+    /// <param name="successFunc">The success function.</param>
     /// <param name="resultIfIsErroneous">The result if erroneous.</param>
     /// <returns>The new value.</returns>
-    public TSuccess Evaluate(TSuccess resultIfIsErroneous)
+    [return: NotNullIfNotNull("resultIfIsErroneous")]
+    public TResult? Evaluate<TResult>(Func<TSuccess, TResult> successFunc, TResult? resultIfIsErroneous)
+    {
+        return this.IsSuccess ? successFunc(this.Value) : resultIfIsErroneous;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="resultIfIsErroneous">The result if erroneous.</param>
+    /// <returns>The new value.</returns>
+    [return: NotNullIfNotNull("resultIfIsErroneous")]
+    public TSuccess? Evaluate(TSuccess? resultIfIsErroneous)
     {
         return this.IsSuccess ? this.Value : resultIfIsErroneous;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TResult">The new value type.</typeparam>
+    /// <param name="seed">The seed.</param>
+    /// <param name="successFunc">The success function.</param>
+    /// <param name="resultIfIsErroneousFunc">The result if erroneous function.</param>
+    /// <returns>The new value.</returns>
+    public TResult? EvaluateToOption<TResult>(TResult? seed, Func<TResult?, TSuccess, TResult?> successFunc, Func<TResult?, TError, TResult?> resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? successFunc(seed, this.Value) : resultIfIsErroneousFunc(seed, this.Error);
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TResult">The new success type.</typeparam>
+    /// <param name="successFunc">The success function.</param>
+    /// <param name="resultIfIsErroneousFunc">The result if erroneous function.</param>
+    /// <returns>The new value.</returns>
+    public TResult? EvaluateToOption<TResult>(Func<TSuccess, TResult?> successFunc, Func<TError, TResult?> resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? successFunc(this.Value) : resultIfIsErroneousFunc(this.Error);
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="resultIfIsErroneousFunc">The result if erroneous function.</param>
+    /// <returns>The new value.</returns>
+    public TSuccess? EvaluateToOption(Func<TError, TSuccess?> resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? this.Value : resultIfIsErroneousFunc(this.Error);
     }
 
     /// <summary>

@@ -114,7 +114,8 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// </summary>
     /// <param name="resultIfIsErroneous">The value if the result is erroneous.</param>
     /// <returns>The new value.</returns>
-    public TSuccess Evaluate(TSuccess resultIfIsErroneous)
+    [return: NotNullIfNotNull("resultIfIsErroneous")]
+    public TSuccess? Evaluate(TSuccess? resultIfIsErroneous)
     {
         return this.IsSuccess ? this.Value : resultIfIsErroneous;
     }
@@ -122,9 +123,22 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <summary>
     /// Evaluates the result into a single value.
     /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="resultFunc">The result function.</param>
+    /// <param name="resultIfIsErroneous">The result if is erroneous.</param>
+    /// <returns>The new value.</returns>
+    [return: NotNullIfNotNull("resultIfIsErroneous")]
+    public TResult? Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, TResult? resultIfIsErroneous)
+    {
+        return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneous;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
     /// <param name="resultIfIsErroneousFunc">The error function.</param>
     /// <returns>The new value.</returns>
-    public TSuccess Evaluate(Func<TSuccess> resultIfIsErroneousFunc)
+    public TSuccess Evaluate([DisallowNull] Func<TSuccess> resultIfIsErroneousFunc)
     {
         return this.IsSuccess ? this.Value : resultIfIsErroneousFunc();
     }
@@ -136,9 +150,19 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <param name="resultFunc">The result function.</param>
     /// <param name="resultIfIsErroneousFunc">The result if is erroneous function.</param>
     /// <returns>The new value.</returns>
-    public TResult Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, TResult resultIfIsErroneousFunc)
+    public TResult Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, Func<TResult> resultIfIsErroneousFunc)
     {
-        return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneousFunc;
+        return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneousFunc();
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="resultIfIsErroneousFunc">The error function.</param>
+    /// <returns>The new value.</returns>
+    public TSuccess? EvaluateToOption(Func<TSuccess?> resultIfIsErroneousFunc)
+    {
+        return this.IsSuccess ? this.Value : resultIfIsErroneousFunc();
     }
 
     /// <summary>
@@ -148,7 +172,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <param name="resultFunc">The result function.</param>
     /// <param name="resultIfIsErroneousFunc">The result if is erroneous function.</param>
     /// <returns>The new value.</returns>
-    public TResult Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, Func<TResult> resultIfIsErroneousFunc)
+    public TResult? EvaluateToOption<TResult>(Func<TSuccess, TResult?> resultFunc, Func<TResult?> resultIfIsErroneousFunc)
     {
         return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneousFunc();
     }

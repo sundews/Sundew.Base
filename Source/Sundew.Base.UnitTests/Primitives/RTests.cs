@@ -188,7 +188,7 @@ public class RTests
     }
 
     [Fact]
-    public void ToOptionResult_When_NullAndTargetIsValueType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public void ToValueOptionResult_When_NullAndTargetIsValueType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var expectedResult = 4;
         var testee = R.Success(expectedResult);
@@ -200,5 +200,18 @@ public class RTests
         result.IsSuccess.Should().BeTrue();
         result.Value.HasValue.Should().BeTrue();
         result.Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void Evaluate_When_Success_Then_ResultShouldBeExpectedResult()
+    {
+        var expectedResult = "value";
+        var testee = R.Success(expectedResult);
+
+        R<string> r = testee;
+
+        var result = r.Evaluate(default(string));
+
+        result.Should().Be(expectedResult);
     }
 }
