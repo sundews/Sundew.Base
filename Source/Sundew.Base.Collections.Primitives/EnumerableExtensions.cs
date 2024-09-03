@@ -21,22 +21,6 @@ using Sundew.Base.Memory;
 public static partial class EnumerableExtensions
 {
     /// <summary>
-    /// Gets an <see cref="IEnumerable{TItem}"/> from an item.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="item">The item.</param>
-    /// <returns>An <see cref="IEnumerable{TItem}"/>.</returns>
-    public static IReadOnlyList<TItem> ToEnumerable<TItem>(this TItem? item)
-    {
-        if (item != null)
-        {
-            return new[] { item };
-        }
-
-        return Arrays.Empty<TItem>();
-    }
-
-    /// <summary>
     /// Finds the index based on the given predicate.
     /// </summary>
     /// <param name="enumerable">The enumerable.</param>
@@ -108,7 +92,7 @@ public static partial class EnumerableExtensions
     /// <returns>
     /// An <see cref="IReadOnlyCollection{Object}" /> containing the result of the executed ling query.
     /// </returns>
-    public static IReadOnlyCollection<object> ToReadOnly(this IEnumerable enumerable)
+    public static IReadOnlyCollection<object> ToReadOnlyCollection(this IEnumerable enumerable)
     {
         return enumerable switch
         {
@@ -126,7 +110,7 @@ public static partial class EnumerableExtensions
     /// <returns>
     /// An <see cref="IReadOnlyCollection{TItem}" /> containing the result of the executed ling query.
     /// </returns>
-    public static IReadOnlyCollection<TItem> ToReadOnly<TItem>(this IEnumerable<TItem> enumerable)
+    public static IReadOnlyCollection<TItem> ToReadOnlyCollection<TItem>(this IEnumerable<TItem> enumerable)
     {
         return enumerable switch
         {

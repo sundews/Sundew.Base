@@ -138,7 +138,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// </summary>
     /// <param name="resultIfIsErroneousFunc">The error function.</param>
     /// <returns>The new value.</returns>
-    public TSuccess Evaluate([DisallowNull] Func<TSuccess> resultIfIsErroneousFunc)
+    public TSuccess Evaluate(Func<TSuccess> resultIfIsErroneousFunc)
     {
         return this.IsSuccess ? this.Value : resultIfIsErroneousFunc();
     }

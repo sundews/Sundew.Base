@@ -149,7 +149,7 @@ public class BufferTests
     public void WriteRange_When_RangeIsAList_ThenInReadOnlyItems_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
-        var expectedResult = new List<byte> { 1, 2, 3, 4, 5 }.ToReadOnly();
+        var expectedResult = new List<byte> { 1, 2, 3, 4, 5 }.ToReadOnlyCollection();
 
         testee.WriteRange(expectedResult);
 
@@ -160,7 +160,7 @@ public class BufferTests
     public void WriteRange_When_RangeIsAnArrayInReadOnlyItems_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
-        var expectedResult = BufferTests.ExpectedResult.ToReadOnly();
+        var expectedResult = BufferTests.ExpectedResult.ToReadOnlyCollection();
 
         testee.WriteRange(expectedResult);
 
@@ -171,7 +171,7 @@ public class BufferTests
     public void WriteRange_When_RangeIsAnEnumerableInReadOnlyItems_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<int>();
-        var expectedResult = Enumerable.Range(1, 5).ToReadOnly();
+        var expectedResult = Enumerable.Range(1, 5).ToReadOnlyCollection();
 
         testee.WriteRange(expectedResult);
 

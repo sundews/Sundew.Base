@@ -18,7 +18,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
-    <PackageReleaseNotes>14.0 - Result improvements
+    <PackageReleaseNotes>14.0 - Result and collections improvements
 13.0 - Results improvements
 12.0 - Restructing into smaller packages
 11.0 - Unified Disposal and Initialization

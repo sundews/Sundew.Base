@@ -80,37 +80,37 @@ public class EnumerableExtensionsTests
     }
 
     [Fact]
-    public void ToReadOnly_When_PassingLinqQuery_Then_ResultShouldBeEquivalentToExpectedEnumerable()
+    public void ToReadOnlyCollection_When_PassingLinqQuery_Then_ResultShouldBeEquivalentToExpectedEnumerable()
     {
         var expectedEnumerable = this.numberList.Where(x => x > 2 && x < 6);
 
-        var result = expectedEnumerable.ToReadOnly();
+        var result = expectedEnumerable.ToReadOnlyCollection();
 
         result.Should().BeEquivalentTo(expectedEnumerable);
     }
 
     [Fact]
-    public void ToReadOnly_When_PassingList_Then_ResultShouldContainTheSameList()
+    public void ToReadOnlyCollection_When_PassingList_Then_ResultShouldContainTheSameList()
     {
-        var result = this.numberList.ToReadOnly();
+        var result = this.numberList.ToReadOnlyCollection();
 
         result.Should().Equal(this.numberList);
     }
 
     [Fact]
-    public void ToReadOnly_When_PassingArray_Then_ResultShouldContainTheSameArray()
+    public void ToReadOnlyCollection_When_PassingArray_Then_ResultShouldContainTheSameArray()
     {
-        var result = this.numberArray.ToReadOnly();
+        var result = this.numberArray.ToReadOnlyCollection();
 
         result.Should().Equal(this.numberArray);
     }
 
     [Fact]
-    public void ToReadOnly_When_PassingReadOnly_Then_ResultShouldBeTheSameIterable()
+    public void ToReadOnlyCollection_When_PassingReadOnly_Then_ResultShouldBeTheSameIterable()
     {
-        var expectedIterable = this.numberList.Where(x => x > 2 && x < 6).ToReadOnly();
+        var expectedIterable = this.numberList.Where(x => x > 2 && x < 6).ToReadOnlyCollection();
 
-        var result = expectedIterable.ToReadOnly();
+        var result = expectedIterable.ToReadOnlyCollection();
 
         result.Should().Equal(expectedIterable);
     }
@@ -139,6 +139,35 @@ public class EnumerableExtensionsTests
         var expectedResult = items1.Concat(items2).Concat(items3).Concat(items4);
 
         var result = items1.Concat(items2, items3, items4);
+
+        result.Should().Equal(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(1, new int[] { 1 })]
+    [InlineData(null, new int[0])]
+    public void ToReadOnlyList_When_PassingNullableStruct_Then_ResultShouldBeExpectedResult(int? value, int[] expectedResult)
+    {
+        var result = value.ToReadOnlyList();
+
+        result.Should().Equal(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("hello", new string[] { "hello" })]
+    [InlineData(null, new string[0])]
+    public void ToReadOnlyList_When_PassingNullableClass_Then_ResultShouldBeExpectedResult(string? value, string[] expectedResult)
+    {
+        var result = value.ToReadOnlyList();
+
+        result.Should().Equal(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("hello", new string[] { "hello" })]
+    public void ToReadOnlyList_When_PassingNonNullableClass_Then_ResultShouldBeExpectedResult(string value, string[] expectedResult)
+    {
+        var result = value.ToReadOnlyList();
 
         result.Should().Equal(expectedResult);
     }

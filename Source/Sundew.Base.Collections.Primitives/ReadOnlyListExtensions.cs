@@ -17,6 +17,40 @@ using System.Runtime.CompilerServices;
 public static class ReadOnlyListExtensions
 {
     /// <summary>
+    /// Gets an <see cref="IReadOnlyList{TItem}"/> from an item.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="item">The item.</param>
+    /// <returns>An <see cref="IReadOnlyList{TItem}"/>.</returns>
+    public static IReadOnlyList<TItem> ToReadOnlyList<TItem>(this TItem? item)
+        where TItem : struct
+    {
+        if (item != null)
+        {
+            return new[] { item.Value };
+        }
+
+        return Arrays.Empty<TItem>();
+    }
+
+    /// <summary>
+    /// Gets an <see cref="IReadOnlyList{TItem}"/> from an item.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="item">The item.</param>
+    /// <returns>An <see cref="IReadOnlyList{TItem}"/>.</returns>
+    public static IReadOnlyList<TItem> ToReadOnlyList<TItem>(this TItem? item)
+        where TItem : class
+    {
+        if (item != null)
+        {
+            return new[] { item };
+        }
+
+        return Arrays.Empty<TItem>();
+    }
+
+    /// <summary>
     /// Copies items from the specified list to the specified array.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>

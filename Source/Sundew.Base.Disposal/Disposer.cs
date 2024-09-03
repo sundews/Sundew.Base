@@ -129,7 +129,7 @@ public abstract class Disposer : IEquatable<Disposer>
         /// <summary>
         /// Disposes the disposable.
         /// </summary>
-    /// <param name="disposalReporter">The disposal reporter.</param>
+        /// <param name="disposalReporter">The disposal reporter.</param>
         public override void Dispose(IDisposalReporter? disposalReporter)
         {
             var valueTask = this.asyncDisposable.DisposeAsync();
@@ -245,7 +245,7 @@ public abstract class Disposer : IEquatable<Disposer>
         /// </summary>
         /// <param name="disposables">The asyncDisposables.</param>
         public Disposers(params Disposer[] disposables)
-            : this(disposables.ToReadOnly())
+            : this(disposables.ToReadOnlyCollection())
         {
         }
 
@@ -254,7 +254,7 @@ public abstract class Disposer : IEquatable<Disposer>
         /// </summary>
         /// <param name="disposers">The disposers.</param>
         public Disposers(IEnumerable<Disposer> disposers)
-            : this(disposers.ToReadOnly())
+            : this(disposers.ToReadOnlyCollection())
         {
         }
 
@@ -324,7 +324,7 @@ public abstract class Disposer : IEquatable<Disposer>
         /// </summary>
         /// <param name="disposables">The asyncDisposables.</param>
         public SynchronousDisposables(params IDisposable[] disposables)
-            : this(disposables.ToReadOnly())
+            : this(disposables.ToReadOnlyCollection())
         {
         }
 
@@ -333,7 +333,7 @@ public abstract class Disposer : IEquatable<Disposer>
         /// </summary>
         /// <param name="disposables">The asyncDisposables.</param>
         public SynchronousDisposables(IEnumerable<IDisposable> disposables)
-            : this(disposables.ToReadOnly())
+            : this(disposables.ToReadOnlyCollection())
         {
         }
 

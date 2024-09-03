@@ -234,11 +234,40 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// Checks if the result is an error and passes the error through the out parameter.
     /// </summary>
     /// <param name="error">The error.</param>
+    /// <param name="value">The value.</param>
     /// <returns><c>true</c> if the result is an error otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Error))]
+    [MemberNotNullWhen(false, nameof(Value))]
+    public bool TryGetError([NotNullWhen(true)] out TError? error, [NotNullWhen(false)] out TSuccess? value)
+    {
+        error = this.Error;
+        value = this.Value;
+        return !this.IsSuccess;
+    }
+
+    /// <summary>
+    /// Checks if the result is an error and passes the error through the out parameter.
+    /// </summary>
+    /// <param name="error">The error.</param>
+    /// <returns><c>true</c> if the result has an error otherwise <c>false</c>.</returns>
     [MemberNotNullWhen(true, nameof(Error))]
     public bool TryGetAnyError([NotNullWhen(true)] out TError? error)
     {
         error = this.Error;
+        return this.HasError;
+    }
+
+    /// <summary>
+    /// Checks if the result is an error and passes the error through the out parameter.
+    /// </summary>
+    /// <param name="error">The error.</param>
+    /// <param name="value">The value.</param>
+    /// <returns><c>true</c> if the result has an error otherwise <c>false</c>.</returns>
+    [MemberNotNullWhen(true, nameof(Error))]
+    public bool TryGetAnyError([NotNullWhen(true)] out TError? error, [NotNullWhen(false)] out TSuccess? value)
+    {
+        error = this.Error;
+        value = this.Value;
         return this.HasError;
     }
 
