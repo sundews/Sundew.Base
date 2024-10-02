@@ -56,8 +56,45 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
+    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
         where TValue : struct
+        where TNewValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+        where TValue : struct
+        where TNewValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+        where TValue : struct
+        where TNewValue : class
     {
         return value.HasValue ? valueFunc(value.Value) : default;
     }
@@ -75,8 +112,29 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
+    public static TNewValue? WithValue<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
         where TValue : struct
+        where TNewValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value, parameter) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
+        where TValue : struct
+        where TNewValue : class
     {
         return value.HasValue ? valueFunc(value.Value, parameter) : default;
     }
@@ -96,8 +154,31 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue> valueFunc)
+    public static TNewValue? WithValue<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
         where TValue : struct
+        where TNewValue : struct
+    {
+        return value.HasValue ? valueFunc(value.Value, parameter1, parameter2) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TParameter1">The type of the parameter 1.</typeparam>
+    /// <typeparam name="TParameter2">The type of the parameter 2.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="parameter1">The parameter 1.</param>
+    /// <param name="parameter2">The parameter 2.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
+        where TValue : struct
+        where TNewValue : class
     {
         return value.HasValue ? valueFunc(value.Value, parameter1, parameter2) : default;
     }
@@ -113,8 +194,45 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
+    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
         where TValue : class
+        where TNewValue : struct
+    {
+        return value != null ? valueFunc(value) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+        where TValue : class
+        where TNewValue : struct
+    {
+        return value != null ? valueFunc(value) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+        where TValue : class
+        where TNewValue : class
     {
         return value != null ? valueFunc(value) : default;
     }
@@ -132,8 +250,29 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue> valueFunc)
+    public static TNewValue? WithValue<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
         where TValue : class
+        where TNewValue : struct
+    {
+        return value != null ? valueFunc(value, parameter) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TParameter">The type of the parameter.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="parameter">The parameter.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
+        where TValue : class
+        where TNewValue : class
     {
         return value != null ? valueFunc(value, parameter) : default;
     }
@@ -153,8 +292,31 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue> valueFunc)
+    public static TNewValue? WithValue<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
         where TValue : class
+        where TNewValue : struct
+    {
+        return value != null ? valueFunc(value, parameter1, parameter2) : null;
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TParameter1">The type of the parameter 1.</typeparam>
+    /// <typeparam name="TParameter2">The type of the parameter 2.</typeparam>
+    /// <typeparam name="TNewValue">The type of the new value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="parameter1">The parameter 1.</param>
+    /// <param name="parameter2">The parameter 2.</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// An optional TNewValue.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
+        where TValue : class
+        where TNewValue : class
     {
         return value != null ? valueFunc(value, parameter1, parameter2) : default;
     }

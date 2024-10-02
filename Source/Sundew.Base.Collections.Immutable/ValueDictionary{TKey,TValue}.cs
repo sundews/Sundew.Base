@@ -238,12 +238,32 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     }
 
     /// <summary>
-    /// Removes the item and returns a newly created array.
+    /// Adds the pairs.
+    /// </summary>
+    /// <param name="pairs">The pairs.</param>
+    /// <returns>The new value dictionary.</returns>
+    public ValueDictionary<TKey, TValue> AddRange(IEnumerable<KeyValuePair<TKey, TValue>> pairs)
+    {
+        return new ValueDictionary<TKey, TValue>(this.inner.AddRange(pairs));
+    }
+
+    /// <summary>
+    /// Removes the key and returns a newly created array.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <returns>The newly created array.</returns>
     public ValueDictionary<TKey, TValue> Remove(TKey key)
     {
         return this.inner.Remove(key).ToValueDictionary();
+    }
+
+    /// <summary>
+    /// Removes the keys and returns a newly created array.
+    /// </summary>
+    /// <param name="keys">The keys.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueDictionary<TKey, TValue> RemoveRange(IEnumerable<TKey> keys)
+    {
+        return this.inner.RemoveRange(keys).ToValueDictionary();
     }
 }

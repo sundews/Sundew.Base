@@ -17,7 +17,7 @@ using System.Runtime.CompilerServices;
 /// Represents in immutable array that implements value semantics.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
-public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<ValueArray<TItem>>
+public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<ValueArray<TItem>>
 {
     private readonly ImmutableArray<TItem> inner;
 
@@ -182,6 +182,16 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     }
 
     /// <summary>
+    /// Adds the items and returns a newly created array with containing the item.
+    /// </summary>
+    /// <param name="items">The items.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueArray<TItem> AddRange(IEnumerable<TItem> items)
+    {
+        return this.inner.AddRange(items);
+    }
+
+    /// <summary>
     /// Removes the item and returns a newly created array.
     /// </summary>
     /// <param name="item">The item.</param>
@@ -189,6 +199,16 @@ public readonly struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<Valu
     public ValueArray<TItem> Remove(TItem item)
     {
         return this.inner.Remove(item);
+    }
+
+    /// <summary>
+    /// Removes the items and returns a newly created list.
+    /// </summary>
+    /// <param name="items">The items.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueArray<TItem> RemoveRange(IEnumerable<TItem> items)
+    {
+        return this.inner.RemoveRange(items);
     }
 
     /// <summary>

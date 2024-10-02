@@ -362,6 +362,18 @@ public static class OptionalValue
     /// <typeparam name="TValue">The value type.</typeparam>
     /// <param name="option">The  option.</param>
     /// <returns>The enumerable if the option contains one, otherwise and empty enumerable.</returns>
+    public static IEnumerable<TValue> ToEnumerableValue<TValue>(this TValue option)
+        where TValue : struct
+    {
+        yield return option;
+    }
+
+    /// <summary>
+    /// Converts the option to an <see cref="IEnumerable{T}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="option">The  option.</param>
+    /// <returns>The enumerable if the option contains one, otherwise and empty enumerable.</returns>
     public static IEnumerable<TValue> ToEnumerable<TValue>(this TValue? option)
         where TValue : struct
     {

@@ -28,117 +28,101 @@ public static class ImmutableListExtensions
     /// <summary>
     /// Add the option item if it has any.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting list.</returns>
-    public static TList AddIfHasValue<TList, TItem>(this TList immutableList, TItem? option)
-        where TList : IImmutableList<TItem>
+    public static ImmutableList<TItem> AddIfHasValue<TItem>(this ImmutableList<TItem> immutableList, TItem? option)
         where TItem : struct
     {
-        return option.HasValue ? (TList)immutableList.Add(option.Value) : immutableList;
+        return option.HasValue ? immutableList.Add(option.Value) : immutableList;
     }
 
     /// <summary>
     /// Add the option item if it has any.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="option">The option.</param>
     /// <returns>The resulting list.</returns>
-    public static TList AddIfHasValue<TList, TItem>(this TList immutableList, TItem? option)
-        where TList : IImmutableList<TItem>
+    public static ImmutableList<TItem> AddIfHasValue<TItem>(this ImmutableList<TItem> immutableList, TItem? option)
         where TItem : class
     {
-        return option.HasValue() ? (TList)immutableList.Add(option) : immutableList;
+        return option.HasValue() ? immutableList.Add(option) : immutableList;
     }
 
     /// <summary>
     /// Add the result value if it succeeded.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfSuccess<TList, TSuccess, TError>(this TList immutableList, R<TSuccess, TError> result)
-        where TList : IImmutableList<TSuccess>
+    public static ImmutableList<TSuccess> AddIfSuccess<TSuccess, TError>(this ImmutableList<TSuccess> immutableList, R<TSuccess, TError> result)
     {
-        return result.IsSuccess ? (TList)immutableList.Add(result.Value) : immutableList;
+        return result.IsSuccess ? immutableList.Add(result.Value) : immutableList;
     }
 
     /// <summary>
     /// Add the result error if the result failed.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TSuccess">The value type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfSuccess<TList, TSuccess>(this TList immutableList, R<TSuccess> result)
-        where TList : IImmutableList<TSuccess>
+    public static ImmutableList<TSuccess> AddIfSuccess<TSuccess>(this ImmutableList<TSuccess> immutableList, R<TSuccess> result)
     {
-        return result.IsSuccess ? (TList)immutableList.Add(result.Value) : immutableList;
+        return result.IsSuccess ? immutableList.Add(result.Value) : immutableList;
     }
 
     /// <summary>
     /// Add the result error if the result failed.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TError">The item type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfError<TList, TError>(this TList immutableList, RoE<TError> result)
-        where TList : IImmutableList<TError>
+    public static ImmutableList<TError> AddIfError<TError>(this ImmutableList<TError> immutableList, RoE<TError> result)
     {
-        return result.IsSuccess ? immutableList : (TList)immutableList.Add(result.Error);
+        return result.IsSuccess ? immutableList : immutableList.Add(result.Error);
     }
 
     /// <summary>
     /// Add the result error if the result failed.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The item type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfError<TList, TSuccess, TError>(this TList immutableList, R<TSuccess, TError> result)
-        where TList : IImmutableList<TError>
+    public static ImmutableList<TError> AddIfError<TSuccess, TError>(this ImmutableList<TError> immutableList, R<TSuccess, TError> result)
     {
-        return result.IsSuccess ? immutableList : (TList)immutableList.Add(result.Error);
+        return result.IsSuccess ? immutableList : immutableList.Add(result.Error);
     }
 
     /// <summary>
     /// Add the result error if it has any.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfAnyError<TList, TError>(this TList immutableList, RoE<TError> result)
-        where TList : IImmutableList<TError>
+    public static ImmutableList<TError> AddIfAnyError<TError>(this ImmutableList<TError> immutableList, RoE<TError> result)
     {
-        return result.HasError ? (TList)immutableList.Add(result.Error) : immutableList;
+        return result.HasError ? immutableList.Add(result.Error) : immutableList;
     }
 
     /// <summary>
     /// Add the result error if it has any.
     /// </summary>
-    /// <typeparam name="TList">The list type.</typeparam>
     /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="immutableList">The immutable list.</param>
     /// <param name="result">The result.</param>
     /// <returns> The resulting list.</returns>
-    public static TList AddIfAnyError<TList, TSuccess, TError>(this TList immutableList, R<TSuccess, TError> result)
-        where TList : IImmutableList<TError>
+    public static ImmutableList<TError> AddIfAnyError<TSuccess, TError>(this ImmutableList<TError> immutableList, R<TSuccess, TError> result)
     {
-        return result.HasError ? (TList)immutableList.Add(result.Error) : immutableList;
+        return result.HasError ? immutableList.Add(result.Error) : immutableList;
     }
 }

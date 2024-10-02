@@ -90,4 +90,97 @@ public class OTests
 
         result.Should().Be(expectedResult);
     }
+
+    [Theory]
+    [InlineData(42)]
+    [InlineData(null)]
+    public void WithValue_When_NullableValueTupleAndResultIsStruct_Then_ResultShouldBeExpectedResult(int? expectedResult)
+    {
+        var tupleOption = this.GetValueTupleOption("Any", expectedResult);
+
+        var result = tupleOption.WithValue(x => x.Value);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(42)]
+    [InlineData(null)]
+    public void WithValue_When_NullableValueTupleAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(int? expectedResult)
+    {
+        var tupleOption = this.GetValueTupleOption("Any", expectedResult);
+
+        var result = tupleOption.WithValue(x => (int?)x.Value);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("T", 1)]
+    [InlineData(null, null)]
+    public void WithValue_When_Option_Then_ResultShouldBeExpectedResult(string? input, int? expectedResult)
+    {
+        var result = input.WithValue(x => x.Length);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("T", 1)]
+    [InlineData(null, null)]
+    public void WithValue_When_OptionAndResultIsNullable_Then_ResultShouldBeExpectedResult(string? input, int? expectedResult)
+    {
+        var result = input.WithValue(x => (int?)x.Length);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("T")]
+    [InlineData(null)]
+    public void With_When_NullableValueTupleAndResultIsClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    {
+        var tupleOption = this.GetValueTupleOption(expectedResult, 42);
+
+        var result = tupleOption.With(x => x.Name);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("T")]
+    [InlineData(null)]
+    public void With_When_OptionAndResultIsClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    {
+        var result = expectedResult.With(x => x);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("T")]
+    [InlineData(null)]
+    public void With_When_NullableValueTupleAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    {
+        var tupleOption = this.GetValueTupleOption(expectedResult, 42);
+
+        var result = tupleOption.With(x => (string?)x.Name);
+
+        result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("T")]
+    [InlineData(null)]
+    public void With_When_OptionAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    {
+        var result = expectedResult.With(x => x.ToString());
+
+        result.Should().Be(expectedResult);
+    }
+
+    private (string Name, int Value)? GetValueTupleOption(string? name, int? value)
+    {
+        return value.HasValue && name != null ? (name, value.Value) : null;
+    }
 }

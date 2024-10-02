@@ -21,7 +21,7 @@ public class EnumerableExtensionsOnlyOneTests
     [InlineData(new[] { 1, 2 }, 0)]
     public void OnlyOneOrDefault_When_ItemTypeIsStruct_Then_ResultShouldBeExpectedResult(int[]? items, int? expectedResult)
     {
-        var result = items.OnlyOneOrDefault();
+        var result = items.OnlyOneOrDefaultValue();
 
         result.Should().Be(expectedResult);
     }
@@ -57,9 +57,14 @@ public class EnumerableExtensionsOnlyOneTests
     [InlineData(null, false, 0)]
     [InlineData(new int[0], false, 0)]
     [InlineData(new[] { 1, 2 }, false, 0)]
-    public void TryGetOnlyOneOrDefault_When_ItemTypeIsStruct_Then_ResultShouldBeExpectedResult(int[]? items, bool expectedResult, int? expectedItem)
+    public void TryGetOnlyOneOrDefault_When_ItemTypeIsStruct_Then_ResultShouldBeExpectedResult(int[]? items, bool expectedResult, int expectedItem)
     {
-        var result = items.TryGetOnlyOne(out var item);
+        bool result = false;
+        if (items.TryGetOnlyOneValue(out var item))
+        {
+            item.ToString().Should().Be(expectedItem!.ToString());
+            result = true;
+        }
 
         result.Should().Be(expectedResult);
         item.Should().Be(expectedItem);
@@ -67,17 +72,21 @@ public class EnumerableExtensionsOnlyOneTests
 
     [Theory]
     [InlineData(new[] { "1" }, true, 1)]
-    [InlineData(null, false, null)]
-    [InlineData(new[] { "1", "2" }, false, null)]
-    [InlineData(new string?[] { null }, false, null)]
-    [InlineData(new string?[] { null, null }, false, null)]
-    [InlineData(new string?[0], false, null)]
+    [InlineData(null, false, 0)]
+    [InlineData(new[] { "1", "2" }, false, 0)]
+    [InlineData(new string?[] { null }, false, 0)]
+    [InlineData(new string?[] { null, null }, false, 0)]
+    [InlineData(new string?[0], false, 0)]
     public void TryGetOnlyOneOrDefault_When_ItemTypeIsNullableStruct_Then_ResultShouldBeExpectedResult(string?[]? items, bool expectedResult, int? expectedItem)
     {
         var result = (items?.Select<string?, int?>(x => x != null ? int.Parse(x) : null) ?? null).TryGetOnlyOne(out var item);
 
         result.Should().Be(expectedResult);
         item.Should().Be(expectedItem);
+        if (result)
+        {
+            item.ToString().Should().Be(expectedItem.ToString());
+        }
     }
 
     [Theory]
@@ -87,7 +96,12 @@ public class EnumerableExtensionsOnlyOneTests
     [InlineData(new[] { "1", "2" }, false, null)]
     public void TryGetOnlyOneOrDefault_When_ItemTypeIsClass_Then_ResultShouldBeExpectedResult(string?[]? items, bool expectedResult, string? expectedItem)
     {
-        var result = items.TryGetOnlyOne(out var item);
+        bool result = false;
+        if (items.TryGetOnlyOne(out var item))
+        {
+            item.ToString().Should().Be(expectedItem!.ToString());
+            result = true;
+        }
 
         result.Should().Be(expectedResult);
         item.Should().Be(expectedItem);

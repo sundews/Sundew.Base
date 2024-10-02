@@ -179,6 +179,16 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     }
 
     /// <summary>
+    /// Adds the items and returns a newly created array with containing the item.
+    /// </summary>
+    /// <param name="items">The items.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueList<TItem> AddRange(IEnumerable<TItem> items)
+    {
+        return this.inner.AddRange(items).ToValueList();
+    }
+
+    /// <summary>
     /// Removes the item and returns a newly created list.
     /// </summary>
     /// <param name="item">The item.</param>
@@ -186,6 +196,16 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     public ValueList<TItem> Remove(TItem item)
     {
         return this.inner.Remove(item).ToValueList();
+    }
+
+    /// <summary>
+    /// Removes the items and returns a newly created list.
+    /// </summary>
+    /// <param name="items">The items.</param>
+    /// <returns>The newly created array.</returns>
+    public ValueList<TItem> RemoveRange(IEnumerable<TItem> items)
+    {
+        return this.inner.RemoveRange(items).ToValueList();
     }
 
     /// <summary>
