@@ -272,14 +272,13 @@ public static partial class R
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static R<TValue> From<TValue, TError>(TValue? value)
-        where TValue : class
     {
         if (value == null)
         {
-            return R.Error();
+            return new R<TValue>(false, default);
         }
 
-        return R.Success(value);
+        return new R<TValue>(true, value);
     }
 
     /// <summary>
