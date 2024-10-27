@@ -20,9 +20,47 @@ public static class Interval
     /// <param name="minimum">The minimum.</param>
     /// <param name="length">The length.</param>
     /// <returns>An interval.</returns>
+    public static R<Interval<int>> TryGetFromMinAndLength(int minimum, int length)
+    {
+        var max = minimum + length;
+        return TryGetFrom(minimum, max);
+    }
+
+    /// <summary>
+    /// Creates an interval with the specified minimum and a length.
+    /// </summary>
+    /// <param name="minimum">The minimum.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>An interval.</returns>
+    public static R<Interval<double>> TryGetFromMinAndLength(double minimum, double length)
+    {
+        var max = minimum + length;
+        return TryGetFrom(minimum, max);
+    }
+
+    /// <summary>
+    /// Creates an interval with the specified minimum and maximum.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="min">The minimum.</param>
+    /// <param name="max">The maximum.</param>
+    /// <returns>An interval.</returns>
+    public static R<Interval<TValue>> TryGetFrom<TValue>(TValue min, TValue max)
+        where TValue : IComparable<TValue>
+    {
+        return R.From(min.IsLessThan(max), new Interval<TValue>(min, max));
+    }
+
+    /// <summary>
+    /// Creates an interval with the specified minimum and a length.
+    /// </summary>
+    /// <param name="minimum">The minimum.</param>
+    /// <param name="length">The length.</param>
+    /// <returns>An interval.</returns>
     public static Interval<int> FromMinAndLength(int minimum, int length)
     {
-        return new Interval<int>(minimum, minimum + length);
+        var max = minimum + length;
+        return From(minimum, max);
     }
 
     /// <summary>
@@ -33,7 +71,8 @@ public static class Interval
     /// <returns>An interval.</returns>
     public static Interval<double> FromMinAndLength(double minimum, double length)
     {
-        return new Interval<double>(minimum, minimum + length);
+        var max = minimum + length;
+        return From(minimum, max);
     }
 
     /// <summary>
@@ -44,8 +83,13 @@ public static class Interval
     /// <param name="max">The maximum.</param>
     /// <returns>An interval.</returns>
     public static Interval<TValue> From<TValue>(TValue min, TValue max)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
-        return new Interval<TValue>(min, max);
+        if (min.IsLessThanOrEqualTo(max))
+        {
+            return new Interval<TValue>(min, max);
+        }
+
+        throw new RangeException<TValue>(min, max);
     }
 }

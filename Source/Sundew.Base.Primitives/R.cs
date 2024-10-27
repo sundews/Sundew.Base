@@ -114,42 +114,6 @@ public static partial class R
     }
 
     /// <summary>Creates a result based on the specified values.</summary>
-    /// <typeparam name="TSuccess">The type of the value.</typeparam>
-    /// <param name="isSuccess">The is success.</param>
-    /// <param name="value">The value.</param>
-    /// <returns>A <see cref="R"/>.</returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TSuccess> FromValue<TSuccess>(bool isSuccess, TSuccess value)
-    {
-        return new R<TSuccess>(isSuccess, value);
-    }
-
-    /// <summary>Creates a result based on the specified values.</summary>
-    /// <typeparam name="TSuccess">The type of the error.</typeparam>
-    /// <param name="isSuccess">The is success.</param>
-    /// <param name="valueFunc">The value function.</param>
-    /// <returns>A <see cref="R"/>.</returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TSuccess> FromValue<TSuccess>(bool isSuccess, Func<TSuccess> valueFunc)
-    {
-        return new R<TSuccess>(isSuccess, isSuccess ? valueFunc() : default!);
-    }
-
-    /// <summary>
-    /// Creates a result based on the specified values.
-    /// </summary>
-    /// <typeparam name="TSuccess">The type of the value.</typeparam>
-    /// <param name="value">The value.</param>
-    /// <returns>
-    /// A <see cref="R" />.
-    /// </returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TSuccess> FromValue<TSuccess>(TSuccess? value)
-    {
-        return new R<TSuccess>(value != null, value);
-    }
-
-    /// <summary>Creates a result based on the specified values.</summary>
     /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="isSuccess">The is success.</param>
     /// <param name="error">The error.</param>
@@ -298,6 +262,123 @@ public static partial class R
     }
 
     /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue> From<TValue, TError>(TValue? value)
+        where TValue : class
+    {
+        if (value == null)
+        {
+            return R.Error();
+        }
+
+        return R.Success(value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue> FromValue<TValue>(TValue value)
+        where TValue : struct, IEquatable<TValue>
+    {
+        if (value.Equals(default))
+        {
+            return R.Error();
+        }
+
+        return R.Success(value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="isSuccess">If set to <c>true</c> [success].</param>
+    /// <param name="value">The result value.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue> From<TValue, TError>(bool isSuccess, TValue value)
+    {
+        return new R<TValue>(isSuccess, value);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="isSuccess">If set to <c>true</c> [success].</param>
+    /// <param name="value">The result value.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ValueTask<R<TValue>> FromAsync<TValue>(bool isSuccess, TValue value)
+    {
+        return new R<TValue>(isSuccess, value).ToValueTask();
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="isSuccess">If set to <c>true</c> [success].</param>
+    /// <param name="value">The value.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue> From<TValue>(bool isSuccess, TValue value)
+    {
+        return new R<TValue>(isSuccess, isSuccess ? value : default);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="isSuccess">If set to <c>true</c> [success].</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue> From<TValue>(bool isSuccess, Func<TValue> valueFunc)
+    {
+        return new R<TValue>(isSuccess, isSuccess ? valueFunc() : default);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="isSuccess">If set to <c>true</c> [success].</param>
+    /// <param name="valueFunc">The value func.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ValueTask<R<TValue>> FromAsync<TValue>(bool isSuccess, Func<TValue> valueFunc)
+    {
+        return new R<TValue>(isSuccess, isSuccess ? valueFunc() : default).ToValueTask();
+    }
+
+    /// <summary>
     /// Creates a successful result.
     /// </summary>
     /// <returns>
@@ -334,6 +415,16 @@ public static partial class R
         where TValue : notnull
     {
         return new ValueTask<R<TValue, TError>>(Success(value));
+    }
+
+    /// <summary>
+    /// Creates an erroneous result.
+    /// </summary>
+    /// <returns>A <see cref="R" />.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static ValueTask<ErrorResult> ErrorAsync()
+    {
+        return default;
     }
 
     /// <summary>

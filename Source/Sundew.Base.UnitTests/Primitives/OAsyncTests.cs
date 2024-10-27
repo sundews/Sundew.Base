@@ -10,7 +10,6 @@ namespace Sundew.Base.UnitTests.Primitives;
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Sundew.Base.Primitives;
 using Xunit;
 
 public class OAsyncTests
@@ -58,7 +57,7 @@ public class OAsyncTests
     [Theory]
     [InlineData(true, "341")]
     [InlineData(false, null)]
-    public async Task With_Then_ResultValueShouldBeExpectedValue(
+    public async Task Map_Then_ResultValueShouldBeExpectedValue(
         bool expectedResult,
         string? expectedValue)
     {
@@ -66,7 +65,7 @@ public class OAsyncTests
 
         var testee = await ComputeAsync(() => option.ToAsync());
 
-        var result = testee.With(x => x + "1");
+        var result = testee.Map(x => x + "1");
 
         result.HasValue().Should().Be(expectedResult);
         result.Should().Be(expectedValue);

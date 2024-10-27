@@ -110,7 +110,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public SuccessResultOption<TNewValue?> With<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
+        public SuccessResultOption<TNewValue?> Map<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
             return new SuccessResultOption<TNewValue?>(valueFunc(this.Value));
         }
@@ -123,7 +123,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ValueTask<SuccessResultOption<TNewValue?>> WithAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
+        public ValueTask<SuccessResultOption<TNewValue?>> MapAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
             return new SuccessResultOption<TNewValue?>(valueFunc(this.Value)).ToValueTask();
         }

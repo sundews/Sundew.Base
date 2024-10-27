@@ -11,5 +11,5 @@ using Sundew.Base.Numeric;
 
 internal static class BufferHelper
 {
-    public static readonly Interval<int> StartIndexInterval = new(10, 128);
+    public static readonly Interval<int> StartIndexInterval = Interval.From(10, 128);
 }

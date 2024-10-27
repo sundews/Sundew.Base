@@ -16,7 +16,7 @@ using System.Globalization;
 /// <typeparam name="TValue">The type of the value.</typeparam>
 /// <seealso cref="System.Exception" />
 public class RangeException<TValue> : Exception
-    where TValue : struct, IComparable<TValue>
+    where TValue : IComparable<TValue>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RangeException{TValue}" /> class.

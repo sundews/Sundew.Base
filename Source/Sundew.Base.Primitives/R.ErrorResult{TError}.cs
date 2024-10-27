@@ -8,7 +8,6 @@
 namespace Sundew.Base;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -88,7 +87,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ErrorResult<TNewError> With<TNewError>(Func<TError, TNewError> errorFunc)
+        public ErrorResult<TNewError> Map<TNewError>(Func<TError, TNewError> errorFunc)
         {
             return new ErrorResult<TNewError>(errorFunc(this.Error));
         }
@@ -101,7 +100,7 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ValueTask<ErrorResult<TNewError>> WithAsync<TNewError>(Func<TError, TNewError> errorFunc)
+        public ValueTask<ErrorResult<TNewError>> MapAsync<TNewError>(Func<TError, TNewError> errorFunc)
         {
             return new ErrorResult<TNewError>(errorFunc(this.Error)).ToValueTask();
         }

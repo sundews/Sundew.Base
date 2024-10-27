@@ -22,7 +22,7 @@ public static class Comparison
     /// <param name="rhs">The RHS.</param>
     /// <returns>The min value.</returns>
     public static TValue Min<TValue>(in TValue lhs, in TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         if (lhs.CompareTo(rhs) < 0)
         {
@@ -40,7 +40,7 @@ public static class Comparison
     /// <param name="rhs">The RHS.</param>
     /// <returns>The max value.</returns>
     public static TValue Max<TValue>(in TValue lhs, in TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         if (lhs.CompareTo(rhs) > 0)
         {

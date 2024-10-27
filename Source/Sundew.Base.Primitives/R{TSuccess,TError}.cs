@@ -299,7 +299,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// </summary>
     /// <returns>The value task.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public R<TSuccess> ToWithValue()
+    public R<TSuccess> ToResultWithValue()
     {
         return this;
     }
@@ -309,7 +309,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// </summary>
     /// <returns>The value task.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public RoE<TError> ToWithError()
+    public RoE<TError> ToResultWithError()
     {
         return this;
     }
@@ -322,9 +322,9 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewValue, TError> With<TNewValue>(Func<TSuccess, TNewValue> valueFunc)
+    public R<TNewValue, TError> Map<TNewValue>(Func<TSuccess, TNewValue> valueFunc)
     {
-        return this.With(valueFunc, error => error);
+        return this.Map(valueFunc, error => error);
     }
 
     /// <summary>
@@ -337,9 +337,9 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewValue, TError> With<TParameter, TNewValue>(TParameter parameter, Func<TSuccess, TParameter, TNewValue> valueFunc)
+    public R<TNewValue, TError> Map<TParameter, TNewValue>(TParameter parameter, Func<TSuccess, TParameter, TNewValue> valueFunc)
     {
-        return this.With(parameter, valueFunc, (error, _) => error);
+        return this.Map(parameter, valueFunc, (error, _) => error);
     }
 
     /// <summary>
@@ -350,9 +350,9 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TSuccess, TNewError> WithError<TNewError>(Func<TError, TNewError> errorFunc)
+    public R<TSuccess, TNewError> MapError<TNewError>(Func<TError, TNewError> errorFunc)
     {
-        return this.With(value => value, errorFunc);
+        return this.Map(value => value, errorFunc);
     }
 
     /// <summary>
@@ -365,9 +365,9 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TSuccess, TNewError> WithError<TParameter, TNewError>(TParameter parameter, Func<TError, TParameter, TNewError> errorFunc)
+    public R<TSuccess, TNewError> MapError<TParameter, TNewError>(TParameter parameter, Func<TError, TParameter, TNewError> errorFunc)
     {
-        return this.With(parameter, (value, _) => value, errorFunc);
+        return this.Map(parameter, (value, _) => value, errorFunc);
     }
 
     /// <summary>
@@ -380,7 +380,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewValue, TNewError> With<TNewValue, TNewError>(Func<TSuccess, TNewValue> valueFunc, Func<TError, TNewError> errorFunc)
+    public R<TNewValue, TNewError> Map<TNewValue, TNewError>(Func<TSuccess, TNewValue> valueFunc, Func<TError, TNewError> errorFunc)
     {
         return this.IsSuccess ? new R<TNewValue, TNewError>(this.IsSuccess, valueFunc(this.Value), default!) : new R<TNewValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error));
     }
@@ -397,7 +397,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewValue, TNewError> With<TParameter, TNewValue, TNewError>(TParameter parameter, Func<TSuccess, TParameter, TNewValue> valueFunc, Func<TError, TParameter, TNewError> errorFunc)
+    public R<TNewValue, TNewError> Map<TParameter, TNewValue, TNewError>(TParameter parameter, Func<TSuccess, TParameter, TNewValue> valueFunc, Func<TError, TParameter, TNewError> errorFunc)
     {
         return this.IsSuccess ? new R<TNewValue, TNewError>(this.IsSuccess, valueFunc(this.Value, parameter), default!) : new R<TNewValue, TNewError>(this.IsSuccess, default!, errorFunc(this.Error, parameter));
     }
@@ -543,7 +543,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     {
         return this.IsSuccess && other.IsSuccess
             ? R.Success((this.Value, other.Value))
-            : R.Error((this.ToWithError(), other.ToWithError()));
+            : R.Error((this.ToResultWithError(), other.ToResultWithError()));
     }
 
     /// <summary>

@@ -54,13 +54,13 @@ public class RAsyncTests
     [Theory]
     [InlineData(true, 0)]
     [InlineData(false, 34)]
-    public async Task With_Then_ResultErrorShouldBeExpectedError(
+    public async Task Map_Then_ResultErrorShouldBeExpectedError(
         bool expectedResult,
         int expectedError)
     {
         var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError));
 
-        var result = testee.With(Convert.ToDouble);
+        var result = testee.Map(Convert.ToDouble);
 
         result.IsSuccess.Should().Be(expectedResult);
         result.Error.Should().Be(expectedError);
@@ -70,14 +70,14 @@ public class RAsyncTests
     [Theory]
     [InlineData(true, 34, 0)]
     [InlineData(false, 0, 23)]
-    public async Task To_Then_ResultValueShouldBeExpectedValue(
+    public async Task Map_Then_ResultValueShouldBeExpectedValue(
         bool expectedResult,
         int expectedValue,
         int expectedError)
     {
         var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError));
 
-        var result = testee.With(expectedValue);
+        var result = testee.Map(expectedValue);
 
         result.IsSuccess.Should().Be(expectedResult);
         result.Value.Should().Be(expectedValue);

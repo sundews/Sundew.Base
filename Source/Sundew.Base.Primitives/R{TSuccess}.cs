@@ -217,7 +217,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TSuccess, TError> With<TError>(TError error)
+    public R<TSuccess, TError> Map<TError>(TError error)
     {
         return new R<TSuccess, TError>(this.IsSuccess, this.IsSuccess ? this.Value : default!, error);
     }
@@ -230,7 +230,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TSuccess, TError> With<TError>(Func<TError> errorFunc)
+    public R<TSuccess, TError> Map<TError>(Func<TError> errorFunc)
     {
         return new R<TSuccess, TError>(this.IsSuccess, this.IsSuccess ? this.Value : default!, errorFunc());
     }
@@ -243,7 +243,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R{TSuccess}" />.
     /// </returns>
-    public R<TNewSuccess> With<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
+    public R<TNewSuccess> Map<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
     {
         return new R<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default!);
     }
@@ -258,7 +258,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R{TSuccess}" />.
     /// </returns>
-    public R<TNewSuccess> With<TParameter, TNewSuccess>(TParameter parameter, Func<TSuccess, TParameter, TNewSuccess> valueFunc)
+    public R<TNewSuccess> Map<TParameter, TNewSuccess>(TParameter parameter, Func<TSuccess, TParameter, TNewSuccess> valueFunc)
     {
         return new R<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value, parameter) : default!);
     }
@@ -273,7 +273,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewSuccess, TError> With<TNewSuccess, TError>(Func<TSuccess, TNewSuccess> valueFunc, TError error)
+    public R<TNewSuccess, TError> Map<TNewSuccess, TError>(Func<TSuccess, TNewSuccess> valueFunc, TError error)
     {
         return this.IsSuccess ? new R<TNewSuccess, TError>(true, valueFunc(this.Value), default!) : new R<TNewSuccess, TError>(false, default!, error);
     }
@@ -288,7 +288,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R" />.
     /// </returns>
-    public R<TNewSuccess, TError> With<TNewSuccess, TError>(Func<TSuccess, TNewSuccess> valueFunc, Func<TError> errorFunc)
+    public R<TNewSuccess, TError> Map<TNewSuccess, TError>(Func<TSuccess, TNewSuccess> valueFunc, Func<TError> errorFunc)
     {
         return this.IsSuccess ? new R<TNewSuccess, TError>(true, valueFunc(this.Value), default!) : new R<TNewSuccess, TError>(false, default!, errorFunc());
     }

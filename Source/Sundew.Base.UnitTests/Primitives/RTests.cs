@@ -53,13 +53,13 @@ public class RTests
     [Theory]
     [InlineData(true, 0)]
     [InlineData(false, 34)]
-    public void With_Then_ResultErrorShouldBeExpectedError(
+    public void Map_Then_ResultErrorShouldBeExpectedError(
         bool expectedResult,
         int expectedError)
     {
         var testee = R.FromError(expectedResult, expectedError);
 
-        var result = testee.With(Convert.ToDouble);
+        var result = testee.Map(Convert.ToDouble);
 
         result.IsSuccess.Should().Be(expectedResult);
         result.Error.Should().Be(expectedError);
@@ -76,7 +76,7 @@ public class RTests
     {
         var testee = R.FromError(expectedResult, () => expectedError);
 
-        var result = testee.With(expectedValue);
+        var result = testee.Map(expectedValue);
 
         result.IsSuccess.Should().Be(expectedResult);
         result.Value.Should().Be(expectedValue);

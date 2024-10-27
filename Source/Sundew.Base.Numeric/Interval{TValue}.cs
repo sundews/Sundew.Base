@@ -15,19 +15,14 @@ using Sundew.Base.Equality;
 /// </summary>
 /// <typeparam name="TValue">The type of the value.</typeparam>
 public readonly struct Interval<TValue> : IEquatable<Interval<TValue>>
-    where TValue : struct, IComparable<TValue>
+    where TValue : IComparable<TValue>
 {
     /// <summary>Initializes a new instance of the <see cref="Interval{TValue}"/> struct.</summary>
     /// <param name="min">The minimum.</param>
     /// <param name="max">The maximum.</param>
     /// <exception cref="RangeException{TValue}">Thrown if min is greater than max.</exception>
-    public Interval(TValue min, TValue max)
+    internal Interval(TValue min, TValue max)
     {
-        if (min.IsGreaterThan(max))
-        {
-            throw new RangeException<TValue>(min, max);
-        }
-
         this.Min = min;
         this.Max = max;
     }

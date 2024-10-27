@@ -26,7 +26,7 @@ public static class ComparableExtensions
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsGreaterThan<TValue>(this TValue lhs, TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return lhs.CompareTo(rhs) > 0;
     }
@@ -42,7 +42,7 @@ public static class ComparableExtensions
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsGreaterThanOrEqualTo<TValue>(this TValue lhs, TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return lhs.CompareTo(rhs) >= 0;
     }
@@ -58,7 +58,7 @@ public static class ComparableExtensions
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsLessThan<TValue>(this TValue lhs, TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return lhs.CompareTo(rhs) < 0;
     }
@@ -74,7 +74,7 @@ public static class ComparableExtensions
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsLessThanOrEqualTo<TValue>(this TValue lhs, TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return lhs.CompareTo(rhs) <= 0;
     }
@@ -90,7 +90,7 @@ public static class ComparableExtensions
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsEqualTo<TValue>(this TValue lhs, TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return lhs.CompareTo(rhs) == 0;
     }
@@ -106,7 +106,7 @@ public static class ComparableExtensions
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsNotEqualTo<TValue>(this TValue lhs, TValue rhs)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return lhs.CompareTo(rhs) != 0;
     }
@@ -125,7 +125,7 @@ public static class ComparableExtensions
     /// <exception cref="RangeException{TValue}">Thrown if min is greater than max.</exception>
     [MethodImpl((MethodImplOptions)0x300)]
     public static bool IsWithinInterval<TValue>(this TValue value, TValue min, TValue max, IntervalMode intervalMode = IntervalMode.Inclusive)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         if (min.IsGreaterThan(max))
         {
@@ -147,7 +147,7 @@ public static class ComparableExtensions
     ///   <c>true</c> if [is within interval] [the specified value]; otherwise, <c>false</c>.
     /// </returns>
     internal static bool InternalIsWithinInterval<TValue>(TValue value, TValue min, TValue max, IntervalMode intervalMode = IntervalMode.Inclusive)
-        where TValue : struct, IComparable<TValue>
+        where TValue : IComparable<TValue>
     {
         return intervalMode switch
         {

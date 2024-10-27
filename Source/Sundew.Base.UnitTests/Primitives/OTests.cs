@@ -94,11 +94,11 @@ public class OTests
     [Theory]
     [InlineData(42)]
     [InlineData(null)]
-    public void WithValue_When_NullableValueTupleAndResultIsStruct_Then_ResultShouldBeExpectedResult(int? expectedResult)
+    public void MapValue_When_NullableValueTupleAndResultIsStruct_Then_ResultShouldBeExpectedResult(int? expectedResult)
     {
         var tupleOption = this.GetValueTupleOption("Any", expectedResult);
 
-        var result = tupleOption.WithValue(x => x.Value);
+        var result = tupleOption.MapValue(x => x.Value);
 
         result.Should().Be(expectedResult);
     }
@@ -106,11 +106,11 @@ public class OTests
     [Theory]
     [InlineData(42)]
     [InlineData(null)]
-    public void WithValue_When_NullableValueTupleAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(int? expectedResult)
+    public void MapValue_When_NullableValueTupleAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(int? expectedResult)
     {
         var tupleOption = this.GetValueTupleOption("Any", expectedResult);
 
-        var result = tupleOption.WithValue(x => (int?)x.Value);
+        var result = tupleOption.MapValue(x => (int?)x.Value);
 
         result.Should().Be(expectedResult);
     }
@@ -118,9 +118,9 @@ public class OTests
     [Theory]
     [InlineData("T", 1)]
     [InlineData(null, null)]
-    public void WithValue_When_Option_Then_ResultShouldBeExpectedResult(string? input, int? expectedResult)
+    public void MapValue_When_Option_Then_ResultShouldBeExpectedResult(string? input, int? expectedResult)
     {
-        var result = input.WithValue(x => x.Length);
+        var result = input.MapValue(x => x.Length);
 
         result.Should().Be(expectedResult);
     }
@@ -128,9 +128,9 @@ public class OTests
     [Theory]
     [InlineData("T", 1)]
     [InlineData(null, null)]
-    public void WithValue_When_OptionAndResultIsNullable_Then_ResultShouldBeExpectedResult(string? input, int? expectedResult)
+    public void MapValue_When_OptionAndResultIsNullable_Then_ResultShouldBeExpectedResult(string? input, int? expectedResult)
     {
-        var result = input.WithValue(x => (int?)x.Length);
+        var result = input.MapValue(x => (int?)x.Length);
 
         result.Should().Be(expectedResult);
     }
@@ -138,11 +138,11 @@ public class OTests
     [Theory]
     [InlineData("T")]
     [InlineData(null)]
-    public void With_When_NullableValueTupleAndResultIsClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    public void Map_When_NullableValueTupleAndResultIsClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
     {
         var tupleOption = this.GetValueTupleOption(expectedResult, 42);
 
-        var result = tupleOption.With(x => x.Name);
+        var result = tupleOption.Map(x => x.Name);
 
         result.Should().Be(expectedResult);
     }
@@ -150,9 +150,9 @@ public class OTests
     [Theory]
     [InlineData("T")]
     [InlineData(null)]
-    public void With_When_OptionAndResultIsClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    public void Map_When_OptionAndResultIsClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
     {
-        var result = expectedResult.With(x => x);
+        var result = expectedResult.Map(x => x);
 
         result.Should().Be(expectedResult);
     }
@@ -160,11 +160,11 @@ public class OTests
     [Theory]
     [InlineData("T")]
     [InlineData(null)]
-    public void With_When_NullableValueTupleAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    public void Map_When_NullableValueTupleAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
     {
         var tupleOption = this.GetValueTupleOption(expectedResult, 42);
 
-        var result = tupleOption.With(x => (string?)x.Name);
+        var result = tupleOption.Map(x => (string?)x.Name);
 
         result.Should().Be(expectedResult);
     }
@@ -172,9 +172,9 @@ public class OTests
     [Theory]
     [InlineData("T")]
     [InlineData(null)]
-    public void With_When_OptionAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
+    public void Map_When_OptionAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? expectedResult)
     {
-        var result = expectedResult.With(x => x.ToString());
+        var result = expectedResult.Map(x => x.ToString());
 
         result.Should().Be(expectedResult);
     }

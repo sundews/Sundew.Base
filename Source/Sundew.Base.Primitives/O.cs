@@ -56,7 +56,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
+    public static TNewValue? MapValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
         where TValue : struct
         where TNewValue : struct
     {
@@ -74,7 +74,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+    public static TNewValue? MapValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
         where TValue : struct
         where TNewValue : struct
     {
@@ -92,7 +92,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+    public static TNewValue? Map<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
         where TValue : struct
         where TNewValue : class
     {
@@ -112,7 +112,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
+    public static TNewValue? MapValue<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
         where TValue : struct
         where TNewValue : struct
     {
@@ -132,7 +132,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
+    public static TNewValue? Map<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
         where TValue : struct
         where TNewValue : class
     {
@@ -154,7 +154,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
+    public static TNewValue? MapValue<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
         where TValue : struct
         where TNewValue : struct
     {
@@ -176,7 +176,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
+    public static TNewValue? Map<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
         where TValue : struct
         where TNewValue : class
     {
@@ -194,7 +194,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
+    public static TNewValue? MapValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue> valueFunc)
         where TValue : class
         where TNewValue : struct
     {
@@ -212,7 +212,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+    public static TNewValue? MapValue<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
         where TValue : class
         where TNewValue : struct
     {
@@ -230,7 +230,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
+    public static TNewValue? Map<TValue, TNewValue>(this TValue? value, Func<TValue, TNewValue?> valueFunc)
         where TValue : class
         where TNewValue : class
     {
@@ -250,7 +250,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
+    public static TNewValue? MapValue<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
         where TValue : class
         where TNewValue : struct
     {
@@ -270,7 +270,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
+    public static TNewValue? Map<TValue, TParameter, TNewValue>(this TValue? value, TParameter parameter, Func<TValue, TParameter, TNewValue?> valueFunc)
         where TValue : class
         where TNewValue : class
     {
@@ -292,7 +292,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? WithValue<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
+    public static TNewValue? MapValue<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
         where TValue : class
         where TNewValue : struct
     {
@@ -314,7 +314,7 @@ public static class O
     /// An optional TNewValue.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static TNewValue? With<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
+    public static TNewValue? Map<TValue, TParameter1, TParameter2, TNewValue>(this TValue? value, TParameter1 parameter1, TParameter2 parameter2, Func<TValue, TParameter1, TParameter2, TNewValue?> valueFunc)
         where TValue : class
         where TNewValue : class
     {
