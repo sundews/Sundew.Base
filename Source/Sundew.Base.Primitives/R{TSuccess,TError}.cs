@@ -149,6 +149,33 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
         return new R<TSuccess?, TError>(true, result.Value, default!);
     }
 
+    /// <summary>Performs an implicit conversion from <see cref="R{TSuccess, TError}"/> to <see cref="R{TObject, TObject}"/>.</summary>
+    /// <param name="result">The success result.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator R<object, object>(R<TSuccess, TError> result)
+    {
+        return new R<object, object>(result.IsSuccess, result.Value, result.Error);
+    }
+
+    /// <summary>Performs an implicit conversion from <see cref="R{TSuccess, TError}"/> to <see cref="R{TObject}"/>.</summary>
+    /// <param name="result">The success result.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator R<object>(R<TSuccess, TError> result)
+    {
+        return new R<object>(result.IsSuccess, result.Value);
+    }
+
+    /// <summary>Performs an implicit conversion from <see cref="R{TSuccess, TError}"/> to <see cref="RoE{TObject}"/>.</summary>
+    /// <param name="result">The success result.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator RoE<object>(R<TSuccess, TError> result)
+    {
+        return new RoE<object>(result.IsSuccess, result.Error);
+    }
+
 #if NOT_SUPPORT_BY_LANGUAGE
     /// <summary>
     /// Performs an implicit conversion from <see cref="R{TValue, TError}"/> to <see cref="R{TValue, TError}"/>.

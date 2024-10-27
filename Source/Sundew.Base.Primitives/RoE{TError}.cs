@@ -83,6 +83,15 @@ public readonly struct RoE<TError> : IEquatable<RoE<TError>>
         return new RoE<TError>(false, errorResult.Error);
     }
 
+    /// <summary>Performs an implicit conversion from <see cref="R{TSuccess, TError}"/> to <see cref="RoE{TObject}"/>.</summary>
+    /// <param name="result">The success result.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator RoE<object>(RoE<TError> result)
+    {
+        return new RoE<object>(result.IsSuccess, result.Error);
+    }
+
     /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="ValueTask{R}"/>.</summary>
     /// <param name="error">The error result.</param>
     /// <returns>The result of the conversion.</returns>

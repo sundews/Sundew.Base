@@ -265,13 +265,12 @@ public static partial class R
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="value">The value.</param>
     /// <returns>
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TValue> From<TValue, TError>(TValue? value)
+    public static R<TValue> From<TValue>(TValue? value)
     {
         if (value == null)
         {
