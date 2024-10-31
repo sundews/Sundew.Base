@@ -73,6 +73,19 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
         return new R<TSuccess>(true, successResult.Value);
     }
 
+    /// <summary>
+    /// Performs an implicit conversion from <see cref="R.SuccessResult{TValue}"/> to <see cref="R"/>.
+    /// </summary>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator R<TSuccess?>(R.SuccessResultOption<TSuccess?> result)
+    {
+        return new R<TSuccess?>(true, result.Value);
+    }
+
     /// <summary>Performs an implicit conversion from <see cref="R{TSuccess}"/> to <see cref="R{TObject}"/>.</summary>
     /// <param name="result">The success result.</param>
     /// <returns>The result of the conversion.</returns>
