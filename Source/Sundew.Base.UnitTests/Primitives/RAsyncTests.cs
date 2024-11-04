@@ -20,7 +20,7 @@ public class RAsyncTests
         const int expectedValue = 34;
         const int expectedError = 0;
 
-        R<int, double> r = await ComputeAsync(() => R.SuccessAsync(expectedValue));
+        R<int, double> r = await ComputeAsync(() => R.SuccessCompleted(expectedValue));
 
         r.IsSuccess.Should().BeTrue();
         r.Value.Should().Be(expectedValue);
@@ -32,7 +32,7 @@ public class RAsyncTests
     {
         const string expectedError = "Failed";
 
-        RoE<string> r = await ComputeAsync(() => R.ErrorAsync(expectedError));
+        RoE<string> r = await ComputeAsync(() => R.ErrorCompleted(expectedError));
 
         r.IsSuccess.Should().BeFalse();
         r.Error.Should().Be(expectedError);
@@ -44,7 +44,7 @@ public class RAsyncTests
         const int expectedValue = default;
         const string expectedError = "Failed";
 
-        R<int, string> r = await ComputeAsync(() => R.ErrorAsync(expectedError));
+        R<int, string> r = await ComputeAsync(() => R.ErrorCompleted(expectedError));
 
         r.IsSuccess.Should().BeFalse();
         r.Value.Should().Be(expectedValue);
@@ -58,7 +58,7 @@ public class RAsyncTests
         bool expectedResult,
         int expectedError)
     {
-        var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError));
+        var testee = await ComputeAsync(() => R.FromErrorCompleted(expectedResult, expectedError));
 
         var result = testee.Map(Convert.ToDouble);
 
@@ -75,7 +75,7 @@ public class RAsyncTests
         int expectedValue,
         int expectedError)
     {
-        var testee = await ComputeAsync(() => R.FromErrorAsync(expectedResult, expectedError));
+        var testee = await ComputeAsync(() => R.FromErrorCompleted(expectedResult, expectedError));
 
         var result = testee.Map(expectedValue);
 
@@ -91,7 +91,7 @@ public class RAsyncTests
         const double expectedValue = 65d;
         const double expectedError = 45d;
 
-        var (isSuccess, value, error) = await ComputeAsync(() => R.FromAsync(expectedIsSuccess, expectedValue, expectedError));
+        var (isSuccess, value, error) = await ComputeAsync(() => R.FromCompleted(expectedIsSuccess, expectedValue, expectedError));
 
         isSuccess.Should().Be(expectedIsSuccess);
         value.Should().Be(expectedValue);
@@ -103,7 +103,7 @@ public class RAsyncTests
     {
         const double expectedError = 65d;
 
-        RoE<double> r = await ComputeAsync(() => R.ErrorAsync(65d));
+        RoE<double> r = await ComputeAsync(() => R.ErrorCompleted(65d));
 
         r.IsSuccess.Should().BeFalse();
         r.Error.Should().Be(expectedError);
@@ -114,7 +114,7 @@ public class RAsyncTests
     {
         const double expectedValue = 65d;
 
-        R<double, double> r = await ComputeAsync(() => R.SuccessAsync(65d));
+        R<double, double> r = await ComputeAsync(() => R.SuccessCompleted(65d));
 
         r.IsSuccess.Should().BeTrue();
         r.Value.Should().Be(expectedValue);
@@ -126,7 +126,7 @@ public class RAsyncTests
     {
         const double expectedError = 65d;
 
-        R<double, double> r = await ComputeAsync(() => R.ErrorAsync(65d));
+        R<double, double> r = await ComputeAsync(() => R.ErrorCompleted(65d));
 
         r.IsSuccess.Should().BeFalse();
         r.Value.Should().Be(default);

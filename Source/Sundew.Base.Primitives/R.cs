@@ -79,6 +79,18 @@ public static partial class R
     }
 
     /// <summary>
+    /// Creates a successful result.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static SuccessResultOption<TValue> SuccessOptionRaw<TValue>(TValue value)
+    {
+        return new SuccessResultOption<TValue>(value);
+    }
+
+    /// <summary>
     /// Creates an erroneous result.
     /// </summary>
     /// <returns>A <see cref="R" />.</returns>
@@ -222,7 +234,7 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TValue, TError>> FromAsync<TValue, TError>(bool isSuccess, TValue value, TError error)
+    public static ValueTask<R<TValue, TError>> FromCompleted<TValue, TError>(bool isSuccess, TValue value, TError error)
     {
         return new R<TValue, TError>(isSuccess, value, error).ToValueTask();
     }
@@ -256,7 +268,7 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TValue, TError>> FromAsync<TValue, TError>(bool isSuccess, Func<TValue> valueFunc, Func<TError> errorFunc)
+    public static ValueTask<R<TValue, TError>> FromCompleted<TValue, TError>(bool isSuccess, Func<TValue> valueFunc, Func<TError> errorFunc)
     {
         return new R<TValue, TError>(isSuccess, isSuccess ? valueFunc() : default, isSuccess ? default : errorFunc()).ToValueTask();
     }
@@ -326,7 +338,7 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TValue>> FromAsync<TValue>(bool isSuccess, TValue value)
+    public static ValueTask<R<TValue>> FromCompleted<TValue>(bool isSuccess, TValue value)
     {
         return new R<TValue>(isSuccess, value).ToValueTask();
     }
@@ -371,7 +383,7 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TValue>> FromAsync<TValue>(bool isSuccess, Func<TValue> valueFunc)
+    public static ValueTask<R<TValue>> FromCompleted<TValue>(bool isSuccess, Func<TValue> valueFunc)
     {
         return new R<TValue>(isSuccess, isSuccess ? valueFunc() : default).ToValueTask();
     }
@@ -383,7 +395,7 @@ public static partial class R
     /// A <see cref="SuccessResult" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<SuccessResult> SuccessAsync()
+    public static ValueTask<SuccessResult> SuccessCompleted()
     {
         return SuccessResult.Result;
     }
@@ -395,7 +407,7 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<SuccessResult<TValue>> SuccessAsync<TValue>(TValue value)
+    public static ValueTask<SuccessResult<TValue>> SuccessCompleted<TValue>(TValue value)
         where TValue : notnull
     {
         return new SuccessResult<TValue>(value);
@@ -409,7 +421,7 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TValue, TError>> SuccessAsync<TValue, TError>(TValue value)
+    public static ValueTask<R<TValue, TError>> SuccessCompleted<TValue, TError>(TValue value)
         where TValue : notnull
     {
         return new ValueTask<R<TValue, TError>>(Success(value));
@@ -420,7 +432,7 @@ public static partial class R
     /// </summary>
     /// <returns>A <see cref="R" />.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<ErrorResult> ErrorAsync()
+    public static ValueTask<ErrorResult> ErrorCompleted()
     {
         return default;
     }
@@ -432,7 +444,7 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R" />.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<ErrorResult<TError>> ErrorAsync<TError>(TError error)
+    public static ValueTask<ErrorResult<TError>> ErrorCompleted<TError>(TError error)
         where TError : notnull
     {
         return new ErrorResult<TError>(error).ToValueTask();
@@ -446,7 +458,7 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R" />.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TValue, TError>> ErrorAsync<TValue, TError>(TError error)
+    public static ValueTask<R<TValue, TError>> ErrorCompleted<TValue, TError>(TError error)
         where TError : notnull
     {
         return new ValueTask<R<TValue, TError>>(R.Error(error));
@@ -458,7 +470,7 @@ public static partial class R
     /// <param name="valueFunc">The value func.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static async ValueTask<R<TSuccess>> FromValueAsync<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
+    public static async ValueTask<R<TSuccess>> FromValueCompleted<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
     {
         return new R<TSuccess>(isSuccess, isSuccess ? await valueFunc().ConfigureAwait(false) : default!);
     }
@@ -469,7 +481,7 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TError>> FromValueAsync<TError>(bool isSuccess, TError error)
+    public static ValueTask<R<TError>> FromValueCompleted<TError>(bool isSuccess, TError error)
     {
         return new R<TError>(isSuccess, error);
     }
@@ -483,7 +495,7 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<R<TSuccess>> FromValueAsync<TSuccess>(TSuccess? value)
+    public static ValueTask<R<TSuccess>> FromValueCompleted<TSuccess>(TSuccess? value)
         where TSuccess : class
     {
         return new R<TSuccess>(value != null, value);
@@ -495,7 +507,7 @@ public static partial class R
     /// <param name="valueFunc">The value function.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static async ValueTask<RoE<TSuccess>> FromErrorAsync<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
+    public static async ValueTask<RoE<TSuccess>> FromErrorCompleted<TSuccess>(bool isSuccess, Func<ValueTask<TSuccess>> valueFunc)
     {
         return new RoE<TSuccess>(isSuccess, isSuccess ? await valueFunc().ConfigureAwait(false) : default!);
     }
@@ -506,7 +518,7 @@ public static partial class R
     /// <param name="error">The error.</param>
     /// <returns>A <see cref="R"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RoE<TError>> FromErrorAsync<TError>(bool isSuccess, TError error)
+    public static ValueTask<RoE<TError>> FromErrorCompleted<TError>(bool isSuccess, TError error)
     {
         return new RoE<TError>(isSuccess, error);
     }
@@ -520,7 +532,7 @@ public static partial class R
     /// A <see cref="R" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<RoE<TError>> FromErrorAsync<TError>(TError? error)
+    public static ValueTask<RoE<TError>> FromErrorCompleted<TError>(TError? error)
         where TError : class
     {
         return new RoE<TError>(error == null, error);

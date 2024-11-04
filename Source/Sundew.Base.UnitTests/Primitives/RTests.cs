@@ -162,7 +162,7 @@ public class RTests
     [Fact]
     public void ToResultOption_When_NullAndTargetIsOptionalReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
-        var expectedResult = "Value";
+        string? expectedResult = "Value";
         var testee = R.SuccessOption(expectedResult);
 
         R<string?, string> r = testee;
@@ -171,6 +171,68 @@ public class RTests
 
         result.HasValue.Should().BeTrue();
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(4)]
+    [InlineData(null)]
+    public void ToResultOption_When_NullableIntComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
+    {
+        static R<TValue> Generic<TValue>(TValue value)
+        {
+            return R.SuccessOptionRaw(value);
+        }
+
+        var result = Generic(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void ToResultOption_When_Int32ComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    {
+        static R<TValue> Generic<TValue>(TValue value)
+        {
+            return R.SuccessOptionRaw(value);
+        }
+
+        const int expectedResult = 42;
+        var result = Generic(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("string")]
+    [InlineData(null)]
+    public void ToResultOption_When_NullableStringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
+    {
+        static R<TValue> Generic<TValue>(TValue value)
+        {
+            return R.SuccessOptionRaw(value);
+        }
+
+        var result = Generic(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void ToResultOption_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    {
+        static R<TValue> Generic<TValue>(TValue value)
+        {
+            return R.SuccessOptionRaw(value);
+        }
+
+        const string expectedResult = "string";
+        var result = Generic(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
     }
 
     [Fact]
