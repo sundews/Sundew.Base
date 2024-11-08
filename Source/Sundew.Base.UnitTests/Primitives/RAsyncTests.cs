@@ -133,6 +133,37 @@ public class RAsyncTests
         r.Error.Should().Be(expectedError);
     }
 
+    [Theory]
+    [InlineData("string")]
+    [InlineData(null)]
+    public async Task SuccessOptionRawCompleted_When_NullableStringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
+    {
+        static async Task<R<TValue>> GenericAsync<TValue>(TValue value)
+        {
+            return await R.SuccessOptionRawCompleted(value);
+        }
+
+        var result = await GenericAsync(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public async Task ToResultOption_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    {
+        static async Task<R<TValue>> GenericAsync<TValue>(TValue value)
+        {
+            return await R.SuccessOptionRawCompleted(value);
+        }
+
+        const string expectedResult = "string";
+        var result = await GenericAsync(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
     private static async ValueTask<TResult> ComputeAsync<TResult>(Func<ValueTask<TResult>> func)
     {
         return await func();

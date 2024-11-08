@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 /// </summary>
 public sealed class ContinuousJob : IJob
 {
-    private readonly ContinuousJob<ˍ> continuousJob;
+    private readonly ContinuousJob<__> continuousJob;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ContinuousJob" /> class.
@@ -26,9 +26,9 @@ public sealed class ContinuousJob : IJob
     /// <param name="taskScheduler">The task scheduler.</param>
     public ContinuousJob(Func<CancellationToken, Task> taskAction, ContinuousJobExceptionHandler? onException = null, TaskScheduler? taskScheduler = null)
     {
-        this.continuousJob = new ContinuousJob<ˍ>(
+        this.continuousJob = new ContinuousJob<__>(
             (_, token) => taskAction.Invoke(token),
-            ˍ._,
+            default,
             onException,
             taskScheduler);
     }
@@ -41,9 +41,9 @@ public sealed class ContinuousJob : IJob
     /// <param name="taskScheduler">The task scheduler.</param>
     public ContinuousJob(Action<CancellationToken> taskAction, ContinuousJobExceptionHandler? onException = null, TaskScheduler? taskScheduler = null)
     {
-        this.continuousJob = new ContinuousJob<ˍ>(
+        this.continuousJob = new ContinuousJob<__>(
             (_, token) => taskAction.Invoke(token),
-            ˍ._,
+            default,
             onException,
             taskScheduler);
     }

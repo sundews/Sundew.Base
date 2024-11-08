@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 /// </summary>
 public sealed class CancellableJob : IJob
 {
-    private readonly CancellableJob<ˍ> cancellableJob;
+    private readonly CancellableJob<__> cancellableJob;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancellableJob" /> class.
@@ -26,9 +26,9 @@ public sealed class CancellableJob : IJob
     /// <param name="taskScheduler">The task scheduler.</param>
     public CancellableJob(Func<CancellationToken, Task> taskAction, JobExceptionHandler? onException = null, TaskScheduler? taskScheduler = null)
     {
-        this.cancellableJob = new CancellableJob<ˍ>(
+        this.cancellableJob = new CancellableJob<__>(
             (_, token) => taskAction.Invoke(token),
-            ˍ._,
+            default,
             onException,
             taskScheduler);
     }
@@ -41,9 +41,9 @@ public sealed class CancellableJob : IJob
     /// <param name="taskScheduler">The task scheduler.</param>
     public CancellableJob(Action<CancellationToken> taskAction, JobExceptionHandler? onException = null, TaskScheduler? taskScheduler = null)
     {
-        this.cancellableJob = new CancellableJob<ˍ>(
+        this.cancellableJob = new CancellableJob<__>(
             (_, token) => taskAction.Invoke(token),
-            ˍ._,
+            default,
             onException,
             taskScheduler);
     }

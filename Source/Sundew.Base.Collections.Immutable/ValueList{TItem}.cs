@@ -20,7 +20,7 @@ using System.Runtime.CompilerServices;
 /// <typeparam name="TItem">The item type.</typeparam>
 public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<ValueList<TItem>>
 {
-    private readonly System.Collections.Immutable.IImmutableList<TItem> inner;
+    private readonly System.Collections.Immutable.IImmutableList<TItem>? inner;
 
     internal ValueList(System.Collections.Immutable.IImmutableList<TItem> inner)
     {
@@ -36,19 +36,19 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <summary>
     /// Gets a value indicating whether this array is empty.
     /// </summary>
-    public bool IsEmpty => this.inner.IsEmpty();
+    public bool IsEmpty => this.inner?.IsEmpty() ?? true;
 
     /// <summary>
     /// Gets the count.
     /// </summary>
-    public int Count => this.inner.Count;
+    public int Count => this.inner?.Count ?? 0;
 
     /// <summary>
     /// Gets the index at the specified index.
     /// </summary>
     /// <param name="index">The index.</param>
     /// <returns>The item.</returns>
-    public TItem this[int index] => this.inner[index];
+    public TItem this[int index] => this.inner == default ? throw new IndexOutOfRangeException($"The index {index} was out of range.") : this.inner[index];
 
     /// <summary>
     /// Converts from a  <see cref="ImmutableArray{T}"/> to an <see cref="ValueList{T}"/>.
@@ -79,7 +79,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
             return immutableList;
         }
 
-        return valueList.inner.ToImmutableList();
+        return valueList.inner?.ToImmutableList() ?? ImmutableList<TItem>.Empty;
     }
 
     /// <summary>
@@ -111,7 +111,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return this.inner.GetEnumerator();
+        return this.inner?.GetEnumerator() ?? Array.Empty<TItem>().GetEnumerator();
     }
 
     /// <summary>
@@ -119,9 +119,9 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// </summary>
     /// <returns>The enumerator.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public IEnumerator<TItem> GetEnumerator()
+    IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
     {
-        return this.inner.GetEnumerator();
+        return this.inner == default ? ((IEnumerable<TItem>)Array.Empty<TItem>()).GetEnumerator() : this.inner.GetEnumerator();
     }
 
     /// <summary>
@@ -131,6 +131,11 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     public override int GetHashCode()
     {
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+        if (this.inner == default)
+        {
+            return 0;
+        }
+
         var hashCode = default(HashCode);
         foreach (var item in this.inner)
         {
@@ -139,7 +144,8 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
 
         return hashCode.ToHashCode();
 #else
-        return Equality.Equality.GetItemsHashCode(this.inner.Select(x => x?.GetHashCode() ?? 0));
+        return this.inner == default ? 0 : Equality.Equality.GetItemsHashCode(this.inner.Select(x => x?.GetHashCode() ?? 0));
+
 #endif
     }
 
@@ -150,12 +156,17 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns><c>true</c>, if the values are equal otherwise false.</returns>
     public bool Equals(ValueList<TItem> other)
     {
-        if (this.inner == null && other.inner == null)
+        if (this.inner == null)
         {
-            return true;
+            if (other.inner == null)
+            {
+                return true;
+            }
+
+            return false;
         }
 
-        return this.inner?.SequenceEqual(other.inner) ?? false;
+        return this.inner.SequenceEqual(other.inner ?? ImmutableList<TItem>.Empty);
     }
 
     /// <summary>
@@ -175,7 +186,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns>The newly created array.</returns>
     public ValueList<TItem> Add(TItem item)
     {
-        return this.inner.Add(item).ToValueList();
+        return (this.inner ?? ImmutableList<TItem>.Empty).Add(item).ToValueList();
     }
 
     /// <summary>
@@ -185,7 +196,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns>The newly created array.</returns>
     public ValueList<TItem> AddRange(IEnumerable<TItem> items)
     {
-        return this.inner.AddRange(items).ToValueList();
+        return (this.inner ?? ImmutableList<TItem>.Empty).AddRange(items).ToValueList();
     }
 
     /// <summary>
@@ -195,7 +206,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns>The newly created array.</returns>
     public ValueList<TItem> Remove(TItem item)
     {
-        return this.inner.Remove(item).ToValueList();
+        return this.inner?.Remove(item).ToValueList() ?? this;
     }
 
     /// <summary>
@@ -205,7 +216,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns>The newly created array.</returns>
     public ValueList<TItem> RemoveRange(IEnumerable<TItem> items)
     {
-        return this.inner.RemoveRange(items).ToValueList();
+        return this.inner?.RemoveRange(items).ToValueList() ?? this;
     }
 
     /// <summary>
@@ -215,6 +226,6 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns><c>true</c> if the item exists, otherwise <c>false</c>.</returns>
     public bool Contains(TItem item)
     {
-        return this.inner.Contains(item);
+        return this.inner?.Contains(item) ?? false;
     }
 }

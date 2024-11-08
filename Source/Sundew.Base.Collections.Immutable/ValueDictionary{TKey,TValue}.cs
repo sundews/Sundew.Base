@@ -23,7 +23,7 @@ using System.Runtime.CompilerServices;
 public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey, TValue>, IEquatable<ValueDictionary<TKey, TValue>>
     where TKey : IEquatable<TKey>
 {
-    private readonly IImmutableDictionary<TKey, TValue> inner;
+    private readonly IImmutableDictionary<TKey, TValue>? inner;
 
     internal ValueDictionary(IImmutableDictionary<TKey, TValue> inner)
     {
@@ -39,31 +39,31 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <summary>
     /// Gets the count.
     /// </summary>
-    public int Count => this.inner.Count;
+    public int Count => this.inner?.Count ?? 0;
 
     /// <summary>
     /// Gets a value indicating whether this array is empty.
     /// </summary>
-    public bool IsEmpty => this.inner.IsEmpty();
+    public bool IsEmpty => this.inner?.IsEmpty() ?? true;
 
     /// <summary>
     /// Gets the keys.
     /// </summary>
     /// <returns>The keys.</returns>
-    public IEnumerable<TKey> Keys => this.inner.Keys;
+    public IEnumerable<TKey> Keys => this.inner?.Keys ?? [];
 
     /// <summary>
     /// Gets the values.
     /// </summary>
     /// <returns>The values.</returns>
-    public IEnumerable<TValue> Values => this.inner.Values;
+    public IEnumerable<TValue> Values => this.inner?.Values ?? [];
 
     /// <summary>
     /// The value corresponding to the specified key.
     /// </summary>
     /// <param name="key">The key.</param>
     /// <returns>The value.</returns>
-    public TValue this[TKey key] => this.inner[key];
+    public TValue this[TKey key] => this.inner == default ? throw new KeyNotFoundException($"The key: {key} was not found") : this.inner[key];
 
     /// <summary>
     /// Converts an <see cref="ImmutableDictionary{TKey,TValue}"/> to a <see cref="ValueDictionary{TKey,TValue}"/>.
@@ -85,7 +85,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
             return dictionary;
         }
 
-        return valueDictionary.inner.ToImmutableDictionary();
+        return valueDictionary.inner?.ToImmutableDictionary() ?? ImmutableDictionary<TKey, TValue>.Empty;
     }
 
     /// <summary>
@@ -117,7 +117,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns><c>true</c>, if the key is present, otherwise <c>false</c>.</returns>
     public bool ContainsKey(TKey key)
     {
-        return this.inner.ContainsKey(key);
+        return this.inner?.ContainsKey(key) ?? false;
     }
 
     /// <summary>
@@ -130,7 +130,8 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767
     {
-        return this.inner.TryGetValue(key, out value);
+        value = default;
+        return this.inner?.TryGetValue(key, out value) ?? false;
     }
 
     /// <summary>
@@ -140,7 +141,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return this.inner.GetEnumerator();
+        return this.inner?.GetEnumerator() ?? new Dictionary<TKey, TValue>().GetEnumerator();
     }
 
     /// <summary>
@@ -150,7 +151,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     [MethodImpl((MethodImplOptions)0x300)]
     public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
     {
-        return this.inner.GetEnumerator();
+        return this.inner?.GetEnumerator() ?? new Dictionary<TKey, TValue>().GetEnumerator();
     }
 
     /// <summary>
@@ -160,6 +161,11 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     public override int GetHashCode()
     {
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
+        if (this.inner == default)
+        {
+            return 0;
+        }
+
         var hashCode = default(HashCode);
         foreach (var pair in this.inner)
         {
@@ -179,7 +185,8 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
             }
         }
 
-        return Equality.Equality.GetItemsHashCode(this.inner.Select(x => CombineHashCode(x.Key?.GetHashCode() ?? 0, x.Value?.GetHashCode() ?? 0)));
+        return this.inner == default ? 0 : Equality.Equality.GetItemsHashCode(this.inner.Select(x => CombineHashCode(x.Key?.GetHashCode() ?? 0, x.Value?.GetHashCode() ?? 0)));
+
 #endif
     }
 
@@ -190,6 +197,16 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns><c>true</c>, if the values are equal otherwise false.</returns>
     public bool Equals(ValueDictionary<TKey, TValue> other)
     {
+        if (this.inner == null)
+        {
+            if (other.inner == null)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         if (this.inner.Count != other.Count)
         {
             return false;
@@ -234,7 +251,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns>The new value dictionary.</returns>
     public ValueDictionary<TKey, TValue> Add(TKey key, TValue value)
     {
-        return new ValueDictionary<TKey, TValue>(this.inner.Add(key, value));
+        return new ValueDictionary<TKey, TValue>(this.inner ?? ImmutableDictionary<TKey, TValue>.Empty.Add(key, value));
     }
 
     /// <summary>
@@ -244,7 +261,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns>The new value dictionary.</returns>
     public ValueDictionary<TKey, TValue> AddRange(IEnumerable<KeyValuePair<TKey, TValue>> pairs)
     {
-        return new ValueDictionary<TKey, TValue>(this.inner.AddRange(pairs));
+        return new ValueDictionary<TKey, TValue>(this.inner ?? ImmutableDictionary<TKey, TValue>.Empty.AddRange(pairs));
     }
 
     /// <summary>
@@ -254,7 +271,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns>The newly created array.</returns>
     public ValueDictionary<TKey, TValue> Remove(TKey key)
     {
-        return this.inner.Remove(key).ToValueDictionary();
+        return this.inner?.Remove(key).ToValueDictionary() ?? this;
     }
 
     /// <summary>
@@ -264,6 +281,6 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns>The newly created array.</returns>
     public ValueDictionary<TKey, TValue> RemoveRange(IEnumerable<TKey> keys)
     {
-        return this.inner.RemoveRange(keys).ToValueDictionary();
+        return this.inner?.RemoveRange(keys).ToValueDictionary() ?? this;
     }
 }

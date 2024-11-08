@@ -19,7 +19,7 @@ using System.Runtime.CompilerServices;
 /// <typeparam name="TItem">The item type.</typeparam>
 public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<ValueArray<TItem>>
 {
-    private readonly ImmutableArray<TItem> inner;
+    private readonly ImmutableArray<TItem>? inner;
 
     internal ValueArray(ImmutableArray<TItem> inner)
     {
@@ -35,24 +35,24 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <summary>
     /// Gets the count.
     /// </summary>
-    public int Count => this.inner.Length;
+    public int Count => this.inner?.Length ?? 0;
 
     /// <summary>
     /// Gets a value indicating whether this array is default.
     /// </summary>
-    public bool IsDefault => this.inner.IsDefault;
+    public bool IsDefault => this.inner?.IsDefault ?? true;
 
     /// <summary>
     /// Gets a value indicating whether this array is default.
     /// </summary>
-    public bool IsEmpty => this.inner.IsEmpty;
+    public bool IsEmpty => this.inner?.IsEmpty ?? true;
 
     /// <summary>
     /// Gets the index at the specified index.
     /// </summary>
     /// <param name="index">The index.</param>
     /// <returns>The item.</returns>
-    public TItem this[int index] => this.inner[index];
+    public TItem this[int index] => this.inner.HasValue ? this.inner.Value[index] : throw new IndexOutOfRangeException($"The index {index} was out of range");
 
     /// <summary>
     /// Converts from an array to a <see cref="ValueArray{TItem}"/>.
@@ -78,7 +78,12 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <param name="valueArray">The value array.</param>
     public static implicit operator ImmutableArray<TItem>(ValueArray<TItem> valueArray)
     {
-        return valueArray.inner;
+        if (valueArray.inner.HasValue)
+        {
+            return (ImmutableArray<TItem>)valueArray.inner;
+        }
+
+        return ImmutableArray<TItem>.Empty;
     }
 
     /// <summary>
@@ -87,7 +92,12 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <param name="valueArray">The value array.</param>
     public static implicit operator ValueList<TItem>(ValueArray<TItem> valueArray)
     {
-        return valueArray.inner;
+        if (valueArray.inner.HasValue)
+        {
+            return (ValueList<TItem>)valueArray.inner;
+        }
+
+        return Empty;
     }
 
     /// <summary>
@@ -119,7 +129,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator IEnumerable.GetEnumerator()
     {
-        return ((IEnumerable<TItem>)this.inner).GetEnumerator();
+        return ((IEnumerable<TItem>?)this.inner)?.GetEnumerator() ?? Array.Empty<TItem>().GetEnumerator();
     }
 
     /// <summary>
@@ -129,7 +139,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     [MethodImpl((MethodImplOptions)0x300)]
     public ImmutableArray<TItem>.Enumerator GetEnumerator()
     {
-        return this.inner.GetEnumerator();
+        return this.inner?.GetEnumerator() ?? ImmutableArray<TItem>.Empty.GetEnumerator();
     }
 
     /// <summary>
@@ -139,7 +149,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
     {
-        return ((IEnumerable<TItem>)this.inner).GetEnumerator();
+        return (((IEnumerable<TItem>?)this.inner) ?? Array.Empty<TItem>()).GetEnumerator();
     }
 
     /// <summary>
@@ -148,7 +158,12 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The hashcode.</returns>
     public override int GetHashCode()
     {
-        return StructuralComparisons.StructuralEqualityComparer.GetHashCode(this.inner);
+        if (this.inner.HasValue)
+        {
+            return StructuralComparisons.StructuralEqualityComparer.GetHashCode(this.inner);
+        }
+
+        return 0;
     }
 
     /// <summary>
@@ -178,7 +193,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The newly created array.</returns>
     public ValueArray<TItem> Add(TItem item)
     {
-        return this.inner.Add(item);
+        return this.inner ?? ImmutableArray<TItem>.Empty.Add(item);
     }
 
     /// <summary>
@@ -188,7 +203,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The newly created array.</returns>
     public ValueArray<TItem> AddRange(IEnumerable<TItem> items)
     {
-        return this.inner.AddRange(items);
+        return this.inner ?? ImmutableArray<TItem>.Empty.AddRange(items);
     }
 
     /// <summary>
@@ -198,7 +213,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The newly created array.</returns>
     public ValueArray<TItem> Remove(TItem item)
     {
-        return this.inner.Remove(item);
+        return this.inner?.Remove(item) ?? this;
     }
 
     /// <summary>
@@ -208,7 +223,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The newly created array.</returns>
     public ValueArray<TItem> RemoveRange(IEnumerable<TItem> items)
     {
-        return this.inner.RemoveRange(items);
+        return this.inner?.RemoveRange(items) ?? this;
     }
 
     /// <summary>
@@ -218,7 +233,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns><c>true</c> if the item exists, otherwise <c>false</c>.</returns>
     public bool Contains(TItem item)
     {
-        return this.inner.Contains(item);
+        return this.inner?.Contains(item) ?? false;
     }
 
     /// <summary>
@@ -227,6 +242,6 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The value list.</returns>
     public ValueList<TItem> ToValueList()
     {
-        return new ValueList<TItem>(this.inner);
+        return new ValueList<TItem>(this.inner ?? ImmutableArray<TItem>.Empty);
     }
 }
