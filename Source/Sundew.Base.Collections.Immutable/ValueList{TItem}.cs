@@ -119,7 +119,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// </summary>
     /// <returns>The enumerator.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
+    public IEnumerator<TItem> GetEnumerator()
     {
         return this.inner == default ? ((IEnumerable<TItem>)Array.Empty<TItem>()).GetEnumerator() : this.inner.GetEnumerator();
     }
