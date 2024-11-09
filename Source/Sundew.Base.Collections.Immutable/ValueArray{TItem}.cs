@@ -193,7 +193,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The newly created array.</returns>
     public ValueArray<TItem> Add(TItem item)
     {
-        return this.inner ?? ImmutableArray<TItem>.Empty.Add(item);
+        return (this.inner ?? ImmutableArray<TItem>.Empty).Add(item);
     }
 
     /// <summary>
@@ -203,7 +203,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The newly created array.</returns>
     public ValueArray<TItem> AddRange(IEnumerable<TItem> items)
     {
-        return this.inner ?? ImmutableArray<TItem>.Empty.AddRange(items);
+        return (this.inner ?? ImmutableArray<TItem>.Empty).AddRange(items);
     }
 
     /// <summary>

@@ -251,7 +251,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns>The new value dictionary.</returns>
     public ValueDictionary<TKey, TValue> Add(TKey key, TValue value)
     {
-        return new ValueDictionary<TKey, TValue>(this.inner ?? ImmutableDictionary<TKey, TValue>.Empty.Add(key, value));
+        return new ValueDictionary<TKey, TValue>((this.inner ?? ImmutableDictionary<TKey, TValue>.Empty).Add(key, value));
     }
 
     /// <summary>
@@ -261,7 +261,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns>The new value dictionary.</returns>
     public ValueDictionary<TKey, TValue> AddRange(IEnumerable<KeyValuePair<TKey, TValue>> pairs)
     {
-        return new ValueDictionary<TKey, TValue>(this.inner ?? ImmutableDictionary<TKey, TValue>.Empty.AddRange(pairs));
+        return new ValueDictionary<TKey, TValue>((this.inner ?? ImmutableDictionary<TKey, TValue>.Empty).AddRange(pairs));
     }
 
     /// <summary>
