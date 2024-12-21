@@ -80,6 +80,16 @@ public partial class R
         }
 
         /// <summary>
+        /// Converts this instance to a task.
+        /// </summary>
+        /// <returns>The value task.</returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+        public Task<ErrorResult<TError>> ToTask()
+        {
+            return Task.FromResult(this);
+        }
+
+        /// <summary>
         /// Creates a result based on the specified result .
         /// </summary>
         /// <typeparam name="TNewError">The type of the new error.</typeparam>

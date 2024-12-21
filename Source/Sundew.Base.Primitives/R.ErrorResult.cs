@@ -59,6 +59,16 @@ public partial class R
         }
 
         /// <summary>
+        /// Converts this instance to a task.
+        /// </summary>
+        /// <returns>The value task.</returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+        public Task<ErrorResult> ToTask()
+        {
+            return Task.FromResult(this);
+        }
+
+        /// <summary>
         /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>

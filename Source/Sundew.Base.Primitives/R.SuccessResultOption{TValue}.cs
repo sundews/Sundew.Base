@@ -90,6 +90,16 @@ public partial class R
         }
 
         /// <summary>
+        /// Converts this instance to a task.
+        /// </summary>
+        /// <returns>The value task.</returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+        public Task<SuccessResultOption<TValue?>> ToTask()
+        {
+            return Task.FromResult(new SuccessResultOption<TValue?>(this.Value));
+        }
+
+        /// <summary>
         /// Creates a result based on the specified values.
         /// </summary>
         /// <typeparam name="TError">The type of the error.</typeparam>

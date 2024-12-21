@@ -265,9 +265,9 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R{TSuccess}" />.
     /// </returns>
-    public R<TNewSuccess> Map<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
+    public R<TNewSuccess?> Map<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
     {
-        return new R<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default!);
+        return new R<TNewSuccess?>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default);
     }
 
     /// <summary>
@@ -386,5 +386,14 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     public override int GetHashCode()
     {
         return Equality.Equality.GetHashCode(this.IsSuccess.GetHashCode(), this.Value?.GetHashCode() ?? 0);
+    }
+
+    /// <summary>
+    /// Converts this result to a result option.
+    /// </summary>
+    /// <returns>A <see cref="R{TSuccess}"/>.</returns>
+    public R<TSuccess?> ToOptional()
+    {
+        return this.Map(x => x);
     }
 }

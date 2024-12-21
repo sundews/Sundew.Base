@@ -312,6 +312,15 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     }
 
     /// <summary>
+    /// Converts this result to a result option.
+    /// </summary>
+    /// <returns>A <see cref="R{TSuccess, TError}"/>.</returns>
+    public R<TSuccess?, TError> ToOptional()
+    {
+        return this.Map(x => (TSuccess?)x);
+    }
+
+    /// <summary>
     /// Converts this instance to a value task.
     /// </summary>
     /// <returns>The value task.</returns>
@@ -319,6 +328,16 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     public ValueTask<R<TSuccess, TError>> ToValueTask()
     {
         return new ValueTask<R<TSuccess, TError>>(this);
+    }
+
+    /// <summary>
+    /// Converts this instance to a task.
+    /// </summary>
+    /// <returns>The value task.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public Task<R<TSuccess, TError>> ToTask()
+    {
+        return Task.FromResult(this);
     }
 
     /// <summary>
