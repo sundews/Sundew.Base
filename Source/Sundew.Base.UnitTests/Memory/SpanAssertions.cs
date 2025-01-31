@@ -23,15 +23,13 @@ public ref struct SpanAssertions<TItem>
 
     public void Equal(ReadOnlySpan<TItem> expected)
     {
-        var assertionScope = Execute.Assertion.ForCondition(this.Subject.SequenceEqual(expected));
-        if (assertionScope.HasFailures())
-        {
-            var stringBuilder = new StringBuilder();
-            var expectedText = GetSpan(expected, stringBuilder);
-            stringBuilder.Clear();
-            var subjectText = GetSpan(this.Subject, stringBuilder);
-            assertionScope.FailWith("Expected (ReadOnly)Span{0} to be {1}, but found {2}.", typeof(TItem).Name, expectedText, subjectText);
-        }
+        var stringBuilder = new StringBuilder();
+        var expectedText = GetSpan(expected, stringBuilder);
+        stringBuilder.Clear();
+        var subjectText = GetSpan(this.Subject, stringBuilder);
+        AssertionChain.GetOrCreate()
+            .ForCondition(this.Subject.SequenceEqual(expected))
+            .FailWith("Expected (ReadOnly)Span{0} to be {1}, but found {2}.", typeof(TItem).Name, expectedText, subjectText);
     }
 
     private static string GetSpan(ReadOnlySpan<TItem> expected, StringBuilder stringBuilder)

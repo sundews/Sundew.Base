@@ -9,10 +9,10 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 * OnlyOneOrDefault similar to SingleOrDefault, but never throws.
 * DistinctInOrder items only appear once, while preserving order.
 * ByCardinality extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
-* Value-Array, List and Dictionary* wrappers for Immutable collections with value semantics. (* Not on NETStandard1.2)
+* Value-Array, List and Dictionary* wrappers for Immutable collections with value semantics.
 
 ## Primitives
-* Result types (R\<T, E\> and R\<E\>)
+* Result types (R\<T, E\> and R\<T\>, RoE\<E\>)
 * Option type T? (through extension methods).
 
 ## Computation

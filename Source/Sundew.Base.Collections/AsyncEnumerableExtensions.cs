@@ -51,7 +51,35 @@ public static class AsyncEnumerableExtensions
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="action">The action.</param>
     /// <returns>The completion task.</returns>
+    public static Task ForEachAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, ValueTask> action)
+    {
+        return Task.WhenAll(enumerable.Select(async x => await action(x).ConfigureAwait(false)));
+    }
+
+    /// <summary>
+    /// Runs an asynchronous for each.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The completion task.</returns>
     public static async Task<IReadOnlyList<TItem>> ForEachItemAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, Task> action)
+    {
+        return await Task.WhenAll(enumerable.Select(async x =>
+        {
+            await action(x).ConfigureAwait(false);
+            return x;
+        }));
+    }
+
+    /// <summary>
+    /// Runs an asynchronous for each.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The completion task.</returns>
+    public static async Task<IReadOnlyList<TItem>> ForEachItemAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, ValueTask> action)
     {
         return await Task.WhenAll(enumerable.Select(async x =>
         {

@@ -42,7 +42,7 @@ public class BufferTests
         slice.Length.Should().Be(ExpectedResult.Length);
         slice.AsSpan().Should().Equal(ExpectedResult);
         testee.AsSpan().Should().Equal(ExpectedResult);
-        testee.Capacity.Should().BeGreaterOrEqualTo(slice.StartIndex + slice.Length);
+        testee.Capacity.Should().BeGreaterThanOrEqualTo(slice.StartIndex + slice.Length);
     }
 
     [Fact]
