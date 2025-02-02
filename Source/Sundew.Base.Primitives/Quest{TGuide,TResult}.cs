@@ -52,7 +52,7 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
     /// <summary>
     /// Gets the Goal task.
     /// </summary>
-    public Task<TResult> Goal => this.taskCompletionSource.Task;
+    public Task<TResult> Task => this.taskCompletionSource.Task;
 
     /// <summary>
     /// Starts the quest.

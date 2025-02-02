@@ -55,7 +55,7 @@ public sealed class Quest<TGuide>
     /// <summary>
     /// Gets the Goal task.
     /// </summary>
-    public Task Goal => this.taskCompletionSource.Task;
+    public Task Task => this.taskCompletionSource.Task;
 
     /// <summary>
     /// Starts the quest.
