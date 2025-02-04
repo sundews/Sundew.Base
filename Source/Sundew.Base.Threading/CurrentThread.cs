@@ -74,7 +74,8 @@ public sealed class CurrentThread : ICurrentThread
     /// </summary>
     /// <param name="timeSpan">The time span.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public void Sleep(TimeSpan timeSpan, CancellationToken cancellationToken)
+    /// <returns><c>true</c>, if sleep completed, otherwise <c>false</c>.</returns>
+    public bool Sleep(TimeSpan timeSpan, CancellationToken cancellationToken)
     {
         var cancelSignal = new object();
         Monitor.Enter(cancelSignal);
@@ -87,6 +88,7 @@ public sealed class CurrentThread : ICurrentThread
         Monitor.Wait(cancelSignal, timeSpan);
         Monitor.Exit(cancelSignal);
         cancellationTokenRegistration.Dispose();
+        return !cancellationToken.IsCancellationRequested;
     }
 
     /// <summary>
@@ -94,9 +96,10 @@ public sealed class CurrentThread : ICurrentThread
     /// </summary>
     /// <param name="milliseconds">The milliseconds.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    public void Sleep(int milliseconds, CancellationToken cancellationToken)
+    /// <returns><c>true</c>, if sleep was completed, otherwise <c>false</c>.</returns>
+    public bool Sleep(int milliseconds, CancellationToken cancellationToken)
     {
-        this.Sleep(TimeSpan.FromMilliseconds(milliseconds), cancellationToken);
+        return this.Sleep(TimeSpan.FromMilliseconds(milliseconds), cancellationToken);
     }
 
     /// <summary>
@@ -119,5 +122,17 @@ public sealed class CurrentThread : ICurrentThread
     public Task Delay(int milliseconds, CancellationToken cancellationToken)
     {
         return Task.Delay(milliseconds, cancellationToken);
+    }
+
+    /// <inheritdoc/>
+    void ICurrentThread.Sleep(TimeSpan timeSpan, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc/>
+    void ICurrentThread.Sleep(int milliseconds, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

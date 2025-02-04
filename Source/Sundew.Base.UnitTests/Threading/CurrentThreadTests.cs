@@ -22,10 +22,11 @@ public class CurrentThreadTests
         var stopwatch = Stopwatch.StartNew();
         using var cancellationTokenSource = new CancellationTokenSource(20);
 
-        testee.Sleep(60, cancellationTokenSource.Token);
+        var result = testee.Sleep(500, cancellationTokenSource.Token);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(20, 60);
+        result.Should().BeFalse();
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(18, 60);
     }
 
     [Fact]
@@ -34,9 +35,10 @@ public class CurrentThreadTests
         var testee = new CurrentThread();
         var stopwatch = Stopwatch.StartNew();
 
-        testee.Sleep(10, CancellationToken.None);
+        var result = testee.Sleep(10, CancellationToken.None);
 
         stopwatch.Stop();
+        result.Should().BeTrue();
         stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 25);
     }
 
