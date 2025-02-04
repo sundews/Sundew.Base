@@ -88,7 +88,7 @@ public sealed class CurrentThread : ICurrentThread
         var wasCanceled = Monitor.Wait(cancelSignal, timeSpan);
         Monitor.Exit(cancelSignal);
         cancellationTokenRegistration.Dispose();
-        return !wasCanceled;
+        return !wasCanceled || !cancellationToken.IsCancellationRequested;
     }
 
     /// <summary>
