@@ -55,14 +55,16 @@ public interface ICurrentThread
     /// </summary>
     /// <param name="timeSpan">The time span.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    void Sleep(TimeSpan timeSpan, CancellationToken cancellationToken);
+    /// <returns><c>true</c>, if sleep completed, otherwise <c>false</c>.</returns>
+    bool Sleep(TimeSpan timeSpan, CancellationToken cancellationToken);
 
     /// <summary>
     /// Sleeps the specified milliseconds.
     /// </summary>
     /// <param name="milliseconds">The milliseconds.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    void Sleep(int milliseconds, CancellationToken cancellationToken);
+    /// <returns><c>true</c>, if sleep completed, otherwise <c>false</c>.</returns>
+    bool Sleep(int milliseconds, CancellationToken cancellationToken);
 
     /// <summary>
     /// Delays for the specified time span.

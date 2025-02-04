@@ -85,10 +85,10 @@ public sealed class CurrentThread : ICurrentThread
             Monitor.Pulse(cancelSignal);
             Monitor.Exit(cancelSignal);
         });
-        Monitor.Wait(cancelSignal, timeSpan);
+        var wasCanceled = Monitor.Wait(cancelSignal, timeSpan);
         Monitor.Exit(cancelSignal);
         cancellationTokenRegistration.Dispose();
-        return !cancellationToken.IsCancellationRequested;
+        return !wasCanceled;
     }
 
     /// <summary>
@@ -122,17 +122,5 @@ public sealed class CurrentThread : ICurrentThread
     public Task Delay(int milliseconds, CancellationToken cancellationToken)
     {
         return Task.Delay(milliseconds, cancellationToken);
-    }
-
-    /// <inheritdoc/>
-    void ICurrentThread.Sleep(TimeSpan timeSpan, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    /// <inheritdoc/>
-    void ICurrentThread.Sleep(int milliseconds, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 }
