@@ -33,11 +33,11 @@ public class QuestTests
             __._,
             Task.Run(() =>
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
                 return Task.CompletedTask;
             }),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(10);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 
@@ -57,7 +57,7 @@ public class QuestTests
             __._,
             Task.Run(() => throw new InvalidOperationException()),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(100);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 
@@ -77,11 +77,11 @@ public class QuestTests
             __._,
             _ =>
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
                 return Task.CompletedTask;
             },
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(10);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 
@@ -101,7 +101,7 @@ public class QuestTests
             __._,
             _ => throw new InvalidOperationException(),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(100);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 
@@ -180,7 +180,7 @@ public class QuestTests
             __._,
             async cancellationToken =>
             {
-                await Task.Delay(100, cancellationToken);
+                await Task.Delay(10, cancellationToken);
                 return expected;
             },
             cancellationTokenSource.Token);
@@ -200,7 +200,7 @@ public class QuestTests
             __._,
             () =>
             {
-                Thread.Sleep(100);
+                Thread.Sleep(10);
                 return expected;
             },
             cancellationTokenSource.Token);
@@ -219,11 +219,11 @@ public class QuestTests
             __._,
             Task.Run(() =>
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
                 return 42;
             }),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(10);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
@@ -246,7 +246,7 @@ public class QuestTests
             __._,
             Task.Run(new Func<Task<int>?>(() => throw new InvalidOperationException())),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(100);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
@@ -270,11 +270,11 @@ public class QuestTests
             __._,
             () =>
             {
-                Thread.Sleep(100);
+                Thread.Sleep(1000);
                 return expected;
             },
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(10);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
@@ -297,7 +297,7 @@ public class QuestTests
             __._,
             _ => throw new InvalidOperationException(),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(100);
+        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
