@@ -9,6 +9,7 @@ namespace Sundew.Base;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,33 +19,25 @@ using System.Threading.Tasks;
 /// <typeparam name="TGuide">The Guide type.</typeparam>
 public sealed class Quest<TGuide>
 {
-    private readonly Func<CancellationToken, Task> startFunc;
+    private readonly Task task;
+    private readonly Task continuation;
     private readonly IDisposable? disposable;
     private readonly CancellationToken cancellationToken;
-#if NETSTANDARD2_1 || NETSTANDARD2_0
-    private readonly TaskCompletionSource<__> taskCompletionSource = new();
-#else
-    private readonly TaskCompletionSource taskCompletionSource = new();
-#endif
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Quest{TGuide}"/> class.
     /// </summary>
     /// <param name="guide">The guide.</param>
-    /// <param name="startFunc">The start func.</param>
+    /// <param name="task">The task.</param>
     /// <param name="disposable">The disposable.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    internal Quest(TGuide guide, Func<CancellationToken, Task> startFunc, IDisposable? disposable, CancellationToken cancellationToken)
+    internal Quest(TGuide guide, Task task, IDisposable? disposable, CancellationToken cancellationToken)
     {
-        this.startFunc = startFunc;
-        this.disposable = disposable;
-        this.cancellationToken = cancellationToken;
-#if NETSTANDARD2_1 || NETSTANDARD2_0
-        this.cancellationToken.Register(this.taskCompletionSource.SetCanceled);
-#else
-        this.cancellationToken.Register(() => this.taskCompletionSource.SetCanceled(cancellationToken));
-#endif
         this.Guide = guide;
+        this.task = task;
+        this.continuation = this.task.ContinueWith(this.Completion, cancellationToken);
+        this.disposable = Quest.NestedDisposable.Create(disposable, guide);
+        this.cancellationToken = cancellationToken;
     }
 
     /// <summary>
@@ -55,27 +48,28 @@ public sealed class Quest<TGuide>
     /// <summary>
     /// Gets the Goal task.
     /// </summary>
-    public Task Task => this.taskCompletionSource.Task;
+    public Task Task => this.continuation;
 
     /// <summary>
     /// Starts the quest.
     /// </summary>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    public async Task Start()
+    public R<QuestStart, InvalidOperationException> Start()
     {
-        try
+        if (this.task.Status == TaskStatus.Created)
         {
-            await this.startFunc(this.cancellationToken).ConfigureAwait(false);
-#if NETSTANDARD2_1 || NETSTANDARD2_0
-            this.taskCompletionSource.SetResult(__._);
-#else
-            this.taskCompletionSource.SetResult();
-#endif
+            try
+            {
+                this.task.Start(TaskScheduler.Default);
+                return R.Success(new QuestStart(true, this.continuation));
+            }
+            catch (InvalidOperationException e)
+            {
+                return R.Error(e);
+            }
         }
-        catch (Exception e)
-        {
-            this.taskCompletionSource.SetException(e);
-        }
+
+        return R.Success(new QuestStart(false, this.continuation));
     }
 
     /// <summary>
@@ -87,5 +81,28 @@ public sealed class Quest<TGuide>
     {
         target = this.disposable;
         return target != default;
+    }
+
+    /// <summary>
+    /// Gets the task awaiter.
+    /// </summary>
+    /// <returns>The task awaiter.</returns>
+    public TaskAwaiter GetAwaiter() => this.Task.GetAwaiter();
+
+    /// <summary>
+    /// Configures the await.
+    /// </summary>
+    /// <param name="continueOnCapturedContext">The continueOnCapturedContext.</param>
+    /// <returns>A <see cref="ConfiguredTaskAwaitable"/>.</returns>
+    public ConfiguredTaskAwaitable ConfigureAwait(bool continueOnCapturedContext) => this.Task.ConfigureAwait(continueOnCapturedContext);
+
+    private void Completion(Task task)
+    {
+        if (task is { IsFaulted: true, Exception: not null })
+        {
+            throw task.Exception!;
+        }
+
+        task.Wait(this.cancellationToken);
     }
 }

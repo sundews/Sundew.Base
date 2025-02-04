@@ -9,6 +9,7 @@ namespace Sundew.Base;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,29 +20,25 @@ using System.Threading.Tasks;
 /// <typeparam name="TResult">The Result type.</typeparam>
 public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
 {
-    private readonly Func<CancellationToken, Task<TResult>> startFunc;
+    private readonly Task<TResult> task;
+    private readonly Task<TResult> continuation;
     private readonly IDisposable? disposable;
     private readonly CancellationToken cancellationToken;
-    private readonly TaskCompletionSource<TResult> taskCompletionSource = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Quest{TGuide, TResult}"/> class.
     /// </summary>
     /// <param name="guide">The guide.</param>
-    /// <param name="startFunc">The start func.</param>
+    /// <param name="task">The task.</param>
     /// <param name="disposable">The disposable.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    internal Quest(TGuide guide, Func<CancellationToken, Task<TResult>> startFunc, IDisposable? disposable, CancellationToken cancellationToken)
+    internal Quest(TGuide guide, Task<TResult> task, IDisposable? disposable, CancellationToken cancellationToken)
     {
-        this.startFunc = startFunc;
-        this.disposable = disposable;
-        this.cancellationToken = cancellationToken;
-#if NETSTANDARD2_1 || NETSTANDARD2_0
-        this.cancellationToken.Register(this.taskCompletionSource.SetCanceled);
-#else
-        this.cancellationToken.Register(() => this.taskCompletionSource.SetCanceled(cancellationToken));
-#endif
         this.Guide = guide;
+        this.task = task;
+        this.continuation = this.task.ContinueWith(this.Completion, cancellationToken);
+        this.disposable = Quest.NestedDisposable.Create(disposable, guide);
+        this.cancellationToken = cancellationToken;
     }
 
     /// <summary>
@@ -52,26 +49,28 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
     /// <summary>
     /// Gets the Goal task.
     /// </summary>
-    public Task<TResult> Task => this.taskCompletionSource.Task;
+    public Task<TResult> Task => this.continuation;
 
     /// <summary>
     /// Starts the quest.
     /// </summary>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-    public async Task<TResult> Start()
+    public R<QuestStart, InvalidOperationException> Start()
     {
-        try
+        if (this.task.Status == TaskStatus.Created)
         {
-            var result = await this.startFunc(this.cancellationToken).ConfigureAwait(false);
-            this.taskCompletionSource.SetResult(result);
-            return result;
-        }
-        catch (Exception e)
-        {
-            this.taskCompletionSource.SetException(e);
+            try
+            {
+                this.task.Start(TaskScheduler.Default);
+                return R.Success(new QuestStart(true, this.continuation));
+            }
+            catch (InvalidOperationException e)
+            {
+                return R.Error(e);
+            }
         }
 
-        return await this.taskCompletionSource.Task;
+        return R.Success(new QuestStart(false, this.continuation));
     }
 
     /// <summary>
@@ -83,5 +82,29 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
     {
         target = this.disposable;
         return target != default;
+    }
+
+    /// <summary>
+    /// Gets the task awaiter.
+    /// </summary>
+    /// <returns>The task awaiter.</returns>
+    public TaskAwaiter<TResult> GetAwaiter() => this.Task.GetAwaiter();
+
+    /// <summary>
+    /// Configures the await.
+    /// </summary>
+    /// <param name="continueOnCapturedContext">The continueOnCapturedContext.</param>
+    /// <returns>A <see cref="ConfiguredTaskAwaitable"/>.</returns>
+    public ConfiguredTaskAwaitable<TResult> ConfigureAwait(bool continueOnCapturedContext) => this.Task.ConfigureAwait(continueOnCapturedContext);
+
+    private TResult Completion(Task<TResult> task)
+    {
+        if (task is { IsFaulted: true, Exception: not null })
+        {
+            throw task.Exception!;
+        }
+
+        task.Wait(this.cancellationToken);
+        return task.Result;
     }
 }
