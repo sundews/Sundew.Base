@@ -35,6 +35,20 @@ public static class Quest
     /// </summary>
     /// <typeparam name="TGuide">The guide type.</typeparam>
     /// <param name="guide">The guide.</param>
+    /// <param name="task">The task.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The quest.</returns>
+    public static Quest<TGuide> Create<TGuide>(TGuide guide, Task task, IDisposable? disposable, CancellationToken cancellationToken = default)
+    {
+        return new Quest<TGuide>(guide, task, disposable, cancellationToken);
+    }
+
+    /// <summary>
+    /// Creates a quest.
+    /// </summary>
+    /// <typeparam name="TGuide">The guide type.</typeparam>
+    /// <param name="guide">The guide.</param>
     /// <param name="startFunc">The start func.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The quest.</returns>
@@ -98,6 +112,21 @@ public static class Quest
     public static Quest<TGuide, TResult> Create<TGuide, TResult>(TGuide guide, Task<TResult> task, CancellationToken cancellationToken = default)
     {
         return new Quest<TGuide, TResult>(guide, task, default, cancellationToken);
+    }
+
+    /// <summary>
+    /// Creates a quest.
+    /// </summary>
+    /// <typeparam name="TGuide">The guide type.</typeparam>
+    /// <typeparam name="TResult">The result type.</typeparam>
+    /// <param name="guide">The guide.</param>
+    /// <param name="task">The task.</param>
+    /// <param name="disposable">The disposable.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <returns>The quest.</returns>
+    public static Quest<TGuide, TResult> Create<TGuide, TResult>(TGuide guide, Task<TResult> task, IDisposable? disposable, CancellationToken cancellationToken = default)
+    {
+        return new Quest<TGuide, TResult>(guide, task, disposable, cancellationToken);
     }
 
     /// <summary>
