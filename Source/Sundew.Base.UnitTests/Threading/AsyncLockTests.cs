@@ -25,7 +25,7 @@ public class AsyncLockTests
     {
         static async Task<int> LockTest()
         {
-            var testee = new AsyncLock();
+            using var testee = new AsyncLock();
             using (await testee.TryLockAsync())
             {
                 return ExpectedResult;
@@ -45,15 +45,13 @@ public class AsyncLockTests
     {
         static async Task<int> LockTest()
         {
-            var testee = new AsyncLock();
-            using (var lockResult = await testee.TryLockAsync())
+            using var testee = new AsyncLock();
+            using var lockResult = await testee.TryLockAsync();
+            if (lockResult)
             {
-                if (lockResult)
-                {
-                }
-
-                return ExpectedResult;
             }
+
+            return ExpectedResult;
         }
 
         var task = LockTest();
@@ -66,23 +64,22 @@ public class AsyncLockTests
     public async Task TryLockAsync_When_AddingAnItemTwiceForEachOfTwoThreads_Then_ResultShouldContainItemsWhereTwoConsecutiveItemsAreEqual()
     {
         var list = new List<int>();
-        var testee = new AsyncLock();
+        using var testee = new AsyncLock();
         var count = int.MaxValue;
         using (var job = new ContinuousJob(
                    async c =>
                    {
-                       using (var result = await testee.TryLockAsync(TimeSpan.FromMilliseconds(5), c))
+                       using var result = await testee.TryLockAsync(TimeSpan.FromMilliseconds(5), c).ConfigureAwait(false);
+                       if (result)
                        {
-                           if (result)
-                           {
-                               list.Add(count);
-                               list.Add(count);
-                               count--;
-                           }
-                           else
-                           {
-                               Console.WriteLine("Didn't get it");
-                           }
+                           list.Add(count);
+                           list.Add(count);
+                           count--;
+                           Console.WriteLine("Got it");
+                       }
+                       else
+                       {
+                           Console.WriteLine("Didn't get it");
                        }
                    }))
         {
@@ -90,14 +87,12 @@ public class AsyncLockTests
             for (int i = 0; i < 100; i++)
             {
                 var value = i;
-                using (var result = await testee.TryLockAsync(startResult.CancellationToken))
+                using var result = await testee.TryLockAsync(startResult.CancellationToken);
+                if (result)
                 {
-                    if (result)
-                    {
-                        list.Add(value);
-                        list.Add(value);
-                        Thread.Sleep(10);
-                    }
+                    list.Add(value);
+                    list.Add(value);
+                    Thread.Sleep(10);
                 }
             }
 
