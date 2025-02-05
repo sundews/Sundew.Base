@@ -71,13 +71,17 @@ public class AsyncLockTests
         using (var job = new ContinuousJob(
                    async c =>
                    {
-                       using (var result = await testee.TryLockAsync(c))
+                       using (var result = await testee.TryLockAsync(TimeSpan.FromMilliseconds(5), c))
                        {
                            if (result)
                            {
                                list.Add(count);
                                list.Add(count);
                                count--;
+                           }
+                           else
+                           {
+                               Console.WriteLine("Didn't get it");
                            }
                        }
                    }))
