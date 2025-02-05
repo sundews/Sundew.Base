@@ -8,6 +8,7 @@
 namespace Sundew.Base.Threading.Jobs;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -33,13 +34,14 @@ public interface IJob : IDisposable
     /// Starts the job.
     /// </summary>
     /// <returns>The job start result.</returns>
-    Task<JobStartResult> StartAsync();
+    Task<JobStartResult> StartAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Starts the job.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The job start result.</returns>
-    JobStartResult Start();
+    JobStartResult Start(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Stops the job and waits for it to complete.

@@ -82,24 +82,26 @@ public sealed class CancellableJob<TState> : IJob
     /// <summary>
     /// Starts the job.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The job start result.</returns>
-    public JobStartResult Start()
+    public JobStartResult Start(CancellationToken cancellationToken = default)
     {
-        return this.StartAsync().Result;
+        return this.StartAsync(cancellationToken).Result;
     }
 
     /// <summary>
     /// Starts the job.
     /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The job start result.</returns>
-    public async Task<JobStartResult> StartAsync()
+    public async Task<JobStartResult> StartAsync(CancellationToken cancellationToken)
     {
         using (await this.@lock.LockAsync())
         {
             if (!this.jobContext.HasValue())
             {
                 this.aggregateException = null;
-                var cancellationTokenSource = new CancellationTokenSource();
+                var cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
                 this.jobContext = new JobContext(
                     cancellationTokenSource,
