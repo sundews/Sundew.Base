@@ -35,13 +35,13 @@ public class AsyncLazyTests
         var cancellationTokenSource = new CancellationTokenSource();
         var testee = new AsyncLazy<string>(async cancellationToken =>
         {
-            await Task.Delay(50, cancellationToken);
+            await Task.Delay(500, cancellationToken);
             return ExpectedResult;
         });
 
         var cancelTask = Task.Run(async () =>
         {
-            await Task.Delay(25, CancellationToken.None);
+            await Task.Delay(10, CancellationToken.None);
             await cancellationTokenSource.CancelAsync();
         });
 
@@ -56,13 +56,13 @@ public class AsyncLazyTests
         var cancellationTokenSource = new CancellationTokenSource();
         var testee = new AsyncLazy<string>(async cancellationToken =>
         {
-            await Task.Delay(50, cancellationToken);
+            await Task.Delay(500, cancellationToken);
             return ExpectedResult;
         });
 
         var cancelTask = Task.Run(async () =>
         {
-            await Task.Delay(25, CancellationToken.None);
+            await Task.Delay(10, CancellationToken.None);
             await cancellationTokenSource.CancelAsync();
         });
 
@@ -89,7 +89,7 @@ public class AsyncLazyTests
                 throw new NotSupportedException("Was only allowed to run once");
             }
 
-            await Task.Delay(25, cancellationToken);
+            await Task.Delay(10, cancellationToken);
             hasRun = true;
             return ExpectedResult;
         });
