@@ -75,11 +75,6 @@ public class AsyncLockTests
                            list.Add(count);
                            list.Add(count);
                            count--;
-                           Console.WriteLine("Got it");
-                       }
-                       else
-                       {
-                           Console.WriteLine("Didn't get it");
                        }
                    }))
         {

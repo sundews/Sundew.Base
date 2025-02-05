@@ -253,7 +253,7 @@ public class QuestTests
                 return 42;
             }),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(1);
+        cancellationTokenSource.CancelAfter(10);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
@@ -303,7 +303,7 @@ public class QuestTests
                 return expected;
             },
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(1);
+        cancellationTokenSource.CancelAfter(10);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
