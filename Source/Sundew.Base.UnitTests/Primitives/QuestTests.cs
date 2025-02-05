@@ -276,7 +276,6 @@ public class QuestTests
             __._,
             Task.Run(new Func<Task<int>?>(() => throw new InvalidOperationException())),
             cancellationTokenSource.Token);
-        cancellationTokenSource.CancelAfter(1);
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
