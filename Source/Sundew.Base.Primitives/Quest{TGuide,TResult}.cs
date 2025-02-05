@@ -8,7 +8,6 @@
 namespace Sundew.Base;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,11 +17,11 @@ using System.Threading.Tasks;
 /// </summary>
 /// <typeparam name="TGuide">The Guide type.</typeparam>
 /// <typeparam name="TResult">The Result type.</typeparam>
-public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
+public sealed class Quest<TGuide, TResult> : IAsyncDisposable, IDisposable
 {
     private readonly Task<TResult> task;
     private readonly Task<TResult> continuation;
-    private readonly IDisposable? disposable;
+    private readonly object? disposable;
     private readonly CancellationToken cancellationToken;
 
     /// <summary>
@@ -32,12 +31,12 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
     /// <param name="task">The task.</param>
     /// <param name="disposable">The disposable.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    internal Quest(TGuide guide, Task<TResult> task, IDisposable? disposable, CancellationToken cancellationToken)
+    internal Quest(TGuide guide, Task<TResult> task, object? disposable, CancellationToken cancellationToken)
     {
         this.Guide = guide;
         this.task = task;
         this.continuation = this.task.ContinueWith(this.Completion, cancellationToken);
-        this.disposable = Quest.NestedDisposable.Create(disposable, guide);
+        this.disposable = ReferenceEquals(guide, disposable) ? default : disposable;
         this.cancellationToken = cancellationToken;
     }
 
@@ -74,17 +73,6 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
     }
 
     /// <summary>
-    /// Gets the <see cref="IDisposable"/> if this quest is disposable.
-    /// </summary>
-    /// <param name="target">The target.</param>
-    /// <returns><c>true</c>, if this quest is disposable, otherwise <c>false</c>.</returns>
-    public bool TryGetTarget([NotNullWhen(true)] out IDisposable? target)
-    {
-        target = this.disposable;
-        return target != default;
-    }
-
-    /// <summary>
     /// Gets the task awaiter.
     /// </summary>
     /// <returns>The task awaiter.</returns>
@@ -97,6 +85,45 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
     /// <returns>A <see cref="ConfiguredTaskAwaitable"/>.</returns>
     public ConfiguredTaskAwaitable<TResult> ConfigureAwait(bool continueOnCapturedContext) => this.Task.ConfigureAwait(continueOnCapturedContext);
 
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        if (this.task.Status != TaskStatus.Created)
+        {
+            try
+            {
+                this.task.Wait(this.cancellationToken);
+                var result = this.task.Result;
+                Quest.TryDispose(result);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        Quest.TryDispose(this.Guide);
+        Quest.TryDispose(this.disposable);
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        if (this.task.Status != TaskStatus.Created)
+        {
+            try
+            {
+                var result = await this.task.ConfigureAwait(false);
+                await Quest.TryDisposeAsync(result).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        await Quest.TryDisposeAsync(this.Guide).ConfigureAwait(false);
+        await Quest.TryDisposeAsync(this.disposable).ConfigureAwait(false);
+    }
+
     private TResult Completion(Task<TResult> task)
     {
         if (task is { IsFaulted: true, Exception: not null })
@@ -105,6 +132,7 @@ public sealed class Quest<TGuide, TResult> : IMayBe<IDisposable>
         }
 
         task.Wait(this.cancellationToken);
-        return task.Result;
+        var result = task.Result;
+        return result;
     }
 }

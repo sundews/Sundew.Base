@@ -79,7 +79,7 @@ public sealed class CurrentThread : ICurrentThread
     {
         var cancelSignal = new object();
         Monitor.Enter(cancelSignal);
-        var cancellationTokenRegistration = cancellationToken.Register(() =>
+        using var cancellationTokenRegistration = cancellationToken.Register(() =>
         {
             Monitor.Enter(cancelSignal);
             Monitor.Pulse(cancelSignal);
@@ -87,7 +87,6 @@ public sealed class CurrentThread : ICurrentThread
         });
         var wasCanceled = Monitor.Wait(cancelSignal, timeSpan);
         Monitor.Exit(cancelSignal);
-        cancellationTokenRegistration.Dispose();
         return !wasCanceled || !cancellationToken.IsCancellationRequested;
     }
 

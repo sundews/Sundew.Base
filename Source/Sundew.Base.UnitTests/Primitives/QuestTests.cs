@@ -112,7 +112,7 @@ public class QuestTests
     }
 
     [Fact]
-    public void TryGetTarget_When_GuideIsDisposable_Then_DisposeShouldBeCalledOnce()
+    public void Dispose_When_GuideIsDisposable_Then_DisposeShouldBeCalledOnce()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
         var mock = Mock.Create<IDisposable>();
@@ -121,16 +121,13 @@ public class QuestTests
             _ => Task.CompletedTask,
             cancellationTokenSource.Token);
 
-        if (quest.TryGetTarget(out var disposable))
-        {
-            disposable.Dispose();
-        }
+        quest.Dispose();
 
         Mock.Assert(() => mock.Dispose(), Occurs.Once());
     }
 
     [Fact]
-    public void TryGetTarget_When_GuideAndDisposableAreTheSame_Then_DisposeShouldBeCalledOnce()
+    public void Dispose_When_GuideAndDisposableAreTheSame_Then_DisposeShouldBeCalledOnce()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
         var mock = Mock.Create<IDisposable>();
@@ -140,16 +137,13 @@ public class QuestTests
             mock,
             cancellationTokenSource.Token);
 
-        if (quest.TryGetTarget(out var disposable))
-        {
-            disposable.Dispose();
-        }
+        quest.Dispose();
 
         Mock.Assert(() => mock.Dispose(), Occurs.Once());
     }
 
     [Fact]
-    public void TryGetTarget_When_GuideAndDisposableAreDifferent_Then_DisposeShouldBeCalledOnceForEach()
+    public void Dispose_When_GuideAndDisposableAreDifferent_Then_DisposeShouldBeCalledOnceForEach()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
         var mock1 = Mock.Create<IDisposable>();
@@ -160,13 +154,51 @@ public class QuestTests
             mock2,
             cancellationTokenSource.Token);
 
-        if (quest.TryGetTarget(out var disposable))
-        {
-            disposable.Dispose();
-        }
+        quest.Dispose();
 
         Mock.Assert(() => mock1.Dispose(), Occurs.Once());
         Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+    }
+
+    [Fact]
+    public void Dispose_When_GuideAndDisposableAreDifferentAndResultIsDisposableButQuestNot_Then_DisposeShouldBeCalledOnceButNotForResult()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock1 = Mock.Create<IDisposable>();
+        var mock2 = Mock.Create<IDisposable>();
+        var mock3 = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock1,
+            _ => Task.FromResult(mock3),
+            mock2,
+            cancellationTokenSource.Token);
+
+        quest.Dispose();
+
+        Mock.Assert(() => mock1.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Never());
+    }
+
+    [Fact]
+    public void Dispose_When_GuideAndDisposableAreDifferentAndResultIsDisposableAndQuestStarted_Then_DisposeShouldBeCalledOnceForAll()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock1 = Mock.Create<IDisposable>();
+        var mock2 = Mock.Create<IDisposable>();
+        var mock3 = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock1,
+            _ => Task.FromResult(mock3),
+            mock2,
+            cancellationTokenSource.Token);
+        quest.Start();
+
+        quest.Dispose();
+
+        Mock.Assert(() => mock1.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Once());
     }
 
     [Fact]

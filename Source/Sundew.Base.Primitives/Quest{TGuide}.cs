@@ -8,7 +8,6 @@
 namespace Sundew.Base;
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ using System.Threading.Tasks;
 /// Represents a quest for processing some type of operation.
 /// </summary>
 /// <typeparam name="TGuide">The Guide type.</typeparam>
-public sealed class Quest<TGuide>
+public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
 {
     private readonly Task task;
     private readonly Task continuation;
@@ -36,7 +35,7 @@ public sealed class Quest<TGuide>
         this.Guide = guide;
         this.task = task;
         this.continuation = this.task.ContinueWith(this.Completion, cancellationToken);
-        this.disposable = Quest.NestedDisposable.Create(disposable, guide);
+        this.disposable = ReferenceEquals(guide, disposable) ? default : disposable;
         this.cancellationToken = cancellationToken;
     }
 
@@ -72,15 +71,40 @@ public sealed class Quest<TGuide>
         return R.Success(new QuestStart(false, this.continuation));
     }
 
-    /// <summary>
-    /// Gets the <see cref="IDisposable"/> if this quest is disposable.
-    /// </summary>
-    /// <param name="target">The target.</param>
-    /// <returns><c>true</c>, if this quest is disposable, otherwise <c>false</c>.</returns>
-    public bool TryGetTarget([NotNullWhen(true)] out IDisposable? target)
+    /// <inheritdoc/>
+    public void Dispose()
     {
-        target = this.disposable;
-        return target != default;
+        if (this.task.Status != TaskStatus.Created)
+        {
+            try
+            {
+                this.task.Wait(this.cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        Quest.TryDispose(this.Guide);
+        Quest.TryDispose(this.disposable);
+    }
+
+    /// <inheritdoc/>
+    public async ValueTask DisposeAsync()
+    {
+        if (this.task.Status != TaskStatus.Created)
+        {
+            try
+            {
+                await this.task.ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        await Quest.TryDisposeAsync(this.Guide).ConfigureAwait(false);
+        await Quest.TryDisposeAsync(this.disposable).ConfigureAwait(false);
     }
 
     /// <summary>

@@ -187,46 +187,39 @@ public static class Quest
         return new Quest<TGuide, TResult>(guide, new Task<TResult>(() => startFunc(cancellationToken).Result), disposable, cancellationToken);
     }
 
-    internal class NestedDisposable : IDisposable
+    internal static async ValueTask TryDisposeAsync(object? disposableCandidate)
     {
-        private readonly IDisposable disposable;
-        private readonly IDisposable additionalDisposable;
-
-        public NestedDisposable(IDisposable disposable, IDisposable additionalDisposable)
+        if (disposableCandidate is IAsyncDisposable asyncDisposable)
         {
-            this.disposable = disposable;
-            this.additionalDisposable = additionalDisposable;
+            try
+            {
+                await asyncDisposable.DisposeAsync().ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+            }
         }
-
-        public void Dispose()
+        else if (disposableCandidate is IDisposable disposable)
         {
-            this.disposable.Dispose();
-            this.additionalDisposable.Dispose();
+            disposable.Dispose();
         }
+    }
 
-        internal static IDisposable? Create(IDisposable? disposable, object? other)
+    internal static void TryDispose(object? disposableCandidate)
+    {
+        if (disposableCandidate is IAsyncDisposable asyncDisposable)
         {
-            if (object.ReferenceEquals(disposable, other))
+            try
             {
-                return disposable;
+                asyncDisposable.DisposeAsync().AsTask().Wait(CancellationToken.None);
             }
-
-            if (disposable is not null && other is IDisposable otherDisposable)
+            catch (OperationCanceledException)
             {
-                return new NestedDisposable(disposable, otherDisposable);
             }
-
-            if (disposable is not null)
-            {
-                return disposable;
-            }
-
-            if (other is IDisposable otherDisposable2)
-            {
-                return otherDisposable2;
-            }
-
-            return default;
+        }
+        else if (disposableCandidate is IDisposable disposable)
+        {
+            disposable.Dispose();
         }
     }
 }
