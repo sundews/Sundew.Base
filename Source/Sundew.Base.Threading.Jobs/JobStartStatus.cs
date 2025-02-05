@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="JobStartResult.cs" company="Sundews">
+// <copyright file="JobStartStatus.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -7,11 +7,23 @@
 
 namespace Sundew.Base.Threading.Jobs;
 
-using System.Threading;
-
 /// <summary>
-/// A result providing access to the jobs cancellation token and a value indicating whether the job was already started.
+/// The job start status.
 /// </summary>
-/// <param name="CancellationToken">The cancellation token.</param>
-/// <param name="Status">The status.</param>
-public readonly record struct JobStartResult(CancellationToken CancellationToken, JobStartStatus Status);
+public enum JobStartStatus
+{
+    /// <summary>
+    /// The job was started.
+    /// </summary>
+    Started = 0,
+
+    /// <summary>
+    /// The job was already running.
+    /// </summary>
+    WasAlreadyRunning = 1,
+
+    /// <summary>
+    /// The job was canceled.
+    /// </summary>
+    Canceled = 2,
+}

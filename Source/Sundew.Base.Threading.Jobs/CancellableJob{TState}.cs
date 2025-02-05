@@ -96,7 +96,7 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>The job start result.</returns>
     public async Task<JobStartResult> StartAsync(CancellationToken cancellationToken)
     {
-        using (await this.@lock.LockAsync())
+        using (await this.@lock.LockAsync(cancellationToken))
         {
             if (!this.jobContext.HasValue())
             {
@@ -112,10 +112,10 @@ public sealed class CancellableJob<TState> : IJob
                             taskCreationOptions,
                             this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default));
 
-                return new JobStartResult(this.jobContext.CancellationTokenSource.Token, false);
+                return new JobStartResult(this.jobContext.CancellationTokenSource.Token, JobStartStatus.Started);
             }
 
-            return new JobStartResult(this.jobContext.CancellationTokenSource.Token, true);
+            return new JobStartResult(this.jobContext.CancellationTokenSource.Token, cancellationToken.IsCancellationRequested ? JobStartStatus.Canceled : JobStartStatus.WasAlreadyRunning);
         }
     }
 

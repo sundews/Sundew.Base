@@ -22,7 +22,7 @@ public class ContinuousJobTests
         var result = testee.Start();
         result = testee.Start();
 
-        result.WasAlreadyRunning.Should().BeTrue();
+        result.Status.Should().Be(JobStartStatus.WasAlreadyRunning);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class ContinuousJobTests
 
         Thread.Sleep(1);
 
-        startResult.WasAlreadyRunning.Should().BeFalse();
+        startResult.Status.Should().Be(JobStartStatus.Started);
         testee.Exception!.InnerException.Should().BeOfType<InvalidOperationException>();
     }
 
@@ -68,7 +68,7 @@ public class ContinuousJobTests
 
         var result = testee.Stop();
 
-        startResult.WasAlreadyRunning.Should().BeFalse();
+        startResult.Status.Should().Be(JobStartStatus.Started);
         result.Error!.InnerException.Should().BeOfType<InvalidOperationException>();
     }
 
@@ -83,7 +83,7 @@ public class ContinuousJobTests
 
         var result = testee.Stop();
 
-        startResult.WasAlreadyRunning.Should().BeFalse();
+        startResult.Status.Should().Be(JobStartStatus.Started);
         ((bool)result).Should().BeTrue();
     }
 }
