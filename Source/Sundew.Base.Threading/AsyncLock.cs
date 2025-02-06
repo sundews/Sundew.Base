@@ -18,6 +18,8 @@ using System.Threading.Tasks;
 /// <seealso cref="IDisposable" />
 public sealed class AsyncLock : IDisposable
 {
+    private const long Attempts = 3;
+
     private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
     private long owner = 0;
@@ -73,13 +75,43 @@ public sealed class AsyncLock : IDisposable
             return new LockResult(this, true);
         }
 
-        var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
-        if (result)
+        var eachAttemptTimeout = TimeSpan.FromTicks(timeoutTimeSpan.Ticks / Attempts);
+        if (timeoutTimeSpan < eachAttemptTimeout)
         {
-            this.InitialOwner();
+            var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockResult(this, true);
+            }
+
+            return new LockResult(this, false);
         }
 
-        return new LockResult(this, result);
+        var remainingTimeout = timeoutTimeSpan;
+        while (remainingTimeout > eachAttemptTimeout)
+        {
+            var result = await this.semaphoreSlim.WaitAsync(eachAttemptTimeout, cancellationToken).ConfigureAwait(false);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockResult(this, true);
+            }
+
+            remainingTimeout -= eachAttemptTimeout;
+        }
+
+        if (remainingTimeout > TimeSpan.Zero)
+        {
+            var result = await this.semaphoreSlim.WaitAsync(remainingTimeout, cancellationToken).ConfigureAwait(false);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockResult(this, true);
+            }
+        }
+
+        return new LockResult(this, false);
     }
 
     /// <summary>
@@ -134,17 +166,43 @@ public sealed class AsyncLock : IDisposable
             return new LockDisposer(this);
         }
 
-        var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
-        if (result)
+        var eachAttemptTimeout = TimeSpan.FromTicks(timeoutTimeSpan.Ticks / Attempts);
+        if (timeoutTimeSpan < eachAttemptTimeout)
         {
-            this.InitialOwner();
-        }
-        else
-        {
-            throw new LockNotAcquiredException();
+            var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockDisposer(this);
+            }
+
+            return new LockDisposer(this);
         }
 
-        return new LockDisposer(this);
+        var remainingTimeout = timeoutTimeSpan;
+        while (remainingTimeout > eachAttemptTimeout)
+        {
+            var result = await this.semaphoreSlim.WaitAsync(eachAttemptTimeout, cancellationToken).ConfigureAwait(false);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockDisposer(this);
+            }
+
+            remainingTimeout -= eachAttemptTimeout;
+        }
+
+        if (remainingTimeout > TimeSpan.Zero)
+        {
+            var result = await this.semaphoreSlim.WaitAsync(remainingTimeout, cancellationToken).ConfigureAwait(false);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockDisposer(this);
+            }
+        }
+
+        throw new LockNotAcquiredException();
     }
 
     /// <summary>
@@ -194,13 +252,43 @@ public sealed class AsyncLock : IDisposable
             return new LockResult(this, true);
         }
 
-        var result = this.semaphoreSlim.Wait(timeoutTimeSpan, cancellationToken);
-        if (result)
+        var eachAttemptTimeout = TimeSpan.FromTicks(timeoutTimeSpan.Ticks / Attempts);
+        if (timeoutTimeSpan < eachAttemptTimeout)
         {
-            this.InitialOwner();
+            var result = this.semaphoreSlim.Wait(timeoutTimeSpan, cancellationToken);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockResult(this, true);
+            }
+
+            return new LockResult(this, false);
         }
 
-        return new LockResult(this, result);
+        var remainingTimeout = timeoutTimeSpan;
+        while (remainingTimeout > eachAttemptTimeout)
+        {
+            var result = this.semaphoreSlim.Wait(eachAttemptTimeout, cancellationToken);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockResult(this, true);
+            }
+
+            remainingTimeout -= eachAttemptTimeout;
+        }
+
+        if (remainingTimeout > TimeSpan.Zero)
+        {
+            var result = this.semaphoreSlim.Wait(remainingTimeout, cancellationToken);
+            if (result)
+            {
+                this.InitialOwner();
+                return new LockResult(this, true);
+            }
+        }
+
+        return new LockResult(this, false);
     }
 
     /// <summary>
