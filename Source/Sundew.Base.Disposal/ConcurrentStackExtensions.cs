@@ -48,4 +48,28 @@ public static class ConcurrentStackExtensions
             await items[i].DisposeAsync().ConfigureAwait(false);
         }
     }
+
+    /// <summary>
+    /// Pops all items from the concurrent stack.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="concurrentStack">The concurrent stack.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    public static IDisposable ToDisposable<TItem>(this ConcurrentStack<TItem> concurrentStack)
+        where TItem : IDisposable
+    {
+        return new DisposeAction(concurrentStack.DisposeAll);
+    }
+
+    /// <summary>
+    /// Pops all items from the concurrent stack.
+    /// </summary>
+    /// <typeparam name="TItem">The item type.</typeparam>
+    /// <param name="concurrentStack">The concurrent stack.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    public static IAsyncDisposable ToAsyncDisposable<TItem>(this ConcurrentStack<TItem> concurrentStack)
+        where TItem : IAsyncDisposable
+    {
+        return new DisposeAsyncAction(async () => await concurrentStack.DisposeAllAsync().ConfigureAwait(false));
+    }
 }
