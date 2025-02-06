@@ -21,7 +21,7 @@ public static class ConcurrentStackExtensions
     /// </summary>
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="concurrentStack">The concurrent stack.</param>
-    public static void DisposeAll<TItem>(ConcurrentStack<TItem> concurrentStack)
+    public static void DisposeAll<TItem>(this ConcurrentStack<TItem> concurrentStack)
         where TItem : IDisposable
     {
         var items = new TItem[concurrentStack.Count];
@@ -38,7 +38,7 @@ public static class ConcurrentStackExtensions
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="concurrentStack">The concurrent stack.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public static async Task DisposeAllAsync<TItem>(ConcurrentStack<TItem> concurrentStack)
+    public static async Task DisposeAllAsync<TItem>(this ConcurrentStack<TItem> concurrentStack)
         where TItem : IAsyncDisposable
     {
         var items = new TItem[concurrentStack.Count];

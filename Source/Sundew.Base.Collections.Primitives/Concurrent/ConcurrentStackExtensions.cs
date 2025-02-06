@@ -22,7 +22,7 @@ public static class ConcurrentStackExtensions
     /// <typeparam name="TItem">The item type.</typeparam>
     /// <param name="concurrentStack">The concurrent stack.</param>
     /// <returns>An <see cref="IEnumerable{T}"/> containing the popped items.</returns>
-    public static IEnumerable<TItem> PopRange<TItem>(ConcurrentStack<TItem> concurrentStack)
+    public static IEnumerable<TItem> PopRange<TItem>(this ConcurrentStack<TItem> concurrentStack)
     {
         var items = new TItem[concurrentStack.Count];
         var count = concurrentStack.TryPopRange(items);
