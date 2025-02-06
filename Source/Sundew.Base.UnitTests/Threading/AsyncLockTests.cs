@@ -41,6 +41,30 @@ public class AsyncLockTests
     }
 
     [Fact]
+    public async Task TryLockAsync_When_Reentrant_Then_ResultShouldBeExpectedResult()
+    {
+        static async Task<int> LockTest()
+        {
+            using var testee = new AsyncLock();
+            using var result = await testee.TryLockAsync();
+            if (result)
+            {
+                using var result2 = await testee.TryLockAsync();
+                if (result2)
+                {
+                    return ExpectedResult;
+                }
+            }
+
+            return 0;
+        }
+
+        var result = await LockTest();
+
+        result.Should().Be(ExpectedResult);
+    }
+
+    [Fact]
     public async Task TryLockAsync_When_CheckIsCalled_Then_ResultShouldBeExpectedResult()
     {
         static async Task<int> LockTest()
@@ -87,7 +111,7 @@ public class AsyncLockTests
                 {
                     list.Add(value);
                     list.Add(value);
-                    Thread.Sleep(10);
+                    Thread.Sleep(1);
                 }
             }
 

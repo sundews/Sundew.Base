@@ -8,7 +8,6 @@
 namespace Sundew.Base.Threading;
 
 using System;
-using System.Threading;
 
 /// <summary>
 /// The result of an <see cref="AsyncLock"/> which validates whether the lock was acquired.
@@ -16,28 +15,19 @@ using System.Threading;
 /// <seealso cref="IDisposable" />
 public sealed class LockResult : IDisposable
 {
-    private readonly SemaphoreSlim? semaphoreSlim;
+    private readonly AsyncLock asyncLock;
     private readonly bool hasLock;
     private bool isConfirmed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LockResult"/> class.
     /// </summary>
+    /// <param name="asyncLock">The async lock.</param>
     /// <param name="hasLock">if set to <c>true</c> [has lock].</param>
-    public LockResult(bool hasLock)
+    internal LockResult(AsyncLock asyncLock, bool hasLock)
     {
+        this.asyncLock = asyncLock;
         this.hasLock = hasLock;
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="LockResult"/> class.
-    /// </summary>
-    /// <param name="semaphoreSlim">The semaphore slim.</param>
-    /// <param name="hasLock">if set to <c>true</c> the lock was acquired.</param>
-    internal LockResult(SemaphoreSlim? semaphoreSlim, bool hasLock)
-    {
-        this.hasLock = hasLock;
-        this.semaphoreSlim = semaphoreSlim;
     }
 
     /// <summary>
@@ -72,7 +62,7 @@ public sealed class LockResult : IDisposable
     {
         if (this.hasLock)
         {
-            this.semaphoreSlim?.Release();
+            this.asyncLock.InternalRelease();
         }
 
         if (!this.isConfirmed)

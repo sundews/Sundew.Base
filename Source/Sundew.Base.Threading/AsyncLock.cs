@@ -8,6 +8,7 @@
 namespace Sundew.Base.Threading;
 
 using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +19,8 @@ using System.Threading.Tasks;
 public sealed class AsyncLock : IDisposable
 {
     private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
+
+    private long owner = 0;
 
     /// <summary>
     /// Waits asynchronously to acquire the lock.
@@ -64,8 +67,19 @@ public sealed class AsyncLock : IDisposable
     /// </returns>
     public async Task<LockResult> TryLockAsync(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
+        if (this.IsOwned())
+        {
+            Interlocked.Increment(ref this.owner);
+            return new LockResult(this, true);
+        }
+
         var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
-        return new LockResult(this.semaphoreSlim, result);
+        if (result)
+        {
+            this.InitialOwner();
+        }
+
+        return new LockResult(this, result);
     }
 
     /// <summary>
@@ -114,8 +128,18 @@ public sealed class AsyncLock : IDisposable
     /// <exception cref="LockNotAcquiredException">Thrown if the lock could not be acquired.</exception>
     public async Task<IDisposable> LockAsync(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
+        if (this.IsOwned())
+        {
+            Interlocked.Increment(ref this.owner);
+            return new LockDisposer(this);
+        }
+
         var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
-        if (!result)
+        if (result)
+        {
+            this.InitialOwner();
+        }
+        else
         {
             throw new LockNotAcquiredException();
         }
@@ -164,8 +188,19 @@ public sealed class AsyncLock : IDisposable
     /// <returns>A lock result.</returns>
     public LockResult TryLock(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
+        if (this.IsOwned())
+        {
+            Interlocked.Increment(ref this.owner);
+            return new LockResult(this, true);
+        }
+
         var result = this.semaphoreSlim.Wait(timeoutTimeSpan, cancellationToken);
-        return new LockResult(this.semaphoreSlim, result);
+        if (result)
+        {
+            this.InitialOwner();
+        }
+
+        return new LockResult(this, result);
     }
 
     /// <summary>
@@ -224,6 +259,29 @@ public sealed class AsyncLock : IDisposable
         this.semaphoreSlim.Dispose();
     }
 
+    internal void InternalRelease()
+    {
+        var entries = Interlocked.Decrement(ref this.owner);
+        if ((int)(entries & 0xFFFFFFFF) == 0)
+        {
+            Interlocked.Exchange(ref this.owner, 0);
+            this.semaphoreSlim.Release();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | (MethodImplOptions)512)]
+    private void InitialOwner()
+    {
+        Interlocked.Exchange(ref this.owner, ((long)Thread.CurrentThread.ManagedThreadId << 32) | 1);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | (MethodImplOptions)512)]
+    private bool IsOwned()
+    {
+        int upperInt = (int)(this.owner >> 32);
+        return upperInt == Thread.CurrentThread.ManagedThreadId;
+    }
+
     private class LockDisposer : IDisposable
     {
         private readonly AsyncLock asyncLock;
@@ -235,7 +293,7 @@ public sealed class AsyncLock : IDisposable
 
         public void Dispose()
         {
-            this.asyncLock.semaphoreSlim.Release();
+            this.asyncLock.InternalRelease();
         }
     }
 }
