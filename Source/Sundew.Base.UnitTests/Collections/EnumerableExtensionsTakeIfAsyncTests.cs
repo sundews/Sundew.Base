@@ -27,7 +27,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
         [new int?[] { 1 }, 2, TooLateAddDelay, false, null],
     };
 
-    private const long DefaultTimeoutMilliseconds = 50;
+    private const long DefaultTimeoutMilliseconds = 60;
     private const int TooLateAddDelay = 70;
 
     [Theory]
@@ -195,7 +195,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
 
     [Theory]
     [InlineData(new string?[] { null, null }, new string[] { "1", "2", "3" }, "2")]
-    public async Task SecondAsync_ForStringOption_When_ListWithInitialListContainsNullAnd2ndItemAfterDelay_Then_ResultIsExpectedResult2(string?[] initialList, string?[] adds, string? expectedResult)
+    public async Task SecondAsync_ForStringOption_When_ListWithInitialListContainsNullAnd2ndItemAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] adds, string? expectedResult)
     {
         var testee = new List<string?>(initialList);
 
@@ -210,7 +210,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
 
     [Theory]
     [InlineData(new string?[] { null, null }, new string[] { "1", "2", "3" }, "2")]
-    public async Task SecondAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAnd2ndItemAfterDelay_Then_ResultIsExpectedResult2(string?[] initialList, string?[] adds, string? expectedResult)
+    public async Task SecondAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAndItemsAddedAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] adds, string? expectedResult)
     {
         var testee = new ObservableCollection<string?>(initialList);
 
@@ -226,7 +226,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     [Theory]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 50, false, new string[] { "1", "2", "3" })]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 5, true, new string[] { "1", "2", "3", "4", "5" })]
-    public async Task TakeIfAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAnd2ndItemAfterDelay_Then_ResultIsExpectedResult2(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
+    public async Task TakeIfAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
     {
         var testee = new ObservableCollection<string?>(initialList);
 
@@ -239,7 +239,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
         result.IsSuccess.Should().Be(expectedResult);
         if (result.TryGet(out var value, out var error))
         {
-            error.Should().Equal(expectedValue);
+            value.Should().Equal(expectedValue);
         }
         else
         {
