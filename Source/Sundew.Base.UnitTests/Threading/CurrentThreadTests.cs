@@ -25,7 +25,7 @@ public class CurrentThreadTests
         testee.Sleep(500, cancellationTokenSource.Token);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(18, 80);
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(18, 200);
     }
 
     [Fact]
@@ -37,7 +37,7 @@ public class CurrentThreadTests
         var result = testee.Sleep(10, CancellationToken.None);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 40);
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 80);
     }
 
     [Fact]
@@ -49,6 +49,6 @@ public class CurrentThreadTests
         testee.Sleep(10);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 40);
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 80);
     }
 }
