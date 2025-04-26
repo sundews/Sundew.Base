@@ -226,11 +226,11 @@ public class EnumerableExtensionsTakeIfAsyncTests
     [Theory]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 100, false, new string[] { "1", "2", "3" })]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 5, true, new string[] { "1", "2", "3", "4", "5" })]
-    public async Task TakeIfAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
+    public async Task TakeDuringAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
     {
         var testee = new ObservableCollection<string?>(initialList);
 
-        var taskResult = testee.TakeIfAsync(x => x != null, 5, TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
+        var taskResult = testee.TakeDuringAsync(x => x != null, 5, TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, 5, firstAdds);
         await TryAddToAfterDelay(testee, secondDelayMilliseconds, secondAdds);
 
@@ -250,11 +250,11 @@ public class EnumerableExtensionsTakeIfAsyncTests
     [Theory]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 100, false, new string[] { "1", "2", "3" })]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 5, true, new string[] { "1", "2", "3", "4", "5" })]
-    public async Task TakeIfAsync_ForStringOption_When_ListWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
+    public async Task TakeDuringAsync_ForStringOption_When_ListWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
     {
         var testee = new List<string?>(initialList);
 
-        var taskResult = testee.TakeIfAsync(x => x != null, 5, TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
+        var taskResult = testee.TakeDuringAsync(x => x != null, 5, TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, 5, firstAdds);
         await TryAddToAfterDelay(testee, secondDelayMilliseconds, secondAdds);
 

@@ -101,7 +101,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return (await TakeIfAsync(enumerable, (item, _) => predicate.Invoke(item), 1, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[0]);
+        return (await TakeDuringAsync(enumerable, (item, _) => predicate.Invoke(item), 1, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[0]);
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool> predicate, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return (await TakeIfAsync(enumerable, predicate, 1, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[0]);
+        return (await TakeDuringAsync(enumerable, predicate, 1, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[0]);
     }
 
     /// <summary>
@@ -126,7 +126,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return (await TakeIfAsync(enumerable, default(Func<TItem, int, bool>), 1, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[0]);
+        return (await TakeDuringAsync(enumerable, default(Func<TItem, int, bool>), 1, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[0]);
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return (await TakeIfAsync(enumerable, default(Func<TItem, int, bool>), 2, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[1]);
+        return (await TakeDuringAsync(enumerable, default(Func<TItem, int, bool>), 2, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[1]);
     }
 
     /// <summary>
@@ -151,7 +151,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return (await TakeIfAsync(enumerable, (item, _) => predicate.Invoke(item), 2, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[1]);
+        return (await TakeDuringAsync(enumerable, (item, _) => predicate.Invoke(item), 2, timeoutCancellationToken).ConfigureAwait(false)).Map(x => x[1]);
     }
 
     /// <summary>
@@ -164,7 +164,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool>? predicate, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return (await TakeIfAsync(
+        return (await TakeDuringAsync(
             enumerable,
             predicate,
             2,
@@ -180,9 +180,9 @@ public static class AsyncEnumerableExtensions
     /// <param name="count">The count.</param>
     /// <param name="timeoutCancellationToken">The cancellation token.</param>
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
-    public static Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, int count, TimeoutCancellationToken timeoutCancellationToken = default)
+    public static Task<R<TItem[], TItem[]>> TakeDuringAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, int count, TimeoutCancellationToken timeoutCancellationToken = default)
     {
-        return TakeIfAsync(
+        return TakeDuringAsync(
             enumerable,
             (item, _) => predicate?.Invoke(item) ?? true,
             count,
@@ -198,10 +198,10 @@ public static class AsyncEnumerableExtensions
     /// <param name="count">The count.</param>
     /// <param name="timeoutCancellationToken">The cancellation token.</param>
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
-    public static Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool>? predicate, int count, TimeoutCancellationToken timeoutCancellationToken = default)
+    public static Task<R<TItem[], TItem[]>> TakeDuringAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool>? predicate, int count, TimeoutCancellationToken timeoutCancellationToken = default)
     {
         var numberOfItems = 0;
-        return TakeIfAsync(
+        return TakeDuringAsync(
             enumerable,
             (item, index) =>
             {
@@ -223,10 +223,10 @@ public static class AsyncEnumerableExtensions
     /// <param name="count">The count.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
-    public static Task<R<TItem[], TItem[]>> TakeAsync<TItem>(this IEnumerable<TItem> enumerable, int count, TimeoutCancellationToken cancellationToken = default)
+    public static Task<R<TItem[], TItem[]>> TakeDuringAsync<TItem>(this IEnumerable<TItem> enumerable, int count, TimeoutCancellationToken cancellationToken = default)
     {
         var numberOfItems = 0;
-        return TakeIfAsync(
+        return TakeDuringAsync(
             enumerable,
             (item, index) => Interlocked.Increment(ref numberOfItems) < count ? TakeAction.Take : TakeAction.TakeAndEnd,
             cancellationToken);
@@ -240,9 +240,9 @@ public static class AsyncEnumerableExtensions
     /// <param name="predicate">The predicate.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
-    public static Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, TakeAction> predicate, TimeoutCancellationToken cancellationToken = default)
+    public static Task<R<TItem[], TItem[]>> TakeDuringAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, TakeAction> predicate, TimeoutCancellationToken cancellationToken = default)
     {
-        return TakeIfAsync(enumerable, (item, _) => predicate.Invoke(item), cancellationToken);
+        return TakeDuringAsync(enumerable, (item, _) => predicate.Invoke(item), cancellationToken);
     }
 
     /// <summary>
@@ -253,7 +253,7 @@ public static class AsyncEnumerableExtensions
     /// <param name="predicate">The predicate.</param>
     /// <param name="cancellationToken">The cancellationToken.</param>
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
-    public static async Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, TakeAction> predicate, TimeoutCancellationToken cancellationToken = default)
+    public static async Task<R<TItem[], TItem[]>> TakeDuringAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, TakeAction> predicate, TimeoutCancellationToken cancellationToken = default)
     {
         var index = 0;
         var buffer = new Buffer<TItem>();
