@@ -9,8 +9,11 @@ namespace Sundew.Base.Collections;
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Sundew.Base.Memory;
 
 /// <summary>
 /// Extends <see cref="IEnumerable{T}"/> with async methods.
@@ -86,5 +89,295 @@ public static class AsyncEnumerableExtensions
             await action(x).ConfigureAwait(false);
             return x;
         }));
+    }
+
+    /// <summary>
+    /// Asynchronously waits for the first item fulfilling the predicate or until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, TimeSpan timeout = default)
+    {
+        return (await TakeIfAsync(enumerable, (item, _) => predicate.Invoke(item), 1, timeout).ConfigureAwait(false)).Map(x => x[0]);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for the first item fulfilling the predicate or until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool> predicate, TimeSpan timeout = default)
+    {
+        return (await TakeIfAsync(enumerable, predicate, 1, timeout).ConfigureAwait(false)).Map(x => x[0]);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for the first item or until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, TimeSpan timeout = default)
+    {
+        return (await TakeIfAsync(enumerable, null, 1, timeout).ConfigureAwait(false)).Map(x => x[0]);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for the second item or until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, TimeSpan timeout = default)
+    {
+        return (await TakeIfAsync(enumerable, null, 2, timeout).ConfigureAwait(false)).Map(x => x[1]);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for the second item fulfilling the predicate or until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, TimeSpan timeout = default)
+    {
+        return (await TakeIfAsync(enumerable, (item, _) => predicate.Invoke(item), 2, timeout).ConfigureAwait(false)).Map(x => x[1]);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for the second item fulfilling the predicate or until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool>? predicate, TimeSpan timeout = default)
+    {
+        return (await TakeIfAsync(
+            enumerable,
+            predicate,
+            2,
+            timeout).ConfigureAwait(false)).Map(x => x[1]);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a number of items or until a timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="count">The count.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, bool> predicate, int count, TimeSpan timeout = default)
+    {
+        return TakeIfAsync(
+            enumerable,
+            (item, _) => predicate?.Invoke(item) ?? true,
+            count,
+            timeout);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a number of items or until a timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="count">The count.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, bool>? predicate, int count, TimeSpan timeout = default)
+    {
+        var numberOfItems = 0;
+        return TakeIfAsync(
+            enumerable,
+            (item, index) =>
+            {
+                if (predicate?.Invoke(item, index) ?? true)
+                {
+                    return Interlocked.Increment(ref numberOfItems) < count ? TakeAction.Take : TakeAction.TakeAndEnd;
+                }
+
+                return TakeAction.Skip;
+            },
+            timeout);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a number of items or until a timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="count">The count.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static Task<R<TItem[], TItem[]>> TakeAsync<TItem>(this IEnumerable<TItem> enumerable, int count, TimeSpan timeout = default)
+    {
+        var numberOfItems = 0;
+        return TakeIfAsync(
+            enumerable,
+            (item, index) => Interlocked.Increment(ref numberOfItems) < count ? TakeAction.Take : TakeAction.TakeAndEnd,
+            timeout);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for items fulfilling the condition until timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, TakeAction> predicate, TimeSpan timeout = default)
+    {
+        return TakeIfAsync(enumerable, (item, _) => predicate.Invoke(item), timeout);
+    }
+
+    /// <summary>
+    /// Asynchronously waits for items fulfilling the predicate or the timeout occurs.
+    /// </summary>
+    /// <typeparam name="TItem">The TItem type.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="predicate">The predicate.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
+    public static async Task<R<TItem[], TItem[]>> TakeIfAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, int, TakeAction> predicate, TimeSpan timeout = default)
+    {
+        timeout = timeout == TimeSpan.Zero ? Timeout.InfiniteTimeSpan : timeout;
+        var index = 0;
+        var buffer = new Buffer<TItem>();
+        foreach (var item in enumerable)
+        {
+            if (ProcessTakeOrSkipOrEnd(item))
+            {
+                return R.Success(buffer.ToFinalArray());
+            }
+        }
+
+        var cancellationTokenSource = new CancellationTokenSource(timeout);
+        var taskCompletionSource = new TaskCompletionSource<R<TItem[], TItem[]>>();
+        var cancellationRegistration = cancellationTokenSource.Token.Register(_ => taskCompletionSource.TrySetResult(R.Error(buffer.ToFinalArray())), __._);
+        if (enumerable is INotifyCollectionChanged collection)
+        {
+            collection.CollectionChanged += OnCollectionChanged;
+#if NETSTANDARD2_0
+            _ = taskCompletionSource.Task.ContinueWith(
+                _ =>
+                {
+                    collection.CollectionChanged -= OnCollectionChanged;
+                    cancellationRegistration.Dispose();
+                },
+                CancellationToken.None);
+#else
+            _ = taskCompletionSource.Task.ContinueWith(
+                async _ =>
+                {
+                    collection.CollectionChanged -= OnCollectionChanged;
+                    await cancellationRegistration.DisposeAsync().ConfigureAwait(false);
+                },
+                CancellationToken.None);
+#endif
+
+            void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            {
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                {
+                    if (e.NewItems == null)
+                    {
+                        return;
+                    }
+
+                    var firstItem = e.NewItems.Cast<TItem>();
+                    foreach (var item in firstItem)
+                    {
+                        if (ProcessTakeOrSkipOrEnd(item))
+                        {
+                            taskCompletionSource.TrySetResult(R.Success(buffer.ToFinalArray()));
+                            return;
+                        }
+                    }
+                }
+            }
+
+            return await taskCompletionSource.Task;
+        }
+
+        if (enumerable is Array)
+        {
+            return R.Error(buffer.ToFinalArray());
+        }
+
+        var synchronizationContext = SynchronizationContext.Current;
+        if (synchronizationContext != null)
+        {
+            synchronizationContext.Post(_ => Reprocess(), __._);
+            return await taskCompletionSource.Task;
+        }
+
+#if NETSTANDARD2_0
+        await Task.Delay(timeout - TimeSpan.FromMilliseconds(timeout.TotalMilliseconds / 3.0), CancellationToken.None).ConfigureAwait(false);
+#else
+        await Task.Delay(timeout - (timeout / 3.0), CancellationToken.None).ConfigureAwait(false);
+#endif
+        foreach (var item in enumerable.Skip(index))
+        {
+            if (ProcessTakeOrSkipOrEnd(item))
+            {
+                return R.Success(buffer.ToFinalArray());
+            }
+        }
+
+        return await taskCompletionSource.Task;
+
+        void Reprocess()
+        {
+            try
+            {
+                while (!cancellationTokenSource.IsCancellationRequested)
+                {
+                    foreach (var item in enumerable.Skip(index))
+                    {
+                        if (ProcessTakeOrSkipOrEnd(item))
+                        {
+                            taskCompletionSource.TrySetResult(R.Success(buffer.ToFinalArray()));
+                            return;
+                        }
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+        }
+
+        bool ProcessTakeOrSkipOrEnd(TItem item)
+        {
+            var takeAction = predicate.Invoke(item, index++);
+            return takeAction switch
+            {
+                TakeAction.Take => Write(item, false),
+                TakeAction.Skip => false,
+                TakeAction.End => true,
+                TakeAction.TakeAndEnd => Write(item, true),
+            };
+        }
+
+        bool Write(TItem item, bool end)
+        {
+            buffer.Write(item);
+            return end;
+        }
     }
 }
