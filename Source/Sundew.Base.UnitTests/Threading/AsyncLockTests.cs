@@ -9,7 +9,6 @@ namespace Sundew.Base.UnitTests.Threading;
 
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Sundew.Base.Threading;
@@ -93,8 +92,8 @@ public class AsyncLockTests
         using (var job = new ContinuousJob(
                    async c =>
                    {
-                       using var result = await testee.TryLockAsync(TimeSpan.FromMilliseconds(5), c).ConfigureAwait(false);
-                       if (result)
+                       using var lockResult = await testee.TryLockAsync(TimeSpan.FromMilliseconds(5), c).ConfigureAwait(false);
+                       if (lockResult)
                        {
                            list.Add(count);
                            list.Add(count);
@@ -106,21 +105,16 @@ public class AsyncLockTests
             for (int i = 0; i < 100; i++)
             {
                 var value = i;
-                var hadLock = false;
-                using (var hasLock = await testee.TryLockAsync(startResult.CancellationToken))
+                using (var lockResult = await testee.TryLockAsync(startResult.CancellationToken))
                 {
-                    if (hasLock)
+                    if (lockResult)
                     {
-                        hadLock = true;
                         list.Add(value);
                         list.Add(value);
                     }
                 }
 
-                if (hadLock)
-                {
-                    Thread.Sleep(1);
-                }
+                await Task.Delay(10);
             }
 
             await job.StopAsync().ConfigureAwait(true);
