@@ -247,6 +247,30 @@ public class EnumerableExtensionsTakeIfAsyncTests
         }
     }
 
+    [Theory]
+    [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 100, false, new string[] { "1", "2", "3" })]
+    [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 5, true, new string[] { "1", "2", "3", "4", "5" })]
+    public async Task TakeIfAsync_ForStringOption_When_ListWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
+    {
+        var testee = new List<string?>(initialList);
+
+        var taskResult = testee.TakeIfAsync(x => x != null, 5, TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
+        await TryAddToAfterDelay(testee, 5, firstAdds);
+        await TryAddToAfterDelay(testee, secondDelayMilliseconds, secondAdds);
+
+        var result = await taskResult;
+
+        result.IsSuccess.Should().Be(expectedResult);
+        if (result.TryGet(out var value, out var error))
+        {
+            value.Should().Equal(expectedValue);
+        }
+        else
+        {
+            error.Should().Equal(expectedValue);
+        }
+    }
+
     private static async Task TryAddToAfterDelay<TItem>(ICollection<TItem> testee, int addDelayMilliSeconds, params IEnumerable<object?> adds)
     {
         if (addDelayMilliSeconds >= 0)
