@@ -106,11 +106,19 @@ public class AsyncLockTests
             for (int i = 0; i < 100; i++)
             {
                 var value = i;
-                using var result = await testee.TryLockAsync(startResult.CancellationToken);
-                if (result)
+                var hadLock = false;
+                using (var hasLock = await testee.TryLockAsync(startResult.CancellationToken))
                 {
-                    list.Add(value);
-                    list.Add(value);
+                    if (hasLock)
+                    {
+                        hadLock = true;
+                        list.Add(value);
+                        list.Add(value);
+                    }
+                }
+
+                if (hadLock)
+                {
                     Thread.Sleep(1);
                 }
             }
