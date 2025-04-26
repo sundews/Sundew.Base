@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>    
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <EmbedUntrackedSources>false</EmbedUntrackedSources>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -20,10 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="8.0.1" />
-    <PackageReference Include="JustMock" Version="2024.4.1203.350" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.12.19" />
+    <PackageReference Include="AwesomeAssertions" Version="8.1.0" />
+    <PackageReference Include="JustMock" Version="2025.1.211.365" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="17.13.61" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.556">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -31,7 +31,7 @@
     <PackageReference Include="Sundew.DiscriminatedUnions" Version="5.3.8" />
     <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
