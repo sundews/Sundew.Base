@@ -126,7 +126,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> FirstAsync<TItem>(this IEnumerable<TItem> enumerable, TimeSpan timeout = default)
     {
-        return (await TakeIfAsync(enumerable, null, 1, timeout).ConfigureAwait(false)).Map(x => x[0]);
+        return (await TakeIfAsync(enumerable, default(Func<TItem, int, bool>), 1, timeout).ConfigureAwait(false)).Map(x => x[0]);
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public static class AsyncEnumerableExtensions
     /// <returns>An async result contain the expected items or an error in case of a timeout containing the items that could be found.</returns>
     public static async Task<R<TItem>> SecondAsync<TItem>(this IEnumerable<TItem> enumerable, TimeSpan timeout = default)
     {
-        return (await TakeIfAsync(enumerable, null, 2, timeout).ConfigureAwait(false)).Map(x => x[1]);
+        return (await TakeIfAsync(enumerable, default(Func<TItem, int, bool>), 2, timeout).ConfigureAwait(false)).Map(x => x[1]);
     }
 
     /// <summary>
