@@ -10,10 +10,12 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 * DistinctInOrder items only appear once, while preserving order.
 * ByCardinality extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
 * Value-Array, List and Dictionary* wrappers for Immutable collections with value semantics.
+* TakeDuringAsync for await items being added to a collection.
 
 ## Primitives
 * Result types (R\<T, E\> and R\<T\>, RoE\<E\>)
 * Option type T? (through extension methods).
+* TimeoutCancellationToken - A CancellationToken compatible that supports timeouts.
 
 ## Computation
 * Attempter for implementing retry logic.
@@ -49,6 +51,7 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 * DisposingList allows building a list of IDisposables for disposal in the same order.
 
 IAsyncDisposable is only supported on .NETStandard2.1
+
 ## Equality
 * ReferenceEqualityComparer compares objects by reference.
 * TargetEqualityWeakReference is a weak reference that implements equality based on target equality.
