@@ -40,7 +40,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     {
         var testee = new List<int>(initialList);
 
-        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(20));
+        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, addDelayMilliSeconds, adds);
 
         var result = await taskResult;
@@ -59,7 +59,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     {
         var testee = new ObservableCollection<int>(initialList);
 
-        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(10));
+        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, addDelayMilliSeconds, adds);
 
         var result = await taskResult;
@@ -78,7 +78,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     {
         var testee = new List<string>(initialList);
 
-        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(20));
+        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, addDelayMilliSeconds, adds);
 
         var result = await taskResult;
@@ -97,7 +97,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     {
         var testee = new ObservableCollection<string>(initialList);
 
-        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(20));
+        var taskResult = testee.FirstAsync(TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, addDelayMilliSeconds, adds);
 
         var result = await taskResult;
@@ -116,7 +116,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     {
         var testee = new ObservableCollection<string>(initialList);
 
-        var taskResult = testee.SecondAsync(TimeSpan.FromMilliseconds(20));
+        var taskResult = testee.SecondAsync(TimeSpan.FromMilliseconds(DefaultTimeoutMilliseconds));
         await TryAddToAfterDelay(testee, addDelayMilliSeconds, adds);
 
         var result = await taskResult;
