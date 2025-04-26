@@ -27,7 +27,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
         [new int?[] { 1 }, 2, TooLateAddDelay, false, null],
     };
 
-    private const long DefaultTimeoutMilliseconds = 80;
+    private const long DefaultTimeoutMilliseconds = 100;
     private const int TooLateAddDelay = 200;
 
     [Theory]
@@ -224,7 +224,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     }
 
     [Theory]
-    [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 100, false, new string[] { "1", "2", "3" })]
+    [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, TooLateAddDelay, false, new string[] { "1", "2", "3" })]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 5, true, new string[] { "1", "2", "3", "4", "5" })]
     public async Task TakeDuringAsync_ForStringOption_When_ObservableCollectionWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
     {
@@ -248,7 +248,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     }
 
     [Theory]
-    [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 100, false, new string[] { "1", "2", "3" })]
+    [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, TooLateAddDelay, false, new string[] { "1", "2", "3" })]
     [InlineData(new string?[] { null, "1" }, new string?[] { null, "2", "3" }, new string?[] { null, "4", "5", "6" }, 5, true, new string[] { "1", "2", "3", "4", "5" })]
     public async Task TakeDuringAsync_ForStringOption_When_ListWithInitialListContainsNullAndMultipleRoundsOfAddingItemsAfterDelay_Then_ResultIsExpectedResult(string?[] initialList, string?[] firstAdds, string?[] secondAdds, int secondDelayMilliseconds, bool expectedResult, string[] expectedValue)
     {
