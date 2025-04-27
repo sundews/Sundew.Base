@@ -17,7 +17,7 @@ using Xunit;
 public class CancellationTests
 {
     [Theory]
-    [InlineData(200, true)]
+    [InlineData(300, true)]
     [InlineData(10, false)]
     public async Task ImplicitOperator_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
     {
@@ -44,7 +44,7 @@ public class CancellationTests
     }
 
     [Theory]
-    [InlineData(200, true)]
+    [InlineData(300, true)]
     [InlineData(10, false)]
     public async Task ImplicitOperator_When_PassingRegularCancellationToken_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
     {

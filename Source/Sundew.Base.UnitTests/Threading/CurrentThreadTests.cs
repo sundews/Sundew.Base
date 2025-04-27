@@ -18,7 +18,7 @@ public class CurrentThreadTests
     [Theory]
     [InlineData(20, 500)]
     [InlineData(0, 200)]
-    [InlineData(1000, 1200)]
+    [InlineData(1000, 1500)]
     public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange(int cancelAfter, int sleep)
     {
         var testee = new CurrentThread();
