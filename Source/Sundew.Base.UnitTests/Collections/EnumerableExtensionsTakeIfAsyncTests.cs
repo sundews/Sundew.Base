@@ -28,7 +28,7 @@ public class EnumerableExtensionsTakeIfAsyncTests
     };
 
     private const long DefaultTimeoutMilliseconds = 100;
-    private const int TooLateAddDelay = 200;
+    private const int TooLateAddDelay = 300;
 
     [Theory]
     [InlineData(new int[0], null, -1, false, 0)]
