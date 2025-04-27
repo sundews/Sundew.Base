@@ -238,6 +238,8 @@ public static partial class AsyncEnumerableExtensions
             return await taskCompletionSource.Task;
         }
 
+        _ = taskCompletionSource.Task.ContinueWith(_ => enabler.Dispose(), CancellationToken.None);
+
         var retryDelay = cancellation.Timeout > TimeSpan.FromSeconds(1)
             ? TimeSpan.FromSeconds(1)
             : GetRetryDelay(cancellation.Timeout);
