@@ -79,16 +79,17 @@ public sealed class CurrentThread : ICurrentThread
                 return false;
             }
 
-            using var cancellationTokenRegistration = cancellationToken.Register(() =>
+            using (cancellationToken.Register(() =>
             {
                 lock (cancelSignal)
                 {
                     Monitor.Pulse(cancelSignal);
                 }
-            });
-
-            var completedWait = Monitor.Wait(cancelSignal, timeSpan);
-            return !completedWait;
+            }))
+            {
+                var completedWait = Monitor.Wait(cancelSignal, timeSpan);
+                return !completedWait;
+            }
         }
     }
 

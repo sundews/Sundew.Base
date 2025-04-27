@@ -295,7 +295,7 @@ public static partial class AsyncEnumerableExtensions
             }
             catch
             {
-                taskCompletionSource.SetCanceled();
+                taskCompletionSource.TrySetResult(R.Error(buffer.ToFinalArray()));
             }
         }
 
