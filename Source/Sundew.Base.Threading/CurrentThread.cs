@@ -31,10 +31,12 @@ public sealed class CurrentThread : ICurrentThread
     /// <param name="timeSpan">The time span.</param>
     public void Sleep(TimeSpan timeSpan)
     {
-        var neverExitedObject = new object();
-        Monitor.Enter(neverExitedObject);
-        Monitor.Wait(neverExitedObject, timeSpan);
-        Monitor.Exit(neverExitedObject);
+        var neverPulsed = new object();
+        lock (neverPulsed)
+        {
+            Monitor.Wait(neverPulsed, 0);
+            Monitor.Wait(neverPulsed, timeSpan);
+        }
     }
 
     /// <summary>
@@ -43,10 +45,12 @@ public sealed class CurrentThread : ICurrentThread
     /// <param name="milliseconds">The milliseconds.</param>
     public void Sleep(int milliseconds)
     {
-        var neverExitedObject = new object();
-        Monitor.Enter(neverExitedObject);
-        Monitor.Wait(neverExitedObject, milliseconds);
-        Monitor.Exit(neverExitedObject);
+        var neverPulsed = new object();
+        lock (neverPulsed)
+        {
+            Monitor.Wait(neverPulsed, 0);
+            Monitor.Wait(neverPulsed, milliseconds);
+        }
     }
 
     /// <summary>
@@ -78,16 +82,24 @@ public sealed class CurrentThread : ICurrentThread
     public bool Sleep(TimeSpan timeSpan, CancellationToken cancellationToken)
     {
         var cancelSignal = new object();
-        Monitor.Enter(cancelSignal);
-        using var cancellationTokenRegistration = cancellationToken.Register(() =>
+        lock (cancelSignal)
         {
-            Monitor.Enter(cancelSignal);
-            Monitor.Pulse(cancelSignal);
-            Monitor.Exit(cancelSignal);
-        });
-        var wasCanceled = Monitor.Wait(cancelSignal, timeSpan);
-        Monitor.Exit(cancelSignal);
-        return !wasCanceled || !cancellationToken.IsCancellationRequested;
+            if (cancellationToken.IsCancellationRequested)
+            {
+                return false;
+            }
+
+            using var cancellationTokenRegistration = cancellationToken.Register(() =>
+            {
+                lock (cancelSignal)
+                {
+                    Monitor.Pulse(cancelSignal);
+                }
+            });
+
+            var completedWait = Monitor.Wait(cancelSignal, timeSpan);
+            return !completedWait;
+        }
     }
 
     /// <summary>
