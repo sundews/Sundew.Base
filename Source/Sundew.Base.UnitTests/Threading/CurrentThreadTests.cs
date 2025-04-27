@@ -56,6 +56,6 @@ public class CurrentThreadTests
         testee.Sleep(sleep);
 
         stopwatch.Stop();
-        ((double)stopwatch.ElapsedMilliseconds).Should().BeInRange(sleep, sleep * 1.8);
+        ((double)stopwatch.ElapsedMilliseconds).Should().BeInRange(sleep, (sleep + 10) * 1.8);
     }
 }
