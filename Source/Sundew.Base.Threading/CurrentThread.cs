@@ -31,12 +31,7 @@ public sealed class CurrentThread : ICurrentThread
     /// <param name="timeSpan">The time span.</param>
     public void Sleep(TimeSpan timeSpan)
     {
-        var neverPulsed = new object();
-        lock (neverPulsed)
-        {
-            Monitor.Wait(neverPulsed, 0);
-            Monitor.Wait(neverPulsed, timeSpan);
-        }
+        Thread.Sleep(timeSpan);
     }
 
     /// <summary>
@@ -45,12 +40,7 @@ public sealed class CurrentThread : ICurrentThread
     /// <param name="milliseconds">The milliseconds.</param>
     public void Sleep(int milliseconds)
     {
-        var neverPulsed = new object();
-        lock (neverPulsed)
-        {
-            Monitor.Wait(neverPulsed, 0);
-            Monitor.Wait(neverPulsed, milliseconds);
-        }
+        Thread.Sleep(milliseconds);
     }
 
     /// <summary>
