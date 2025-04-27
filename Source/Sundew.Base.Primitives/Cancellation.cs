@@ -9,13 +9,16 @@ namespace Sundew.Base;
 
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 /// <summary>
 /// A timeout cancellation token used to pass timeout into a cancellation token.
 /// </summary>
-public readonly struct Cancellation
+public struct Cancellation
 {
-    private readonly bool wasConstructed;
+    private readonly CancellationToken originCancellationToken;
+    private readonly CancellationTokenSource? cancellationTokenSource;
+    private readonly Flag? consumedFlag = new Flag();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Cancellation"/> struct.
@@ -61,9 +64,21 @@ public readonly struct Cancellation
     /// <param name="timeout">The timeout.</param>
     public Cancellation(CancellationToken cancellationToken, TimeSpan timeout)
     {
+        this.originCancellationToken = cancellationToken;
         this.Timeout = timeout;
-        this.Token = cancellationToken;
-        this.wasConstructed = true;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Cancellation"/> struct.
+    /// </summary>
+    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="timeout">The timeout.</param>
+    /// <param name="cancellationTokenSource">The cancellation token source.</param>
+    private Cancellation(CancellationToken cancellationToken, TimeSpan timeout, CancellationTokenSource cancellationTokenSource)
+    {
+        this.originCancellationToken = cancellationToken;
+        this.Timeout = timeout;
+        this.cancellationTokenSource = cancellationTokenSource;
     }
 
     /// <summary>
@@ -79,7 +94,7 @@ public readonly struct Cancellation
     /// <summary>
     /// Gets the token.
     /// </summary>
-    public CancellationToken Token { get; }
+    public CancellationToken Token => this.cancellationTokenSource?.Token ?? this.originCancellationToken;
 
     /// <summary>
     /// Gets a value indicating whether cancellation is requested.
@@ -119,28 +134,35 @@ public readonly struct Cancellation
     }
 
     /// <summary>
-    /// Create a linked token source and starts the timeout.
+    /// Create creates a <see cref="Cancellation.Enabler"/> and starts the timeout.
     /// </summary>
     /// <returns>The linked cancellation token source.</returns>
-    public CancellationTokenSource CreateLinkedAndTryStartTimeout()
+    public Enabler EnableCancellation()
     {
-        return this.CreateLinked(true);
+        return this.EnableCancellation(true);
     }
 
     /// <summary>
-    /// Create a linked token source and starts the timeout.
+    /// Create creates a <see cref="Cancellation.Enabler"/> and starts the timeout if specified.
     /// </summary>
     /// <param name="startTimeout">The start timeout.</param>
     /// <returns>The linked cancellation token source.</returns>
-    public CancellationTokenSource CreateLinked(bool startTimeout)
+    public Enabler EnableCancellation(bool startTimeout)
     {
-        var cancellationTokenSource = System.Threading.CancellationTokenSource.CreateLinkedTokenSource(this.Token);
-        if (this.wasConstructed && startTimeout && this.Timeout != System.Threading.Timeout.InfiniteTimeSpan)
+        if (!this.cancellationTokenSource.HasValue())
         {
-            cancellationTokenSource.CancelAfter(this.Timeout);
+            this = new Cancellation(
+                this.originCancellationToken,
+                this.consumedFlag.HasValue() ? this.Timeout : System.Threading.Timeout.InfiniteTimeSpan,
+                this.originCancellationToken != CancellationToken.None ? CancellationTokenSource.CreateLinkedTokenSource(this.originCancellationToken) : new CancellationTokenSource());
         }
 
-        return cancellationTokenSource;
+        if (startTimeout && this.Timeout != System.Threading.Timeout.InfiniteTimeSpan)
+        {
+            this.cancellationTokenSource?.CancelAfter(this.Timeout);
+        }
+
+        return new Enabler(this);
     }
 
     /// <summary>
@@ -198,5 +220,89 @@ public readonly struct Cancellation
     public CancellationTokenRegistration Register(Action<object?> callback, object? state, bool useSynchronizationContext)
     {
         return this.Token.Register(callback, state, useSynchronizationContext);
+    }
+
+    /// <summary>
+    /// Represents a running cancellation.
+    /// </summary>
+    public readonly struct Enabler : IDisposable
+    {
+        private readonly Cancellation cancellation;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Enabler"/> struct.
+        /// </summary>
+        /// <param name="cancellation">The cancellation.</param>
+        public Enabler(Cancellation cancellation)
+        {
+            this.cancellation = cancellation;
+        }
+
+        /// <summary>
+        /// Gets the token.
+        /// </summary>
+        public CancellationToken Token => this.cancellation.Token;
+
+        /// <summary>
+        /// Gets a value indicating whether cancellation is requested.
+        /// </summary>
+        public bool IsCancellationRequested => this.Token.IsCancellationRequested;
+
+        /// <summary>
+        /// Gets a value indicating whether cancellation is supported.
+        /// </summary>
+        public bool CanBeCanceled => this.Token.CanBeCanceled;
+
+        /// <summary>
+        /// Converts the <see cref="Cancellation"/> into a regular <see cref="CancellationToken"/>.
+        /// </summary>
+        /// <param name="enabler">The timeout cancellation token.</param>
+        public static implicit operator CancellationToken(Cancellation.Enabler enabler)
+        {
+            return enabler.Token;
+        }
+
+        /// <summary>
+        /// Requests cancellation.
+        /// </summary>
+        /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
+        public bool Cancel()
+        {
+            if (this.cancellation.cancellationTokenSource.HasValue())
+            {
+                this.cancellation.cancellationTokenSource.Cancel();
+                return true;
+            }
+
+            return false;
+        }
+
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Requests cancellation.
+        /// </summary>
+        /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
+        public async Task<bool> CancelAsync()
+        {
+            if (this.cancellation.cancellationTokenSource.HasValue())
+            {
+                await this.cancellation.cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+                return true;
+            }
+
+            return false;
+        }
+#endif
+
+        /// <summary>
+        /// Dispose the underlying <see cref="CancellationTokenSource"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.cancellation.consumedFlag?.Set() ?? false)
+            {
+                this.cancellation.cancellationTokenSource?.Dispose();
+            }
+        }
     }
 }

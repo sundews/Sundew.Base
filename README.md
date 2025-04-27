@@ -15,6 +15,7 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 ## Primitives
 * Result types (R\<T, E\> and R\<T\>, RoE\<E\>)
 * Option type T? (through extension methods).
+* Flag is an Interlocked.Exchanged based flag.
 
 ## Computation
 * Attempter for implementing retry logic.
@@ -62,7 +63,6 @@ IAsyncDisposable is only supported on .NETStandard2.1
 ## Threading and Threading.Jobs
 * AsyncLazy provides a cancellable async lazy implementation
 * AsyncLock provides async locking.
-* Flag is an Interlocked.Exchanged based flag.
 * CancellableJob is implementation of a cancellable task.
 * ContinusJob is implementation of a cancellable task that keeps running.
 

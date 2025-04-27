@@ -101,21 +101,21 @@ public sealed class CancellableJob<TState> : IJob
             if (!this.jobContext.HasValue())
             {
                 this.aggregateException = null;
-                var cancellationTokenSource = cancellation.CreateLinkedAndTryStartTimeout();
+                var cancellationEnabler = cancellation.EnableCancellation();
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
                 this.jobContext = new JobContext(
-                    cancellationTokenSource,
+                    cancellationEnabler,
                     Task.Factory
                         .StartNew(
-                            () => this.TaskAction(cancellationTokenSource.Token),
-                            cancellationTokenSource.Token,
+                            () => this.TaskAction(cancellation),
+                            cancellation,
                             taskCreationOptions,
                             this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default));
 
-                return new JobStartResult(this.jobContext.CancellationTokenSource.Token, JobStartStatus.Started);
+                return new JobStartResult(this.jobContext.CancellationEnabler, JobStartStatus.Started);
             }
 
-            return new JobStartResult(this.jobContext.CancellationTokenSource.Token, cancellation.IsCancellationRequested ? JobStartStatus.Canceled : JobStartStatus.WasAlreadyRunning);
+            return new JobStartResult(this.jobContext.CancellationEnabler, cancellation.IsCancellationRequested ? JobStartStatus.Canceled : JobStartStatus.WasAlreadyRunning);
         }
     }
 
@@ -142,9 +142,9 @@ public sealed class CancellableJob<TState> : IJob
             if (this.jobContext.HasValue())
             {
 #if NET7_0_OR_GREATER
-                await this.jobContext.CancellationTokenSource.CancelAsync();
+                await this.jobContext.CancellationEnabler.CancelAsync().ConfigureAwait(false);
 #else
-                this.jobContext.CancellationTokenSource.Cancel();
+                this.jobContext.CancellationEnabler.Cancel();
 #endif
                 task = this.jobContext.JobContinuationTask;
             }
@@ -217,7 +217,7 @@ public sealed class CancellableJob<TState> : IJob
         {
             if (lockResult.Check())
             {
-                this.jobContext?.CancellationTokenSource.Dispose();
+                this.jobContext?.CancellationEnabler.Dispose();
                 this.aggregateException = jobTask.Exception;
                 this.jobContext = null;
             }
@@ -261,13 +261,13 @@ public sealed class CancellableJob<TState> : IJob
 
     private sealed class JobContext
     {
-        public JobContext(CancellationTokenSource cancellationTokenSource, Task jobContinuationTask)
+        public JobContext(Cancellation.Enabler cancellationEnabler, Task jobContinuationTask)
         {
-            this.CancellationTokenSource = cancellationTokenSource;
+            this.CancellationEnabler = cancellationEnabler;
             this.JobContinuationTask = jobContinuationTask;
         }
 
-        public CancellationTokenSource CancellationTokenSource { get; }
+        public Cancellation.Enabler CancellationEnabler { get; }
 
         public Task JobContinuationTask { get; }
     }

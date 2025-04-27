@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Threading;
+namespace Sundew.Base;
 
 using System;
 using System.Threading;

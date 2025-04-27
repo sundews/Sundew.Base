@@ -19,20 +19,19 @@ public class CancellationTests
     [Theory]
     [InlineData(300, true)]
     [InlineData(10, false)]
-    public async Task ImplicitOperator_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
+    public async Task ImplicitOperator_When_CancellationOriginCancellationTokenSource_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
     {
-        var cancellationTokenSource = new CancellationTokenSource();
-        var cancellingTask = Task.Run(async () =>
-        {
-            await Task.Delay(100, CancellationToken.None).ConfigureAwait(false);
-            await cancellationTokenSource.CancelAsync();
-            cancellationTokenSource.Dispose();
-        });
+        var expectedTimeout = TimeSpan.FromMilliseconds(100);
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var cancellationWithTimeout = cancellationTokenSource.ToCancellationWithTimeout(expectedTimeout);
+        using var cancellationEnabler = cancellationWithTimeout.EnableCancellation(false);
 
-        var result = await CancellableCall(cancellationTokenSource.ToCancellationWithTimeout(TimeSpan.FromMilliseconds(100)), waitForCancellationTimeout);
-        await cancellingTask;
+        cancellationTokenSource.CancelAfter(cancellationWithTimeout.Timeout);
+
+        var result = await CancellableCall(cancellationWithTimeout, waitForCancellationTimeout);
 
         result.Should().Be(expectedResult);
+        cancellationWithTimeout.Timeout.Should().Be(expectedTimeout);
     }
 
     [Fact]
@@ -49,17 +48,13 @@ public class CancellationTests
     public async Task ImplicitOperator_When_PassingRegularCancellationToken_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
     {
         var cancellationTokenSource = new CancellationTokenSource();
-        var cancellingTask = Task.Run(async () =>
-        {
-            await Task.Delay(100, CancellationToken.None).ConfigureAwait(false);
-            await cancellationTokenSource.CancelAsync();
-            cancellationTokenSource.Dispose();
-        });
+        var expectedTimeout = TimeSpan.FromMilliseconds(100);
 
-        var result = await CancellableCall2(cancellationTokenSource.Token, waitForCancellationTimeout);
-        await cancellingTask;
+        var cancellationWithTimeout = cancellationTokenSource.ToCancellationWithTimeout(expectedTimeout);
+        var result = await CancellableCall2(cancellationWithTimeout, waitForCancellationTimeout);
 
         result.Should().Be(expectedResult);
+        cancellationWithTimeout.Timeout.Should().Be(expectedTimeout);
     }
 
     private static Task<bool> CancellableCall(CancellationToken cancellationToken, int waitTimeout)
@@ -69,10 +64,13 @@ public class CancellationTests
         return resetEvent.WaitAsync(TimeSpan.FromMilliseconds(waitTimeout), CancellationToken.None);
     }
 
-    private static Task<bool> CancellableCall2(Cancellation cancellationToken, int waitTimeout)
+    private static async Task<bool> CancellableCall2(Cancellation cancellation, int waitTimeout)
     {
-        var resetEvent = new ManualResetEventAsync();
-        cancellationToken.Token.Register(_ => { resetEvent.Set(); }, __._);
-        return resetEvent.WaitAsync(TimeSpan.FromMilliseconds(waitTimeout), CancellationToken.None);
+        using (cancellation.EnableCancellation())
+        {
+            var resetEvent = new ManualResetEventAsync();
+            cancellation.Token.Register(_ => { resetEvent.Set(); }, __._);
+            return await resetEvent.WaitAsync(TimeSpan.FromMilliseconds(waitTimeout), CancellationToken.None);
+        }
     }
 }
