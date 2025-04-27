@@ -75,21 +75,21 @@ public sealed class ContinuousJob<TState> : IJob
     /// <summary>
     /// Starts the job.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="cancellation">The cancellation.</param>
     /// <returns>The job start result.</returns>
-    public Task<JobStartResult> StartAsync(CancellationToken cancellationToken = default)
+    public Task<JobStartResult> StartAsync(Cancellation cancellation = default)
     {
-        return this.cancellableJob.StartAsync(cancellationToken);
+        return this.cancellableJob.StartAsync(cancellation);
     }
 
     /// <summary>
     /// Starts the job.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="cancellation">The cancellation.</param>
     /// <returns>The job start result.</returns>
-    public JobStartResult Start(CancellationToken cancellationToken = default)
+    public JobStartResult Start(Cancellation cancellation = default)
     {
-        return this.cancellableJob.Start(cancellationToken);
+        return this.cancellableJob.Start(cancellation);
     }
 
     /// <summary>

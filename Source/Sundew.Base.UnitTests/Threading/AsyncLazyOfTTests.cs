@@ -47,9 +47,9 @@ public class AsyncLazyOfTTests
             await cancellationTokenSource.CancelAsync();
         });
 
+        await cancelTask;
         await Assert.ThrowsAsync<TaskCanceledException>(
             async () => await testee.GetValueAsync(cancellationTokenSource.Token));
-        await cancelTask;
     }
 
     [Fact]
@@ -68,9 +68,9 @@ public class AsyncLazyOfTTests
             await cancellationTokenSource.CancelAsync();
         });
 
+        await cancelTask;
         await Assert.ThrowsAsync<TaskCanceledException>(
             async () => await testee.GetValueAsync(cancellationTokenSource.Token));
-        await cancelTask;
 
         var cancellationTokenSource2 = new CancellationTokenSource();
         string? result = null;

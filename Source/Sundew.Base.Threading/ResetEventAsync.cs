@@ -81,7 +81,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the synchronously.
+    /// Waits synchronously.
     /// </summary>
     /// <returns>A boolean result indicating whether the signal was received.</returns>
     public bool Wait()
@@ -90,7 +90,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the synchronously.
+    /// Waits synchronously.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A boolean result indicating whether the signal was received.</returns>
@@ -100,7 +100,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the synchronously.
+    /// Waits synchronously.
     /// </summary>
     /// <param name="timeout">The timeout.</param>
     /// <returns>A boolean result indicating whether the signal was received.</returns>
@@ -110,7 +110,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the synchronously.
+    /// Waits synchronously.
     /// </summary>
     /// <param name="timeout">The timeout.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
@@ -123,7 +123,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the asynchronously.
+    /// Waits asynchronously.
     /// </summary>
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
     public Task<bool> WaitAsync()
@@ -132,7 +132,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the asynchronously.
+    /// Waits asynchronously.
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
@@ -142,7 +142,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the asynchronously.
+    /// Waits asynchronously.
     /// </summary>
     /// <param name="timeout">The timeout.</param>
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
@@ -152,7 +152,7 @@ public abstract class ResetEventAsync
     }
 
     /// <summary>
-    /// Waits the asynchronously.
+    /// Waits asynchronously.
     /// </summary>
     /// <param name="timeout">The timeout.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
@@ -211,6 +211,7 @@ public abstract class ResetEventAsync
                         lock (this.lockObject)
                         {
                             this.awaiters.Remove(awaiter);
+                            awaiter.CancellationTokenSource.Dispose();
                         }
 
                         awaiter.TaskCompletionSource.SetResult(false);
