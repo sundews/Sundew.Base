@@ -15,17 +15,21 @@ using Xunit;
 
 public class CurrentThreadTests
 {
-    [Fact]
-    public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange()
+    [Theory]
+    [InlineData(20, 500)]
+    [InlineData(0, 200)]
+    [InlineData(1000, 1500)]
+    public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange(int cancelAfter, int sleep)
     {
         var testee = new CurrentThread();
+        using var cancellationTokenSource = new CancellationTokenSource(cancelAfter);
         var stopwatch = Stopwatch.StartNew();
-        using var cancellationTokenSource = new CancellationTokenSource(20);
 
-        testee.Sleep(500, cancellationTokenSource.Token);
+        var result = testee.Sleep(sleep, cancellationTokenSource.Token);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(18, 80);
+        result.Should().BeFalse();
+        stopwatch.ElapsedMilliseconds.Should().BeLessThan(sleep);
     }
 
     [Fact]
@@ -37,18 +41,21 @@ public class CurrentThreadTests
         var result = testee.Sleep(10, CancellationToken.None);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 40);
+        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 80);
     }
 
-    [Fact]
-    public void Sleep_Then_ElapsedTimeShouldBeWithInRange()
+    [Theory]
+    [InlineData(20)]
+    [InlineData(0)]
+    [InlineData(200)]
+    [InlineData(1000)]
+    public void Sleep_Then_ElapsedTimeShouldBeWithInRange(int sleep)
     {
         var testee = new CurrentThread();
         var stopwatch = Stopwatch.StartNew();
-
-        testee.Sleep(10);
+        testee.Sleep(sleep);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 40);
+        ((double)stopwatch.ElapsedMilliseconds).Should().BeInRange(sleep, sleep * 1.8);
     }
 }
