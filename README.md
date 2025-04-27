@@ -15,7 +15,6 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 ## Primitives
 * Result types (R\<T, E\> and R\<T\>, RoE\<E\>)
 * Option type T? (through extension methods).
-* TimeoutCancellationToken - A CancellationToken compatible that supports timeouts.
 
 ## Computation
 * Attempter for implementing retry logic.
