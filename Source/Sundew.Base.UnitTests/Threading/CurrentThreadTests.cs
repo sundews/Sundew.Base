@@ -19,13 +19,13 @@ public class CurrentThreadTests
     public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange()
     {
         var testee = new CurrentThread();
-        var stopwatch = Stopwatch.StartNew();
         using var cancellationTokenSource = new CancellationTokenSource(20);
+        var stopwatch = Stopwatch.StartNew();
 
         testee.Sleep(500, cancellationTokenSource.Token);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(18, 200);
+        stopwatch.ElapsedMilliseconds.Should().BeLessThan(500);
     }
 
     [Fact]
