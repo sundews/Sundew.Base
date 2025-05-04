@@ -60,13 +60,40 @@ public partial class R
             return result.Error;
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="ValueTask{ErrorResult}"/> to <see cref="ErrorResult{TValue}"/>.</summary>
+        /// <summary>Performs an implicit conversion from <see cref="ErrorResult{TError}"/> to <see cref="ValueTask{T}"/> of <see cref="ErrorResult{TValue}"/>.</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
         public static implicit operator ValueTask<ErrorResult<TError>>(ErrorResult<TError> result)
         {
             return result.ToValueTask();
+        }
+
+        /// <summary>Performs an implicit conversion from <see cref="ErrorResult{TError}"/> to <see cref="Task{T}"/> of <see cref="ErrorResult{TValue}"/>.</summary>
+        /// <param name="result">The result.</param>
+        /// <returns>The result of the conversion.</returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+        public static implicit operator Task<ErrorResult<TError>>(ErrorResult<TError> result)
+        {
+            return result.ToTask();
+        }
+
+        /// <summary>Performs an implicit conversion from <see cref="ErrorResult{TError}"/> to <see cref="ValueTask{T}"/> of <see cref="RoE{TValue}"/>.</summary>
+        /// <param name="result">The result.</param>
+        /// <returns>The result of the conversion.</returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+        public static implicit operator ValueTask<RoE<TError>>(ErrorResult<TError> result)
+        {
+            return result.Map().ToValueTask();
+        }
+
+        /// <summary>Performs an implicit conversion from <see cref="ErrorResult{TError}"/> to <see cref="Task{T}"/> of <see cref="RoE{TValue}"/>.</summary>
+        /// <param name="result">The result.</param>
+        /// <returns>The result of the conversion.</returns>
+        [MethodImpl((MethodImplOptions)0x300)]
+        public static implicit operator Task<RoE<TError>>(ErrorResult<TError> result)
+        {
+            return result.Map().ToTask();
         }
 
         /// <summary>
@@ -116,11 +143,22 @@ public partial class R
         }
 
         /// <summary>
-        /// Converts this <see cref="ErrorResult{TError}"/> to a erroneous <see cref="R{TValue, TError}"/>.
+        /// Converts this <see cref="ErrorResult{TError}"/> to an erroneous <see cref="R{TValue, TError}"/>.
         /// </summary>
         /// <typeparam name="TValue">The value type.</typeparam>
         /// <returns>An erroneous result.</returns>
         public R<TValue, TError> Omits<TValue>()
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// Converts the current instance to an <see cref="RoE{TError}"/> result.
+        /// </summary>
+        /// <remarks>This method allows the current instance to be treated as an <see cref="RoE{TError}"/>
+        /// result, enabling seamless usage in contexts where an <see cref="RoE{TError}"/> is expected.</remarks>
+        /// <returns>The current instance as an <see cref="RoE{TError}"/> result.</returns>
+        public RoE<TError> Map()
         {
             return this;
         }

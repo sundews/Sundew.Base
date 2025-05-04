@@ -24,7 +24,7 @@ public static class ReadOnlyMemoryExtensions
     /// <param name="splitFunc">The split function.</param>
     /// <param name="splitOptions">The split options.</param>
     /// <returns>
-    /// The splitted items as an <see cref="IEnumerable{T}" />.
+    /// The split items as an <see cref="IEnumerable{T}" />.
     /// </returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when an unknown <see cref="SplitAction" /> result is returned.</exception>
     public static IEnumerable<ReadOnlyMemory<TItem>> Split<TItem>(this ReadOnlyMemory<TItem> input, SplitFunc<TItem> splitFunc, SplitOptions splitOptions = SplitOptions.None)
@@ -113,16 +113,16 @@ public static class ReadOnlyMemoryExtensions
 
                     break;
                 case SplitAction.SplitAndIncludeRest:
-                {
-                    var section = splitContext.GetSectionAndReset();
-                    if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
                     {
-                        yield return section;
-                    }
+                        var section = splitContext.GetSectionAndReset();
+                        if (!section.IsEmpty || !splitOptions.HasFlag(SplitOptions.RemoveEmptyEntries))
+                        {
+                            yield return section;
+                        }
 
-                    yield return input.Slice(index, input.Length - index);
-                    yield break;
-                }
+                        yield return input.Slice(index, input.Length - index);
+                        yield break;
+                    }
 
                 default:
                     throw new ArgumentOutOfRangeException($"Invalid SplitMemory value: {splitMemory}");

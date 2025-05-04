@@ -16,7 +16,7 @@ using System.Threading;
 /// An ordered concurrent list.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
-public class ConcurrentList<TItem> : IList<TItem>
+public class ConcurrentList<TItem> : IList<TItem>, IReadOnlyList<TItem>
 {
     private ImmutableList<TItem> inner = ImmutableList<TItem>.Empty;
 

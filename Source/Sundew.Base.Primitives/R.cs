@@ -422,7 +422,7 @@ public static partial class R
     public static ValueTask<SuccessResult<TValue>> SuccessCompleted<TValue>(TValue value)
         where TValue : notnull
     {
-        return new SuccessResult<TValue>(value);
+        return new SuccessResult<TValue>(value).ToValueTask();
     }
 
     /// <summary>

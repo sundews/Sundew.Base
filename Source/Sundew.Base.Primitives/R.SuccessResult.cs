@@ -70,6 +70,18 @@ public partial class R
         }
 
         /// <summary>
+        /// Converts the current instance to an <see cref="RoE{TError}"/> result.
+        /// </summary>
+        /// <typeparam name="TError">The error type.</typeparam>
+        /// <remarks>This method allows the current instance to be treated as an <see cref="RoE{TError}"/>
+        /// result, enabling seamless usage in contexts where an <see cref="RoE{TError}"/> is expected.</remarks>
+        /// <returns>The current instance as an <see cref="RoE{TError}"/> result.</returns>
+        public RoE<TError> Omits<TError>()
+        {
+            return this;
+        }
+
+        /// <summary>
         /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
