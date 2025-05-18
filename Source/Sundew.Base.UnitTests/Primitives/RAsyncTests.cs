@@ -136,11 +136,59 @@ public class RAsyncTests
     [Theory]
     [InlineData("string")]
     [InlineData(null)]
-    public async Task SuccessOptionRawCompleted_When_NullableStringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
+    public async Task ImplicitCast_When_UsingOptionalReferenceTypeInGenericMethodAndCastingToResult_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
     {
-        static async Task<R<TValue>> GenericAsync<TValue>(TValue value)
+        static Task<R<TValue>> GenericAsync<TValue>(TValue value)
         {
-            return await R.SuccessOptionRawCompleted(value);
+            return R.SuccessOption(value).Map();
+        }
+
+        var result = await GenericAsync(expectedResult);
+
+        result.IsSuccess.Should().Be(expectedResult.HasValue());
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("string")]
+    [InlineData(null)]
+    public async Task ImplicitCast_When_UsingOptionalReferenceTypeInGenericMethodAndCastingToResultOption_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
+    {
+        static Task<R<TValue?>> GenericAsync<TValue>(TValue value)
+        {
+            return R.SuccessOption(value);
+        }
+
+        var result = await GenericAsync(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(42)]
+    [InlineData(null)]
+    public async Task ImplicitCast_When_UsingOptionalValueTypeInGenericMethodAndCastingToResult_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
+    {
+        static Task<R<TValue>> GenericAsync<TValue>(TValue value)
+        {
+            return R.SuccessOption(value).Map();
+        }
+
+        var result = await GenericAsync(expectedResult);
+
+        result.IsSuccess.Should().Be(expectedResult.HasValue);
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData(42)]
+    [InlineData(null)]
+    public async Task ImplicitCast_When_UsingOptionalValueTypeInGenericMethodAndCastingToResultOption_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
+    {
+        static Task<R<TValue?>> GenericAsync<TValue>(TValue value)
+        {
+            return R.SuccessOption(value);
         }
 
         var result = await GenericAsync(expectedResult);
@@ -150,15 +198,30 @@ public class RAsyncTests
     }
 
     [Fact]
-    public async Task ToResultOption_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public async Task SuccessOptionMap_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
-        static async Task<R<TValue>> GenericAsync<TValue>(TValue value)
+        static Task<R<TValue>> GenericAsync<TValue>(TValue value)
         {
-            return await R.SuccessOptionRawCompleted(value);
+            return R.SuccessOption(value).Map();
         }
 
         const string expectedResult = "string";
         var result = await GenericAsync(expectedResult);
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public async Task SuccessOptionMap_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult2()
+    {
+        static Task<R<TValue, TError>> GenericAsync<TValue, TError>(TValue value, Func<TError> errorFunc)
+        {
+            return R.SuccessOption(value).Map(errorFunc);
+        }
+
+        const string expectedResult = "string";
+        var result = await GenericAsync(expectedResult, () => 3);
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(expectedResult);

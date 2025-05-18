@@ -81,9 +81,9 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator R<TSuccess>(R.SuccessResultOption<TSuccess> result)
+    public static implicit operator R<TSuccess>(R.SuccessOptionResult<TSuccess?> result)
     {
-        return new R<TSuccess>(true, result.Value);
+        return new R<TSuccess>(result.Value != null, result.Value);
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R{TSuccess}"/> to <see cref="R{TObject}"/>.</summary>
@@ -96,12 +96,12 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="ValueTask{R}"/>.</summary>
-    /// <param name="resultWithValue">The error result.</param>
+    /// <param name="r">The error result.</param>
     /// <returns>The result of the conversion.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator ValueTask<R<TSuccess>>(R<TSuccess> resultWithValue)
+    public static implicit operator ValueTask<R<TSuccess>>(R<TSuccess> r)
     {
-        return resultWithValue.ToValueTask();
+        return r.ToValueTask();
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="Task{R}"/>.</summary>
@@ -265,9 +265,9 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>
     /// A new <see cref="R{TSuccess}" />.
     /// </returns>
-    public R<TNewSuccess?> Map<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
+    public R<TNewSuccess> Map<TNewSuccess>(Func<TSuccess, TNewSuccess> valueFunc)
     {
-        return new R<TNewSuccess?>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default);
+        return new R<TNewSuccess>(this.IsSuccess, this.IsSuccess ? valueFunc(this.Value) : default);
     }
 
     /// <summary>
@@ -394,6 +394,6 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <returns>A <see cref="R{TSuccess}"/>.</returns>
     public R<TSuccess?> ToOptional()
     {
-        return this.Map(x => x);
+        return this.Map(x => (TSuccess?)x);
     }
 }

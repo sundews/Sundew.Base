@@ -144,7 +144,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator R<TSuccess?, TError>(R.SuccessResultOption<TSuccess?> result)
+    public static implicit operator R<TSuccess?, TError>(R.SuccessOptionResult<TSuccess?> result)
     {
         return new R<TSuccess?, TError>(true, result.Value, default!);
     }
@@ -211,6 +211,15 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     public static implicit operator ValueTask<R<TSuccess, TError>>(R<TSuccess, TError> r)
     {
         return r.ToValueTask();
+    }
+
+    /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="Task{R}"/>.</summary>
+    /// <param name="r">The result.</param>
+    /// <returns>The result of the conversion.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static implicit operator Task<R<TSuccess, TError>>(R<TSuccess, TError> r)
+    {
+        return r.ToTask();
     }
 
     /// <summary>Implements the operator ==.</summary>

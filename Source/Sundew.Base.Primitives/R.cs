@@ -47,9 +47,9 @@ public static partial class R
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static SuccessResultOption<TValue?> SuccessOption<TValue>()
+    public static SuccessOptionResult<TValue?> SuccessOption<TValue>()
     {
-        return new SuccessResultOption<TValue?>(default);
+        return new SuccessOptionResult<TValue?>(default);
     }
 
     /// <summary>
@@ -59,10 +59,10 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static SuccessResultOption<TValue?> SuccessOption<TValue>(TValue? value)
+    public static SuccessOptionResult<TValue?> SuccessOption<TValue>(TValue? value)
         where TValue : struct
     {
-        return new SuccessResultOption<TValue?>(value);
+        return new SuccessOptionResult<TValue?>(value);
     }
 
     /// <summary>
@@ -72,10 +72,9 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static SuccessResultOption<TValue?> SuccessOption<TValue>(TValue? value)
-        where TValue : class
+    public static SuccessOptionResult<TValue?> SuccessOption<TValue>(TValue? value)
     {
-        return new SuccessResultOption<TValue?>(value);
+        return new SuccessOptionResult<TValue?>(value);
     }
 
     /// <summary>
@@ -85,21 +84,9 @@ public static partial class R
     /// <param name="value">The value.</param>
     /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static SuccessResultOption<TValue> SuccessOptionRaw<TValue>(TValue value)
+    public static ValueTask<SuccessOptionResult<TValue?>> SuccessOptionCompleted<TValue>(TValue? value)
     {
-        return new SuccessResultOption<TValue>(value);
-    }
-
-    /// <summary>
-    /// Creates a successful result.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="value">The value.</param>
-    /// <returns>A <see cref="SuccessResult{TValue}"/>.</returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static ValueTask<SuccessResultOption<TValue>> SuccessOptionRawCompleted<TValue>(TValue value)
-    {
-        return new ValueTask<SuccessResultOption<TValue>>(new SuccessResultOption<TValue>(value));
+        return new ValueTask<SuccessOptionResult<TValue?>>(new SuccessOptionResult<TValue?>(value));
     }
 
     /// <summary>

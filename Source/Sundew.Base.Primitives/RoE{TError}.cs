@@ -71,7 +71,7 @@ public readonly struct RoE<TError> : IEquatable<RoE<TError>>
     [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator RoE<TError>(R.SuccessResult successResult)
     {
-        return new RoE<TError>(successResult.IsSuccess, default!);
+        return new RoE<TError>(true, default!);
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R.ErrorResult{TError}"/> to <see cref="RoE{TError}"/>.</summary>

@@ -14,20 +14,106 @@ using Xunit;
 public class RTests
 {
     [Fact]
-    public void ImplicitCast_When_CastingToResult_Then_ValueShouldBeExpectedValue()
+    public void ImplicitCast_When_CastingToResultOfError_Then_ValueShouldBeExpectedValue()
     {
-        const int expectedValue = 34;
         const int expectedError = 0;
+
+        RoE<int> r = R.Success();
+
+        r.IsSuccess.Should().BeTrue();
+        r.Error.Should().Be(expectedError);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingRequiredValueTypeAndCastingToResult_Then_ValueShouldBeExpectedValue()
+    {
+        const int expectedValue = 0;
+
+        R<int> r = R.Success(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingOptionalValueTypeAndCastingToResultOption_Then_ValueShouldBeExpectedValue()
+    {
+        int? expectedValue = 0;
+
+        R<int?> r = R.SuccessOption(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingRequiredReferenceTypeAndCastingToResult_Then_ValueShouldBeExpectedValue()
+    {
+        const string expectedValue = "expected";
+
+        R<string> r = R.Success(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingOptionalReferenceTypeAndCastingToResultOption_Then_ValueShouldBeExpectedValue()
+    {
+        const string? expectedValue = "expected";
+
+        R<string?> r = R.SuccessOption(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingRequiredValueTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
+    {
+        const int expectedValue = 42;
 
         R<int, double> r = R.Success(expectedValue);
 
         r.IsSuccess.Should().BeTrue();
         r.Value.Should().Be(expectedValue);
-        r.Error.Should().Be(expectedError);
     }
 
     [Fact]
-    public void ImplicitCast_WhenCastingToIfError_Then_ErrorShouldBeExpectedError()
+    public void ImplicitCast_When_UsingOptionalValueTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
+    {
+        int? expectedValue = 42;
+
+        R<int?, double> r = R.SuccessOption(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingRequiredReferenceTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
+    {
+        const string expectedValue = "42";
+
+        R<string, string> r = R.Success(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_UsingOptionalReferenceTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
+    {
+        const string expectedValue = "42";
+
+        R<string?, string> r = R.SuccessOption(expectedValue);
+
+        r.IsSuccess.Should().BeTrue();
+        r.Value.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void ImplicitCast_When_CastingToResultOfError_Then_ErrorShouldBeExpectedError()
     {
         const string expectedError = "Failed";
 
@@ -38,7 +124,7 @@ public class RTests
     }
 
     [Fact]
-    public void ImplicitCast_WhenCastingToResult_Then_ErrorShouldBeExpectedError()
+    public void ImplicitCast_When_CastingToResultOfBoth_Then_ErrorShouldBeExpectedError()
     {
         const int expectedValue = 0;
         const string expectedError = "Failed";
@@ -176,25 +262,25 @@ public class RTests
     [Theory]
     [InlineData(4)]
     [InlineData(null)]
-    public void ToResultOption_When_NullableIntComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
+    public void SuccessOption_When_NullableIntComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOptionRaw(value);
+            return R.SuccessOption(value);
         }
 
         var result = Generic(expectedResult);
 
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccess.Should().Be(expectedResult.HasValue);
         result.Value.Should().Be(expectedResult);
     }
 
     [Fact]
-    public void ToResultOption_When_Int32ComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public void SuccessOption_When_Int32ComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOptionRaw(value);
+            return R.SuccessOption(value);
         }
 
         const int expectedResult = 42;
@@ -207,16 +293,16 @@ public class RTests
     [Theory]
     [InlineData("string")]
     [InlineData(null)]
-    public void ToResultOption_When_NullableStringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
+    public void SuccessOption_When_NullableStringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOptionRaw(value);
+            return R.SuccessOption(value);
         }
 
         var result = Generic(expectedResult);
 
-        result.IsSuccess.Should().BeTrue();
+        result.IsSuccess.Should().Be(expectedResult.HasValue());
         result.Value.Should().Be(expectedResult);
     }
 
@@ -225,7 +311,7 @@ public class RTests
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOptionRaw(value);
+            return R.SuccessOption(value);
         }
 
         const string expectedResult = "string";

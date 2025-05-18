@@ -17,16 +17,40 @@ using System.Threading.Tasks;
 public partial class R
 {
     /// <summary>
+    /// Converts the success option result into a <see cref="R{TValue}"/> which will fail if the value is null.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>A <see cref="R{TValue}"/>.</returns>
+    public static R<TValue> Map<TValue>(this SuccessOptionResult<TValue?> result)
+    {
+        return new R<TValue>(result.Value != null, result.Value);
+    }
+
+    /// <summary>
+    /// Converts the success option result into a <see cref="R{TValue}"/> which will fail if the value is null.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <param name="errorFunc">The error func.</param>
+    /// <returns>A <see cref="R{TValue}"/>.</returns>
+    public static R<TValue, TError> Map<TValue, TError>(this SuccessOptionResult<TValue?> result, Func<TError> errorFunc)
+    {
+        return new R<TValue, TError>(result.Value != null, result.Value, result.Value != null ? errorFunc() : default);
+    }
+
+    /// <summary>
     /// A successful result.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public readonly struct SuccessResultOption<TValue>
+    public readonly struct SuccessOptionResult<TValue>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SuccessResultOption{TValue}"/> struct.
+        /// Initializes a new instance of the <see cref="SuccessOptionResult{TValue}"/> struct.
         /// </summary>
         /// <param name="value">The value.</param>
-        internal SuccessResultOption(TValue value)
+        internal SuccessOptionResult(TValue value)
         {
             this.Value = value;
         }
@@ -45,7 +69,7 @@ public partial class R
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator bool(SuccessResultOption<TValue> result)
+        public static implicit operator bool(SuccessOptionResult<TValue> result)
         {
             return true;
         }
@@ -56,54 +80,54 @@ public partial class R
         /// <param name="result">The result.</param>
         /// <returns>A value indicating whether the result was successful.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator TValue(SuccessResultOption<TValue> result)
+        public static implicit operator TValue?(SuccessOptionResult<TValue> result)
         {
             return result.Value;
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="SuccessResultOption{TValue}"/> to <see cref="ValueTask{T}"/> of <see cref="SuccessResultOption{TValue}"/> .</summary>
+        /// <summary>Performs an implicit conversion from <see cref="SuccessOptionResult{TValue}"/> to <see cref="ValueTask{T}"/> of <see cref="SuccessOptionResult{TValue}"/> .</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator ValueTask<SuccessResultOption<TValue?>>(SuccessResultOption<TValue?> result)
+        public static implicit operator ValueTask<SuccessOptionResult<TValue?>>(SuccessOptionResult<TValue?> result)
         {
             return result.ToValueTask();
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="SuccessResultOption{TValue}"/> to <see cref="Task{T}"/> of <see cref="SuccessResultOption{TValue}"/> .</summary>
+        /// <summary>Performs an implicit conversion from <see cref="SuccessOptionResult{TValue}"/> to <see cref="Task{T}"/> of <see cref="SuccessOptionResult{TValue}"/> .</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator Task<SuccessResultOption<TValue?>>(SuccessResultOption<TValue?> result)
+        public static implicit operator Task<SuccessOptionResult<TValue?>>(SuccessOptionResult<TValue?> result)
         {
             return result.ToTask();
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="SuccessResultOption{TValue}"/> to <see cref="ValueTask{T}"/> of <see cref="R{TValue}"/> .</summary>
+        /// <summary>Performs an implicit conversion from <see cref="SuccessOptionResult{TValue}"/> to <see cref="ValueTask{T}"/> of <see cref="R{TValue}"/> .</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator ValueTask<R<TValue?>>(SuccessResultOption<TValue?> result)
+        public static implicit operator ValueTask<R<TValue?>>(SuccessOptionResult<TValue?> result)
         {
-            return result.Map().ToValueTask();
+            return new R<TValue?>(true, result.Value).ToValueTask();
         }
 
-        /// <summary>Performs an implicit conversion from <see cref="SuccessResultOption{TValue}"/> to <see cref="Task{T}"/> of <see cref="R{TValue}"/> .</summary>
+        /// <summary>Performs an implicit conversion from <see cref="SuccessOptionResult{TValue}"/> to <see cref="Task{T}"/> of <see cref="R{TValue}"/> .</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator Task<R<TValue?>>(SuccessResultOption<TValue?> result)
+        public static implicit operator Task<R<TValue?>>(SuccessOptionResult<TValue?> result)
         {
-            return result.Map().ToTask();
+            return new R<TValue?>(true, result.Value).ToTask();
         }
 
         /// <summary>Performs an implicit conversion from <see cref="ValueTask{SuccessResult}"/> to <see cref="SuccessResult{TValue}"/>.</summary>
         /// <param name="result">The result.</param>
         /// <returns>The result of the conversion.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public static implicit operator SuccessResultOption<TValue?>(SuccessResult result)
+        public static implicit operator SuccessOptionResult<TValue?>(SuccessResult result)
         {
-            return new SuccessResultOption<TValue?>(default(TValue?));
+            return new SuccessOptionResult<TValue?>(default(TValue?));
         }
 
         /// <summary>
@@ -111,9 +135,9 @@ public partial class R
         /// </summary>
         /// <returns>The value task.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public ValueTask<SuccessResultOption<TValue?>> ToValueTask()
+        public ValueTask<SuccessOptionResult<TValue?>> ToValueTask()
         {
-            return new ValueTask<SuccessResultOption<TValue?>>(new SuccessResultOption<TValue?>(this.Value));
+            return new ValueTask<SuccessOptionResult<TValue?>>(new SuccessOptionResult<TValue?>(this.Value));
         }
 
         /// <summary>
@@ -121,9 +145,9 @@ public partial class R
         /// </summary>
         /// <returns>The value task.</returns>
         [MethodImpl((MethodImplOptions)0x300)]
-        public Task<SuccessResultOption<TValue?>> ToTask()
+        public Task<SuccessOptionResult<TValue?>> ToTask()
         {
-            return Task.FromResult(new SuccessResultOption<TValue?>(this.Value));
+            return Task.FromResult(new SuccessOptionResult<TValue?>(this.Value));
         }
 
         /// <summary>
@@ -147,9 +171,9 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public SuccessResultOption<TNewValue?> Map<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
+        public SuccessOptionResult<TNewValue?> Map<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
-            return new SuccessResultOption<TNewValue?>(valueFunc(this.Value));
+            return new SuccessOptionResult<TNewValue?>(valueFunc(this.Value));
         }
 
         /// <summary>
@@ -160,20 +184,9 @@ public partial class R
         /// <returns>
         /// A new <see cref="R" />.
         /// </returns>
-        public ValueTask<SuccessResultOption<TNewValue?>> MapAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
+        public ValueTask<SuccessOptionResult<TNewValue?>> MapAsync<TNewValue>(Func<TValue?, TNewValue?> valueFunc)
         {
-            return new SuccessResultOption<TNewValue?>(valueFunc(this.Value)).ToValueTask();
-        }
-
-        /// <summary>
-        /// Converts the current instance to an <see cref="R{TSuccess}"/> result.
-        /// </summary>
-        /// <remarks>This method allows the current instance to be treated as an <see cref="R{TSuccess}"/>
-        /// result, enabling seamless usage in contexts where an <see cref="R{TSuccess}"/> is expected.</remarks>
-        /// <returns>The current instance as an <see cref="R{TSuccess}"/> result.</returns>
-        public R<TValue> Map()
-        {
-            return this;
+            return new SuccessOptionResult<TNewValue?>(valueFunc(this.Value)).ToValueTask();
         }
 
         /// <summary>
