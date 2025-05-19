@@ -232,6 +232,15 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     }
 
     /// <summary>
+    /// Maps this result to a <see cref="R{TSuccess}"/>.
+    /// </summary>
+    /// <returns>The new result.</returns>
+    public R<object?> MapToOption()
+    {
+        return new R<object?>(this.IsSuccess, this.Value);
+    }
+
+    /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TError">The type of the error.</typeparam>

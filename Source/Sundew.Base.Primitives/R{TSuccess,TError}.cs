@@ -370,6 +370,15 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     }
 
     /// <summary>
+    /// Maps this result to a <see cref="R{TSuccess}"/>.
+    /// </summary>
+    /// <returns>The new result.</returns>
+    public R<object?, object> MapToOption()
+    {
+        return new R<object?, object>(this.IsSuccess, this.Value, this.Error);
+    }
+
+    /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
     /// <typeparam name="TNewValue">The type of the new value.</typeparam>

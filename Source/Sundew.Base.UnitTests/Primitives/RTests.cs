@@ -148,6 +148,18 @@ public class RTests
         result.Value.Should().Be(expectedValue);
     }
 
+    [Fact]
+    public void Map_When_TargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue()
+    {
+        int? expectedValue = new Random().Next(0, 1) > -1 ? 42 : null;
+
+        R<int?> r = R.SuccessOption(expectedValue);
+        R<object?> result = r.MapToOption();
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedValue);
+    }
+
     [Theory]
     [InlineData(true, 0)]
     [InlineData(false, 34)]
