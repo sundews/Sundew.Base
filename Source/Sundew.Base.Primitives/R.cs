@@ -608,4 +608,17 @@ public static partial class R
     {
         return new R<TValue?, TError>(result.IsSuccess, result.Value, result.Error);
     }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the value.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// A new <see cref="R{TSuccess}" />.
+    /// </returns>
+    public static R<TSuccess> Map<TSuccess>(in this R<TSuccess?> result)
+    {
+        return new R<TSuccess>(result.Value != null, result.Value);
+    }
 }
