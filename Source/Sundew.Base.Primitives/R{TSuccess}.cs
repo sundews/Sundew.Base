@@ -81,9 +81,9 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static implicit operator R<TSuccess>(R.SuccessOptionResult<TSuccess?> result)
+    public static implicit operator R<TSuccess?>(R.SuccessOptionResult<TSuccess?> result)
     {
-        return new R<TSuccess>(result.Value != null, result.Value);
+        return new R<TSuccess?>(true, result.Value);
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R{TSuccess}"/> to <see cref="R{TObject}"/>.</summary>

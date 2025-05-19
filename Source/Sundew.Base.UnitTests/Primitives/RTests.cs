@@ -266,7 +266,7 @@ public class RTests
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOption(value);
+            return R.SuccessOption(value).Map();
         }
 
         var result = Generic(expectedResult);
@@ -280,7 +280,7 @@ public class RTests
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOption(value);
+            return R.SuccessOption(value).Map();
         }
 
         const int expectedResult = 42;
@@ -297,7 +297,7 @@ public class RTests
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOption(value);
+            return R.SuccessOption(value).Map();
         }
 
         var result = Generic(expectedResult);
@@ -311,7 +311,7 @@ public class RTests
     {
         static R<TValue> Generic<TValue>(TValue value)
         {
-            return R.SuccessOption(value);
+            return R.SuccessOption(value).Map();
         }
 
         const string expectedResult = "string";
