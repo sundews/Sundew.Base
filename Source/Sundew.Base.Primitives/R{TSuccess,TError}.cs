@@ -324,9 +324,9 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// Converts this result to a result option.
     /// </summary>
     /// <returns>A <see cref="R{TSuccess, TError}"/>.</returns>
-    public R<TSuccess?, TError> ToOptional()
+    public R<TSuccess?, TError> ToOption()
     {
-        return this.Map(x => (TSuccess?)x);
+        return new R<TSuccess?, TError>(this.IsSuccess, this.Value, this.Error);
     }
 
     /// <summary>

@@ -61,7 +61,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<TSuccess>(R.ErrorResult errorResult)
     {
-        return new R<TSuccess>(errorResult.IsSuccess, default!);
+        return new R<TSuccess>(false, default!);
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R.ErrorResult{TError}"/> to <see cref="R{TSuccess}"/>.</summary>
@@ -92,7 +92,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     [MethodImpl((MethodImplOptions)0x300)]
     public static implicit operator R<object>(R<TSuccess> result)
     {
-        return new R<object>(result.IsSuccess, result.Value);
+        return new R<object>(result.IsSuccess && result.Value != null, result.Value);
     }
 
     /// <summary>Performs an implicit conversion from <see cref="R"/> to <see cref="ValueTask{R}"/>.</summary>
@@ -136,8 +136,18 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// </summary>
     /// <param name="resultIfIsErroneous">The value if the result is erroneous.</param>
     /// <returns>The new value.</returns>
+    public TSuccess Evaluate(TSuccess resultIfIsErroneous)
+    {
+        return this.IsSuccess ? this.Value : resultIfIsErroneous;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <param name="resultIfIsErroneous">The value if the result is erroneous.</param>
+    /// <returns>The new value.</returns>
     [return: NotNullIfNotNull("resultIfIsErroneous")]
-    public TSuccess? Evaluate(TSuccess? resultIfIsErroneous)
+    public TSuccess? EvaluateToOption(TSuccess? resultIfIsErroneous)
     {
         return this.IsSuccess ? this.Value : resultIfIsErroneous;
     }
@@ -150,7 +160,20 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// <param name="resultIfIsErroneous">The result if is erroneous.</param>
     /// <returns>The new value.</returns>
     [return: NotNullIfNotNull("resultIfIsErroneous")]
-    public TResult? Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, TResult? resultIfIsErroneous)
+    public TResult Evaluate<TResult>(Func<TSuccess, TResult> resultFunc, TResult resultIfIsErroneous)
+    {
+        return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneous;
+    }
+
+    /// <summary>
+    /// Evaluates the result into a single value.
+    /// </summary>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="resultFunc">The result function.</param>
+    /// <param name="resultIfIsErroneous">The result if is erroneous.</param>
+    /// <returns>The new value.</returns>
+    [return: NotNullIfNotNull("resultIfIsErroneous")]
+    public TResult? EvaluateToOption<TResult>(Func<TSuccess, TResult> resultFunc, TResult? resultIfIsErroneous)
     {
         return this.IsSuccess ? resultFunc(this.Value) : resultIfIsErroneous;
     }
@@ -229,15 +252,6 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     public Task<R<TSuccess>> ToTask()
     {
         return Task.FromResult(this);
-    }
-
-    /// <summary>
-    /// Maps this result to a <see cref="R{TSuccess}"/>.
-    /// </summary>
-    /// <returns>The new result.</returns>
-    public R<object?> MapToOption()
-    {
-        return new R<object?>(this.IsSuccess, this.Value);
     }
 
     /// <summary>
@@ -401,8 +415,17 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// Converts this result to a result option.
     /// </summary>
     /// <returns>A <see cref="R{TSuccess}"/>.</returns>
-    public R<TSuccess?> ToOptional()
+    public R<TSuccess?> ToOption()
     {
-        return this.Map(x => (TSuccess?)x);
+        return new R<TSuccess?>(this.IsSuccess, this.Value);
+    }
+
+    /// <summary>
+    /// Converts this result to a result option.
+    /// </summary>
+    /// <returns>A <see cref="R{TSuccess}"/>.</returns>
+    public R<object?> ToObjectOption()
+    {
+        return new R<object?>(this.IsSuccess, this.Value);
     }
 }

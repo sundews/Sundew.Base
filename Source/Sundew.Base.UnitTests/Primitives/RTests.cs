@@ -149,14 +149,40 @@ public class RTests
     }
 
     [Fact]
-    public void Map_When_TargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue()
+    public void ToObjectOption_When_SourceIsResultOfOptionTypeAndTargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue()
     {
         int? expectedValue = new Random().Next(0, 1) > -1 ? 42 : null;
 
         R<int?> r = R.SuccessOption(expectedValue);
-        R<object?> result = r.MapToOption();
+        R<object?> result = r.ToObjectOption();
 
         result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedValue);
+    }
+
+    [Theory]
+    [InlineData(42)]
+    [InlineData(0)]
+    public void ImplicitCast_When_SourceIsResultOfTypeAndTargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue(int expectedValue)
+    {
+        R<int> r = R.Success(expectedValue);
+
+        R<object> result = r;
+
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().Be(expectedValue);
+    }
+
+    [Theory]
+    [InlineData(42, true)]
+    [InlineData(null, false)]
+    public void ImplicitCast_When_SourceIsResultOfTypeAndTargetIsResultOfObject_Then_ResultShouldBeExpectedValue(int? expectedValue, bool expectedResult)
+    {
+        R<int?> r = R.SuccessOption(expectedValue);
+
+        R<object> result = r;
+
+        result.IsSuccess.Should().Be(expectedResult);
         result.Value.Should().Be(expectedValue);
     }
 
@@ -250,7 +276,7 @@ public class RTests
 
         R<string, string> r = testee;
 
-        var result = r.ToOption();
+        var result = R.ToOption(r);
 
         result.HasValue.Should().BeTrue();
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
@@ -374,6 +400,32 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
+    [Theory]
+    [InlineData("value", "value")]
+    [InlineData(null, "fallback")]
+    public void Evaluate_Then_ResultShouldBeExpectedValue(string? input, string? expectedValue)
+    {
+        var testee = R.From(input);
+        R<string?> r = testee.ToOption();
+
+        var result = r.Evaluate("fallback");
+
+        result.Should().Be(expectedValue);
+    }
+
+    [Fact]
+    public void EvaluateOption_When_Success_Then_ResultShouldBeExpectedResult()
+    {
+        var expectedResult = "value";
+        var testee = R.SuccessOption(expectedResult);
+
+        R<string?> r = testee;
+
+        var result = r.EvaluateToOption(default(string));
+
+        result.Should().Be(expectedResult);
+    }
+
     [Fact]
     public void Evaluate_When_Success_Then_ResultShouldBeExpectedResult()
     {
@@ -382,7 +434,7 @@ public class RTests
 
         R<string> r = testee;
 
-        var result = r.Evaluate(default(string));
+        var result = r.Evaluate("fallback");
 
         result.Should().Be(expectedResult);
     }

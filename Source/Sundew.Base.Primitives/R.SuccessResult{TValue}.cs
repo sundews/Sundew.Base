@@ -179,9 +179,9 @@ public partial class R
         /// Converts this result to a result option.
         /// </summary>
         /// <returns>A <see cref="R{TSuccess}"/>.</returns>
-        public R<TSuccess?> ToOptional()
+        public R<TSuccess?> ToOption()
         {
-            return this.Map(x => (TSuccess?)x);
+            return new R<TSuccess?>(true, this.Value);
         }
 
         /// <summary>
