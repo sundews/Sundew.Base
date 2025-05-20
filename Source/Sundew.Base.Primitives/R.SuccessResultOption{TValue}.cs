@@ -199,5 +199,23 @@ public partial class R
         {
             return $"Success: {this.Value}";
         }
+
+        /// <summary>
+        /// Converts this result to a result option.
+        /// </summary>
+        /// <returns>A <see cref="R{TSuccess}"/>.</returns>
+        public R<TValue?> ToOption()
+        {
+            return new R<TValue?>(true, this.Value);
+        }
+
+        /// <summary>
+        /// Converts this result to a result option.
+        /// </summary>
+        /// <returns>A <see cref="R{TSuccess}"/>.</returns>
+        public R<object?> ToObjectOption()
+        {
+            return new R<object?>(true, this.Value);
+        }
     }
 }
