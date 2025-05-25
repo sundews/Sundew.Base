@@ -324,9 +324,18 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// Converts this result to a result option.
     /// </summary>
     /// <returns>A <see cref="R{TSuccess, TError}"/>.</returns>
-    public R<TSuccess?, TError> ToOption()
+    public R<TSuccess?, TError> MapToOption()
     {
         return new R<TSuccess?, TError>(this.IsSuccess, this.Value, this.Error);
+    }
+
+    /// <summary>
+    /// Maps this result to a <see cref="R{TSuccess}"/>.
+    /// </summary>
+    /// <returns>The new result.</returns>
+    public R<object?, object> MapToObjectOption()
+    {
+        return new R<object?, object>(this.IsSuccess, this.Value, this.Error);
     }
 
     /// <summary>
@@ -367,15 +376,6 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     public RoE<TError> ToResultWithError()
     {
         return this;
-    }
-
-    /// <summary>
-    /// Maps this result to a <see cref="R{TSuccess}"/>.
-    /// </summary>
-    /// <returns>The new result.</returns>
-    public R<object?, object> MapToOption()
-    {
-        return new R<object?, object>(this.IsSuccess, this.Value, this.Error);
     }
 
     /// <summary>

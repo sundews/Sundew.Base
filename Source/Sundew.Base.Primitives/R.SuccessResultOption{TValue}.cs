@@ -204,7 +204,7 @@ public partial class R
         /// Converts this result to a result option.
         /// </summary>
         /// <returns>A <see cref="R{TSuccess}"/>.</returns>
-        public R<TValue?> ToOption()
+        public R<TValue?> MapToOption()
         {
             return new R<TValue?>(true, this.Value);
         }
@@ -213,7 +213,7 @@ public partial class R
         /// Converts this result to a result option.
         /// </summary>
         /// <returns>A <see cref="R{TSuccess}"/>.</returns>
-        public R<object?> ToObjectOption()
+        public R<object?> MapToObjectOption()
         {
             return new R<object?>(true, this.Value);
         }

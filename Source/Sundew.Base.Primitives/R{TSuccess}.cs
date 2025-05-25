@@ -415,7 +415,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// Converts this result to a result option.
     /// </summary>
     /// <returns>A <see cref="R{TSuccess}"/>.</returns>
-    public R<TSuccess?> ToOption()
+    public R<TSuccess?> MapToOption()
     {
         return new R<TSuccess?>(this.IsSuccess, this.Value);
     }
@@ -424,7 +424,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// Converts this result to a result option.
     /// </summary>
     /// <returns>A <see cref="R{TSuccess}"/>.</returns>
-    public R<object?> ToObjectOption()
+    public R<object?> MapToObjectOption()
     {
         return new R<object?>(this.IsSuccess, this.Value);
     }

@@ -149,12 +149,12 @@ public class RTests
     }
 
     [Fact]
-    public void ToObjectOption_When_SourceIsResultOfOptionTypeAndTargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue()
+    public void MapToObjectOption_When_SourceIsResultOfOptionTypeAndTargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue()
     {
         int? expectedValue = new Random().Next(0, 1) > -1 ? 42 : null;
 
         R<int?> r = R.SuccessOption(expectedValue);
-        R<object?> result = r.ToObjectOption();
+        R<object?> result = r.MapToObjectOption();
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(expectedValue);
@@ -406,7 +406,7 @@ public class RTests
     public void Evaluate_Then_ResultShouldBeExpectedValue(string? input, string? expectedValue)
     {
         var testee = R.From(input);
-        R<string?> r = testee.ToOption();
+        R<string?> r = testee.MapToOption();
 
         var result = r.Evaluate("fallback");
 
