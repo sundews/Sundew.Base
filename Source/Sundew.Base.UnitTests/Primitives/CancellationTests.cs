@@ -51,20 +51,13 @@ public class CancellationTests
         var expectedTimeout = TimeSpan.FromMilliseconds(100);
 
         var cancellationWithTimeout = cancellationTokenSource.ToCancellationWithTimeout(expectedTimeout);
-        var result = await CancellableCall2(cancellationWithTimeout, waitForCancellationTimeout);
+        var result = await CancellableCall(cancellationWithTimeout, waitForCancellationTimeout);
 
         result.Should().Be(expectedResult);
         cancellationWithTimeout.Timeout.Should().Be(expectedTimeout);
     }
 
-    private static Task<bool> CancellableCall(CancellationToken cancellationToken, int waitTimeout)
-    {
-        var resetEvent = new ManualResetEventAsync();
-        cancellationToken.Register(_ => { resetEvent.Set(); }, __._);
-        return resetEvent.WaitAsync(TimeSpan.FromMilliseconds(waitTimeout), CancellationToken.None);
-    }
-
-    private static async Task<bool> CancellableCall2(Cancellation cancellation, int waitTimeout)
+    private static async Task<bool> CancellableCall(Cancellation cancellation, int waitTimeout)
     {
         using (cancellation.EnableCancellation())
         {

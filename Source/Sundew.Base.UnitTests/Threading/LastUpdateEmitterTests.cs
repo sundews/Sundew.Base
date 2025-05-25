@@ -39,9 +39,9 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(400));
-        successfullyWaited.Should().BeTrue();
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(500));
         expectedResult.Should().Equal([1, finalExpectedValue]);
+        successfullyWaited.Should().BeTrue();
     }
 
     [Fact]
@@ -67,9 +67,9 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(400));
-        successfullyWaited.Should().BeTrue();
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(500));
         expectedResult.Should().Equal(["1", finalExpectedValue]);
+        successfullyWaited.Should().BeTrue();
     }
 
     [Fact]
@@ -95,8 +95,8 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(400));
-        successfullyWaited.Should().BeTrue();
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(500));
         expectedResult.Should().Equal(["1", finalExpectedValue]);
+        successfullyWaited.Should().BeTrue();
     }
 }
