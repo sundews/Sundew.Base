@@ -20,5 +20,6 @@ public interface IBufferReporter : IReporter
     /// </summary>
     /// <param name="oldCapacity">The old capacity.</param>
     /// <param name="newCapacity">The new capacity.</param>
+    [Report(RelativeImportance = RelativeImportance.Low)]
     void OnExpanding(int oldCapacity, int newCapacity);
 }

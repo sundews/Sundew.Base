@@ -50,6 +50,15 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
     public Task Task => this.continuation;
 
     /// <summary>
+    /// Converts from a  <see cref="Quest{TGuide}"/> to an <see cref="Task"/>.
+    /// </summary>
+    /// <param name="quest">The quest.</param>
+    public static implicit operator Task(Quest<TGuide> quest)
+    {
+        return quest.Task;
+    }
+
+    /// <summary>
     /// Starts the quest.
     /// </summary>
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
