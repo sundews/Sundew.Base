@@ -46,8 +46,10 @@ public class AutoResetEventAsyncTests
         this.testee.Set();
 
         var result = await waitTask;
-        result.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -59,8 +61,10 @@ public class AutoResetEventAsyncTests
         await cancellationTokenSource.CancelAsync();
 
         var result = await waitTask;
-        result.Should().BeFalse();
-        this.testee.IsSet.Should().BeFalse();
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -70,8 +74,10 @@ public class AutoResetEventAsyncTests
         await Task.Delay(10);
 
         var result = await waitTask;
-        result.Should().BeFalse();
-        this.testee.IsSet.Should().BeFalse();
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -88,17 +94,19 @@ public class AutoResetEventAsyncTests
 
         var task1Result = await waitTask1;
 
-        task1Result.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
-        waitTask2.IsCompleted.Should().BeFalse();
+        Assert.Multiple(
+            () => task1Result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse(),
+            () => waitTask2.IsCompleted.Should().BeFalse());
 
         await Task.Delay(10);
         this.testee.Set();
 
         var task2Result = await waitTask2;
 
-        task2Result.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
+        Assert.Multiple(
+            () => task2Result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -119,17 +127,20 @@ public class AutoResetEventAsyncTests
         var otherTask = task == waitTask1 ? waitTask2 : waitTask1;
 
         var resultFirstTask = await firstTask;
-        resultFirstTask.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
-        otherTask.IsCompleted.Should().BeFalse();
+
+        Assert.Multiple(
+            () => resultFirstTask.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse(),
+            () => otherTask.IsCompleted.Should().BeFalse());
 
         await Task.Delay(10);
         this.testee.Set();
 
         var otherTaskResult = await otherTask;
 
-        otherTaskResult.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
+        Assert.Multiple(
+            () => otherTaskResult.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -145,17 +156,19 @@ public class AutoResetEventAsyncTests
 
         var task1Result = await waitTask1;
 
-        task1Result.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
-        waitTask2.IsCompleted.Should().BeFalse();
+        Assert.Multiple(
+        () => task1Result.Should().BeTrue(),
+        () => this.testee.IsSet.Should().BeFalse(),
+        () => waitTask2.IsCompleted.Should().BeFalse());
 
         await Task.Delay(10);
         this.testee.Set();
 
         var task2Result = await waitTask2;
 
-        task2Result.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
+        Assert.Multiple(
+            () => task2Result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -171,16 +184,18 @@ public class AutoResetEventAsyncTests
         var otherTask = task == waitTask1 ? waitTask2 : waitTask1;
 
         var resultFirstTask = await firstTask;
-        resultFirstTask.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
-        otherTask.IsCompleted.Should().BeFalse();
+        Assert.Multiple(
+            () => resultFirstTask.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse(),
+            () => otherTask.IsCompleted.Should().BeFalse());
 
         await Task.Delay(10);
         this.testee.Set();
 
         var otherTaskResult = await otherTask;
 
-        otherTaskResult.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
+        Assert.Multiple(
+            () => otherTaskResult.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 }

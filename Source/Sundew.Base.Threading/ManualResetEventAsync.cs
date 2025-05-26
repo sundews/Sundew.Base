@@ -58,7 +58,7 @@ public sealed class ManualResetEventAsync : ResetEventAsync
     }
 
     /// <inheritdoc/>
-    private protected override Task<bool> ConfigureAwaiterWhileLocked(Cancellation externalCancellation)
+    private protected override Task<bool> ConfigureTaskWhileLocked(Cancellation externalCancellation)
     {
         this.taskCompletionSource ??= new TaskCompletionSource<bool>();
         var enabler = externalCancellation.EnableCancellation();

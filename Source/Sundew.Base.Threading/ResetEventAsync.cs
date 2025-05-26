@@ -174,7 +174,7 @@ public abstract class ResetEventAsync
                 return TaskHelper.CompletedFalseTask;
             }
 
-            return this.ConfigureAwaiterWhileLocked(cancellation);
+            return this.ConfigureTaskWhileLocked(cancellation);
         }
     }
 
@@ -184,7 +184,7 @@ public abstract class ResetEventAsync
     /// <param name="isSet">if set to <c>true</c> [is set].</param>
     private protected abstract void OnIsSetDuringWaitWhileLocked(ref bool isSet);
 
-    private protected abstract Task<bool> ConfigureAwaiterWhileLocked(Cancellation linkedCancellation);
+    private protected abstract Task<bool> ConfigureTaskWhileLocked(Cancellation linkedCancellation);
 
     private protected virtual void OnResetWhileLocked()
     {

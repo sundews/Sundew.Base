@@ -62,7 +62,7 @@ public sealed class AutoResetEventAsync : ResetEventAsync
         isSet = false;
     }
 
-    private protected override Task<bool> ConfigureAwaiterWhileLocked(Cancellation externalCancellation)
+    private protected override Task<bool> ConfigureTaskWhileLocked(Cancellation externalCancellation)
     {
         var taskCompletionSource = new TaskCompletionSource<bool>();
         var enabler = externalCancellation.EnableCancellation();

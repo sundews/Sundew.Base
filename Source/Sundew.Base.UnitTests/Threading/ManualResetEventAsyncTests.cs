@@ -30,8 +30,9 @@ public class ManualResetEventAsyncTests
 
         var result = await this.testee.WaitAsync();
 
-        result.Should().BeTrue();
-        this.testee.IsSet.Should().BeTrue();
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
     }
 
     [Fact]
@@ -46,8 +47,10 @@ public class ManualResetEventAsyncTests
         this.testee.Set();
 
         var result = await waitTask;
-        result.Should().BeTrue();
-        this.testee.IsSet.Should().BeTrue();
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
     }
 
     [Fact]
@@ -59,8 +62,10 @@ public class ManualResetEventAsyncTests
         await cancellationTokenSource.CancelAsync();
 
         var result = await waitTask;
-        result.Should().BeFalse();
-        this.testee.IsSet.Should().BeFalse();
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -70,8 +75,10 @@ public class ManualResetEventAsyncTests
         await Task.Delay(10);
 
         var result = await waitTask;
-        result.Should().BeFalse();
-        this.testee.IsSet.Should().BeFalse();
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => this.testee.IsSet.Should().BeFalse());
     }
 
     [Fact]
@@ -84,8 +91,9 @@ public class ManualResetEventAsyncTests
 
         var result = await Tasks.WhenAll(waitTask1, waitTask2);
 
-        result.Should().Be((true, true));
-        this.testee.IsSet.Should().BeTrue();
+        Assert.Multiple(
+            () => result.Should().Be((true, true)),
+            () => this.testee.IsSet.Should().BeTrue());
     }
 
     [Fact]
