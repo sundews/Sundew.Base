@@ -8,7 +8,6 @@
 namespace Sundew.Base.Threading;
 
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Sundew.Base.Threading.Internal;
@@ -18,9 +17,18 @@ using Sundew.Base.Threading.Internal;
 /// </summary>
 public abstract class ResetEventAsync
 {
-    private readonly object lockObject = new();
-    private readonly LinkedList<Awaiter> awaiters = new();
-    private bool isSet;
+#pragma warning disable SA1401
+    // ReSharper disable InconsistentNaming
+#if NET9_0_OR_GREATER
+    private protected readonly Lock lockObject = new();
+#else
+    private protected readonly object lockObject = new();
+#endif
+#pragma warning disable SA1306
+    private protected bool privateIsSet;
+#pragma warning restore SA1306
+#pragma warning restore SA1401
+    // ReSharper restore InconsistentNaming
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ResetEventAsync"/> class.
@@ -36,7 +44,7 @@ public abstract class ResetEventAsync
     /// <param name="isSet">if set to <c>true</c> [initial state].</param>
     protected ResetEventAsync(bool isSet)
     {
-        this.isSet = isSet;
+        this.privateIsSet = isSet;
     }
 
     /// <summary>
@@ -45,7 +53,16 @@ public abstract class ResetEventAsync
     /// <value>
     ///   <c>true</c> if this instance is set; otherwise, <c>false</c>.
     /// </value>
-    public bool IsSet => this.isSet;
+    public bool IsSet
+    {
+        get
+        {
+            lock (this.lockObject)
+            {
+                return this.privateIsSet;
+            }
+        }
+    }
 
     /// <summary>
     /// Reset this instance.
@@ -54,31 +71,15 @@ public abstract class ResetEventAsync
     {
         lock (this.lockObject)
         {
-            this.isSet = false;
+            this.privateIsSet = false;
+            this.OnResetWhileLocked();
         }
     }
 
     /// <summary>
     /// Sets this instance.
     /// </summary>
-    public void Set()
-    {
-        TaskCompletionSource<bool>? completedWaiter = null;
-        lock (this.lockObject)
-        {
-            var first = this.awaiters.First;
-            if (first != null)
-            {
-                this.awaiters.RemoveFirst();
-                completedWaiter = first.Value.TaskCompletionSource;
-                first.Value.CancellationTokenSource.Cancel();
-            }
-
-            this.isSet = completedWaiter == null;
-        }
-
-        completedWaiter?.SetResult(true);
-    }
+    public abstract void Set();
 
     /// <summary>
     /// Waits synchronously.
@@ -117,7 +118,7 @@ public abstract class ResetEventAsync
     /// <returns>A boolean result indicating whether the signal was received.</returns>
     public bool Wait(TimeSpan timeout, CancellationToken cancellationToken)
     {
-        var waitTask = this.WaitAsync(timeout, cancellationToken);
+        var waitTask = this.WaitAsync(new Cancellation(timeout, cancellationToken));
         waitTask.Wait(timeout);
         return waitTask.Result;
     }
@@ -128,7 +129,7 @@ public abstract class ResetEventAsync
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
     public Task<bool> WaitAsync()
     {
-        return this.WaitAsync(Timeout.InfiniteTimeSpan, CancellationToken.None);
+        return this.WaitAsync(new Cancellation(Timeout.InfiniteTimeSpan, CancellationToken.None));
     }
 
     /// <summary>
@@ -138,7 +139,7 @@ public abstract class ResetEventAsync
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
     public Task<bool> WaitAsync(CancellationToken cancellationToken)
     {
-        return this.WaitAsync(Timeout.InfiniteTimeSpan, cancellationToken);
+        return this.WaitAsync(new Cancellation(Timeout.InfiniteTimeSpan, cancellationToken));
     }
 
     /// <summary>
@@ -148,34 +149,32 @@ public abstract class ResetEventAsync
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
     public Task<bool> WaitAsync(TimeSpan timeout)
     {
-        return this.WaitAsync(timeout, CancellationToken.None);
+        return this.WaitAsync(new Cancellation(timeout, CancellationToken.None));
     }
 
     /// <summary>
     /// Waits asynchronously.
     /// </summary>
-    /// <param name="timeout">The timeout.</param>
-    /// <param name="cancellationToken">The cancellation token.</param>
+    /// <param name="cancellation">The cancellation.</param>
     /// <returns>A task with a boolean result indicating whether the signal was received.</returns>
-    public Task<bool> WaitAsync(TimeSpan timeout, CancellationToken cancellationToken)
+    public Task<bool> WaitAsync(Cancellation cancellation)
     {
         lock (this.lockObject)
         {
-            if (this.isSet)
+            if (this.privateIsSet)
             {
-                this.OnIsSetDuringWaitWhileLocked(ref this.isSet);
+                this.OnIsSetDuringWaitWhileLocked(ref this.privateIsSet);
                 return TaskHelper.CompletedTrueTask;
             }
 
-            if (timeout == TimeSpan.Zero || cancellationToken.IsCancellationRequested)
+            var timeout = cancellation.Timeout;
+            var externalToken = cancellation.Token;
+            if (timeout == TimeSpan.Zero || externalToken.IsCancellationRequested)
             {
                 return TaskHelper.CompletedFalseTask;
             }
 
-            var awaiter = new Awaiter(new TaskCompletionSource<bool>(), new CancellationTokenSource());
-            this.awaiters.AddFirst(awaiter);
-            this.HandleWaitTimeout(timeout, awaiter, cancellationToken);
-            return awaiter.TaskCompletionSource.Task;
+            return this.ConfigureAwaiterWhileLocked(cancellation);
         }
     }
 
@@ -183,54 +182,11 @@ public abstract class ResetEventAsync
     /// Called during a Wait or WaitAsync call when the event is set and the lock is acquired.
     /// </summary>
     /// <param name="isSet">if set to <c>true</c> [is set].</param>
-    protected abstract void OnIsSetDuringWaitWhileLocked(ref bool isSet);
+    private protected abstract void OnIsSetDuringWaitWhileLocked(ref bool isSet);
 
-    private void HandleWaitTimeout(
-        TimeSpan timeout,
-        Awaiter awaiter,
-        CancellationToken cancellationToken)
+    private protected abstract Task<bool> ConfigureAwaiterWhileLocked(Cancellation linkedCancellation);
+
+    private protected virtual void OnResetWhileLocked()
     {
-        Task.Run(
-            async () =>
-            {
-                try
-                {
-                    using var linkedCancellationTokenSource =
-                        CancellationTokenSource.CreateLinkedTokenSource(
-                            cancellationToken,
-                            awaiter.CancellationTokenSource.Token);
-                    await Task.Delay(timeout, linkedCancellationTokenSource.Token).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException)
-                {
-                }
-                finally
-                {
-                    if (!awaiter.CancellationTokenSource.IsCancellationRequested)
-                    {
-                        lock (this.lockObject)
-                        {
-                            this.awaiters.Remove(awaiter);
-                            awaiter.CancellationTokenSource.Dispose();
-                        }
-
-                        awaiter.TaskCompletionSource.SetResult(false);
-                    }
-                }
-            },
-            awaiter.CancellationTokenSource.Token);
-    }
-
-    private class Awaiter
-    {
-        public Awaiter(TaskCompletionSource<bool> taskCompletionSource, CancellationTokenSource cancellationTokenSource)
-        {
-            this.TaskCompletionSource = taskCompletionSource;
-            this.CancellationTokenSource = cancellationTokenSource;
-        }
-
-        public TaskCompletionSource<bool> TaskCompletionSource { get; }
-
-        public CancellationTokenSource CancellationTokenSource { get; }
     }
 }

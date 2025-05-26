@@ -10,7 +10,6 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 * DistinctInOrder items only appear once, while preserving order.
 * ByCardinality extension allows checking whether an IEnumerable\<TItem\> is empty, has a single element or multiple elements.
 * Value-Array, List and Dictionary* wrappers for Immutable collections with value semantics.
-* TakeDuringAsync for await items being added to a collection.
 
 ## Primitives
 * Result types (R\<T, E\> and R\<T\>, RoE\<E\>)
@@ -45,6 +44,7 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 
 ## Disposal
 * DisposeAction for wrapping an Action in an IDisposable.
+* DisposeAsyncAction for wrapping an Action in an IAsyncDisposable.
 * Disposer provides disposal of a fixed set of IDisposables.
 * DisposableState provides an easy way to implement the Dispose(bool) pattern.
 * DisposingDictionary allows building a list of IDisposables that supports disposal by a key and otherwise supports disposal in the same order.

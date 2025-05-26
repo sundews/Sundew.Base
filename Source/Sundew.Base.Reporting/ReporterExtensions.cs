@@ -15,7 +15,7 @@ public static class ReporterExtensions
     /// <summary>
     /// Sets the source.
     /// </summary>
-    /// <typeparam name="TReporter">The type of the reporter.</typeparam>
+    /// <typeparam name="TReporter">The type of the reporter.</typeparam>x
     /// <param name="reporter">The reporter.</param>
     /// <param name="source">The source.</param>
     public static void SetSource<TReporter>(this TReporter reporter, object source)

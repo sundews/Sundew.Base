@@ -73,4 +73,114 @@ public class AutoResetEventAsyncTests
         result.Should().BeFalse();
         this.testee.IsSet.Should().BeFalse();
     }
+
+    [Fact]
+    public async Task WaitAsync_When_SetWithInterval_Then_WaitersShouldBeNotifiedOneAtATime()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask2 = Task.Run(async () =>
+        {
+            await Task.Delay(50);
+            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100));
+        });
+        await Task.Delay(50);
+        this.testee.Set();
+
+        var task1Result = await waitTask1;
+
+        task1Result.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+        waitTask2.IsCompleted.Should().BeFalse();
+
+        await Task.Delay(10);
+        this.testee.Set();
+
+        var task2Result = await waitTask2;
+
+        task2Result.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_SetWithInterval_Then_WaitersShouldBeNotifiedOneAtATimeInAnyOrder()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask2 = Task.Run(async () =>
+        {
+            await Task.Delay(50);
+            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100));
+        });
+        await Task.Delay(50);
+        this.testee.Set();
+
+        var task = await Task.WhenAny(waitTask1, waitTask2);
+
+        var firstTask = task == waitTask1 ? waitTask1 : waitTask2;
+        var otherTask = task == waitTask1 ? waitTask2 : waitTask1;
+
+        var resultFirstTask = await firstTask;
+        resultFirstTask.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+        otherTask.IsCompleted.Should().BeFalse();
+
+        await Task.Delay(10);
+        this.testee.Set();
+
+        var otherTaskResult = await otherTask;
+
+        otherTaskResult.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_AlreadySetAndLaterAgain_Then_WaitersShouldBeNotifiedOneAtATime()
+    {
+        this.testee.Set();
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask2 = Task.Run(async () =>
+        {
+            await Task.Delay(50);
+            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100));
+        });
+
+        var task1Result = await waitTask1;
+
+        task1Result.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+        waitTask2.IsCompleted.Should().BeFalse();
+
+        await Task.Delay(10);
+        this.testee.Set();
+
+        var task2Result = await waitTask2;
+
+        task2Result.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_AlreadySetAndLaterAgain_Then_WaitersShouldBeNotifiedOneAtATimeInAnyOrder()
+    {
+        this.testee.Set();
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+
+        var task = await Task.WhenAny(waitTask1, waitTask2);
+
+        var firstTask = task == waitTask1 ? waitTask1 : waitTask2;
+        var otherTask = task == waitTask1 ? waitTask2 : waitTask1;
+
+        var resultFirstTask = await firstTask;
+        resultFirstTask.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+        otherTask.IsCompleted.Should().BeFalse();
+
+        await Task.Delay(10);
+        this.testee.Set();
+
+        var otherTaskResult = await otherTask;
+
+        otherTaskResult.Should().BeTrue();
+        this.testee.IsSet.Should().BeFalse();
+    }
 }

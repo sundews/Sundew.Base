@@ -295,6 +295,22 @@ public struct Cancellation
 #endif
 
         /// <summary>
+        /// Requests cancellation after the specified time span.
+        /// </summary>
+        /// <param name="timeSpan">The time span.</param>
+        /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
+        public bool CancelAfter(TimeSpan timeSpan)
+        {
+            if (this.cancellation.cancellationTokenSource.HasValue())
+            {
+                this.cancellation.cancellationTokenSource.CancelAfter(timeSpan);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Dispose the underlying <see cref="CancellationTokenSource"/>.
         /// </summary>
         public void Dispose()

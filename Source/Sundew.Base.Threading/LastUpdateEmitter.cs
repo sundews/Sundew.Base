@@ -81,28 +81,14 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
                 {
                     this.updateEmitterReporter?.ErrorDuringUpdate(ex);
                 }
-#if NET9_0_OR_GREATER
-                this.lockObject.Enter();
-#else
-                Monitor.Enter(this.lockObject);
-#endif
+
+                this.EnterIfNeeded();
                 value = this.nextValue;
             }
         }
         finally
         {
-#if NET9_0_OR_GREATER
-            if (!this.lockObject.IsHeldByCurrentThread)
-            {
-                this.lockObject.Enter();
-            }
-#else
-            if (!Monitor.IsEntered(this.lockObject))
-            {
-                Monitor.Enter(this.lockObject);
-            }
-#endif
-
+            this.EnterIfNeeded();
             this.currentTask = null;
 #if NET9_0_OR_GREATER
             this.lockObject.Exit();
@@ -110,5 +96,20 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
             Monitor.Exit(this.lockObject);
 #endif
         }
+    }
+
+    private void EnterIfNeeded()
+    {
+#if NET9_0_OR_GREATER
+                if (!this.lockObject.IsHeldByCurrentThread)
+                {
+                    this.lockObject.Enter();
+                }
+#else
+        if (!Monitor.IsEntered(this.lockObject))
+        {
+            Monitor.Enter(this.lockObject);
+        }
+#endif
     }
 }

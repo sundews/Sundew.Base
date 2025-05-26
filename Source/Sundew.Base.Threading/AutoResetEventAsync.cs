@@ -7,11 +7,16 @@
 
 namespace Sundew.Base.Threading;
 
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
 /// <summary>
 /// An asynchronous auto reset event.
 /// </summary>
 public sealed class AutoResetEventAsync : ResetEventAsync
 {
+    private readonly LinkedList<TaskCompletionSource<bool>> awaiters = new();
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AutoResetEventAsync"/> class.
     /// </summary>
@@ -29,11 +34,50 @@ public sealed class AutoResetEventAsync : ResetEventAsync
     }
 
     /// <summary>
+    /// Sets the event and signals all waiters.
+    /// </summary>
+    public override void Set()
+    {
+        LinkedListNode<TaskCompletionSource<bool>>? taskCompletionSource;
+        lock (this.lockObject)
+        {
+            taskCompletionSource = this.awaiters.First;
+            this.privateIsSet = !taskCompletionSource.HasValue();
+        }
+
+        if (!taskCompletionSource.HasValue())
+        {
+            return;
+        }
+
+        taskCompletionSource.Value.TrySetResult(true);
+    }
+
+    /// <summary>
     /// Called during a Wait or WaitAsync call when the event is set and the lock is acquired.
     /// </summary>
     /// <param name="isSet">if set to <c>true</c> [is set].</param>
-    protected override void OnIsSetDuringWaitWhileLocked(ref bool isSet)
+    private protected override void OnIsSetDuringWaitWhileLocked(ref bool isSet)
     {
         isSet = false;
+    }
+
+    private protected override Task<bool> ConfigureAwaiterWhileLocked(Cancellation externalCancellation)
+    {
+        var taskCompletionSource = new TaskCompletionSource<bool>();
+        var enabler = externalCancellation.EnableCancellation();
+        enabler.Token.Register(() => taskCompletionSource.TrySetResult(false));
+        taskCompletionSource.Task.ContinueWith(_ =>
+        {
+            lock (this.lockObject)
+            {
+                this.awaiters.Remove(taskCompletionSource);
+            }
+
+            enabler.Dispose();
+        });
+        this.awaiters.AddLast(taskCompletionSource);
+
+        return taskCompletionSource.Task;
     }
 }

@@ -63,7 +63,7 @@ public class CancellationTests
         {
             var resetEvent = new ManualResetEventAsync();
             cancellation.Token.Register(_ => { resetEvent.Set(); }, __._);
-            return await resetEvent.WaitAsync(TimeSpan.FromMilliseconds(waitTimeout), CancellationToken.None);
+            return await resetEvent.WaitAsync(new Cancellation(TimeSpan.FromMilliseconds(waitTimeout), CancellationToken.None));
         }
     }
 }
