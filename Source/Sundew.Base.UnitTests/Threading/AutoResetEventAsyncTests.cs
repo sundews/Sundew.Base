@@ -83,11 +83,11 @@ public class AutoResetEventAsyncTests
     [Fact]
     public async Task WaitAsync_When_SetWithInterval_Then_WaitersShouldBeNotifiedOneAtATime()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(500)));
         var waitTask2 = Task.Run(async () =>
         {
-            await Task.Delay(50);
-            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100));
+            await Task.Delay(100);
+            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(500));
         });
         await Task.Delay(50);
         this.testee.Set();

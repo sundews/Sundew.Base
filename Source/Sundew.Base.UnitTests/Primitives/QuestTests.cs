@@ -242,7 +242,7 @@ public class QuestTests
     }
 
     [Fact]
-    public async Task Start_When_TaskIsRunningAndCanceled_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
+    public async Task Start_When_TaskIsRunningAndCanceledShortlyAfter_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
         var quest = Quest.Create(
@@ -254,6 +254,33 @@ public class QuestTests
             }),
             cancellationTokenSource.Token);
         cancellationTokenSource.CancelAfter(10);
+
+        var start = quest.Start();
+#pragma warning disable VSTHRD003
+        var startTask = () => start.Value.Task;
+#pragma warning restore VSTHRD003
+        await startTask.Should().ThrowAsync<OperationCanceledException>();
+
+        quest.Task.IsCanceled.Should().BeTrue();
+#pragma warning disable VSTHRD003
+        var result = async () => await quest.Task.ConfigureAwait(false);
+#pragma warning restore VSTHRD003
+        await result.Should().ThrowAsync<OperationCanceledException>();
+    }
+
+    [Fact]
+    public async Task Start_When_TaskIsRunningAndCanceled_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var quest = Quest.Create(
+            __._,
+            Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+                return 42;
+            }),
+            cancellationTokenSource.Token);
+        await cancellationTokenSource.CancelAsync();
 
         var start = quest.Start();
 #pragma warning disable VSTHRD003
