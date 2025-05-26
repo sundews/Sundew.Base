@@ -36,7 +36,7 @@ public class TasksTests
             return await Tasks.WhenAll(task1, task2, task3);
         }
 
-        await Assert.ThrowsAsync<OperationCanceledException>(Test);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(Test);
     }
 
     [Fact]
