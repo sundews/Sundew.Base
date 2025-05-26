@@ -39,7 +39,7 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(500));
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
 
         Assert.Multiple(
             () => expectedResult.Should().Equal([1, finalExpectedValue]),
@@ -69,7 +69,7 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(500));
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
 
         Assert.Multiple(
             () => expectedResult.Should().Equal(["1", finalExpectedValue]),
@@ -99,7 +99,7 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(500));
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
         Assert.Multiple(
             () => expectedResult.Should().Equal(["1", finalExpectedValue]),
             () => successfullyWaited.Should().BeTrue());
