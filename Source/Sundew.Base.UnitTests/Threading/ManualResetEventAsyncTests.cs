@@ -97,6 +97,36 @@ public class ManualResetEventAsyncTests
     }
 
     [Fact]
+    public async Task WaitAsync_When_AwaitTwoTaskAndTimesOut_Then_ResultShouldBeFalse()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1)));
+        await Task.Delay(10);
+
+        var result = await Tasks.WhenAll(waitTask1, waitTask2);
+
+        Assert.Multiple(
+            () => result.Should().Be((false, false)),
+            () => this.testee.IsSet.Should().BeFalse());
+    }
+
+    [Fact]
+    public async Task Reset_When_TimesOut_Then_IsSetShouldBeFalse()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        await Task.Delay(50);
+
+        this.testee.Reset();
+
+        var result = await Tasks.WhenAll(waitTask1, waitTask2);
+
+        Assert.Multiple(
+            () => result.Should().Be((false, false)),
+            () => this.testee.IsSet.Should().BeFalse());
+    }
+
+    [Fact]
     public void Reset_When_Set_Then_IsSetShouldBeFalse()
     {
         this.testee.Set();

@@ -61,8 +61,9 @@ public sealed class ManualResetEventAsync : ResetEventAsync
     private protected override Task<bool> ConfigureTaskWhileLocked(Cancellation externalCancellation)
     {
         this.taskCompletionSource ??= new TaskCompletionSource<bool>();
+        var taskCompletionSourceToCompleteOnCancel = this.taskCompletionSource;
         var enabler = externalCancellation.EnableCancellation();
-        enabler.Token.Register(() => this.taskCompletionSource.TrySetResult(false));
+        enabler.Token.Register(() => taskCompletionSourceToCompleteOnCancel.TrySetResult(false));
         this.taskCompletionSource.Task.ContinueWith(_ => enabler.Dispose());
         return this.taskCompletionSource.Task;
     }
