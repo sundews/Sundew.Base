@@ -24,7 +24,7 @@ public class LastUpdateEmitterTests
         var manualResetEvent = new ManualResetEventAsync(false);
         var testee = new LastUpdateEmitter<int>(async x =>
         {
-            await Task.Delay(100);
+            await Task.Delay(50);
             expectedResult.Add(x);
             if (x == finalExpectedValue)
             {
@@ -54,7 +54,7 @@ public class LastUpdateEmitterTests
         var manualResetEvent = new ManualResetEventAsync(false);
         var testee = new LastUpdateEmitter<string>(async x =>
         {
-            await Task.Delay(100);
+            await Task.Delay(50);
             expectedResult.Add(x);
             if (x == finalExpectedValue)
             {
@@ -84,7 +84,7 @@ public class LastUpdateEmitterTests
         var manualResetEvent = new ManualResetEventAsync(false);
         var testee = new LastUpdateEmitter<string?>(async x =>
         {
-            await Task.Delay(100);
+            await Task.Delay(50);
             expectedResult.Add(x);
             if (x == finalExpectedValue)
             {

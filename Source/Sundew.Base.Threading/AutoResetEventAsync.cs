@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 /// </summary>
 public sealed class AutoResetEventAsync : ResetEventAsync
 {
-    private readonly LinkedList<TaskCompletionSource<bool>> awaiters = new();
+    private readonly LinkedList<TaskCompletionSource<bool>> taskCompletionSources = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AutoResetEventAsync"/> class.
@@ -41,7 +41,7 @@ public sealed class AutoResetEventAsync : ResetEventAsync
         LinkedListNode<TaskCompletionSource<bool>>? taskCompletionSource;
         lock (this.lockObject)
         {
-            taskCompletionSource = this.awaiters.First;
+            taskCompletionSource = this.taskCompletionSources.First;
             this.privateIsSet = !taskCompletionSource.HasValue();
         }
 
@@ -71,12 +71,12 @@ public sealed class AutoResetEventAsync : ResetEventAsync
         {
             lock (this.lockObject)
             {
-                this.awaiters.Remove(taskCompletionSource);
+                this.taskCompletionSources.Remove(taskCompletionSource);
             }
 
             enabler.Dispose();
         });
-        this.awaiters.AddLast(taskCompletionSource);
+        this.taskCompletionSources.AddLast(taskCompletionSource);
 
         return taskCompletionSource.Task;
     }
