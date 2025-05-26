@@ -11,6 +11,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Sundew.Base.Threading;
 using Telerik.JustMock;
 using Xunit;
 
@@ -244,15 +245,17 @@ public class QuestTests
     [Fact]
     public async Task Start_When_TaskIsRunningAndCanceledShortlyAfter_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
     {
+        var manualResetEvent = new ManualResetEventAsync();
         using var cancellationTokenSource = new CancellationTokenSource();
         var quest = Quest.Create(
             __._,
             Task.Run(() =>
             {
-                Thread.Sleep(1000);
+                manualResetEvent.Wait(TimeSpan.FromMilliseconds(2000));
                 return 42;
             }),
             cancellationTokenSource.Token);
+        cancellationTokenSource.Token.Register(() => manualResetEvent.Set());
         cancellationTokenSource.CancelAfter(10);
 
         var start = quest.Start();
