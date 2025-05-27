@@ -64,12 +64,17 @@ public sealed class ManualResetEventAsync : ResetEventAsync
         var taskCompletionSourceToCompleteOnCancel = this.taskCompletionSource;
         var enabler = externalCancellation.EnableCancellation();
         enabler.Token.Register(() => taskCompletionSourceToCompleteOnCancel.TrySetResult(false));
-        this.taskCompletionSource.Task.ContinueWith(_ => enabler.Dispose());
-        return this.taskCompletionSource.Task;
-    }
+        return this.taskCompletionSource.Task.ContinueWith(task =>
+        {
+            var isSet = false;
+            lock (this.lockObject)
+            {
+                this.taskCompletionSource = null;
+                isSet = this.privateIsSet;
+            }
 
-    private protected override void OnResetWhileLocked()
-    {
-        this.taskCompletionSource = null;
+            enabler.Dispose();
+            return isSet;
+        });
     }
 }

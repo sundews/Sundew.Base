@@ -72,7 +72,6 @@ public abstract class ResetEventAsync
         lock (this.lockObject)
         {
             this.privateIsSet = false;
-            this.OnResetWhileLocked();
         }
     }
 
@@ -185,8 +184,4 @@ public abstract class ResetEventAsync
     private protected abstract void OnIsSetDuringWaitWhileLocked(ref bool isSet);
 
     private protected abstract Task<bool> ConfigureTaskWhileLocked(Cancellation linkedCancellation);
-
-    private protected virtual void OnResetWhileLocked()
-    {
-    }
 }

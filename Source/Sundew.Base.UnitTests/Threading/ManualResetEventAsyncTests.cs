@@ -72,7 +72,127 @@ public class ManualResetEventAsyncTests
     public async Task WaitAsync_When_Timedout_Then_ResultShouldBeFalse()
     {
         var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1)));
+
+        var result = await waitTask;
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => this.testee.IsSet.Should().BeFalse());
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_ResetAndSet_Then_ResultShouldBeFalse()
+    {
+        var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
         await Task.Delay(10);
+        this.testee.Reset();
+        await Task.Delay(10);
+        this.testee.Set();
+
+        var result = await waitTask;
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_SetAndResetBeforeAndSetAfter_Then_ResultShouldBeTrue()
+    {
+        this.testee.Set();
+        this.testee.Reset();
+        var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+        await Task.Delay(500);
+        this.testee.Set();
+
+        var result = await waitTask;
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_PreviouslyAwaitedAndSetAndResetBeforeAndSetAfter_Then_ResultShouldBeTrue()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+        this.testee.Set();
+        var waitTask1Result = await waitTask1;
+
+        Assert.Multiple(
+            () => waitTask1Result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+
+        this.testee.Reset();
+        this.testee.IsSet.Should().BeFalse();
+
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+        await Task.Delay(200);
+        this.testee.Set();
+
+        var result = await waitTask2;
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_SetAndResetBeforeAndTimeoutAfter_Then_ResultShouldBeFalse()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        await Task.Delay(50);
+        this.testee.Set();
+        var waitTask1Result = await waitTask1;
+
+        Assert.Multiple(
+            () => waitTask1Result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+
+        this.testee.Reset();
+        this.testee.IsSet.Should().BeFalse();
+
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+
+        var result = await waitTask2;
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => this.testee.IsSet.Should().BeFalse());
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_PreviouslyAwaitedAndDelayedSetAndResetBeforeAndSetAfter_Then_ResultShouldBeTrue()
+    {
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        await Task.Delay(50);
+        this.testee.Set();
+        var waitTask1Result = await waitTask1;
+
+        Assert.Multiple(
+            () => waitTask1Result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+
+        this.testee.Reset();
+        this.testee.IsSet.Should().BeFalse();
+
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        await Task.Delay(50);
+        this.testee.Set();
+
+        var result = await waitTask2;
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => this.testee.IsSet.Should().BeTrue());
+    }
+
+    [Fact]
+    public async Task WaitAsync_When_SetAndResetAndTimedout_Then_ResultShouldBeFalse()
+    {
+        this.testee.Set();
+        this.testee.Reset();
+        var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
 
         var result = await waitTask;
 
