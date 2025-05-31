@@ -66,16 +66,18 @@ public sealed class AutoResetEventAsync : ResetEventAsync
     {
         var taskCompletionSource = new TaskCompletionSource<bool>();
         var enabler = externalCancellation.EnableCancellation();
-        enabler.Token.Register(() => taskCompletionSource.TrySetResult(false));
-        taskCompletionSource.Task.ContinueWith(_ =>
-        {
-            lock (this.lockObject)
+        enabler.Register(() => taskCompletionSource.TrySetResult(false));
+        taskCompletionSource.Task.ContinueWith(
+            _ =>
             {
-                this.taskCompletionSources.Remove(taskCompletionSource);
-            }
+                lock (this.lockObject)
+                {
+                    this.taskCompletionSources.Remove(taskCompletionSource);
+                }
 
-            enabler.Dispose();
-        });
+                enabler.Dispose();
+            },
+            TaskScheduler.Default);
         this.taskCompletionSources.AddLast(taskCompletionSource);
 
         return taskCompletionSource.Task;

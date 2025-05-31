@@ -369,4 +369,180 @@ public class QuestTests
 #pragma warning restore VSTHRD003
         await result.Should().ThrowAsync<AggregateException>();
     }
+
+    [Fact]
+    public async Task Start_When_MappedAndCompleted_Then_IsCompletedSuccessfullyShouldBeTrueAndResultShouldBeExpected()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var quest = Quest.Create(
+            __._,
+            () =>
+            {
+                Thread.Sleep(10);
+                return expected;
+            },
+            cancellationTokenSource.Token);
+
+        var newQuest = quest.Map(x => x.ToString());
+
+        await newQuest.Start().Value;
+
+        newQuest.Task.IsCompletedSuccessfully.Should().BeTrue();
+        quest.Task.IsCompletedSuccessfully.Should().BeTrue();
+        (await newQuest.Task).Should().Be(expected.ToString());
+    }
+
+    [Fact]
+    public async Task Start_When_TriggeredAncestorAndCompleted_Then_IsCompletedSuccessfullyShouldBeTrueAndResultShouldBeExpected()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var quest = Quest.Create(
+            __._,
+            () =>
+            {
+                Thread.Sleep(10);
+                return expected;
+            },
+            cancellationTokenSource.Token);
+
+        var newQuest = quest.Map(x => x.ToString());
+        await quest.Start().Value;
+
+        await newQuest;
+        newQuest.Task.IsCompletedSuccessfully.Should().BeTrue();
+        quest.Task.IsCompletedSuccessfully.Should().BeTrue();
+        (await newQuest.Task).Should().Be(expected.ToString());
+    }
+
+    [Fact]
+    public void Dispose_When_MappedAndGuideIsDisposable_Then_DisposeShouldBeCalledOnce()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock,
+            _ => Task.CompletedTask,
+            cancellationTokenSource.Token);
+
+        var newQuest = quest.Map(() => expected);
+
+        newQuest.Dispose();
+
+        Mock.Assert(() => mock.Dispose(), Occurs.Once());
+    }
+
+    [Fact]
+    public void Dispose_When_MappedAndGuideAndDisposableAreTheSame_Then_DisposeShouldBeCalledOnce()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock,
+            _ => Task.CompletedTask,
+            mock,
+            cancellationTokenSource.Token);
+
+        var newQuest = quest.Map(() => expected);
+
+        newQuest.Dispose();
+
+        Mock.Assert(() => mock.Dispose(), Occurs.Once());
+    }
+
+    [Fact]
+    public void Dispose_When_MappedAndGuideAndDisposableAreDifferent_Then_DisposeShouldBeCalledOnceForEach()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock1 = Mock.Create<IDisposable>();
+        var mock2 = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock1,
+            _ => Task.CompletedTask,
+            mock2,
+            cancellationTokenSource.Token);
+
+        var newQuest = quest.Map(() => expected);
+
+        newQuest.Dispose();
+
+        Mock.Assert(() => mock1.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+    }
+
+    [Fact]
+    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableButQuestNot_Then_DisposeShouldBeCalledOnceButNotForResult()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock1 = Mock.Create<IDisposable>();
+        var mock2 = Mock.Create<IDisposable>();
+        var mock3 = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock1,
+            _ => Task.FromResult(mock3),
+            mock2,
+            cancellationTokenSource.Token);
+
+        var newQuest = quest.Map(_ => expected);
+
+        newQuest.Dispose();
+
+        Mock.Assert(() => mock1.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Never());
+    }
+
+    [Fact]
+    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndQuestStarted_Then_DisposeShouldBeCalledOnceForAll()
+    {
+        const int expected = 42;
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock1 = Mock.Create<IDisposable>();
+        var mock2 = Mock.Create<IDisposable>();
+        var mock3 = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock1,
+            _ => Task.FromResult(mock3),
+            mock2,
+            cancellationTokenSource.Token);
+        quest.Start();
+
+        var newQuest = quest.Map(_ => expected);
+
+        newQuest.Dispose();
+
+        Mock.Assert(() => mock1.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Once());
+    }
+
+    [Fact]
+    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndNewResultIsDisposableQuestStarted_Then_DisposeShouldBeCalledOnceForAll()
+    {
+        using var cancellationTokenSource = new CancellationTokenSource();
+        var mock1 = Mock.Create<IDisposable>();
+        var mock2 = Mock.Create<IDisposable>();
+        var mock3 = Mock.Create<IDisposable>();
+        var mock4 = Mock.Create<IDisposable>();
+        var quest = Quest.Create(
+            mock1,
+            _ => Task.FromResult(mock3),
+            mock2,
+            cancellationTokenSource.Token);
+        quest.Start();
+
+        var newQuest = quest.Map(_ => mock4);
+
+        newQuest.Dispose();
+
+        Mock.Assert(() => mock1.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock2.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock4.Dispose(), Occurs.Once());
+    }
 }

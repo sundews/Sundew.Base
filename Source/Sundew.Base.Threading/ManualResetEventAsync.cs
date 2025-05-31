@@ -63,18 +63,20 @@ public sealed class ManualResetEventAsync : ResetEventAsync
         this.taskCompletionSource ??= new TaskCompletionSource<bool>();
         var taskCompletionSourceToCompleteOnCancel = this.taskCompletionSource;
         var enabler = externalCancellation.EnableCancellation();
-        enabler.Token.Register(() => taskCompletionSourceToCompleteOnCancel.TrySetResult(false));
-        return this.taskCompletionSource.Task.ContinueWith(task =>
-        {
-            var isSet = false;
-            lock (this.lockObject)
+        enabler.Register(() => taskCompletionSourceToCompleteOnCancel.TrySetResult(false));
+        return this.taskCompletionSource.Task.ContinueWith(
+            _ =>
             {
-                this.taskCompletionSource = null;
-                isSet = this.privateIsSet;
-            }
+                var isSet = false;
+                lock (this.lockObject)
+                {
+                    this.taskCompletionSource = null;
+                    isSet = this.privateIsSet;
+                }
 
-            enabler.Dispose();
-            return isSet;
-        });
+                enabler.Dispose();
+                return isSet;
+            },
+            TaskScheduler.Default);
     }
 }

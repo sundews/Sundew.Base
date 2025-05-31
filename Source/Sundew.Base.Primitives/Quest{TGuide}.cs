@@ -11,17 +11,19 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using static Sundew.Base.Quest;
 
 /// <summary>
 /// Represents a quest for processing some type of operation.
 /// </summary>
 /// <typeparam name="TGuide">The Guide type.</typeparam>
-public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
+public sealed class Quest<TGuide> : IQuest
 {
     private readonly Task task;
     private readonly Task continuation;
-    private readonly IDisposable? disposable;
+    private readonly Quest.TryDisposeAction<TGuide, IDisposable> disposable;
     private readonly CancellationToken cancellationToken;
+    private readonly IQuest? ancestorQuest;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Quest{TGuide}"/> class.
@@ -30,13 +32,15 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
     /// <param name="task">The task.</param>
     /// <param name="disposable">The disposable.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
-    internal Quest(TGuide guide, Task task, IDisposable? disposable, CancellationToken cancellationToken)
+    /// <param name="ancestorQuest">The ancestor quest.</param>
+    internal Quest(TGuide guide, Task task, Quest.TryDisposeAction<TGuide, IDisposable> disposable, CancellationToken cancellationToken, IQuest? ancestorQuest)
     {
         this.Guide = guide;
         this.task = task;
         this.continuation = this.task.ContinueWith(this.Completion, cancellationToken);
-        this.disposable = ReferenceEquals(guide, disposable) ? default : disposable;
+        this.disposable = disposable;
         this.cancellationToken = cancellationToken;
+        this.ancestorQuest = ancestorQuest;
     }
 
     /// <summary>
@@ -48,6 +52,22 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
     /// Gets the Goal task.
     /// </summary>
     public Task Task => this.continuation;
+
+    /// <summary>
+    /// Gets a value indicating whether the quest has started.
+    /// </summary>
+    public bool IsStarted
+    {
+        get
+        {
+            if (this.ancestorQuest.HasValue())
+            {
+                return this.ancestorQuest.IsStarted;
+            }
+
+            return this.task.Status != TaskStatus.Created;
+        }
+    }
 
     /// <summary>
     /// Converts from a  <see cref="Quest{TGuide}"/> to an <see cref="Task"/>.
@@ -64,6 +84,12 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
     /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
     public R<QuestStart, InvalidOperationException> Start()
     {
+        if (this.ancestorQuest != null)
+        {
+            var ancestorStart = this.ancestorQuest.Start();
+            return ancestorStart.Map(x => x with { Task = this.continuation });
+        }
+
         if (this.task.Status == TaskStatus.Created)
         {
             try
@@ -83,7 +109,7 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
     /// <inheritdoc/>
     public void Dispose()
     {
-        if (this.task.Status != TaskStatus.Created)
+        if (this.IsStarted)
         {
             try
             {
@@ -94,14 +120,13 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
             }
         }
 
-        Quest.TryDispose(this.Guide);
         Quest.TryDispose(this.disposable);
     }
 
     /// <inheritdoc/>
     public async ValueTask DisposeAsync()
     {
-        if (this.task.Status != TaskStatus.Created)
+        if (this.IsStarted)
         {
             try
             {
@@ -112,7 +137,6 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
             }
         }
 
-        await Quest.TryDisposeAsync(this.Guide).ConfigureAwait(false);
         await Quest.TryDisposeAsync(this.disposable).ConfigureAwait(false);
     }
 
@@ -128,6 +152,163 @@ public sealed class Quest<TGuide> : IAsyncDisposable, IDisposable
     /// <param name="continueOnCapturedContext">The continueOnCapturedContext.</param>
     /// <returns>A <see cref="ConfiguredTaskAwaitable"/>.</returns>
     public ConfiguredTaskAwaitable ConfigureAwait(bool continueOnCapturedContext) => this.Task.ConfigureAwait(continueOnCapturedContext);
+
+    /// <summary>
+    /// Transforms the result of the current quest into a new result by applying the specified asynchronous function.
+    /// </summary>
+    /// <remarks>The transformation is performed asynchronously, ensuring that the current quest completes
+    /// before invoking the <paramref name="nextQuest"/> function. The returned quest maintains the same guide and
+    /// cancellation token as the original quest.</remarks>
+    /// <typeparam name="TNewGuide">The type of the new guide.</typeparam>
+    /// <typeparam name="TNewResult">The type of the result produced by the next quest.</typeparam>
+    /// <param name="nextGuide">The next guide.</param>
+    /// <param name="nextQuest">A function that defines the next quest, returning a task that produces the new result.</param>
+    /// <returns>A new <see cref="Quest{TNewGuide, TNewResult}"/> instance representing the transformed quest.</returns>
+    public Quest<TNewGuide, TNewResult> Map<TNewGuide, TNewResult>(Func<TGuide, TNewGuide> nextGuide, Func<Task<TNewResult>> nextQuest)
+    {
+        async Task<TNewResult> Continuation()
+        {
+            await this.Task.ConfigureAwait(false);
+            return await nextQuest().ConfigureAwait(false);
+        }
+
+        var newGuide = nextGuide(this.Guide);
+        return new Quest<TNewGuide, TNewResult>(
+            newGuide,
+            Continuation(),
+            new Quest.TryDisposeAction<TNewGuide, IDisposable>(newGuide, null),
+            this.cancellationToken,
+            this);
+    }
+
+    /// <summary>
+    /// Transforms the result of the current quest into a new result by applying the specified asynchronous function.
+    /// </summary>
+    /// <remarks>The transformation is performed asynchronously, ensuring that the current quest completes
+    /// before invoking the <paramref name="nextQuest"/> function. The returned quest maintains the same guide and
+    /// cancellation token as the original quest.</remarks>
+    /// <typeparam name="TNewGuide">The type of the new guide.</typeparam>
+    /// <typeparam name="TNewResult">The type of the result produced by the next quest.</typeparam>
+    /// <param name="nextGuide">The next guide.</param>
+    /// <param name="nextQuest">A function that defines the next quest, returning a task that produces the new result.</param>
+    /// <returns>A new <see cref="Quest{TNewGuide, TNewResult}"/> instance representing the transformed quest.</returns>
+    public Quest<TNewGuide, TNewResult> Map<TNewGuide, TNewResult>(Func<TGuide, TNewGuide> nextGuide, Func<TNewResult> nextQuest)
+    {
+        async Task<TNewResult> Continuation()
+        {
+            await this.Task.ConfigureAwait(false);
+            return nextQuest();
+        }
+
+        var newGuide = nextGuide(this.Guide);
+        return new Quest<TNewGuide, TNewResult>(
+            newGuide,
+            Continuation(),
+            new Quest.TryDisposeAction<TNewGuide, IDisposable>(newGuide, null),
+            this.cancellationToken,
+            this);
+    }
+
+    /// <summary>
+    /// Transforms the result of the current quest into a new result by applying the specified asynchronous function.
+    /// </summary>
+    /// <remarks>The transformation is performed asynchronously, ensuring that the current quest completes
+    /// before invoking the <paramref name="nextQuest"/> function. The returned quest maintains the same guide and
+    /// cancellation token as the original quest.</remarks>
+    /// <typeparam name="TNewResult">The type of the result produced by the next quest.</typeparam>
+    /// <param name="nextQuest">A function that defines the next quest, returning a task that produces the new result.</param>
+    /// <returns>A new <see cref="Quest{TGuide, TNewResult}"/> instance representing the transformed quest.</returns>
+    public Quest<TGuide, TNewResult> Map<TNewResult>(Func<Task<TNewResult>> nextQuest)
+    {
+        async Task<TNewResult> Continuation()
+        {
+            await this.Task.ConfigureAwait(false);
+            return await nextQuest().ConfigureAwait(false);
+        }
+
+        return new Quest<TGuide, TNewResult>(
+            this.Guide,
+            Continuation(),
+            new Quest.TryDisposeAction<TGuide, IDisposable>(default, null),
+            this.cancellationToken,
+            this);
+    }
+
+    /// <summary>
+    /// Transforms the result of the current quest into a new result by applying the specified asynchronous function.
+    /// </summary>
+    /// <remarks>The transformation is performed asynchronously, ensuring that the current quest completes
+    /// before invoking the <paramref name="nextQuest"/> function. The returned quest maintains the same guide and
+    /// cancellation token as the original quest.</remarks>
+    /// <typeparam name="TNewResult">The type of the result produced by the next quest.</typeparam>
+    /// <param name="nextQuest">A function that defines the next quest, returning a task that produces the new result.</param>
+    /// <returns>A new <see cref="Quest{TGuide, TNewResult}"/> instance representing the transformed quest.</returns>
+    public Quest<TGuide, TNewResult> Map<TNewResult>(Func<TNewResult> nextQuest)
+    {
+        async Task<TNewResult> Continuation()
+        {
+            await this.Task.ConfigureAwait(false);
+            return nextQuest();
+        }
+
+        return new Quest<TGuide, TNewResult>(
+            this.Guide,
+            Continuation(),
+            new Quest.TryDisposeAction<TGuide, IDisposable>(default, null),
+            this.cancellationToken,
+            this);
+    }
+
+    /// <summary>
+    /// Transforms the result of the current quest into a new result by applying the specified asynchronous function.
+    /// </summary>
+    /// <remarks>The transformation is performed asynchronously, ensuring that the current quest completes
+    /// before invoking the <paramref name="nextQuest"/> function. The returned quest maintains the same guide and
+    /// cancellation token as the original quest.</remarks>
+    /// <typeparam name="TNewGuide">The type of the new guide.</typeparam>
+    /// <param name="nextGuide">The next guide.</param>
+    /// <param name="nextQuest">A function that defines the next quest, returning a task that produces the new result.</param>
+    /// <returns>A new <see cref="Quest{TNewGuide}"/> instance representing the transformed quest.</returns>
+    public Quest<TNewGuide> Map<TNewGuide>(Func<TGuide, TNewGuide> nextGuide, Func<Task> nextQuest)
+    {
+        async Task Continuation()
+        {
+            await this.Task.ConfigureAwait(false);
+            await nextQuest().ConfigureAwait(false);
+        }
+
+        var newGuide = nextGuide(this.Guide);
+        return new Quest<TNewGuide>(
+            newGuide,
+            Continuation(),
+            new TryDisposeAction<TNewGuide, IDisposable>(newGuide, null),
+            this.cancellationToken,
+            this);
+    }
+
+    /// <summary>
+    /// Transforms the result of the current quest into a new result by applying the specified asynchronous function.
+    /// </summary>
+    /// <remarks>The transformation is performed asynchronously, ensuring that the current quest completes
+    /// before invoking the <paramref name="nextQuest"/> function. The returned quest maintains the same guide and
+    /// cancellation token as the original quest.</remarks>
+    /// <param name="nextQuest">A function that defines the next quest, returning a task that produces the new result.</param>
+    /// <returns>A new <see cref="Quest{TGuide}"/> instance representing the transformed quest.</returns>
+    public Quest<TGuide> Map(Func<Task> nextQuest)
+    {
+        async Task Continuation()
+        {
+            await this.Task.ConfigureAwait(false);
+            await nextQuest().ConfigureAwait(false);
+        }
+
+        return new Quest<TGuide>(
+            this.Guide,
+            Continuation(),
+            new Quest.TryDisposeAction<TGuide, IDisposable>(default, null),
+            this.cancellationToken,
+            this);
+    }
 
     private void Completion(Task task)
     {

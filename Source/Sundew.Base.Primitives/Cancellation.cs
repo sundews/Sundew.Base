@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 /// </summary>
 public struct Cancellation
 {
-    private readonly CancellationToken originCancellationToken;
+    private readonly CancellationToken externalCancellationToken;
     private readonly CancellationTokenSource? cancellationTokenSource;
     private readonly Flag? consumedFlag = new Flag();
 
@@ -64,7 +64,7 @@ public struct Cancellation
     /// <param name="timeout">The timeout.</param>
     public Cancellation(CancellationToken cancellationToken, TimeSpan timeout)
     {
-        this.originCancellationToken = cancellationToken;
+        this.externalCancellationToken = cancellationToken;
         this.Timeout = timeout;
     }
 
@@ -76,7 +76,7 @@ public struct Cancellation
     /// <param name="cancellationTokenSource">The cancellation token source.</param>
     private Cancellation(CancellationToken cancellationToken, TimeSpan timeout, CancellationTokenSource cancellationTokenSource)
     {
-        this.originCancellationToken = cancellationToken;
+        this.externalCancellationToken = cancellationToken;
         this.Timeout = timeout;
         this.cancellationTokenSource = cancellationTokenSource;
     }
@@ -94,7 +94,7 @@ public struct Cancellation
     /// <summary>
     /// Gets the token.
     /// </summary>
-    public CancellationToken Token => this.cancellationTokenSource?.Token ?? this.originCancellationToken;
+    public CancellationToken Token => this.cancellationTokenSource?.Token ?? this.externalCancellationToken;
 
     /// <summary>
     /// Gets a value indicating whether cancellation is requested.
@@ -152,9 +152,9 @@ public struct Cancellation
         if (!this.cancellationTokenSource.HasValue())
         {
             this = new Cancellation(
-                this.originCancellationToken,
+                this.externalCancellationToken,
                 this.consumedFlag.HasValue() ? this.Timeout : System.Threading.Timeout.InfiniteTimeSpan,
-                this.originCancellationToken != CancellationToken.None ? CancellationTokenSource.CreateLinkedTokenSource(this.originCancellationToken) : new CancellationTokenSource());
+                this.externalCancellationToken != CancellationToken.None ? CancellationTokenSource.CreateLinkedTokenSource(this.externalCancellationToken) : new CancellationTokenSource());
         }
 
         if (startTimeout && this.Timeout != System.Threading.Timeout.InfiniteTimeSpan)
@@ -162,64 +162,7 @@ public struct Cancellation
             this.cancellationTokenSource?.CancelAfter(this.Timeout);
         }
 
-        return new Enabler(this);
-    }
-
-    /// <summary>
-    /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
-    /// </summary>
-    /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
-    /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
-    public CancellationTokenRegistration Register(Action callback)
-    {
-        return this.Register(callback, false);
-    }
-
-    /// <summary>
-    /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
-    /// </summary>
-    /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
-    /// <param name="useSynchronizationContext">A value that indicates whether to capture the current <see cref="T:System.Threading.SynchronizationContext" /> and use it when invoking the <paramref name="callback" />.</param>
-    /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
-    public CancellationTokenRegistration Register(Action callback, bool useSynchronizationContext)
-    {
-        return this.Token.Register(callback, useSynchronizationContext);
-    }
-
-    /// <summary>
-    /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
-    /// </summary>
-    /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
-    /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked. This may be null.</param>
-    /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
-    public CancellationTokenRegistration Register(Action<object?> callback, object? state)
-    {
-        return this.Token.Register(callback, state);
-    }
-
-    /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</summary>
-    /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</param>
-    /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked.  This may be <see langword="null" />.</param>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="callback" /> is <see langword="null" />.</exception>
-    /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
-    public CancellationTokenRegistration Register(Action<object?, CancellationToken> callback, object? state)
-    {
-        var token = this;
-        return this.Token.Register(x => callback(x, token.Token), state, false);
-    }
-
-    /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.</summary>
-    /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
-    /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked. This may be null.</param>
-    /// <param name="useSynchronizationContext">A Boolean value that indicates whether to capture the current <see cref="T:System.Threading.SynchronizationContext" /> and use it when invoking the <paramref name="callback" />.</param>
-    /// <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
-    /// <exception cref="T:System.ArgumentNullException">
-    /// <paramref name="callback" /> is null.</exception>
-    /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
-    public CancellationTokenRegistration Register(Action<object?> callback, object? state, bool useSynchronizationContext)
-    {
-        return this.Token.Register(callback, state, useSynchronizationContext);
+        return new Enabler(this, this.Token);
     }
 
     /// <summary>
@@ -228,20 +171,23 @@ public struct Cancellation
     public readonly struct Enabler : IDisposable
     {
         private readonly Cancellation cancellation;
+        private readonly CancellationToken cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Enabler"/> struct.
         /// </summary>
         /// <param name="cancellation">The cancellation.</param>
-        public Enabler(Cancellation cancellation)
+        /// <param name="cancellationToken">The cancellation token.</param>
+        public Enabler(Cancellation cancellation, CancellationToken cancellationToken)
         {
             this.cancellation = cancellation;
+            this.cancellationToken = cancellationToken;
         }
 
         /// <summary>
         /// Gets the token.
         /// </summary>
-        public CancellationToken Token => this.cancellation.Token;
+        public CancellationToken Token => this.cancellationToken;
 
         /// <summary>
         /// Gets a value indicating whether cancellation is requested.
@@ -260,6 +206,124 @@ public struct Cancellation
         public static implicit operator CancellationToken(Cancellation.Enabler enabler)
         {
             return enabler.Token;
+        }
+
+        /// <summary>
+        /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
+        /// </summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action callback)
+        {
+            return this.Register(callback, false);
+        }
+
+        /// <summary>
+        /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
+        /// </summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <param name="useSynchronizationContext">A value that indicates whether to capture the current <see cref="T:System.Threading.SynchronizationContext" /> and use it when invoking the <paramref name="callback" />.</param>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action callback, bool useSynchronizationContext)
+        {
+            return this.Token.Register(callback, useSynchronizationContext);
+        }
+
+        /// <summary>
+        /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
+        /// </summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked. This may be null.</param>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<object?> callback, object? state)
+        {
+            return this.Token.Register(callback, state);
+        }
+
+        /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</param>
+        /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked.  This may be <see langword="null" />.</param>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="callback" /> is <see langword="null" />.</exception>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<object?, CancellationToken> callback, object? state)
+        {
+            var token = this;
+            return this.Token.Register(x => callback(x, token.Token), state, false);
+        }
+
+        /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.</summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked. This may be null.</param>
+        /// <param name="useSynchronizationContext">A Boolean value that indicates whether to capture the current <see cref="T:System.Threading.SynchronizationContext" /> and use it when invoking the <paramref name="callback" />.</param>
+        /// <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="callback" /> is null.</exception>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<object?> callback, object? state, bool useSynchronizationContext)
+        {
+            return this.Token.Register(callback, state, useSynchronizationContext);
+        }
+
+        /// <summary>
+        /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
+        /// </summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<CancelReason> callback)
+        {
+            var enabler = this;
+            return this.Register(_ => callback(GetCancelReason(enabler)), false);
+        }
+
+        /// <summary>
+        /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
+        /// </summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <param name="useSynchronizationContext">A value that indicates whether to capture the current <see cref="T:System.Threading.SynchronizationContext" /> and use it when invoking the <paramref name="callback" />.</param>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<CancelReason> callback, bool useSynchronizationContext)
+        {
+            var enabler = this;
+            return this.Token.Register(_ => callback(GetCancelReason(enabler)), useSynchronizationContext);
+        }
+
+        /// <summary>
+        /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
+        /// </summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked. This may be null.</param>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state)
+        {
+            var enabler = this;
+            return this.Token.Register(x => callback(GetCancelReason(enabler), x), state);
+        }
+
+        /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</param>
+        /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked.  This may be <see langword="null" />.</param>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="callback" /> is <see langword="null" />.</exception>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<CancelReason, object?, CancellationToken> callback, object? state)
+        {
+            var token = this.cancellation.externalCancellationToken;
+            return this.Token.Register(x => callback(GetCancelReason(token), x, token), state, false);
+        }
+
+        /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.</summary>
+        /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
+        /// <param name="state">The state to pass to the <paramref name="callback" /> when the delegate is invoked. This may be null.</param>
+        /// <param name="useSynchronizationContext">A Boolean value that indicates whether to capture the current <see cref="T:System.Threading.SynchronizationContext" /> and use it when invoking the <paramref name="callback" />.</param>
+        /// <exception cref="T:System.ObjectDisposedException">The associated <see cref="T:System.Threading.CancellationTokenSource" /> has been disposed.</exception>
+        /// <exception cref="T:System.ArgumentNullException">
+        /// <paramref name="callback" /> is null.</exception>
+        /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
+        public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state, bool useSynchronizationContext)
+        {
+            var token = this.cancellation.externalCancellationToken;
+            return this.Token.Register(actualState => callback(GetCancelReason(token), actualState), state, useSynchronizationContext);
         }
 
         /// <summary>
@@ -292,6 +356,7 @@ public struct Cancellation
 
             return false;
         }
+
 #endif
 
         /// <summary>
@@ -319,6 +384,11 @@ public struct Cancellation
             {
                 this.cancellation.cancellationTokenSource?.Dispose();
             }
+        }
+
+        private static CancelReason GetCancelReason(in CancellationToken externalCancellationToken)
+        {
+            return externalCancellationToken.IsCancellationRequested ? CancelReason.ExternallyRequested : CancelReason.InternalOrTimeout;
         }
     }
 }
