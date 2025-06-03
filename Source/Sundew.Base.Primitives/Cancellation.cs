@@ -8,8 +8,8 @@
 namespace Sundew.Base;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using System.Threading.Tasks;
 
 /// <summary>
 /// A timeout cancellation token used to pass timeout into a cancellation token.
@@ -195,6 +195,12 @@ public struct Cancellation
         public bool IsCancellationRequested => this.Token.IsCancellationRequested;
 
         /// <summary>
+        /// Gets the cancel reason if cancellation is requested.
+        /// </summary>
+        [MemberNotNullWhen(true, nameof(IsCancellationRequested))]
+        public CancelReason? CancelReason => this.IsCancellationRequested ? GetCancelReason(this.cancellation.externalCancellationToken) : default;
+
+        /// <summary>
         /// Gets a value indicating whether cancellation is supported.
         /// </summary>
         public bool CanBeCanceled => this.Token.CanBeCanceled;
@@ -346,7 +352,7 @@ public struct Cancellation
         /// Requests cancellation.
         /// </summary>
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
-        public async Task<bool> CancelAsync()
+        public async System.Threading.Tasks.Task<bool> CancelAsync()
         {
             if (this.cancellation.cancellationTokenSource.HasValue())
             {
@@ -388,7 +394,7 @@ public struct Cancellation
 
         private static CancelReason GetCancelReason(in CancellationToken externalCancellationToken)
         {
-            return externalCancellationToken.IsCancellationRequested ? CancelReason.ExternallyRequested : CancelReason.InternalOrTimeout;
+            return externalCancellationToken.IsCancellationRequested ? Base.CancelReason.ExternallyRequested : Base.CancelReason.InternalOrTimeout;
         }
     }
 }
