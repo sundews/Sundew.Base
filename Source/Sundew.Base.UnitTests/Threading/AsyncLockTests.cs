@@ -5,8 +5,6 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-#pragma warning disable xUnit1006
-#pragma warning disable xUnit1025
 namespace Sundew.Base.UnitTests.Threading;
 
 using System;

@@ -56,6 +56,7 @@ public class CancellationTests
     [Fact]
     public async Task EnableCancellation_When_CancelAsync_Then_CancelReasonShouldBeInternal()
     {
+        var manualResetEventAsync = new ManualResetEventAsync();
         var cancellation = default(Cancellation);
         var enabler = cancellation.EnableCancellation();
         _ = Task.Run(async () =>
@@ -63,8 +64,10 @@ public class CancellationTests
             await Task.Delay(50);
             await enabler.CancelAsync();
             enabler.Dispose();
+            manualResetEventAsync.Set();
         });
-        await Task.Delay(500);
+
+        await manualResetEventAsync.WaitAsync();
 
         enabler.CancelReason.Should().Be(CancelReason.Internal);
     }
@@ -72,12 +75,17 @@ public class CancellationTests
     [Fact]
     public async Task EnablerRegister_When_Timeout_Then_CancelReasonShouldBeTimeout()
     {
+        var manualResetEventAsync = new ManualResetEventAsync();
         var taskCompletionSource = new TaskCompletionSource<CancelReason>();
         var cancellation = new Cancellation(TimeSpan.FromMilliseconds(50));
         using var enabler = cancellation.EnableCancellation();
-        using var register = enabler.Register(reason => taskCompletionSource.TrySetResult(reason));
+        using var register = enabler.Register(reason =>
+        {
+            taskCompletionSource.TrySetResult(reason);
+            manualResetEventAsync.Set();
+        });
 
-        await Task.Delay(500);
+        await manualResetEventAsync.WaitAsync();
 
         var result = await taskCompletionSource.Task;
 
