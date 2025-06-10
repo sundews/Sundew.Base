@@ -139,14 +139,15 @@ public sealed class CancellableJob<TState> : IJob
         Task? task = null;
         using (await this.@lock.LockAsync().ConfigureAwait(false))
         {
-            if (this.jobContext.HasValue())
+            var jobContext = this.jobContext;
+            if (jobContext.HasValue())
             {
 #if NET7_0_OR_GREATER
-                await this.jobContext.CancellationEnabler.CancelAsync().ConfigureAwait(false);
+                await jobContext.CancellationEnabler.CancelAsync().ConfigureAwait(false);
 #else
-                this.jobContext.CancellationEnabler.Cancel();
+                jobContext.CancellationEnabler.Cancel();
 #endif
-                task = this.jobContext.JobContinuationTask;
+                task = jobContext.JobContinuationTask;
             }
         }
 

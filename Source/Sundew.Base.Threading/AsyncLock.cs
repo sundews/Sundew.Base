@@ -343,7 +343,7 @@ public sealed class AsyncLock : IDisposable
         var (ownerId, hasLock) = this.UpdateOwner();
         if (hasLock)
         {
-            return new LockResult(this, true, ownerId);
+            return new LockDisposer(this, ownerId);
         }
 
         var result = this.semaphoreSlim.Wait(timeoutTimeSpan, cancellationToken);
