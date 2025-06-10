@@ -70,6 +70,21 @@ public class CancellationTests
     }
 
     [Fact]
+    public async Task EnablerRegister_When_Timeout_Then_CancelReasonShouldBeTimeout()
+    {
+        var taskCompletionSource = new TaskCompletionSource<CancelReason>();
+        var cancellation = new Cancellation(TimeSpan.FromMilliseconds(50));
+        using var enabler = cancellation.EnableCancellation();
+        using var register = enabler.Register(reason => taskCompletionSource.TrySetResult(reason));
+
+        await Task.Delay(500);
+
+        var result = await taskCompletionSource.Task;
+
+        result.Should().Be(CancelReason.Timeout);
+    }
+
+    [Fact]
     public async Task EnableCancellation_When_ExternalCancelled_Then_CancelReasonShouldBeExternal()
     {
         var cancellationTokenSource = new CancellationTokenSource();

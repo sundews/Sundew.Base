@@ -75,7 +75,7 @@ public sealed class InitializeFlag
     public Task<bool> WhenInitialized(Cancellation cancellation = default)
     {
         var enabler = cancellation.EnableCancellation();
-        enabler.Register(x => this.taskCompletionSource.TrySetResult(false));
+        var registration = enabler.Register(x => this.taskCompletionSource.TrySetResult(false));
         return this.taskCompletionSource.Task.ContinueWith(
             task =>
             {
@@ -85,6 +85,7 @@ public sealed class InitializeFlag
                 }
                 finally
                 {
+                    registration.Dispose();
                     enabler.Dispose();
                 }
             },

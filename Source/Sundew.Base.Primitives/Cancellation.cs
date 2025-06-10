@@ -281,8 +281,8 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason> callback)
         {
-            var enabler = this;
-            return this.Register(_ => callback(this.GetCancelReason(enabler)), false);
+            var token = this.cancellation.externalCancellationToken;
+            return this.Register(_ => callback(this.GetCancelReason(token)), false);
         }
 
         /// <summary>
@@ -293,8 +293,8 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason> callback, bool useSynchronizationContext)
         {
-            var enabler = this;
-            return this.Token.Register(_ => callback(this.GetCancelReason(enabler)), useSynchronizationContext);
+            var token = this.cancellation.externalCancellationToken;
+            return this.Token.Register(_ => callback(this.GetCancelReason(token)), useSynchronizationContext);
         }
 
         /// <summary>
@@ -305,8 +305,8 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state)
         {
-            var enabler = this;
-            return this.Token.Register(x => callback(this.GetCancelReason(enabler), x), state);
+            var token = this.cancellation.externalCancellationToken;
+            return this.Token.Register(x => callback(this.GetCancelReason(token), x), state);
         }
 
         /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</summary>
