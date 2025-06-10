@@ -67,6 +67,7 @@ public sealed class AutoResetEventAsync : ResetEventAsync
         var taskCompletionSource = new TaskCompletionSource<bool>();
         var enabler = externalCancellation.EnableCancellation();
         enabler.Register(() => taskCompletionSource.TrySetResult(false));
+        this.taskCompletionSources.AddLast(taskCompletionSource);
         taskCompletionSource.Task.ContinueWith(
             _ =>
             {
@@ -83,7 +84,6 @@ public sealed class AutoResetEventAsync : ResetEventAsync
                 }
             },
             TaskScheduler.Default);
-        this.taskCompletionSources.AddLast(taskCompletionSource);
 
         return taskCompletionSource.Task;
     }

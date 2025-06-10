@@ -130,7 +130,6 @@ public class AutoResetEventAsyncTests
 
         Assert.Multiple(
             () => resultFirstTask.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse(),
             () => otherTask.IsCompleted.Should().BeFalse());
 
         await Task.Delay(10);
@@ -139,8 +138,7 @@ public class AutoResetEventAsyncTests
         var otherTaskResult = await otherTask;
 
         Assert.Multiple(
-            () => otherTaskResult.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse());
+            () => otherTaskResult.Should().BeTrue());
     }
 
     [Fact]

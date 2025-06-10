@@ -8,7 +8,6 @@
 namespace Sundew.Base.UnitTests.Primitives;
 
 using System;
-using System.Diagnostics;
 using FluentAssertions;
 using Xunit;
 
@@ -270,27 +269,27 @@ public class RTests
     }
 
     [Fact]
-    public void ToOption_When_SuccessResultAndTargetIsReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public void MapToOption_When_SuccessResultAndTargetIsReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         const string expectedResult = "Value";
         var testee = R.Success(expectedResult);
 
         R<string, string> r = testee;
 
-        var result = R.ToOption(r);
+        var result = R.MapToOption(r);
 
         result.HasValue.Should().BeTrue();
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
     }
 
     [Fact]
-    public void ToResultOption_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
+    public void MapToResultOption_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var testee = R.SuccessOption(default(string));
 
         R<string?, string> r = testee;
 
-        var result = r.ToResultOption();
+        var result = r.MapToResultOption();
 
         result.HasValue.Should().BeFalse();
         result.GetValueOrDefault().Value.Should().BeNull();
@@ -304,7 +303,7 @@ public class RTests
 
         R<string?, string> r = testee;
 
-        var result = r.ToResultOption();
+        var result = r.MapToResultOption();
 
         result.HasValue.Should().BeTrue();
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
@@ -380,7 +379,7 @@ public class RTests
 
         R<string, string> r = testee;
 
-        var result = r.ToOptionResult();
+        var result = r.MapToOptionResult();
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(expectedResult);
@@ -394,7 +393,7 @@ public class RTests
 
         R<int, string> r = testee;
 
-        var result = r.ToValueOptionResult();
+        var result = r.MapToValueOptionResult();
 
         result.IsSuccess.Should().BeTrue();
         result.Value.HasValue.Should().BeTrue();
@@ -438,5 +437,20 @@ public class RTests
         var result = r.Evaluate("fallback");
 
         result.Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [InlineData("value", -1, 0, true)]
+    [InlineData(null, 42, 42, false)]
+    public void ToResultOptionMap_Then_ResultShouldBeExpectedResult(string? input, int error, int expectedError, bool expectedResult)
+    {
+        var testee = R.SuccessOption(input);
+
+        R<string?> r = testee;
+        var result = r.MapToResultOption().Map(error);
+
+        result.IsSuccess.Should().Be(expectedResult);
+        result.Value.Should().Be(input);
+        result.Error.Should().Be(expectedError);
     }
 }
