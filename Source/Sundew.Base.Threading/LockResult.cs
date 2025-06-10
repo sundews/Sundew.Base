@@ -17,6 +17,7 @@ public sealed class LockResult : IDisposable
 {
     private readonly AsyncLock asyncLock;
     private readonly bool hasLock;
+    private readonly long ownerId;
     private bool isConfirmed;
 
     /// <summary>
@@ -24,10 +25,12 @@ public sealed class LockResult : IDisposable
     /// </summary>
     /// <param name="asyncLock">The async lock.</param>
     /// <param name="hasLock">if set to <c>true</c> [has lock].</param>
-    internal LockResult(AsyncLock asyncLock, bool hasLock)
+    /// <param name="ownerId">The owner id.</param>
+    internal LockResult(AsyncLock asyncLock, bool hasLock, long ownerId)
     {
         this.asyncLock = asyncLock;
         this.hasLock = hasLock;
+        this.ownerId = ownerId;
     }
 
     /// <summary>
@@ -62,7 +65,7 @@ public sealed class LockResult : IDisposable
     {
         if (this.hasLock)
         {
-            this.asyncLock.InternalRelease();
+            this.asyncLock.InternalRelease(this.ownerId);
         }
 
         if (!this.isConfirmed)

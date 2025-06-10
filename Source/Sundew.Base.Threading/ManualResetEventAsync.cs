@@ -68,13 +68,19 @@ public sealed class ManualResetEventAsync : ResetEventAsync
             _ =>
             {
                 var isSet = false;
-                lock (this.lockObject)
+                try
                 {
-                    this.taskCompletionSource = null;
-                    isSet = this.privateIsSet;
+                    lock (this.lockObject)
+                    {
+                        this.taskCompletionSource = null;
+                        isSet = this.privateIsSet;
+                    }
+                }
+                finally
+                {
+                    enabler.Dispose();
                 }
 
-                enabler.Dispose();
                 return isSet;
             },
             TaskScheduler.Default);

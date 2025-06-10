@@ -7,6 +7,8 @@
 
 namespace Sundew.Base.UnitTests.Initialization;
 
+using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Sundew.Base.Initialization;
 using Xunit;
@@ -53,5 +55,39 @@ public class InitializeFlagTests
         var result = testee.Initialize();
 
         result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AwaitFlag_Then_()
+    {
+        var testee = new InitializeFlag();
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(100).ConfigureAwait(false);
+            testee.Initialize();
+        });
+
+        var result = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(500)));
+
+        Assert.Multiple(
+            () => result.Should().BeTrue(),
+            () => testee.IsInitialized.Should().BeTrue());
+    }
+
+    [Fact]
+    public async Task AwaitFlag_Then_2()
+    {
+        var testee = new InitializeFlag();
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(500).ConfigureAwait(false);
+            testee.Initialize();
+        });
+
+        var result = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(50)));
+
+        Assert.Multiple(
+            () => result.Should().BeFalse(),
+            () => testee.IsInitialized.Should().BeFalse());
     }
 }

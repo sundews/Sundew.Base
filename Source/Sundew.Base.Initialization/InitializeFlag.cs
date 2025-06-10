@@ -8,14 +8,15 @@
 namespace Sundew.Base.Initialization;
 
 using System;
-using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Represents a thread safe initialize flag.
 /// </summary>
 public sealed class InitializeFlag
 {
-    private int flag;
+    private readonly TaskCompletionSource<bool> taskCompletionSource = new();
 
     /// <summary>
     /// Occurs when [initialized].
@@ -28,7 +29,7 @@ public sealed class InitializeFlag
     /// <value>
     ///   <c>true</c> if this instance is initialized; otherwise, <c>false</c>.
     /// </value>
-    public bool IsInitialized => this.flag == 1;
+    public bool IsInitialized => this.taskCompletionSource.Task is { Status: TaskStatus.RanToCompletion, Result: true };
 
     /// <summary>
     /// Performs an implicit conversion from <see cref="InitializeFlag" /> to <see cref="bool" />.
@@ -48,12 +49,45 @@ public sealed class InitializeFlag
     /// <returns>A value indicating whether the flag was just initialized.</returns>
     public bool Initialize()
     {
-        var result = Interlocked.Exchange(ref this.flag, 1) == 0;
+        var result = this.taskCompletionSource.TrySetResult(true);
         if (result)
         {
             this.Initialized?.Invoke(this, EventArgs.Empty);
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Awaits the initialization of the flag.
+    /// </summary>
+    /// <returns>A <see cref="TaskAwaiter"/>.</returns>
+    public TaskAwaiter<bool> GetAwaiter()
+    {
+        return this.taskCompletionSource.Task.GetAwaiter();
+    }
+
+    /// <summary>
+    /// Enhances the initialization with cancellation support.
+    /// </summary>
+    /// <param name="cancellation">The cancellation.</param>
+    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+    public Task<bool> WhenInitialized(Cancellation cancellation = default)
+    {
+        var enabler = cancellation.EnableCancellation();
+        enabler.Register(x => this.taskCompletionSource.TrySetResult(false));
+        return this.taskCompletionSource.Task.ContinueWith(
+            task =>
+            {
+                try
+                {
+                    return task.Result;
+                }
+                finally
+                {
+                    enabler.Dispose();
+                }
+            },
+            TaskScheduler.Default);
     }
 }

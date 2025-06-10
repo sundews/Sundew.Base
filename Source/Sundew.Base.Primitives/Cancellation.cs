@@ -168,13 +168,16 @@ public struct Cancellation
     /// <summary>
     /// Represents a running cancellation.
     /// </summary>
-    public readonly struct Enabler : IDisposable
+    public sealed class Enabler : IDisposable
     {
+        private const int InternalCancelReason = (int)Base.CancelReason.Internal;
+        private const int NoCancelReason = -1;
         private readonly Cancellation cancellation;
         private readonly CancellationToken cancellationToken;
+        private int cancelReason = NoCancelReason;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Enabler"/> struct.
+        /// Initializes a new instance of the <see cref="Enabler"/> class.
         /// </summary>
         /// <param name="cancellation">The cancellation.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -198,7 +201,7 @@ public struct Cancellation
         /// Gets the cancel reason if cancellation is requested.
         /// </summary>
         [MemberNotNullWhen(true, nameof(IsCancellationRequested))]
-        public CancelReason? CancelReason => this.IsCancellationRequested ? GetCancelReason(this.cancellation.externalCancellationToken) : default;
+        public CancelReason? CancelReason => this.IsCancellationRequested ? this.GetCancelReason(this.cancellation.externalCancellationToken) : null;
 
         /// <summary>
         /// Gets a value indicating whether cancellation is supported.
@@ -279,7 +282,7 @@ public struct Cancellation
         public CancellationTokenRegistration Register(Action<CancelReason> callback)
         {
             var enabler = this;
-            return this.Register(_ => callback(GetCancelReason(enabler)), false);
+            return this.Register(_ => callback(this.GetCancelReason(enabler)), false);
         }
 
         /// <summary>
@@ -291,7 +294,7 @@ public struct Cancellation
         public CancellationTokenRegistration Register(Action<CancelReason> callback, bool useSynchronizationContext)
         {
             var enabler = this;
-            return this.Token.Register(_ => callback(GetCancelReason(enabler)), useSynchronizationContext);
+            return this.Token.Register(_ => callback(this.GetCancelReason(enabler)), useSynchronizationContext);
         }
 
         /// <summary>
@@ -303,7 +306,7 @@ public struct Cancellation
         public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state)
         {
             var enabler = this;
-            return this.Token.Register(x => callback(GetCancelReason(enabler), x), state);
+            return this.Token.Register(x => callback(this.GetCancelReason(enabler), x), state);
         }
 
         /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</summary>
@@ -315,7 +318,7 @@ public struct Cancellation
         public CancellationTokenRegistration Register(Action<CancelReason, object?, CancellationToken> callback, object? state)
         {
             var token = this.cancellation.externalCancellationToken;
-            return this.Token.Register(x => callback(GetCancelReason(token), x, token), state, false);
+            return this.Token.Register(x => callback(this.GetCancelReason(token), x, token), state, false);
         }
 
         /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.</summary>
@@ -329,7 +332,7 @@ public struct Cancellation
         public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state, bool useSynchronizationContext)
         {
             var token = this.cancellation.externalCancellationToken;
-            return this.Token.Register(actualState => callback(GetCancelReason(token), actualState), state, useSynchronizationContext);
+            return this.Token.Register(actualState => callback(this.GetCancelReason(token), actualState), state, useSynchronizationContext);
         }
 
         /// <summary>
@@ -338,7 +341,8 @@ public struct Cancellation
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
         public bool Cancel()
         {
-            if (this.cancellation.cancellationTokenSource.HasValue())
+            var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
+            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue())
             {
                 this.cancellation.cancellationTokenSource.Cancel();
                 return true;
@@ -354,7 +358,8 @@ public struct Cancellation
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
         public async System.Threading.Tasks.Task<bool> CancelAsync()
         {
-            if (this.cancellation.cancellationTokenSource.HasValue())
+            var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
+            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue())
             {
                 await this.cancellation.cancellationTokenSource.CancelAsync().ConfigureAwait(false);
                 return true;
@@ -392,9 +397,9 @@ public struct Cancellation
             }
         }
 
-        private static CancelReason GetCancelReason(in CancellationToken externalCancellationToken)
+        private CancelReason GetCancelReason(in CancellationToken externalCancellationToken)
         {
-            return externalCancellationToken.IsCancellationRequested ? Base.CancelReason.ExternallyRequested : Base.CancelReason.InternalOrTimeout;
+            return externalCancellationToken.IsCancellationRequested ? Base.CancelReason.External : this.cancelReason == NoCancelReason ? Base.CancelReason.Timeout : (CancelReason)this.cancelReason;
         }
     }
 }

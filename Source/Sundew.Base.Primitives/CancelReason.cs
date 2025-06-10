@@ -15,10 +15,15 @@ public enum CancelReason
     /// <summary>
     /// Indicates that the cancellation was requested by the externally linked token.
     /// </summary>
-    ExternallyRequested,
+    External,
 
     /// <summary>
-    /// Indicates that the cancellation was due to a timeout or internally requested.
+    /// Indicates that the cancellation was due to a timeout.
     /// </summary>
-    InternalOrTimeout,
+    Timeout,
+
+    /// <summary>
+    /// Indicates that the cancellation was internally requested.
+    /// </summary>
+    Internal,
 }

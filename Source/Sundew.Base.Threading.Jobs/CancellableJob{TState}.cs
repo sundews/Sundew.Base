@@ -96,7 +96,7 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>The job start result.</returns>
     public async Task<JobStartResult> StartAsync(Cancellation cancellation)
     {
-        using (await this.@lock.LockAsync(cancellation))
+        using (await this.@lock.LockAsync(cancellation).ConfigureAwait(false))
         {
             if (!this.jobContext.HasValue())
             {
@@ -125,7 +125,7 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>A result containing the exception in case of an error.</returns>
     public RoE<AggregateException> Stop()
     {
-        var task = this.StopAsync();
+        var task = Task.Run(this.StopAsync);
         task.Wait();
         return task.Result;
     }
@@ -137,7 +137,7 @@ public sealed class CancellableJob<TState> : IJob
     public async Task<RoE<AggregateException>> StopAsync()
     {
         Task? task = null;
-        using (await this.@lock.LockAsync())
+        using (await this.@lock.LockAsync().ConfigureAwait(false))
         {
             if (this.jobContext.HasValue())
             {
@@ -167,7 +167,7 @@ public sealed class CancellableJob<TState> : IJob
     public async Task<RoE<AggregateException>> WaitAsync()
     {
         Task? task = null;
-        using (await this.@lock.LockAsync())
+        using (await this.@lock.LockAsync().ConfigureAwait(false))
         {
             if (this.jobContext.HasValue())
             {
@@ -213,14 +213,11 @@ public sealed class CancellableJob<TState> : IJob
 
     private void DisposeTask(Task jobTask)
     {
-        using (var lockResult = this.@lock.TryLock())
+        using (this.@lock.Lock())
         {
-            if (lockResult.Check())
-            {
-                this.jobContext?.CancellationEnabler.Dispose();
-                this.aggregateException = jobTask.Exception;
-                this.jobContext = null;
-            }
+            this.jobContext?.CancellationEnabler.Dispose();
+            this.aggregateException = jobTask.Exception;
+            this.jobContext = null;
         }
     }
 

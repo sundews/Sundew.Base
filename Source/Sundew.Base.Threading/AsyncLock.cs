@@ -69,10 +69,18 @@ public sealed class AsyncLock : IDisposable
     /// </returns>
     public async Task<LockResult> TryLockAsync(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
-        if (this.IsOwned())
+        var currentOwnerCount = this.owner & 0xFFFF_FFFF;
+        var ownerId = (long)Thread.CurrentThread.ManagedThreadId << 32;
+        var expectedOwner = ownerId | currentOwnerCount;
+        var newOwner = ownerId | currentOwnerCount + 1;
+        if ((newOwner & 0xFFFF_FFFF) == 0)
         {
-            Interlocked.Increment(ref this.owner);
-            return new LockResult(this, true);
+        }
+
+        var oldOwner = Interlocked.CompareExchange(ref this.owner, newOwner, expectedOwner);
+        if (oldOwner == expectedOwner)
+        {
+            return new LockResult(this, true, ownerId);
         }
 
         var eachAttemptTimeout = TimeSpan.FromTicks(timeoutTimeSpan.Ticks / Attempts);
@@ -81,11 +89,11 @@ public sealed class AsyncLock : IDisposable
             var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
             if (result)
             {
-                this.InitialOwner();
-                return new LockResult(this, true);
+                this.InitialOwner(ownerId);
+                return new LockResult(this, true, ownerId);
             }
 
-            return new LockResult(this, false);
+            return new LockResult(this, false, ownerId);
         }
 
         var remainingTimeout = timeoutTimeSpan;
@@ -94,8 +102,8 @@ public sealed class AsyncLock : IDisposable
             var result = await this.semaphoreSlim.WaitAsync(eachAttemptTimeout, cancellationToken).ConfigureAwait(false);
             if (result)
             {
-                this.InitialOwner();
-                return new LockResult(this, true);
+                this.InitialOwner(ownerId);
+                return new LockResult(this, true, ownerId);
             }
 
             remainingTimeout -= eachAttemptTimeout;
@@ -106,12 +114,12 @@ public sealed class AsyncLock : IDisposable
             var result = await this.semaphoreSlim.WaitAsync(remainingTimeout, cancellationToken).ConfigureAwait(false);
             if (result)
             {
-                this.InitialOwner();
-                return new LockResult(this, true);
+                this.InitialOwner(ownerId);
+                return new LockResult(this, true, ownerId);
             }
         }
 
-        return new LockResult(this, false);
+        return new LockResult(this, false, ownerId);
     }
 
     /// <summary>
@@ -160,10 +168,10 @@ public sealed class AsyncLock : IDisposable
     /// <exception cref="LockNotAcquiredException">Thrown if the lock could not be acquired.</exception>
     public async Task<IDisposable> LockAsync(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
-        if (this.IsOwned())
+        var (ownerId, hasLock) = this.UpdateOwner();
+        if (hasLock)
         {
-            Interlocked.Increment(ref this.owner);
-            return new LockDisposer(this);
+            return new LockDisposer(this, ownerId);
         }
 
         var eachAttemptTimeout = TimeSpan.FromTicks(timeoutTimeSpan.Ticks / Attempts);
@@ -172,11 +180,11 @@ public sealed class AsyncLock : IDisposable
             var result = await this.semaphoreSlim.WaitAsync(timeoutTimeSpan, cancellationToken).ConfigureAwait(false);
             if (result)
             {
-                this.InitialOwner();
-                return new LockDisposer(this);
+                this.InitialOwner(ownerId);
+                return new LockDisposer(this, ownerId);
             }
 
-            return new LockDisposer(this);
+            return new LockDisposer(this, ownerId);
         }
 
         var remainingTimeout = timeoutTimeSpan;
@@ -185,8 +193,8 @@ public sealed class AsyncLock : IDisposable
             var result = await this.semaphoreSlim.WaitAsync(eachAttemptTimeout, cancellationToken).ConfigureAwait(false);
             if (result)
             {
-                this.InitialOwner();
-                return new LockDisposer(this);
+                this.InitialOwner(ownerId);
+                return new LockDisposer(this, ownerId);
             }
 
             remainingTimeout -= eachAttemptTimeout;
@@ -197,8 +205,8 @@ public sealed class AsyncLock : IDisposable
             var result = await this.semaphoreSlim.WaitAsync(remainingTimeout, cancellationToken).ConfigureAwait(false);
             if (result)
             {
-                this.InitialOwner();
-                return new LockDisposer(this);
+                this.InitialOwner(ownerId);
+                return new LockDisposer(this, ownerId);
             }
         }
 
@@ -246,10 +254,10 @@ public sealed class AsyncLock : IDisposable
     /// <returns>A lock result.</returns>
     public LockResult TryLock(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
-        if (this.IsOwned())
+        var (ownerId, hasLock) = this.UpdateOwner();
+        if (hasLock)
         {
-            Interlocked.Increment(ref this.owner);
-            return new LockResult(this, true);
+            return new LockResult(this, true, ownerId);
         }
 
         var eachAttemptTimeout = TimeSpan.FromTicks(timeoutTimeSpan.Ticks / Attempts);
@@ -258,11 +266,11 @@ public sealed class AsyncLock : IDisposable
             var result = this.semaphoreSlim.Wait(timeoutTimeSpan, cancellationToken);
             if (result)
             {
-                this.InitialOwner();
-                return new LockResult(this, true);
+                this.InitialOwner(ownerId);
+                return new LockResult(this, true, ownerId);
             }
 
-            return new LockResult(this, false);
+            return new LockResult(this, false, ownerId);
         }
 
         var remainingTimeout = timeoutTimeSpan;
@@ -271,8 +279,8 @@ public sealed class AsyncLock : IDisposable
             var result = this.semaphoreSlim.Wait(eachAttemptTimeout, cancellationToken);
             if (result)
             {
-                this.InitialOwner();
-                return new LockResult(this, true);
+                this.InitialOwner(ownerId);
+                return new LockResult(this, true, ownerId);
             }
 
             remainingTimeout -= eachAttemptTimeout;
@@ -283,12 +291,12 @@ public sealed class AsyncLock : IDisposable
             var result = this.semaphoreSlim.Wait(remainingTimeout, cancellationToken);
             if (result)
             {
-                this.InitialOwner();
-                return new LockResult(this, true);
+                this.InitialOwner(ownerId);
+                return new LockResult(this, true, ownerId);
             }
         }
 
-        return new LockResult(this, false);
+        return new LockResult(this, false, ownerId);
     }
 
     /// <summary>
@@ -332,13 +340,20 @@ public sealed class AsyncLock : IDisposable
     /// <returns>A lock result.</returns>
     public IDisposable Lock(TimeSpan timeoutTimeSpan, CancellationToken cancellationToken)
     {
+        var (ownerId, hasLock) = this.UpdateOwner();
+        if (hasLock)
+        {
+            return new LockResult(this, true, ownerId);
+        }
+
         var result = this.semaphoreSlim.Wait(timeoutTimeSpan, cancellationToken);
         if (!result)
         {
             throw new LockNotAcquiredException();
         }
 
-        return new LockDisposer(this);
+        this.InitialOwner(ownerId);
+        return new LockDisposer(this, ownerId);
     }
 
     /// <inheritdoc />
@@ -347,41 +362,50 @@ public sealed class AsyncLock : IDisposable
         this.semaphoreSlim.Dispose();
     }
 
-    internal void InternalRelease()
+    internal void InternalRelease(long ownerId)
     {
-        var entries = Interlocked.Decrement(ref this.owner);
-        if ((int)(entries & 0xFFFFFFFF) == 0)
+        var currentOwnerCount = this.owner & 0xFFFF_FFFF;
+        var expectedOwner = ownerId | currentOwnerCount;
+        var newOwner = currentOwnerCount <= 1 ? 0 : ownerId | currentOwnerCount - 1;
+        var oldOwner = Interlocked.CompareExchange(ref this.owner, newOwner, expectedOwner);
+        if (oldOwner == (ownerId | 1) || oldOwner == ownerId)
         {
-            Interlocked.Exchange(ref this.owner, 0);
             this.semaphoreSlim.Release();
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | (MethodImplOptions)512)]
-    private void InitialOwner()
+    private void InitialOwner(long ownerId)
     {
-        Interlocked.Exchange(ref this.owner, ((long)Thread.CurrentThread.ManagedThreadId << 32) | 1);
+        Interlocked.Exchange(ref this.owner, ownerId | 1);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | (MethodImplOptions)512)]
-    private bool IsOwned()
+    private (long OwnerId, bool HasLock) UpdateOwner()
     {
-        int upperInt = (int)(this.owner >> 32);
-        return upperInt == Thread.CurrentThread.ManagedThreadId;
+        var currentOwnerCount = this.owner & 0xFFFF_FFFF;
+        var ownerId = (long)Thread.CurrentThread.ManagedThreadId << 32;
+        var previousOwner = ownerId | currentOwnerCount;
+        var expectedOwner = currentOwnerCount == 0 ? 0 : previousOwner;
+        var newOwner = ownerId | currentOwnerCount + 1;
+        var oldOwner = Interlocked.CompareExchange(ref this.owner, newOwner, expectedOwner);
+        return (ownerId, oldOwner == previousOwner);
     }
 
     private class LockDisposer : IDisposable
     {
         private readonly AsyncLock asyncLock;
+        private readonly long ownerId;
 
-        public LockDisposer(AsyncLock asyncLock)
+        public LockDisposer(AsyncLock asyncLock, long ownerId)
         {
             this.asyncLock = asyncLock;
+            this.ownerId = ownerId;
         }
 
         public void Dispose()
         {
-            this.asyncLock.InternalRelease();
+            this.asyncLock.InternalRelease(this.ownerId);
         }
     }
 }

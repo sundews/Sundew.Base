@@ -135,7 +135,6 @@ public sealed class ContinuousJob<TState> : IJob
     /// </summary>
     public void Dispose()
     {
-        this.Stop();
         this.cancellableJob.Dispose();
     }
 

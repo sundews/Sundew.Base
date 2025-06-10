@@ -42,6 +42,61 @@ public class CancellationTests
         result.Should().BeFalse();
     }
 
+    [Fact]
+    public async Task EnableCancellation_When_Timeout_Then_CancelReasonShouldBeTimeout()
+    {
+        var cancellation = new Cancellation(TimeSpan.FromMilliseconds(50));
+        using var enabler = cancellation.EnableCancellation();
+
+        await Task.Delay(500);
+
+        enabler.CancelReason.Should().Be(CancelReason.Timeout);
+    }
+
+    [Fact]
+    public async Task EnableCancellation_When_CancelAsync_Then_CancelReasonShouldBeInternal()
+    {
+        var cancellation = default(Cancellation);
+        var enabler = cancellation.EnableCancellation();
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(50);
+            await enabler.CancelAsync();
+            enabler.Dispose();
+        });
+        await Task.Delay(500);
+
+        enabler.CancelReason.Should().Be(CancelReason.Internal);
+    }
+
+    [Fact]
+    public async Task EnableCancellation_When_ExternalCancelled_Then_CancelReasonShouldBeExternal()
+    {
+        var cancellationTokenSource = new CancellationTokenSource();
+        var cancellation = new Cancellation(cancellationTokenSource.Token);
+        var enabler = cancellation.EnableCancellation();
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(50);
+            await cancellationTokenSource.CancelAsync();
+            enabler.Dispose();
+            cancellationTokenSource.Dispose();
+        });
+
+        await Task.Delay(500);
+
+        enabler.CancelReason.Should().Be(CancelReason.External);
+    }
+
+    [Fact]
+    public void EnableCancellation_When_NotCancelled_Then_CancelReasonShouldBeNull()
+    {
+        var cancellation = default(Cancellation);
+        using var enabler = cancellation.EnableCancellation();
+
+        enabler.CancelReason.Should().BeNull();
+    }
+
     [Theory]
     [InlineData(300, true)]
     [InlineData(10, false)]

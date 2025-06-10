@@ -70,12 +70,17 @@ public sealed class AutoResetEventAsync : ResetEventAsync
         taskCompletionSource.Task.ContinueWith(
             _ =>
             {
-                lock (this.lockObject)
+                try
                 {
-                    this.taskCompletionSources.Remove(taskCompletionSource);
+                    lock (this.lockObject)
+                    {
+                        this.taskCompletionSources.Remove(taskCompletionSource);
+                    }
                 }
-
-                enabler.Dispose();
+                finally
+                {
+                    enabler.Dispose();
+                }
             },
             TaskScheduler.Default);
         this.taskCompletionSources.AddLast(taskCompletionSource);
