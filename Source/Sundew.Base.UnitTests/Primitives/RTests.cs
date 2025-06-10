@@ -442,12 +442,29 @@ public class RTests
     [Theory]
     [InlineData("value", -1, 0, true)]
     [InlineData(null, 42, 42, false)]
-    public void ToResultOptionMap_Then_ResultShouldBeExpectedResult(string? input, int error, int expectedError, bool expectedResult)
+    public void MapToResultOptionMap_Then_ResultShouldBeExpectedResult(string? input, int error, int expectedError, bool expectedResult)
     {
         var testee = R.SuccessOption(input);
 
         R<string?> r = testee;
+
         var result = r.MapToResultOption().Map(error);
+
+        result.IsSuccess.Should().Be(expectedResult);
+        result.Value.Should().Be(input);
+        result.Error.Should().Be(expectedError);
+    }
+
+    [Theory]
+    [InlineData("value", -1, 0, true)]
+    [InlineData(null, 42, 42, false)]
+    public void MapToResult_Then_ResultShouldBeExpectedResult(string? input, int error, int expectedError, bool expectedResult)
+    {
+        var testee = R.SuccessOption(input);
+
+        R<string?> r = testee;
+
+        var result = r.MapToResult(error);
 
         result.IsSuccess.Should().Be(expectedResult);
         result.Value.Should().Be(input);

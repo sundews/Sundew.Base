@@ -629,7 +629,7 @@ public static partial class R
     /// The result of the conversion.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TValue, TError> MapToResultOption<TValue, TError>(this R<TValue?> result, Func<TError> errorIfNullOrError)
+    public static R<TValue, TError> MapToResult<TValue, TError>(this R<TValue?> result, Func<TError> errorIfNullOrError)
     {
         if (!result.IsSuccess)
         {
@@ -656,7 +656,7 @@ public static partial class R
     /// The result of the conversion.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TValue, TError> MapToResultOption<TValue, TError>(this R<TValue?> result, TError errorIfNullOrError)
+    public static R<TValue, TError> MapToResult<TValue, TError>(this R<TValue?> result, TError errorIfNullOrError)
     {
         if (!result.IsSuccess)
         {

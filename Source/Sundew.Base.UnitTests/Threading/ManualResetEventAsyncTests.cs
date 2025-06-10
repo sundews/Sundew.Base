@@ -127,7 +127,7 @@ public class ManualResetEventAsyncTests
         this.testee.IsSet.Should().BeFalse();
 
         var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
-        await Task.Delay(200);
+        await Task.Delay(100);
         this.testee.Set();
 
         var result = await waitTask2;
