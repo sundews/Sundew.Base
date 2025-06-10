@@ -594,6 +594,35 @@ public static partial class R
     }
 
     /// <summary>
+    /// Converts from <see cref="R{TValue, TError}"/> to <see cref="R{TValue, TError}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue?, TError> MapToValueOptionResult<TValue, TError>(this R<TValue, TError> result)
+        where TValue : struct
+    {
+        return new R<TValue?, TError>(result.IsSuccess, result.Value, result.Error);
+    }
+
+    /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the value.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>
+    /// A new <see cref="R{TSuccess}" />.
+    /// </returns>
+    public static R<TSuccess> Map<TSuccess>(in this R<TSuccess?> result)
+    {
+        return new R<TSuccess>(result.Value != null, result.Value);
+    }
+
+    /// <summary>
     /// Converts from <see cref="R{TValue}"/> to <see cref="R{TValue}"/>.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
@@ -744,26 +773,117 @@ public static partial class R
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="result">The result.</param>
+    /// <param name="errorIfNullOrError">The error if null or error.</param>
     /// <returns>
     /// The result of the conversion.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static R<TValue?, TError> MapToValueOptionResult<TValue, TError>(this R<TValue, TError> result)
-        where TValue : struct
+    public static R<TValue, TError> MapToResult<TValue, TError>(this R<TValue?, TError> result, Func<TError?, TError> errorIfNullOrError)
     {
-        return new R<TValue?, TError>(result.IsSuccess, result.Value, result.Error);
+        if (!result.IsSuccess)
+        {
+            return new R<TValue, TError>(false, default, errorIfNullOrError(result.Error));
+        }
+
+        var value = result.Value;
+        if (value != null)
+        {
+            return new R<TValue, TError>(true, value, default);
+        }
+
+        return new R<TValue, TError>(false, default, errorIfNullOrError(result.Error));
     }
 
     /// <summary>
-    /// Creates a result based on the specified values.
+    /// Converts from <see cref="R{TValue, TError}"/> to <see cref="R{TValue, TError}"/>.
     /// </summary>
-    /// <typeparam name="TSuccess">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
     /// <param name="result">The result.</param>
+    /// <param name="errorIfNullOrError">The error if null or error.</param>
     /// <returns>
-    /// A new <see cref="R{TSuccess}" />.
+    /// The result of the conversion.
     /// </returns>
-    public static R<TSuccess> Map<TSuccess>(in this R<TSuccess?> result)
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue, TError> MapToResult<TValue, TError>(this R<TValue?, TError> result, TError errorIfNullOrError)
     {
-        return new R<TSuccess>(result.Value != null, result.Value);
+        if (!result.IsSuccess)
+        {
+            return new R<TValue, TError>(false, default, errorIfNullOrError);
+        }
+
+        var value = result.Value;
+        if (value != null)
+        {
+            return new R<TValue, TError>(true, value, default);
+        }
+
+        return new R<TValue, TError>(false, default, errorIfNullOrError);
+    }
+
+    /// <summary>
+    /// Converts from <see cref="R{TValue}"/> to <see cref="R{TValue}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="resultOption">The result option.</param>
+    /// <param name="errorIfNullOrError">The error if result is null result is error.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue, TError> Map<TValue, TError>(this R<TValue?, TError>? resultOption, TError errorIfNullOrError)
+    {
+        if (resultOption == null)
+        {
+            return new R<TValue, TError>(false, default, errorIfNullOrError);
+        }
+
+        var result = resultOption.Value;
+        if (!result.IsSuccess)
+        {
+            return new R<TValue, TError>(false, default, errorIfNullOrError);
+        }
+
+        var value = result.Value;
+        if (value != null)
+        {
+            return new R<TValue, TError>(true, value, default);
+        }
+
+        return new R<TValue, TError>(false, default, errorIfNullOrError);
+    }
+
+    /// <summary>
+    /// Converts from <see cref="R{TValue}"/> to <see cref="R{TValue}"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="resultOption">The result option.</param>
+    /// <param name="errorIfNullOrError">The error if result is null result is error.</param>
+    /// <returns>
+    /// The result of the conversion.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TValue, TError> Map<TValue, TError>(this R<TValue?, TError>? resultOption, Func<TError?, TError> errorIfNullOrError)
+    {
+        if (resultOption == null)
+        {
+            return new R<TValue, TError>(false, default, errorIfNullOrError(default));
+        }
+
+        var result = resultOption.Value;
+        if (!result.IsSuccess)
+        {
+            return new R<TValue, TError>(false, default, errorIfNullOrError(result.Error));
+        }
+
+        var value = result.Value;
+        if (value != null)
+        {
+            return new R<TValue, TError>(true, value, default);
+        }
+
+        return new R<TValue, TError>(false, default, errorIfNullOrError(result.Error));
     }
 }
