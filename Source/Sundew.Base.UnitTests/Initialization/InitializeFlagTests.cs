@@ -58,7 +58,7 @@ public class InitializeFlagTests
     }
 
     [Fact]
-    public async Task AwaitFlag_Then_()
+    public async Task WhenInitialized_Then_IsInitializedShouldBeTrue()
     {
         var testee = new InitializeFlag();
         _ = Task.Run(async () =>
@@ -75,7 +75,7 @@ public class InitializeFlagTests
     }
 
     [Fact]
-    public async Task AwaitFlag_Then_2()
+    public async Task WhenInitialized_When_Timedout_Then_IsInitializedShouldBeFalse()
     {
         var testee = new InitializeFlag();
         _ = Task.Run(async () =>
