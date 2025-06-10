@@ -195,12 +195,12 @@ public struct Cancellation
         /// <summary>
         /// Gets a value indicating whether cancellation is requested.
         /// </summary>
+        [MemberNotNullWhen(true, nameof(CancelReason))]
         public bool IsCancellationRequested => this.Token.IsCancellationRequested;
 
         /// <summary>
         /// Gets the cancel reason if cancellation is requested.
         /// </summary>
-        [MemberNotNullWhen(true, nameof(IsCancellationRequested))]
         public CancelReason? CancelReason => this.IsCancellationRequested ? this.GetCancelReason(this.cancellation.externalCancellationToken) : null;
 
         /// <summary>
