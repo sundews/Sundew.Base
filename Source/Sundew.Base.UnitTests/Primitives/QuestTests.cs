@@ -162,7 +162,7 @@ public class QuestTests
     }
 
     [Fact]
-    public void Dispose_When_GuideAndDisposableAreDifferentAndResultIsDisposableButQuestNot_Then_DisposeShouldBeCalledOnceButNotForResult()
+    public void Dispose_When_GuideAndDisposableAreDifferentAndResultIsDisposableButQuestNotStarted_Then_DisposeShouldBeCalledOnceButNotForResult()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
         var mock1 = Mock.Create<IDisposable>();
@@ -199,7 +199,7 @@ public class QuestTests
 
         Mock.Assert(() => mock1.Dispose(), Occurs.Once());
         Mock.Assert(() => mock2.Dispose(), Occurs.Once());
-        Mock.Assert(() => mock3.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Never());
     }
 
     [Fact]
@@ -498,7 +498,7 @@ public class QuestTests
     }
 
     [Fact]
-    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndQuestStarted_Then_DisposeShouldBeCalledOnceForAll()
+    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndQuestStarted_Then_DisposeShouldNotBeCalledForResults()
     {
         const int expected = 42;
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -518,11 +518,11 @@ public class QuestTests
 
         Mock.Assert(() => mock1.Dispose(), Occurs.Once());
         Mock.Assert(() => mock2.Dispose(), Occurs.Once());
-        Mock.Assert(() => mock3.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Never());
     }
 
     [Fact]
-    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndNewResultIsDisposableQuestStarted_Then_DisposeShouldBeCalledOnceForAll()
+    public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndNewResultIsDisposableQuestStarted_Then_DisposeShouldNotBeCalledForResults()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
         var mock1 = Mock.Create<IDisposable>();
@@ -542,7 +542,7 @@ public class QuestTests
 
         Mock.Assert(() => mock1.Dispose(), Occurs.Once());
         Mock.Assert(() => mock2.Dispose(), Occurs.Once());
-        Mock.Assert(() => mock3.Dispose(), Occurs.Once());
-        Mock.Assert(() => mock4.Dispose(), Occurs.Once());
+        Mock.Assert(() => mock3.Dispose(), Occurs.Never());
+        Mock.Assert(() => mock4.Dispose(), Occurs.Never());
     }
 }

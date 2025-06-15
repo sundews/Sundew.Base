@@ -299,8 +299,6 @@ public sealed class Quest<TGuide, TResult> : IQuest
             try
             {
                 this.task.Wait(this.cancellationToken);
-                var result = this.task.Result;
-                Quest.TryDispose(result);
             }
             catch (OperationCanceledException)
             {
@@ -318,8 +316,7 @@ public sealed class Quest<TGuide, TResult> : IQuest
         {
             try
             {
-                var result = await this.task.ConfigureAwait(false);
-                await Quest.TryDisposeAsync(result).ConfigureAwait(false);
+                await this.task.ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
