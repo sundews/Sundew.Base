@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Text;
 
 using System;
 using System.Collections.Generic;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Text;
 using Xunit;
 

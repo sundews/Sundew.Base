@@ -10,7 +10,7 @@ namespace Sundew.Base.UnitTests.Text;
 using System;
 using System.Globalization;
 using System.Text;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Text;
 using Xunit;
 

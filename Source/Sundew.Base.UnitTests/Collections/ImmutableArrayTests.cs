@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Collections;
 
 using System.Collections.Immutable;
 using System.Globalization;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Collections.Linq;
 using Xunit;
 

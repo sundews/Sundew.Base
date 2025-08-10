@@ -8,7 +8,7 @@
 namespace Sundew.Base.UnitTests.Equality;
 
 using System;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Equality;
 using Xunit;
 

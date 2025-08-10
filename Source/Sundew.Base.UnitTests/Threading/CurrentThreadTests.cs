@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Threading;
 
 using System.Diagnostics;
 using System.Threading;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Threading;
 using Xunit;
 

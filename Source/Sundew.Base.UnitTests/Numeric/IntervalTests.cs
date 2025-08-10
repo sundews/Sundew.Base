@@ -7,7 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Numeric;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Numeric;
 using Xunit;
 

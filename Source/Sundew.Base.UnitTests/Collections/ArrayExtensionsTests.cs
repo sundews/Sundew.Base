@@ -7,7 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Collections;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Collections;
 using Xunit;
 

@@ -10,7 +10,7 @@ namespace Sundew.Base.UnitTests.Memory;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Memory;
 using Xunit;
 

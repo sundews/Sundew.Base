@@ -10,7 +10,7 @@ namespace Sundew.Base.UnitTests.Threading;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Threading;
 using Sundew.Base.Threading.Jobs;
 using Xunit;

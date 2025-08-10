@@ -7,8 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Primitives;
 
-using FluentAssertions;
-using Sundew.Base.Primitives;
+using AwesomeAssertions;
 using Xunit;
 
 public class OExtensionsToOptionTests

@@ -7,6 +7,7 @@
 
 namespace Sundew.Base.Collections.Concurrent;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -64,6 +65,22 @@ public class ConcurrentList<TItem> : IList<TItem>, IReadOnlyList<TItem>
             newList = oldList.Clear();
         }
         while (Interlocked.CompareExchange(ref this.inner, newList, oldList) != oldList);
+    }
+
+    /// <summary>
+    /// Clears the list, but performs the specified action on each item.
+    /// </summary>
+    /// <param name="itemAction">The action to perform.</param>
+    public void Clear(Action<TItem> itemAction)
+    {
+        ImmutableList<TItem> oldList, newList;
+        do
+        {
+            oldList = this.inner;
+            newList = oldList.Clear();
+        }
+        while (Interlocked.CompareExchange(ref this.inner, newList, oldList) != oldList);
+        oldList.ForEach(itemAction);
     }
 
     /// <inheritdoc/>

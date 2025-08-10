@@ -39,6 +39,6 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.8" />
   </ItemGroup>
 </Project>

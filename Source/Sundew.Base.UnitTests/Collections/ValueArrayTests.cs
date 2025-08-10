@@ -7,8 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Collections;
 
-using FluentAssertions;
-using Sundew.Base.Collections;
+using AwesomeAssertions;
 using Sundew.Base.Collections.Immutable;
 using Xunit;
 

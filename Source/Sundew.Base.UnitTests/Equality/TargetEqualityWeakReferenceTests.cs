@@ -7,7 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Equality;
 
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Primitives.WeakReferencing;
 using Xunit;
 

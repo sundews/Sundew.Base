@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Memory;
 
 using System;
 using System.Text;
-using FluentAssertions.Execution;
+using AwesomeAssertions.Execution;
 
 public ref struct SpanAssertions<TItem>
     where TItem : IEquatable<TItem>

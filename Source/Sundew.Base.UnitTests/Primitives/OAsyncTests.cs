@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Primitives;
 
 using System;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Xunit;
 
 public class OAsyncTests

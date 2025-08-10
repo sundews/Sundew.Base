@@ -10,7 +10,7 @@ namespace Sundew.Base.UnitTests.Computation;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Computation;
 using Xunit;
 

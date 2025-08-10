@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Initialization;
 
 using System;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Initialization;
 using Xunit;
 

@@ -8,7 +8,7 @@
 namespace Sundew.Base.UnitTests.Disposal;
 
 using System.Threading;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Disposal;
 using Xunit;
 

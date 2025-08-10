@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Text;
 using Sundew.Base.UnitTests.Infrastructure;
 using Sundew.Test.Infrastructure.Text;

@@ -59,7 +59,8 @@ Sundew.Base.Timers
     <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
     <ProjectReference Include="..\Sundew.Base.Threading.Jobs\Sundew.Base.Threading.Jobs.csproj" />
     <ProjectReference Include="..\Sundew.Base.Threading\Sundew.Base.Threading.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Timers\Sundew.Base.Timers.csproj" />
+		<ProjectReference Include="..\Sundew.Base.Timers\Sundew.Base.Timers.csproj" />
+		<ProjectReference Include="..\Sundew.Base.Reactions\Sundew.Base.Reactions.csproj" />
   </ItemGroup>
 
 </Project>

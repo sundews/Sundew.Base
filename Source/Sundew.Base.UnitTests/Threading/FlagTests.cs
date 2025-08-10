@@ -7,8 +7,7 @@
 
 namespace Sundew.Base.UnitTests.Threading;
 
-using FluentAssertions;
-using Sundew.Base.Threading;
+using AwesomeAssertions;
 using Xunit;
 
 public class FlagTests

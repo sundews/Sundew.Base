@@ -2,15 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>net9.0;net8.0;net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
-    <Description>Extensions for collections types.</Description>
+    <Description>Primitives types and extension methods.</Description>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-    <RootNamespace>Sundew.Base.Collections</RootNamespace>
-    <NoWarn>1701;1702;SA1633</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
-  </ItemGroup>
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
@@ -33,20 +31,19 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Reactive" Version="6.0.1" />
     <PackageReference Include="System.ValueTuple" Version="4.6.1" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
-    <PackageReference Include="System.Collections.Immutable" Version="9.0.8" />
-  </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
-    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Update="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Collections.Primitives\Sundew.Base.Collections.Primitives.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Equality\Sundew.Base.Equality.csproj" />
   </ItemGroup>
-
 </Project>

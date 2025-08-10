@@ -9,7 +9,7 @@ namespace Sundew.Base.UnitTests.Disposal;
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FluentAssertions;
+using AwesomeAssertions;
 using Sundew.Base.Disposal;
 using Xunit;
 

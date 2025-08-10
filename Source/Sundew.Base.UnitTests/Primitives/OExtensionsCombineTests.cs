@@ -9,8 +9,7 @@ namespace Sundew.Base.UnitTests.Primitives;
 
 using System;
 using System.Globalization;
-using FluentAssertions;
-using Sundew.Base.Primitives;
+using AwesomeAssertions;
 using Xunit;
 
 public class OExtensionsCombineTests
