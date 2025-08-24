@@ -83,6 +83,8 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
     [MethodImpl((MethodImplOptions)0x300)]
+    [MemberNotNullWhen(true, nameof(Value))]
+    [MemberNotNullWhen(false, nameof(Error))]
     public static implicit operator bool(R<TSuccess, TError> r)
     {
         return r.IsSuccess;

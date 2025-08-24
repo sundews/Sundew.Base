@@ -60,6 +60,7 @@ public readonly struct RoE<TError> : IEquatable<RoE<TError>>
     /// </summary>
     /// <param name="error">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
+    [MemberNotNullWhen(false, nameof(Error))]
     public static implicit operator bool(RoE<TError> error)
     {
         return error.IsSuccess;

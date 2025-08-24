@@ -50,6 +50,7 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     /// </summary>
     /// <param name="r">The result.</param>
     /// <returns>A value indicating whether the result was successful.</returns>
+    [MemberNotNullWhen(true, nameof(Value))]
     public static implicit operator bool(R<TSuccess> r)
     {
         return r.IsSuccess;

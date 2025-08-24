@@ -538,6 +538,27 @@ public static partial class R
     }
 
     /// <summary>
+    /// Creates a result based on the specified values.
+    /// </summary>
+    /// <typeparam name="TParsable">The type of the error.</typeparam>
+    /// <param name="value">The value.</param>
+    /// <param name="formatProvider">The formatProvider.</param>
+    /// <returns>
+    /// A <see cref="R" />.
+    /// </returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static R<TParsable> Parse<TParsable>(string? value, IFormatProvider? formatProvider)
+        where TParsable : IParsable<TParsable>
+    {
+        if (TParsable.TryParse(value, formatProvider, out var result))
+        {
+            return new R<TParsable>(true, result);
+        }
+
+        return R.Error();
+    }
+
+    /// <summary>
     /// Converts from <see cref="R{TValue, TError}"/> to <see cref="R{TValue, TError}"/>.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
