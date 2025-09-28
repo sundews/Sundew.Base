@@ -48,7 +48,7 @@ public static class ImmutableListExtensions
     public static ImmutableList<TItem> AddIfHasValue<TItem>(this ImmutableList<TItem> immutableList, TItem? option)
         where TItem : class
     {
-        return option.HasValue() ? immutableList.Add(option) : immutableList;
+        return option.HasValue ? immutableList.Add(option) : immutableList;
     }
 
     /// <summary>

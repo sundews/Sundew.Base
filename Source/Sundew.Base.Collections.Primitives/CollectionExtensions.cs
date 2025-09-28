@@ -72,7 +72,7 @@ public static class CollectionExtensions
     public static bool AddIfHasValue<TItem>(this ICollection<TItem> collection, TItem? option)
         where TItem : class
     {
-        if (option.HasValue())
+        if (option.HasValue)
         {
             collection.Add(option);
             return true;
@@ -205,7 +205,7 @@ public static class CollectionExtensions
     public static bool AddIfHasValue<TValue, TOptionList>(this ICollection<TValue> collection, TOptionList? option)
         where TOptionList : class, IEnumerable<TValue>
     {
-        if (option.HasValue())
+        if (option.HasValue)
         {
             var count = collection.Count;
             collection.AddRange(option);

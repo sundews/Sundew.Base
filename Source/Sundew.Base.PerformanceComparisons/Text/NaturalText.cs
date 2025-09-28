@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.PerformanceTests.Text;
+namespace Sundew.Base.PerformanceComparisons.Text;
 
 using System;
 using System.Collections.Generic;

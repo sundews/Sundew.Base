@@ -98,7 +98,7 @@ public sealed class CancellableJob<TState> : IJob
     {
         using (await this.@lock.LockAsync(cancellation).ConfigureAwait(false))
         {
-            if (!this.jobContext.HasValue())
+            if (!this.jobContext.HasValue)
             {
                 this.aggregateException = null;
                 var cancellationEnabler = cancellation.EnableCancellation();
@@ -140,7 +140,7 @@ public sealed class CancellableJob<TState> : IJob
         using (await this.@lock.LockAsync().ConfigureAwait(false))
         {
             var jobContext = this.jobContext;
-            if (jobContext.HasValue())
+            if (jobContext.HasValue)
             {
 #if NET7_0_OR_GREATER
                 await jobContext.CancellationEnabler.CancelAsync().ConfigureAwait(false);
@@ -151,7 +151,7 @@ public sealed class CancellableJob<TState> : IJob
             }
         }
 
-        if (task.HasValue())
+        if (task.HasValue)
         {
             await task.ConfigureAwait(false);
         }
@@ -170,13 +170,13 @@ public sealed class CancellableJob<TState> : IJob
         Task? task = null;
         using (await this.@lock.LockAsync().ConfigureAwait(false))
         {
-            if (this.jobContext.HasValue())
+            if (this.jobContext.HasValue)
             {
                 task = this.jobContext.JobContinuationTask;
             }
         }
 
-        if (task.HasValue())
+        if (task.HasValue)
         {
             await task.ConfigureAwait(false);
         }

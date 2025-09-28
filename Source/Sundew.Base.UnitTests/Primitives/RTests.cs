@@ -352,7 +352,7 @@ public class RTests
 
         var result = Generic(expectedResult);
 
-        result.IsSuccess.Should().Be(expectedResult.HasValue());
+        result.IsSuccess.Should().Be(expectedResult.HasValue);
         result.Value.Should().Be(expectedResult);
     }
 

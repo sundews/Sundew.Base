@@ -164,7 +164,7 @@ public static class Item
     public static Item<TValue> ToItem<TValue>(this TValue? option)
         where TValue : class
     {
-        return new Item<TValue>(option, option.HasValue());
+        return new Item<TValue>(option, option.HasValue);
     }
 
     /// <summary>

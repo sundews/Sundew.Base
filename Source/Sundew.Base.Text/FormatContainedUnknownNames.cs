@@ -13,16 +13,16 @@ using System.Collections.Generic;
 /// Represents a failed formatted string due to unknown names in format string.
 /// </summary>
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-public sealed record FormatContainedUnknownNames : FormattedStringResult
+public sealed record FormatContainedUnknownNames
 #else
-public sealed class FormatContainedUnknownNames : FormattedStringResult
+public sealed class FormatContainedUnknownNames
 #endif
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FormatContainedUnknownNames"/> class.
     /// </summary>
     /// <param name="names">The names.</param>
-    public FormatContainedUnknownNames(IReadOnlyList<string> names)
+    public FormatContainedUnknownNames(IReadOnlyCollection<string> names)
     {
         this.Names = names;
     }
@@ -30,5 +30,5 @@ public sealed class FormatContainedUnknownNames : FormattedStringResult
     /// <summary>
     /// Gets the names.
     /// </summary>
-    public IReadOnlyList<string> Names { get; }
+    public IReadOnlyCollection<string> Names { get; }
 }

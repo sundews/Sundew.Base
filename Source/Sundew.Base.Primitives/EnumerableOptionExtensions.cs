@@ -26,7 +26,7 @@ public static class EnumerableOptionExtensions
     {
         foreach (var result in options)
         {
-            if (result.HasValue())
+            if (result.HasValue)
             {
                 yield return result;
             }

@@ -149,11 +149,11 @@ public struct Cancellation
     /// <returns>The linked cancellation token source.</returns>
     public Enabler EnableCancellation(bool startTimeout)
     {
-        if (!this.cancellationTokenSource.HasValue())
+        if (!this.cancellationTokenSource.HasValue)
         {
             this = new Cancellation(
                 this.externalCancellationToken,
-                this.consumedFlag.HasValue() ? this.Timeout : System.Threading.Timeout.InfiniteTimeSpan,
+                this.consumedFlag.HasValue ? this.Timeout : System.Threading.Timeout.InfiniteTimeSpan,
                 this.externalCancellationToken != CancellationToken.None ? CancellationTokenSource.CreateLinkedTokenSource(this.externalCancellationToken) : new CancellationTokenSource());
         }
 
@@ -342,7 +342,7 @@ public struct Cancellation
         public bool Cancel()
         {
             var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
-            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue())
+            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue)
             {
                 this.cancellation.cancellationTokenSource.Cancel();
                 return true;
@@ -359,7 +359,7 @@ public struct Cancellation
         public async System.Threading.Tasks.Task<bool> CancelAsync()
         {
             var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
-            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue())
+            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue)
             {
                 await this.cancellation.cancellationTokenSource.CancelAsync().ConfigureAwait(false);
                 return true;
@@ -377,7 +377,7 @@ public struct Cancellation
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
         public bool CancelAfter(TimeSpan timeSpan)
         {
-            if (this.cancellation.cancellationTokenSource.HasValue())
+            if (this.cancellation.cancellationTokenSource.HasValue)
             {
                 this.cancellation.cancellationTokenSource.CancelAfter(timeSpan);
                 return true;

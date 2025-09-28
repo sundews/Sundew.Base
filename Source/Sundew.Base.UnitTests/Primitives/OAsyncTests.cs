@@ -67,7 +67,7 @@ public class OAsyncTests
 
         var result = testee.Map(x => x + "1");
 
-        result.HasValue().Should().Be(expectedResult);
+        result.HasValue.Should().Be(expectedResult);
         result.Should().Be(expectedValue);
     }
 

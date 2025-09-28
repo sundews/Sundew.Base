@@ -50,7 +50,7 @@ public static class ImmutableHashSetExtensions
     public static ImmutableHashSet<TItem> AddIfHasValue<TItem>(this ImmutableHashSet<TItem> immutableSet, TItem? option)
         where TItem : class
     {
-        return option.HasValue() ? immutableSet.Add(option) : immutableSet;
+        return option.HasValue ? immutableSet.Add(option) : immutableSet;
     }
 
     /// <summary>

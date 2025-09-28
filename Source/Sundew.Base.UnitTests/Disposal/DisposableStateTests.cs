@@ -58,7 +58,7 @@ IDisposable
             this.disposer.Dispose(false, this.Dispose);
         }
 
-        public List<string> Calls { get; } = new List<string>();
+        public List<string> Calls { get; } = [];
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA1816:TryDispose methods should call SuppressFinalize", Justification = "It is done by disposer.")]
         public void Dispose()

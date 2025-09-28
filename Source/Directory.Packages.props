@@ -1,0 +1,41 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="AwesomeAssertions" Version="9.2.0" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.3" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Disposal.Interfaces" Version="1.0.1" />
+    <PackageVersion Include="Initialization.Interfaces" Version="1.0.2" />
+    <PackageVersion Include="JustMock" Version="2025.3.813.457" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.VisualStudio.Threading" Version="17.14.15" />
+    <PackageVersion Include="Paket.Core" Version="9.0.2" />
+    <PackageVersion Include="PolySharp" Version="1.15.0" />
+    <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
+    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.3.9-u20250922-221632-local" />
+    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.9" />
+    <PackageVersion Include="System.Reflection.Metadata" Version="9.0.4" />
+    <PackageVersion Include="System.Security.Permissions" Version="9.0.9" />
+    <PackageVersion Include="TransparentMoq" Version="4.20.70.2" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
+    <PackageVersion Include="System.Collections.Immutable" Version="9.0.9" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
+    <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageVersion Include="System.Memory" Version="4.6.3" />
+    <PackageVersion Update="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <PackageVersion Include="System.Threading.Timer" Version="4.3.0" />
+    <PackageVersion Include="System.ValueTuple" Version="4.6.1" />
+    <PackageVersion Include="Microsoft.Bcl.Hashcode" Version="6.0.0" />
+  </ItemGroup>
+</Project>

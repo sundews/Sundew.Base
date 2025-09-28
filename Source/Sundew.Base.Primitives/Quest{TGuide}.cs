@@ -60,7 +60,7 @@ public sealed class Quest<TGuide> : IQuest
     {
         get
         {
-            if (this.ancestorQuest.HasValue())
+            if (this.ancestorQuest.HasValue)
             {
                 return this.ancestorQuest.IsStarted;
             }

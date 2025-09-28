@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.PerformanceTests;
+namespace Sundew.Base.PerformanceComparisons;
 
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;

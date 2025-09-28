@@ -20,6 +20,21 @@ using System.Threading.Tasks;
 public static class O
 {
     /// <summary>
+    /// Extends TValue with option-like functionality.
+    /// </summary>
+    extension<TValue>([NotNullWhen(true)] TValue? value)
+        where TValue : class
+    {
+        /// <summary>
+        /// Gets a value indicating whether value has a value (Not null).
+        /// </summary>
+        /// <returns><c>true</c>, if value is not null, otherwise <c>false</c>.</returns>
+#pragma warning disable SA1101
+        public bool HasValue => value != null;
+#pragma warning restore SA1101
+    }
+
+    /// <summary>
     /// Gets a value indicating whether value has a value (Not null).
     /// </summary>
     /// <typeparam name="TValue">The value type.</typeparam>
@@ -31,19 +46,8 @@ public static class O
         where TValue : class
     {
         result = value;
-        return value.HasValue();
+        return value.HasValue;
     }
-
-    /// <summary>
-    /// Gets a value indicating whether value has a value (Not null).
-    /// </summary>
-    /// <typeparam name="TValue">The value type.</typeparam>
-    /// <param name="value">The value.</param>
-    /// <returns><c>true</c>, if value is not null, otherwise <c>false</c>.</returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static bool HasValue<TValue>([NotNullWhen(true)] this TValue? value)
-        where TValue : class
-        => value != default;
 
     /// <summary>
     /// Creates a result based on the specified values.
@@ -518,7 +522,7 @@ public static class O
         where TOtherValue : struct
         where TNewValue : class
     {
-        var hasValue = value.HasValue() && otherValue.HasValue;
+        var hasValue = value.HasValue && otherValue.HasValue;
         return hasValue ? getValueFunc(value!, otherValue.GetValueOrDefault()) : null;
     }
 
@@ -536,7 +540,7 @@ public static class O
     public static R<TValue, TError> ToResult<TValue, TError>(this TValue? value, TError error)
         where TValue : class
     {
-        var isSuccess = value.HasValue();
+        var isSuccess = value.HasValue;
         return new R<TValue, TError>(isSuccess, value, isSuccess ? default! : error);
     }
 
@@ -554,7 +558,7 @@ public static class O
     public static R<TValue, TError> ToResult<TValue, TError>(this TValue? value, Func<TError> errorFunc)
         where TValue : class
     {
-        var isSuccess = value.HasValue();
+        var isSuccess = value.HasValue;
         return new R<TValue, TError>(isSuccess, value, isSuccess ? default! : errorFunc());
     }
 
@@ -574,7 +578,7 @@ public static class O
     public static R<TNewValue, TError> ToResult<TValue, TNewValue, TError>(this TValue? value, Func<TValue, TNewValue> valueFunc, TError error)
         where TValue : class
     {
-        var isSuccess = value.HasValue();
+        var isSuccess = value.HasValue;
         return new R<TNewValue, TError>(isSuccess, isSuccess ? valueFunc(value!) : default!, error);
     }
 

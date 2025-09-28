@@ -28,56 +28,56 @@ public class NaturalTextComparerTests
 
     public static IEnumerable<object[]> UnsortedCollections()
     {
-        yield return new object[]
-        {
+        yield return
+        [
             new[] { "foo", "foobar" },
-            new[] { "foo", "foobar" },
-        };
-        yield return new object[]
-        {
+            new[] { "foo", "foobar" }
+        ];
+        yield return
+        [
             new[] { "foobar", "foo" },
-            new[] { "foo", "foobar" },
-        };
-        yield return new object[]
-        {
+            new[] { "foo", "foobar" }
+        ];
+        yield return
+        [
             new[] { "10", "2" },
-            new[] { "2", "10" },
-        };
-        yield return new object[]
-        {
+            new[] { "2", "10" }
+        ];
+        yield return
+        [
             new[] { "0010", "2" },
-            new[] { "2", "0010" },
-        };
-        yield return new object[]
-        {
+            new[] { "2", "0010" }
+        ];
+        yield return
+        [
             new[] { "1000", "2" },
-            new[] { "2", "1000" },
-        };
-        yield return new object[]
-        {
+            new[] { "2", "1000" }
+        ];
+        yield return
+        [
             new[] { "foo10", "foo2" },
-            new[] { "foo2", "foo10" },
-        };
-        yield return new object[]
-        {
+            new[] { "foo2", "foo10" }
+        ];
+        yield return
+        [
             new[] { "10foo2", "2foo2" },
-            new[] { "2foo2", "10foo2" },
-        };
-        yield return new object[]
-        {
+            new[] { "2foo2", "10foo2" }
+        ];
+        yield return
+        [
             new[] { "foo (10)", "foo (2)" },
-            new[] { "foo (2)", "foo (10)" },
-        };
-        yield return new object[]
-        {
+            new[] { "foo (2)", "foo (10)" }
+        ];
+        yield return
+        [
             new[] { "foo 10 bar 10 x", "foo 10 bar 2 x" },
-            new[] { "foo 10 bar 2 x", "foo 10 bar 10 x" },
-        };
-        yield return new object[]
-        {
+            new[] { "foo 10 bar 2 x", "foo 10 bar 10 x" }
+        ];
+        yield return
+        [
             new[] { "\"1\"", "\"JC\"", "1", "2", "21", "3" },
-            new[] { "\"1\"", "\"JC\"", "1", "2", "3", "21" },
-        };
+            new[] { "\"1\"", "\"JC\"", "1", "2", "3", "21" }
+        ];
     }
 
     [Theory]

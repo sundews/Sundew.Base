@@ -5,7 +5,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.PerformanceTests.Split;
+namespace Sundew.Base.PerformanceComparisons.Split;
 
 using System;
 using System.Collections.Generic;

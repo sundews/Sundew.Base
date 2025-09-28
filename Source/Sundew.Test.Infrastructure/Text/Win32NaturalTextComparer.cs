@@ -1,8 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Security;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="Win32NaturalTextComparer.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace Sundew.Test.Infrastructure.Text;
+
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Security;
 
 public class Win32NaturalTextComparer : IComparer<string>
 {

@@ -35,7 +35,7 @@ public class DisposingListTests
         var expectedOrder = new[] { 1, 2 };
         var testee = new DisposingList<DisposeAction>();
         var disposeOrder = new List<int>();
-        testee.AddRange(new[] { new DisposeAction(() => disposeOrder.Add(1)), new DisposeAction(() => disposeOrder.Add(2)) });
+        testee.AddRange([new DisposeAction(() => disposeOrder.Add(1)), new DisposeAction(() => disposeOrder.Add(2))]);
 
         testee.Dispose();
 

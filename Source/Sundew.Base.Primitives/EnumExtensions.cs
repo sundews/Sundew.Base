@@ -94,7 +94,7 @@ public static class EnumExtensions
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
         if (Enum.TryParse(typeof(TEnum), value, ignoreCase, out var actualValue))
         {
-            if (actualValue.HasValue())
+            if (actualValue.HasValue)
             {
                 result = (TEnum)actualValue;
                 return true;

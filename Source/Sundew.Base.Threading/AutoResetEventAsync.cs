@@ -42,10 +42,12 @@ public sealed class AutoResetEventAsync : ResetEventAsync
         lock (this.lockObject)
         {
             taskCompletionSource = this.taskCompletionSources.First;
-            this.privateIsSet = !taskCompletionSource.HasValue();
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+            this.privateIsSet = !taskCompletionSource.HasValue;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
 
-        if (!taskCompletionSource.HasValue())
+        if (!taskCompletionSource.HasValue)
         {
             return;
         }

@@ -1,0 +1,48 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Debug-Publish" />
+    <BuildType Name="Release" />
+    <BuildType Name="Release-Publish" />
+    <BuildType Name="Release-Stable" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="../.github/workflows/dotnet.yml" />
+    <File Path="../README.md" />
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Build.targets" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="NuGet.Config" />
+    <File Path="Testing/testing.globalconfig" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Sundew.Base.PerformanceComparisons/Sundew.Base.PerformanceComparisons.csproj">
+      <BuildType Solution="Debug-Publish|*" Project="Debug" />
+      <BuildType Solution="Release-Publish|*" Project="Release" />
+    </Project>
+    <Project Path="Sundew.Base.UnitTests/Sundew.Base.UnitTests.csproj" />
+    <Project Path="Sundew.Test.Infrastructure/Sundew.Test.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="Sundew.Base.Collections.Immutable/Sundew.Base.Collections.Immutable.csproj" />
+  <Project Path="Sundew.Base.Collections.Linq/Sundew.Base.Collections.Linq.csproj" />
+  <Project Path="Sundew.Base.Collections.Primitives/Sundew.Base.Collections.Primitives.csproj" />
+  <Project Path="Sundew.Base.Collections/Sundew.Base.Collections.csproj" />
+  <Project Path="Sundew.Base.Computation/Sundew.Base.Computation.csproj" />
+  <Project Path="Sundew.Base.Disposal/Sundew.Base.Disposal.csproj" />
+  <Project Path="Sundew.Base.Equality/Sundew.Base.Equality.csproj" />
+  <Project Path="Sundew.Base.Initialization/Sundew.Base.Initialization.csproj" />
+  <Project Path="Sundew.Base.IO/Sundew.Base.IO.csproj" />
+  <Project Path="Sundew.Base.Memory/Sundew.Base.Memory.csproj" />
+  <Project Path="Sundew.Base.Numeric/Sundew.Base.Numeric.csproj" />
+  <Project Path="Sundew.Base.Primitives/Sundew.Base.Primitives.csproj" />
+  <Project Path="Sundew.Base.Reporting/Sundew.Base.Reporting.csproj" />
+  <Project Path="Sundew.Base.Text/Sundew.Base.Text.csproj" />
+  <Project Path="Sundew.Base.Threading.Jobs/Sundew.Base.Threading.Jobs.csproj" />
+  <Project Path="Sundew.Base.Threading/Sundew.Base.Threading.csproj" />
+  <Project Path="Sundew.Base.Time/Sundew.Base.Time.csproj" />
+  <Project Path="Sundew.Base.Timers/Sundew.Base.Timers.csproj" />
+  <Project Path="Sundew.Base.Visiting/Sundew.Base.Visiting.csproj" />
+  <Project Path="Sundew.Base/Sundew.Base.csproj" />
+</Solution>

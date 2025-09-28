@@ -145,7 +145,7 @@ public class RAsyncTests
 
         var result = await GenericAsync(expectedResult);
 
-        result.IsSuccess.Should().Be(expectedResult.HasValue());
+        result.IsSuccess.Should().Be(expectedResult.HasValue);
         result.Value.Should().Be(expectedResult);
     }
 

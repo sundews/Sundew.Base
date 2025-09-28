@@ -18,7 +18,7 @@ using Xunit;
 
 public class BufferTests
 {
-    private static readonly byte[] ExpectedResult = { 1, 2, 3, 4, 5 };
+    private static readonly byte[] ExpectedResult = [1, 2, 3, 4, 5];
 
     [Fact]
     public void Write_Then_ToArrayShouldEqualExpectedResult()

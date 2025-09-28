@@ -537,6 +537,7 @@ public static partial class R
         return new RoE<TError>(error == null, error);
     }
 
+#if NET8_0_OR_GREATER
     /// <summary>
     /// Creates a result based on the specified values.
     /// </summary>
@@ -557,6 +558,7 @@ public static partial class R
 
         return R.Error();
     }
+#endif
 
     /// <summary>
     /// Converts from <see cref="R{TValue, TError}"/> to <see cref="R{TValue, TError}"/>.

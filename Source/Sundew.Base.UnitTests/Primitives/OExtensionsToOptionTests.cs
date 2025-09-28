@@ -24,9 +24,9 @@ public class OExtensionsToOptionTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public void GetValueOrDefault_When_OperandIsNullableStructAndAlternativeIsStruct_Then_ResultShouldBeExpectedResult2(bool isSuccess)
+    public void HasValue_When_OperandIsNullableStructAndAlternativeIsStruct_Then_ResultShouldBeExpectedResult2(bool isSuccess)
     {
         var option = isSuccess.ToOption("text");
-        option.HasValue().Should().Be(isSuccess);
+        option.HasValue.Should().Be(isSuccess);
     }
 }

@@ -48,7 +48,7 @@ public static class ImmutableArrayExtensions
     public static ImmutableArray<TItem> AddIfHasValue<TItem>(this ImmutableArray<TItem> immutableArray, TItem? option)
         where TItem : class
     {
-        return option.HasValue() ? immutableArray.Add(option) : immutableArray;
+        return option.HasValue ? immutableArray.Add(option) : immutableArray;
     }
 
     /// <summary>

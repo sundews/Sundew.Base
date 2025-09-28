@@ -35,7 +35,7 @@ public static class ValueArrayExtensions
     public static ValueArray<TItem> AddIfHasValue<TItem>(this ValueArray<TItem> valueArray, TItem? option)
         where TItem : class
     {
-        return option.HasValue() ? valueArray.Add(option) : valueArray;
+        return option.HasValue ? valueArray.Add(option) : valueArray;
     }
 
     /// <summary>

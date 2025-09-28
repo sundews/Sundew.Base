@@ -35,7 +35,7 @@ public static class ValueListExtensions
     public static ValueList<TItem> AddIfHasValue<TItem>(this ValueList<TItem> valueList, TItem? option)
         where TItem : class
     {
-        return option.HasValue() ? valueList.Add(option) : valueList;
+        return option.HasValue ? valueList.Add(option) : valueList;
     }
 
     /// <summary>

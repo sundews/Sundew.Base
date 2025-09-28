@@ -61,7 +61,7 @@ public sealed class Quest<TGuide, TResult> : IQuest
     {
         get
         {
-            if (this.ancestorQuest.HasValue())
+            if (this.ancestorQuest.HasValue)
             {
                 return this.ancestorQuest.IsStarted;
             }

@@ -7,7 +7,6 @@
 
 namespace Sundew.Base.IO;
 
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
@@ -23,7 +22,7 @@ public readonly record struct Paths(params string[] FileSystemPaths)
     /// Initializes a new instance of the <see cref="Paths"/> struct.
     /// </summary>
     public Paths()
-        : this(Array.Empty<string>())
+        : this([])
     {
     }
 

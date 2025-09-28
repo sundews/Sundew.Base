@@ -22,7 +22,7 @@ public class NamedFormatStringTests
     [InlineData("Don't insert here: {{Escaped}}, but here: {Insertion}", new string[] { "Insertion" }, new object[] { "Inserted" }, "Don't insert here: {Escaped}, but here: Inserted")]
     [InlineData("Multiple insertions: {One}, {Two}", new string[] { "One", "Two" }, new object[] { "first", "second" }, "Multiple insertions: first, second")]
     [InlineData("Formatted number insertions: {One:N2}, {Two:N4}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Formatted number insertions: 1.23, 9.8765")]
-    [InlineData("Accecpt normal indices: {0:N2}, {1:N4}, {One:N3}, {Two:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Accecpt normal indices: 1.23, 9.8765, 1.235, 9.88")]
+    [InlineData("Accept normal indices: {0:N2}, {1:N4}, {One:N3}, {Two:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Accept normal indices: 1.23, 9.8765, 1.235, 9.88")]
     [InlineData("Padding: {0,-10:N2}, {1,10:N4}, {One,-10:N3}, {Two,10:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Padding: 1.23      ,     9.8765, 1.235     ,       9.88")]
     public void FormatInvariant_Then_ResultShouldBeExpectedResult(string format, string[] names, object[] input, string expectedResult)
     {
@@ -36,7 +36,7 @@ public class NamedFormatStringTests
     [Fact]
     public void ImplicitFormatOperator_Then_ResultShouldBeExpectedResult()
     {
-        var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", new[] { "One", "Two" });
+        var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", ["One", "Two"]);
 
         string result = testee;
 
@@ -48,7 +48,7 @@ public class NamedFormatStringTests
     public void GetNullArguments_Then_NullNamesShouldBeExpectedResult()
     {
         var expectedResult = new List<(string Name, int Index)>() { ("Two", 1) };
-        var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", new[] { "One", "Two" });
+        var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", ["One", "Two"]);
 
         var result = testee.GetNullArguments(1, null);
 
@@ -59,7 +59,7 @@ public class NamedFormatStringTests
     [Fact]
     public void FormatInvariant_When_PassingNullArray_Then_ArgumentNullExceptionShouldBeThrown()
     {
-        var testee = NamedFormatString.CreateInvariant("{One}", new[] { "One" });
+        var testee = NamedFormatString.CreateInvariant("{One}", ["One"]);
         object[]? array = null;
 
 #pragma warning disable CS8604 // Possible null reference argument.
@@ -75,8 +75,9 @@ public class NamedFormatStringTests
         const string expectedResult = "$, \", 4";
 
         var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
+        result.TryGet(out var content, out var _);
 
-        result.Should().BeOfType<StringFormatted>().Which.Result.Should().Be(expectedResult);
+        content!.Result.Should().Be(expectedResult);
     }
 
     [Fact]
@@ -86,14 +87,9 @@ public class NamedFormatStringTests
 
         var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), 4);
 
-        var content = result switch
-        {
-            StringFormatted stringFormatted => stringFormatted.Result,
-            ArgumentsContainedNullValues argumentsContainedNullValues => nameof(argumentsContainedNullValues),
-            FormatContainedUnknownNames unexpectedNames => nameof(unexpectedNames),
-        };
+        result.TryGet(out var content, out var _);
 
-        content.Should().Be(expectedResult);
+        content!.Result.Should().Be(expectedResult);
     }
 
     [Fact]
@@ -104,13 +100,48 @@ public class NamedFormatStringTests
 
         var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", NamedValues.Create(("Dollar", "$"), ("DQ", "\"")), arguments);
 
-        var content = result switch
-        {
-            StringFormatted stringFormatted => stringFormatted.Result,
-            ArgumentsContainedNullValues argumentsContainedNullValues => nameof(argumentsContainedNullValues),
-            FormatContainedUnknownNames formatContainedUnknownNames => nameof(formatContainedUnknownNames),
-        };
+        result.TryGet(out var content, out var _);
 
-        content.Should().Be(expectedResult);
+        content!.Result.Should().Be(expectedResult);
+    }
+
+    [Fact]
+    public void FormatInvariant_When_AllNamesAreFound_Then_ContentShouldBeExpectedResult()
+    {
+        const string expectedResult = "$, \", 4";
+        var arguments = new[] { "4" };
+
+        var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", (name, _) => name switch { "Dollar" => R.SuccessOption("$"), "DQ" => R.SuccessOption("\""), _ => R.SuccessOption(default(string?)), }, arguments);
+
+        var content = result.Value!;
+
+        content.Result.Should().Be(expectedResult);
+        content.HasNulls.Should().BeFalse();
+    }
+
+    [Fact]
+    public void FormatInvariant_When_SomeNameMapToNull_Then_ContentShouldBeExpectedResult()
+    {
+        const string expectedResult = "$, , 4";
+        var arguments = new[] { "4" };
+
+        var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", (name, _) => name switch { "Dollar" => R.SuccessOption("$"), _ => R.SuccessOption(default(string?)), }, arguments);
+
+        var content = result.Value!;
+
+        content.Result.Should().Be(expectedResult);
+        content.HasNulls.Should().BeTrue();
+    }
+
+    [Fact]
+    public void FormatInvariant_When_OneNameCannotBeFound_Then_ContentShouldBeExpectedResult()
+    {
+        var arguments = new[] { "4" };
+
+        var result = NamedFormatString.FormatInvariant("{Dollar}, {DQ}, {0}", (name, _) => name switch { "Dollar" => R.SuccessOption("$"), _ => R.Error(), }, arguments);
+
+        var content = result.Error!;
+
+        content.Names.Should().Equal(["DQ"]);
     }
 }

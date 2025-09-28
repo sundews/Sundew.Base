@@ -20,7 +20,7 @@ public class EnumerableToTextExtensionsTests
     private const string ExpectedStringSeparatedResult = "2.3| 2.5| 6.5";
     private const string StringSeparator = "| ";
     private const char CharSeparator = '|';
-    private static readonly double[] Values = { 2.3, 2.5, 6.5 };
+    private static readonly double[] Values = [2.3, 2.5, 6.5];
 
     [Fact]
     public void JoinToString_When_PassingFormatProvider_Then_ResultShouldBeExpectedResult()
@@ -83,7 +83,7 @@ public class EnumerableToTextExtensionsTests
     [InlineData(false, "Hi|there||!")]
     public void AppendItems_When_UsingNullableClassOverloadAndCharSeparator_Then_ResultShouldBeExpectedResult(bool skipNullValues, string expectedResult)
     {
-        var result = new StringBuilder().AppendItems(new[] { "Hi", "there", null, "!" }, CharSeparator, CultureInfo.InvariantCulture, skipNullValues).ToString();
+        var result = new StringBuilder().AppendItems(["Hi", "there", null, "!"], CharSeparator, CultureInfo.InvariantCulture, skipNullValues).ToString();
 
         result.Should().Be(expectedResult);
     }
@@ -91,7 +91,7 @@ public class EnumerableToTextExtensionsTests
     [Fact]
     public void AppendItems_When_UsingNotNullOverloadAndCharSeparator_Then_ResultShouldBeExpectedResult()
     {
-        var result = new StringBuilder().AppendItems(new[] { "Hi", "there", "!" }, CharSeparator, CultureInfo.InvariantCulture).ToString();
+        var result = new StringBuilder().AppendItems(["Hi", "there", "!"], CharSeparator, CultureInfo.InvariantCulture).ToString();
 
         result.Should().Be("Hi|there|!");
     }

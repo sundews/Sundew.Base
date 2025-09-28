@@ -16,8 +16,8 @@ public class ValueArrayTests
     [Fact]
     public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
-        ValueArray<int> lhs = System.Collections.Immutable.ImmutableArray.Create(4, 5, 6);
-        ValueArray<int> rhs = System.Collections.Immutable.ImmutableArray.Create(4, 5, 6);
+        ValueArray<int> lhs = [4, 5, 6];
+        ValueArray<int> rhs = [4, 5, 6];
 
         ((object)lhs).Should().Be(rhs);
     }

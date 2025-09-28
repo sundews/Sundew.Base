@@ -40,17 +40,6 @@ public static class OptionalValue
     }
 
     /// <summary>
-    /// Gets a value indicating whether value has a value (Not null).
-    /// </summary>
-    /// <typeparam name="TValue">The value type.</typeparam>
-    /// <param name="value">The value.</param>
-    /// <returns><c>true</c>, if value is not null, otherwise <c>false</c>.</returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static bool HasValue<TValue>([NotNullWhen(true)] this TValue? value)
-        where TValue : struct
-        => value.HasValue;
-
-    /// <summary>
     /// Gets the value or the default value.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
@@ -218,7 +207,7 @@ public static class OptionalValue
         where TOtherValue : struct
         where TNewValue : struct
     {
-        var hasValue = value.HasValue() && otherValue.HasValue;
+        var hasValue = value.HasValue && otherValue.HasValue;
         return hasValue ? getValueFunc(value!, otherValue.GetValueOrDefault()) : null;
     }
 
