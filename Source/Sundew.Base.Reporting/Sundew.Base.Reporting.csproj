@@ -5,8 +5,4 @@
     <Description>The IReporter interface for assisting with implementation of reporter/loggers.</Description>
   </PropertyGroup>
 
-  <ItemGroup>
-    <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
-  </ItemGroup>
-
 </Project>

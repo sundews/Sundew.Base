@@ -7,7 +7,7 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.3" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Disposal.Interfaces" Version="1.0.1" />
-    <PackageVersion Include="Initialization.Interfaces" Version="1.0.2" />
+    <PackageVersion Include="Initialization.Interfaces" Version="1.0.3-u20250427-154049-ci" />
     <PackageVersion Include="JustMock" Version="2025.3.813.457" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
     <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
@@ -17,8 +17,8 @@
     <PackageVersion Include="Paket.Core" Version="9.0.2" />
     <PackageVersion Include="PolySharp" Version="1.15.0" />
     <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
-    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.3.9-u20250922-221632-local" />
-    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.9" />
+    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.3.9-u20250427-204829-ci" />
+    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.10-u20250427-204945-ci" />
     <PackageVersion Include="System.Reflection.Metadata" Version="9.0.4" />
     <PackageVersion Include="System.Security.Permissions" Version="9.0.9" />
     <PackageVersion Include="TransparentMoq" Version="4.20.70.2" />

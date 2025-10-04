@@ -1,0 +1,24 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ValueArrayTests.cs" company="Sundews">
+// Copyright (c) Sundews. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for full license information.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace Sundew.Base.Development.Tests.Collections;
+
+using AwesomeAssertions;
+using Sundew.Base.Collections.Immutable;
+using Xunit;
+
+public class ValueArrayTests
+{
+    [Fact]
+    public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
+    {
+        ValueArray<int> lhs = [4, 5, 6];
+        ValueArray<int> rhs = [4, 5, 6];
+
+        ((object)lhs).Should().Be(rhs);
+    }
+}

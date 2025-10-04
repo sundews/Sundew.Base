@@ -40,14 +40,8 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>    
   </PropertyGroup>
   <ItemGroup>
-    <EmbeddedFiles Include="$(GeneratedAssemblyInfoFile)"/>
     <None Include="..\..\README.md" Pack="true" PackagePath="\docs"/>
   </ItemGroup>
 
-  <ItemGroup Condition="$(AssemblyName.EndsWith('Tests'))">
-    <GlobalAnalyzerConfigFiles Include="..\testing.globalconfig" Link="testing.globalconfig"/>
-    <AdditionalFiles Include="..\Testing\testing.globalconfig" Link="testing.globalconfig"/>
-  </ItemGroup>
-
-  <Import Project="Directory.Build.props.user" Condition="Exists('Directory.Build.props.user')"/>
+ <Import Project="Directory.Build.props.user" Condition="Exists('Directory.Build.props.user')"/>
 </Project>

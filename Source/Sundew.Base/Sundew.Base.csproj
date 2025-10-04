@@ -30,7 +30,6 @@ Sundew.Base.Timers
 
   <ItemGroup>
     <EmbeddedFiles Remove="$(GeneratedAssemblyInfoFile)" />
-    <AdditionalFiles Include="stylecop.json" />
   </ItemGroup>
 
   <ItemGroup>

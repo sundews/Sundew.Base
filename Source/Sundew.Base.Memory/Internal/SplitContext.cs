@@ -9,7 +9,6 @@ namespace Sundew.Base.Memory.Internal;
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Represents a context for splitting <see cref="ReadOnlyMemory{T}"/>.

@@ -6,24 +6,27 @@
     <BuildType Name="Release-Publish" />
     <BuildType Name="Release-Stable" />
   </Configurations>
-  <Folder Name="/Solution Items/">
+  <Folder Name="/Build/">
     <File Path="../.github/workflows/dotnet.yml" />
     <File Path="../README.md" />
     <File Path=".editorconfig" />
+    <File Path="Build/stylecop.json" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
     <File Path="global.json" />
     <File Path="NuGet.Config" />
-    <File Path="Testing/testing.globalconfig" />
+  </Folder>
+  <Folder Name="/Build/Development/">
+    <File Path="Build/Development/stylecop.json" />
   </Folder>
   <Folder Name="/Tests/">
-    <Project Path="Sundew.Base.PerformanceComparisons/Sundew.Base.PerformanceComparisons.csproj">
+    <Project Path="Sundew.Base.Development.Baselines/Sundew.Base.Development.Baselines.csproj" />
+    <Project Path="Sundew.Base.Development.PerformanceBenchmark/Sundew.Base.Development.PerformanceBenchmark.csproj">
       <BuildType Solution="Debug-Publish|*" Project="Debug" />
       <BuildType Solution="Release-Publish|*" Project="Release" />
     </Project>
-    <Project Path="Sundew.Base.UnitTests/Sundew.Base.UnitTests.csproj" />
-    <Project Path="Sundew.Test.Infrastructure/Sundew.Test.Infrastructure.csproj" />
+    <Project Path="Sundew.Base.Development.Tests/Sundew.Base.Development.Tests.csproj" />
   </Folder>
   <Project Path="Sundew.Base.Collections.Immutable/Sundew.Base.Collections.Immutable.csproj" />
   <Project Path="Sundew.Base.Collections.Linq/Sundew.Base.Collections.Linq.csproj" />

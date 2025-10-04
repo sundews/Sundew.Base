@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>    
+    <TargetFramework>net10.0</TargetFramework>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+    <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <Compile Remove="Properties\**" />
+    <EmbeddedResource Remove="Properties\**" />
+    <None Remove="Properties\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudio.Threading" />
+    <PackageReference Include="Sundew.DiscriminatedUnions" />
+    <PackageReference Include="System.Security.Permissions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Computation\Sundew.Base.Computation.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
+    <ProjectReference Include="..\Sundew.Base\Sundew.Base.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Development.Baselines\Sundew.Base.Development.Baselines.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="IO\" />
+  </ItemGroup>
+
+</Project>

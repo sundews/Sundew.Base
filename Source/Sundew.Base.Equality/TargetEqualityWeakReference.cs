@@ -5,12 +5,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Sundew.Base.Primitives.WeakReferencing;
+namespace Sundew.Base.Equality;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using Sundew.Base.Equality;
 
 /// <summary>
 /// A weak reference that compares equality by reference on the target.

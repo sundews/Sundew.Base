@@ -1,8 +1,0 @@
-
-[*.{cs,vb}]
-csharp_using_directive_placement = outside_namespace:error
-csharp_style_namespace_declarations = block_scoped:error
-dotnet_style_readonly_field = true:error
-
-dotnet_sort_system_directives_first = true
-

@@ -10,15 +10,12 @@ namespace Sundew.Base.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using Sundew.Base.Collections;
 using Sundew.Base.Memory;
-using static Sundew.Base.Text.NamedFormatString;
 
 /// <summary>
 /// A formatter that supports names and indices.

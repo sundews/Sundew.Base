@@ -9,7 +9,6 @@ namespace Sundew.Base.Collections;
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Extends <see cref="IReadOnlyList{TItem}"/> interface.

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net8.0;net48</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Development.Baselines\Sundew.Base.Development.Baselines.csproj" />
+  </ItemGroup>
+
+</Project>

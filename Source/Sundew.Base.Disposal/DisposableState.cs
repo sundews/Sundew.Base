@@ -9,7 +9,6 @@ namespace Sundew.Base.Disposal;
 
 using System;
 using System.Threading.Tasks;
-using Sundew.Base.Threading;
 
 /// <summary>
 /// Helps implementing the dispose pattern.

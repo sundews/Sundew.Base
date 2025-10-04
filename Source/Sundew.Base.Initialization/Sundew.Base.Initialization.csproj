@@ -6,10 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <AdditionalFiles Include="..\Sundew.Base\stylecop.json" Link="stylecop.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Initialization.Interfaces"  />
     <PackageReference Include="System.Collections.Immutable"  />
 	</ItemGroup>
