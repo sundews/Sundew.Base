@@ -6,7 +6,7 @@
     <PackageVersion Include="AwesomeAssertions" Version="9.2.0" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.3" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
-    <PackageVersion Include="Disposal.Interfaces" Version="1.0.2" />
+    <PackageVersion Include="Disposal.Interfaces" Version="1.0.3" />
     <PackageVersion Include="Initialization.Interfaces" Version="1.0.3" />
     <PackageVersion Include="JustMock" Version="2025.3.813.457" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
