@@ -10,6 +10,7 @@ namespace Sundew.Base.Collections;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -39,6 +40,20 @@ public static partial class AsyncEnumerableExtensions
     /// <param name="enumerable">The enumerable.</param>
     /// <param name="action">The action.</param>
     /// <returns>The completion task.</returns>
+    [OverloadResolutionPriority(0)]
+    public static Task ForEachAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, Task> action)
+    {
+        return Task.WhenAll(enumerable.Select(async x => await action(x).ConfigureAwait(false)));
+    }
+
+    /// <summary>
+    /// Runs an asynchronous for each.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <param name="enumerable">The enumerable.</param>
+    /// <param name="action">The action.</param>
+    /// <returns>The completion task.</returns>
+    [OverloadResolutionPriority(1)]
     public static Task ForEachAsync<TItem>(this IEnumerable<TItem> enumerable, Func<TItem, ValueTask> action)
     {
         return Task.WhenAll(enumerable.Select(async x => await action(x).ConfigureAwait(false)));
