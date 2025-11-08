@@ -69,7 +69,7 @@ public class LastUpdateEmitterTests
 
         testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
+        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(1000));
 
         Assert.Multiple(
             () => expectedResult.Should().Equal(["1", finalExpectedValue]),

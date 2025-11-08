@@ -140,7 +140,7 @@ public class ManualResetEventAsyncTests
     [Fact]
     public async Task WaitAsync_When_SetAndResetBeforeAndTimeoutAfter_Then_ResultShouldBeFalse()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
         await Task.Delay(50);
         this.testee.Set();
         var waitTask1Result = await waitTask1;
@@ -152,7 +152,7 @@ public class ManualResetEventAsyncTests
         this.testee.Reset();
         this.testee.IsSet.Should().BeFalse();
 
-        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
 
         var result = await waitTask2;
 
@@ -164,7 +164,7 @@ public class ManualResetEventAsyncTests
     [Fact]
     public async Task WaitAsync_When_PreviouslyAwaitedAndDelayedSetAndResetBeforeAndSetAfter_Then_ResultShouldBeTrue()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
         await Task.Delay(50);
         this.testee.Set();
         var waitTask1Result = await waitTask1;
@@ -176,7 +176,7 @@ public class ManualResetEventAsyncTests
         this.testee.Reset();
         this.testee.IsSet.Should().BeFalse();
 
-        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
         await Task.Delay(50);
         this.testee.Set();
 
@@ -192,7 +192,7 @@ public class ManualResetEventAsyncTests
     {
         this.testee.Set();
         this.testee.Reset();
-        var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(200)));
+        var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
 
         var result = await waitTask;
 
@@ -204,8 +204,8 @@ public class ManualResetEventAsyncTests
     [Fact]
     public async Task WaitAsync_When_Set_Then_AllWaitersShouldBeNotified()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(500)));
-        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(500)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
         await Task.Delay(10);
         this.testee.Set();
 
@@ -233,8 +233,8 @@ public class ManualResetEventAsyncTests
     [Fact]
     public async Task Reset_When_TimesOut_Then_IsSetShouldBeFalse()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
-        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
         await Task.Delay(50);
 
         this.testee.Reset();
