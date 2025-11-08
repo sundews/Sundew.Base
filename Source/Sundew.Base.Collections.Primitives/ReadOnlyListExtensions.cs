@@ -9,13 +9,39 @@ namespace Sundew.Base.Collections;
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Extends <see cref="IReadOnlyList{TItem}"/> interface.
 /// </summary>
 public static class ReadOnlyListExtensions
 {
+    /// <summary>
+    /// Extends TValue with option-like functionality.
+    /// </summary>
+    /// <typeparam name="TItem">The type of the item.</typeparam>
+    extension<TItem>(IReadOnlyCollection<TItem> list)
+    {
+        /// <summary>
+        /// Gets a value indicating whether the list has any items.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if the specified source array has any; otherwise, <c>false</c>.
+        /// </returns>
+#pragma warning disable SA1101
+        public bool HasAny => list.Count > 0;
+#pragma warning restore SA1101
+
+        /// <summary>
+        /// Gets a value indicating whether the list is empty.
+        /// </summary>
+        /// <returns>
+        ///   <c>true</c> if the specified list is empty; otherwise, <c>false</c>.
+        /// </returns>
+#pragma warning disable SA1101
+        public bool IsEmpty => list.Count == 0;
+#pragma warning restore SA1101
+    }
+
     /// <summary>
     /// Gets an <see cref="IReadOnlyList{TItem}"/> from an item.
     /// </summary>
@@ -44,7 +70,7 @@ public static class ReadOnlyListExtensions
     {
         if (item != null)
         {
-            return new[] { item };
+            return [item];
         }
 
         return Arrays.Empty<TItem>();
@@ -106,11 +132,7 @@ public static class ReadOnlyListExtensions
     {
         if (sourceArray == null)
         {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-            return Array.Empty<TOutItem>();
-#else
-            return new TOutItem[0];
-#endif
+            return [];
         }
 
         if (converter == null)
@@ -125,33 +147,5 @@ public static class ReadOnlyListExtensions
         }
 
         return result;
-    }
-
-    /// <summary>
-    /// Determines whether this instance has any.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="list">The list.</param>
-    /// <returns>
-    ///   <c>true</c> if the specified source array has any; otherwise, <c>false</c>.
-    /// </returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static bool HasAny<TItem>(this IReadOnlyCollection<TItem> list)
-    {
-        return list.Count > 0;
-    }
-
-    /// <summary>
-    /// Determines whether the specified list is empty.
-    /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
-    /// <param name="list">The list.</param>
-    /// <returns>
-    ///   <c>true</c> if the specified list is empty; otherwise, <c>false</c>.
-    /// </returns>
-    [MethodImpl((MethodImplOptions)0x300)]
-    public static bool IsEmpty<TItem>(this IReadOnlyCollection<TItem> list)
-    {
-        return list.Count == 0;
     }
 }

@@ -42,7 +42,7 @@ public class ReadOnlyListExtensionsTests
     {
         var list = new List<int> { 0, 1, 2, 3, 4 };
 
-        var result = list.HasAny();
+        var result = list.HasAny;
 
         result.Should().BeTrue();
     }
@@ -52,7 +52,7 @@ public class ReadOnlyListExtensionsTests
     {
         var list = new int[] { 0, 1, 2, 3, 4 };
 
-        var result = list.HasAny();
+        var result = list.HasAny;
 
         result.Should().BeTrue();
     }
@@ -62,7 +62,7 @@ public class ReadOnlyListExtensionsTests
     {
         var list = new List<int>();
 
-        var result = list.IsEmpty();
+        var result = list.IsEmpty;
 
         result.Should().BeTrue();
     }
@@ -72,7 +72,7 @@ public class ReadOnlyListExtensionsTests
     {
         var list = Array.Empty<int>();
 
-        var result = list.IsEmpty();
+        var result = list.IsEmpty;
 
         result.Should().BeTrue();
     }

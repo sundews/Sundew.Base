@@ -60,7 +60,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <param name="array">An array.</param>
     public static implicit operator ValueArray<TItem>(TItem[] array)
     {
-        return new ValueArray<TItem>(array.ToImmutableArray());
+        return new ValueArray<TItem>([..array]);
     }
 
     /// <summary>
@@ -149,7 +149,7 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     [MethodImpl((MethodImplOptions)0x300)]
     IEnumerator<TItem> IEnumerable<TItem>.GetEnumerator()
     {
-        return (((IEnumerable<TItem>?)this.inner) ?? Array.Empty<TItem>()).GetEnumerator();
+        return (((IEnumerable<TItem>?)this.inner) ?? []).GetEnumerator();
     }
 
     /// <summary>

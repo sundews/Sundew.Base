@@ -36,7 +36,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <summary>
     /// Gets a value indicating whether this array is empty.
     /// </summary>
-    public bool IsEmpty => this.inner?.IsEmpty() ?? true;
+    public bool IsEmpty => this.inner?.IsEmpty ?? true;
 
     /// <summary>
     /// Gets the count.
@@ -48,7 +48,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// </summary>
     /// <param name="index">The index.</param>
     /// <returns>The item.</returns>
-    public TItem this[int index] => this.inner == default ? throw new IndexOutOfRangeException($"The index {index} was out of range.") : this.inner[index];
+    public TItem this[int index] => this.inner == null ? throw new IndexOutOfRangeException($"The index {index} was out of range.") : this.inner[index];
 
     /// <summary>
     /// Converts from a  <see cref="ImmutableArray{T}"/> to an <see cref="ValueList{T}"/>.
@@ -121,7 +121,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     [MethodImpl((MethodImplOptions)0x300)]
     public IEnumerator<TItem> GetEnumerator()
     {
-        return this.inner == default ? ((IEnumerable<TItem>)Array.Empty<TItem>()).GetEnumerator() : this.inner.GetEnumerator();
+        return this.inner == null ? ((IEnumerable<TItem>)Array.Empty<TItem>()).GetEnumerator() : this.inner.GetEnumerator();
     }
 
     /// <summary>
@@ -131,7 +131,7 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     public override int GetHashCode()
     {
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-        if (this.inner == default)
+        if (this.inner == null)
         {
             return 0;
         }

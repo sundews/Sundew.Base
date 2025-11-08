@@ -15,11 +15,20 @@ using Xunit;
 public class ValueDictionaryTests
 {
     [Fact]
-    public void Equals_Then_LhsAndRhsShouldBeEqual()
+    public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueDictionary<int, int> lhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);
         ValueDictionary<int, int> rhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);
 
         ((object)lhs).Should().Be(rhs);
+    }
+
+    [Fact]
+    public void GetHashCode_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
+    {
+        ValueDictionary<int, int> lhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);
+        ValueDictionary<int, int> rhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);
+
+        lhs.GetHashCode().Should().Be(rhs.GetHashCode());
     }
 }

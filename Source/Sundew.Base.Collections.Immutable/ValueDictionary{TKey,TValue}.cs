@@ -43,7 +43,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <summary>
     /// Gets a value indicating whether this array is empty.
     /// </summary>
-    public bool IsEmpty => this.inner?.IsEmpty() ?? true;
+    public bool IsEmpty => this.inner?.IsEmpty ?? true;
 
     /// <summary>
     /// Gets the keys.
@@ -62,7 +62,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// </summary>
     /// <param name="key">The key.</param>
     /// <returns>The value.</returns>
-    public TValue this[TKey key] => this.inner == default ? throw new KeyNotFoundException($"The key: {key} was not found") : this.inner[key];
+    public TValue this[TKey key] => this.inner == null ? throw new KeyNotFoundException($"The key: {key} was not found") : this.inner[key];
 
     /// <summary>
     /// Converts an <see cref="ImmutableDictionary{TKey,TValue}"/> to a <see cref="ValueDictionary{TKey,TValue}"/>.
@@ -160,7 +160,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     public override int GetHashCode()
     {
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-        if (this.inner == default)
+        if (this.inner == null)
         {
             return 0;
         }
