@@ -100,13 +100,13 @@ public class CancellationTests
         var enabler = cancellation.EnableCancellation();
         _ = Task.Run(async () =>
         {
-            await Task.Delay(50);
+            await Task.Delay(20, CancellationToken.None);
             await cancellationTokenSource.CancelAsync();
             enabler.Dispose();
             cancellationTokenSource.Dispose();
         });
 
-        await Task.Delay(500);
+        await Task.Delay(1000, CancellationToken.None);
 
         enabler.CancelReason.Should().Be(CancelReason.External);
     }
