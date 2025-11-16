@@ -412,17 +412,16 @@ public static class ParallelEnumerableAsyncExtensions
         Func<TItem, int, CancellationToken, ValueTask<TOutItem>> func)
     {
         var maxDegreeOfParallelism = Interval.From(1, Environment.ProcessorCount).Limit(parallelism.MaxDegreeOfParallelism);
-        var cancellationToken = parallelism.Cancellation.Token;
-        var scheduler = parallelism.TaskScheduler ?? TaskScheduler.Current;
+        var taskScheduler = parallelism.TaskScheduler ?? TaskScheduler.Current;
         var enumerator = enumerable.GetEnumerator();
         var enabler = parallelism.Cancellation.EnableCancellation();
-        var semaphore = new SemaphoreSlim(1, 1);
-        var workerTasks = new Task[maxDegreeOfParallelism];
+        var semaphoreSlim = new SemaphoreSlim(1, 1);
+        var tasks = new Task[maxDegreeOfParallelism];
         var concurrentList = new ConcurrentList<TOutItem>();
         var index = 0;
         for (var i = 0; i < maxDegreeOfParallelism; i++)
         {
-            workerTasks[i] = Task.Factory.StartNew(
+            tasks[i] = Task.Factory.StartNew(
                     async () =>
                     {
                         (TItem? Item, int Index) itemPair = (default, 0);
@@ -430,7 +429,7 @@ public static class ParallelEnumerableAsyncExtensions
                         {
                             while (enabler.ContinueOrThrowIfCancellationRequested())
                             {
-                                await semaphore.WaitAsync().ConfigureAwait(true);
+                                await semaphoreSlim.WaitAsync().ConfigureAwait(true);
                                 try
                                 {
                                     if (!enumerator.MoveNext())
@@ -442,7 +441,7 @@ public static class ParallelEnumerableAsyncExtensions
                                 }
                                 finally
                                 {
-                                    semaphore.Release();
+                                    semaphoreSlim.Release();
                                 }
 
                                 concurrentList[itemPair.Index] = await func(itemPair.Item, itemPair.Index, enabler.Token).ConfigureAwait(true);
@@ -461,16 +460,16 @@ public static class ParallelEnumerableAsyncExtensions
                     },
                     CancellationToken.None,
                     TaskCreationOptions.DenyChildAttach,
-                    scheduler)
+                    taskScheduler)
                 .Unwrap();
         }
 
-        return Task.WhenAll(workerTasks).ContinueWith(
+        return Task.WhenAll(tasks).ContinueWith(
             _ =>
             {
                 using (enumerator)
                 using (enabler)
-                using (semaphore)
+                using (semaphoreSlim)
                 {
                 }
 
