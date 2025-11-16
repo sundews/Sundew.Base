@@ -37,7 +37,8 @@ public class ConcurrentList<TItem> : IList<TItem>, IReadOnlyList<TItem>
             do
             {
                 oldList = this.inner;
-                newList = oldList.Replace(this.inner[index], value);
+                newList = EnsureSize(index, oldList, false);
+                newList = newList.SetItem(index, value);
             }
             while (Interlocked.CompareExchange(ref this.inner, newList, oldList) != oldList);
         }
@@ -114,7 +115,8 @@ public class ConcurrentList<TItem> : IList<TItem>, IReadOnlyList<TItem>
         do
         {
             oldList = this.inner;
-            newList = oldList.Insert(index, item);
+            newList = EnsureSize(index, oldList, true);
+            newList = newList.Insert(index, item);
         }
         while (Interlocked.CompareExchange(ref this.inner, newList, oldList) != oldList);
     }
@@ -148,5 +150,15 @@ public class ConcurrentList<TItem> : IList<TItem>, IReadOnlyList<TItem>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return this.GetEnumerator();
+    }
+
+    private static ImmutableList<TItem> EnsureSize(int index, ImmutableList<TItem> list, bool isInsert)
+    {
+        if (index >= list.Count)
+        {
+            list = list.AddRange(new TItem[(index - list.Count) + (isInsert ? 0 : 1)]);
+        }
+
+        return list;
     }
 }

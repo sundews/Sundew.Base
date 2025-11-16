@@ -218,6 +218,16 @@ public struct Cancellation
         }
 
         /// <summary>
+        /// Throws an <see cref="T:System.OperationCanceledException" /> if cancellation has been requested for this token.
+        /// </summary>
+        /// <returns><c>true</c>.</returns>
+        public bool ContinueOrThrowIfCancellationRequested()
+        {
+            this.Token.ThrowIfCancellationRequested();
+            return true;
+        }
+
+        /// <summary>
         /// Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.
         /// </summary>
         /// <param name="callback">The delegate to be executed when the <see cref="T:System.Threading.CancellationToken" /> is canceled.</param>
