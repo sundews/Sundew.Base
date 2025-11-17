@@ -11,12 +11,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 /// <summary>
 /// Represents in immutable array that implements value semantics.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
+[DebuggerDisplay("Count = {Count}")]
 public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquatable<ValueArray<TItem>>
 {
     private readonly ImmutableArray<TItem>? inner;

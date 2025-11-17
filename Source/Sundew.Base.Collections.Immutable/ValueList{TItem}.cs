@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -18,6 +19,7 @@ using System.Runtime.CompilerServices;
 /// Represents in immutable list that implements value semantics.
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
+[DebuggerDisplay("Count = {Count}")]
 public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<ValueList<TItem>>
 {
     private readonly System.Collections.Immutable.IImmutableList<TItem>? inner;
