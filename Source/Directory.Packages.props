@@ -9,7 +9,7 @@
     <PackageVersion Include="Disposal.Interfaces" Version="1.0.3" />
     <PackageVersion Include="Initialization.Interfaces" Version="1.0.3" />
     <PackageVersion Include="JustMock" Version="2025.4.1112.487" />
-    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.100" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
@@ -17,16 +17,16 @@
     <PackageVersion Include="Paket.Core" Version="9.0.2" />
     <PackageVersion Include="PolySharp" Version="1.15.0" />
     <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
-    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.3.9" />
-    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.9" />
+    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.3.11" />
+    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.12" />
     <PackageVersion Include="System.Reflection.Metadata" Version="9.0.4" />
-    <PackageVersion Include="System.Security.Permissions" Version="9.0.9" />
+    <PackageVersion Include="System.Security.Permissions" Version="10.0.0" />
     <PackageVersion Include="TransparentMoq" Version="4.20.70.2" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
-    <PackageVersion Include="System.Collections.Immutable" Version="9.0.9" />
+    <PackageVersion Include="System.Collections.Immutable" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
