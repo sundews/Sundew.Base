@@ -51,7 +51,8 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
     /// Schedules the specified value for processing.
     /// </summary>
     /// <param name="value">The value.</param>
-    public void Update(TValue value)
+    /// <returns>A task representing the processing.</returns>
+    public ValueTask Update(TValue value)
     {
         var needUpdate = !this.comparer.Equals(value, this.currentValue);
         lock (this.lockObject)
@@ -61,6 +62,8 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
             {
                 this.currentTask = Task.Run(() => this.ProcessAsync(value));
             }
+
+            return this.currentTask.HasValue ? new ValueTask(this.currentTask) : default;
         }
     }
 

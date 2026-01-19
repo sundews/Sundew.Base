@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Computation\Sundew.Base.Computation.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Migrations.System.Text.Json\Sundew.Base.Migrations.System.Text.Json.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Migrations\Sundew.Base.Migrations.csproj" />
     <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base\Sundew.Base.csproj" />

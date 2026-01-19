@@ -38,6 +38,8 @@
   <Project Path="Sundew.Base.Initialization/Sundew.Base.Initialization.csproj" />
   <Project Path="Sundew.Base.IO/Sundew.Base.IO.csproj" />
   <Project Path="Sundew.Base.Memory/Sundew.Base.Memory.csproj" />
+  <Project Path="Sundew.Base.Migrations.System.Text.Json/Sundew.Base.Migrations.System.Text.Json.csproj" />
+  <Project Path="Sundew.Base.Migrations/Sundew.Base.Migrations.csproj" />
   <Project Path="Sundew.Base.Numeric/Sundew.Base.Numeric.csproj" />
   <Project Path="Sundew.Base.Primitives/Sundew.Base.Primitives.csproj" />
   <Project Path="Sundew.Base.Reporting/Sundew.Base.Reporting.csproj" />

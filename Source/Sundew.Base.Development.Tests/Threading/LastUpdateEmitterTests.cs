@@ -32,12 +32,12 @@ public class LastUpdateEmitterTests
             }
         });
 
-        testee.Update(1);
-        testee.Update(2);
-        testee.Update(3);
-        testee.Update(4);
+        _ = testee.Update(1);
+        _ = testee.Update(2);
+        _ = testee.Update(3);
+        _ = testee.Update(4);
 
-        testee.Update(finalExpectedValue);
+        _ = testee.Update(finalExpectedValue);
 
         var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
 
@@ -62,12 +62,12 @@ public class LastUpdateEmitterTests
             }
         });
 
-        testee.Update("1");
-        testee.Update("2");
-        testee.Update("3");
-        testee.Update("4");
+        _ = testee.Update("1");
+        _ = testee.Update("2");
+        _ = testee.Update("3");
+        _ = testee.Update("4");
 
-        testee.Update(finalExpectedValue);
+        _ = testee.Update(finalExpectedValue);
 
         var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(1000));
 
@@ -92,12 +92,12 @@ public class LastUpdateEmitterTests
             }
         });
 
-        testee.Update("1");
-        testee.Update("2");
-        testee.Update("3");
-        testee.Update("4");
+        _ = testee.Update("1");
+        _ = testee.Update("2");
+        _ = testee.Update("3");
+        _ = testee.Update("4");
 
-        testee.Update(finalExpectedValue);
+        _ = testee.Update(finalExpectedValue);
 
         var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
         Assert.Multiple(

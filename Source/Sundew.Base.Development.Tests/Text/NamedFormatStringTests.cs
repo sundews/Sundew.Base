@@ -16,6 +16,7 @@ using Xunit;
 public class NamedFormatStringTests
 {
     [Theory]
+    [InlineData("Can this {Resemble->A.Path}.", new string[] { "Resemble->A.Path" }, new object[] { "work" }, "Can this work.")]
     [InlineData("Hello {Name}.", new string[] { "Name" }, new object[] { "World" }, "Hello World.")]
     [InlineData("{Greeting} how are you?", new string[] { "Greeting" }, new object[] { "Hello" }, "Hello how are you?")]
     [InlineData("What do you mean{Punctuation}", new string[] { "Punctuation" }, new object[] { "?" }, "What do you mean?")]

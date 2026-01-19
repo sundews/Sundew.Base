@@ -7,6 +7,8 @@
 
 namespace Sundew.Base.Threading;
 
+using System.Threading.Tasks;
+
 /// <summary>
 /// Interface for implementing an update emitter.
 /// </summary>
@@ -17,5 +19,6 @@ public interface IUpdateEmitter<in TValue>
     /// Schedules the specified value for processing.
     /// </summary>
     /// <param name="value">The value type.</param>
-    void Update(TValue value);
+    /// <returns>A task representing the update operation.</returns>
+    ValueTask Update(TValue value);
 }
