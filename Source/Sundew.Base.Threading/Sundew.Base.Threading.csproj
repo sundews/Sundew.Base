@@ -6,10 +6,19 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces"  />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
   </ItemGroup>
 
-	<ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0' OR '$(TargetFramework)' == 'netstandard2.1'">
+    <Compile Remove="IValueSynchronizer{TValue}.cs" />
+    <Compile Remove="PostApplyAction.cs" />
+    <Compile Remove="ValueSynchronizer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
   </ItemGroup>

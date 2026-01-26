@@ -16,7 +16,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
     <ProjectReference Include="..\Sundew.Base.Reporting\Sundew.Base.Reporting.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Threading\Sundew.Base.Threading.csproj" />
   </ItemGroup>
 
 </Project>
