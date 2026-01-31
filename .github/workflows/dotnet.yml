@@ -11,13 +11,15 @@ on:
 concurrency:
   group: ${{ github.ref == 'refs/tags/release' && github.ref || github.run_id }}
 
+env:
+  solutionFileName: Sundew.Base.slnx
+  solutionDir: ./Source
+
 jobs:
   build:
     name: .NET
     runs-on: ubuntu-latest
     env:
-      solutionFileName: Sundew.Base.slnx
-      solutionDir: ./Source
       solutionPath: ${{ env.solutionDir }}/${{ env.solutionFileName }}
       versioningProjectPath: ./Source/Sundew.Base/Sundew.Base.csproj
       repository: 'https://sundew-dev:${{ secrets.SUNDEW_DEV_TOKEN }}@github.com/sundews/Sundew.Base.git'
