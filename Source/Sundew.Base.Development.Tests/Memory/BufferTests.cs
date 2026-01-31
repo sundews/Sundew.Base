@@ -14,13 +14,12 @@ using AwesomeAssertions;
 using Sundew.Base.Collections;
 using Sundew.Base.Memory;
 using Telerik.JustMock;
-using Xunit;
 
 public class BufferTests
 {
     private static readonly byte[] ExpectedResult = [1, 2, 3, 4, 5];
 
-    [Fact]
+    [Test]
     public void Write_Then_ToArrayShouldEqualExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -30,7 +29,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(ExpectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Write_When_BufferHasBeenSliced_Then_SliceAndBufferShouldEqualExpectedResults()
     {
         var testee = new Buffer<byte>();
@@ -45,7 +44,7 @@ public class BufferTests
         testee.Capacity.Should().BeGreaterThanOrEqualTo(slice.StartIndex + slice.Length);
     }
 
-    [Fact]
+    [Test]
     public void Write_When_BufferHasBeenSlicedMultipleTimes_Then_SliceAndBufferShouldEqualExpectedResults()
     {
         var testee = new Buffer<byte>();
@@ -64,7 +63,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(totalExpectedArray);
     }
 
-    [Fact]
+    [Test]
     public void Slice_When_ExceedsCapacity_Then_BufferShouldBeResized()
     {
         const int expectedLength = 5;
@@ -79,7 +78,7 @@ public class BufferTests
         resizeArrange.OccursOnce();
     }
 
-    [Fact]
+    [Test]
     public void Write_When_SliceHasToGrow_Then_TesteeAsSpanShouldEqualExpectedResult()
     {
         var buffer = new Buffer<byte>();
@@ -90,7 +89,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(ExpectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Write_When_SliceHasToGrowAndIsNotLastSlice_Then_NotSupportedExceptionShouldBeThrown()
     {
         var buffer = new Buffer<byte>();
@@ -101,7 +100,7 @@ public class BufferTests
         action.Should().Throw<NotSupportedException>();
     }
 
-    [Fact]
+    [Test]
     public void Indexer_When_SetThroughIndexerAndFetched_Then_ResultShouldBeExpectedResult()
     {
         const int expectedResult = 0xFF;
@@ -113,7 +112,7 @@ public class BufferTests
         result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void WriteRange_When_RangeIsAList_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -124,7 +123,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(expectedResult.ToArray());
     }
 
-    [Fact]
+    [Test]
     public void WriteRange_When_RangeIsAnArray_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -134,7 +133,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(ExpectedResult);
     }
 
-    [Fact]
+    [Test]
     public void WriteRange_When_RangeIsAnEnumerable_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<int>();
@@ -145,7 +144,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(expectedResult.ToArray());
     }
 
-    [Fact]
+    [Test]
     public void WriteRange_When_RangeIsAList_ThenInReadOnlyItems_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -156,7 +155,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(expectedResult.ToArray());
     }
 
-    [Fact]
+    [Test]
     public void WriteRange_When_RangeIsAnArrayInReadOnlyItems_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -167,7 +166,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(expectedResult.ToArray());
     }
 
-    [Fact]
+    [Test]
     public void WriteRange_When_RangeIsAnEnumerableInReadOnlyItems_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<int>();
@@ -178,7 +177,7 @@ public class BufferTests
         testee.AsSpan().Should().Equal(expectedResult.ToArray());
     }
 
-    [Fact]
+    [Test]
     public void Write_When_PreviousDataHasBeenWritten_Then_ResultsShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -191,11 +190,11 @@ public class BufferTests
         testee.Length.Should().Be(4);
     }
 
-    [Theory]
-    [InlineData(null, 10, 10, 20)]
-    [InlineData(null, 1000, 128, 1128)]
-    [InlineData(1500, 1000, 128, 1500)]
-    [InlineData(100, 20, 30, 100)]
+    [Test]
+    [Arguments(null, 10, 10, 20)]
+    [Arguments(null, 1000, 128, 1128)]
+    [Arguments(1500, 1000, 128, 1500)]
+    [Arguments(100, 20, 30, 100)]
     public void SliceDefault_Then_SliceShouldBeInMinimumAt4AndMaxAt128(int? startCapacity, int expectedCapacity, int expectedStartIndex, int expectedTotalCapacity)
     {
         var testee = startCapacity.HasValue ? new Buffer<byte>(startCapacity.Value) : new Buffer<byte>();
@@ -208,10 +207,10 @@ public class BufferTests
         testee.Capacity.Should().Be(expectedTotalCapacity);
     }
 
-    [Theory]
-    [InlineData(null, 2, 4, 16)]
-    [InlineData(null, 100, 1000, 2300)]
-    [InlineData(1500, 100, 1000, 1500)]
+    [Test]
+    [Arguments(null, 2, 4, 16)]
+    [Arguments(null, 100, 1000, 2300)]
+    [Arguments(1500, 100, 1000, 1500)]
     public void SliceDefault_When_CalledMultipleTimes_Then_SliceShouldBeAfterFirstSlice(int? startCapacity, int firstSliceCapacity, int expectedCapacity, int expectedTotalCapacity)
     {
         var testee = startCapacity.HasValue ? new Buffer<byte>(startCapacity.Value) : new Buffer<byte>();
@@ -225,7 +224,7 @@ public class BufferTests
         testee.Capacity.Should().Be(expectedTotalCapacity);
     }
 
-    [Fact]
+    [Test]
     public void SliceDefault_When_BufferHasContent_Then_SliceShouldBeAfterFirstSlice()
     {
         var testee = new Buffer<byte>();
@@ -237,7 +236,7 @@ public class BufferTests
         testee.Length.Should().Be(5);
     }
 
-    [Fact]
+    [Test]
     public void Slice_Then_ResultShouldBeExpectedResult()
     {
         var testee = new Buffer<byte>();
@@ -252,7 +251,7 @@ public class BufferTests
         slice.AsSpan().Should().Equal(ExpectedResult);
     }
 
-    [Fact]
+    [Test]
     public void GetSpan_Then_LengthShouldBeIncrementedToTheLengthOrTheRequestedSpan()
     {
         var testee = new Buffer<byte>();
@@ -265,7 +264,7 @@ public class BufferTests
         testee.StartIndex.Should().Be(slice.StartIndex);
     }
 
-    [Fact]
+    [Test]
     public void GetSpan_When_WritingToASecondSlice_Then_LengthShouldBeIncrementedToTheLengthOrTheRequestedSpan()
     {
         var testee = new Buffer<byte>();

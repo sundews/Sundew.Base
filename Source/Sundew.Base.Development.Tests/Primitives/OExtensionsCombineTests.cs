@@ -10,14 +10,13 @@ namespace Sundew.Base.Development.Tests.Primitives;
 using System;
 using System.Globalization;
 using AwesomeAssertions;
-using Xunit;
 
 public class OExtensionsCombineTests
 {
-    [Theory]
-    [InlineData(5, 10.5, 15.5)]
-    [InlineData(5, null, null)]
-    [InlineData(null, 10.5, null)]
+    [Test]
+    [Arguments(5, 10.5, 15.5)]
+    [Arguments(5, null, null)]
+    [Arguments(null, 10.5, null)]
     public void Combine_When_OperandsAreNullableStructsAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(int? lhsOption, double? rhsOption, double? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => lhs + rhs);
@@ -25,10 +24,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(5, 10.5, "510.5")]
-    [InlineData(5, null, null)]
-    [InlineData(null, 10.5, null)]
+    [Test]
+    [Arguments(5, 10.5, "510.5")]
+    [Arguments(5, null, null)]
+    [Arguments(null, 10.5, null)]
     public void Combine_When_OperandsAreNullableStructsAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(int? lhsOption, double? rhsOption, string? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => FormattableString.Invariant($"{lhs}{rhs}"));
@@ -36,10 +35,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("5", "10.5", 15.5)]
-    [InlineData("5", null, null)]
-    [InlineData(null, "10.5", null)]
+    [Test]
+    [Arguments("5", "10.5", 15.5)]
+    [Arguments("5", null, null)]
+    [Arguments(null, "10.5", null)]
     public void Combine_When_OperandsAreNullableClassesAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(string? lhsOption, string? rhsOption, double? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => int.Parse(lhs) + double.Parse(rhs, CultureInfo.InvariantCulture));
@@ -47,10 +46,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("5", "10.5", "510.5")]
-    [InlineData("5", null, null)]
-    [InlineData(null, "10.5", null)]
+    [Test]
+    [Arguments("5", "10.5", "510.5")]
+    [Arguments("5", null, null)]
+    [Arguments(null, "10.5", null)]
     public void Combine_When_OperandsAreNullableClassesAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? lhsOption, string? rhsOption, string? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => $"{lhs}{rhs}");
@@ -58,10 +57,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("5", 10.5, "510.5")]
-    [InlineData("5", null, null)]
-    [InlineData(null, 10.5, null)]
+    [Test]
+    [Arguments("5", 10.5, "510.5")]
+    [Arguments("5", null, null)]
+    [Arguments(null, 10.5, null)]
     public void Combine_When_LhsIsNullableClassAndRhsIsNullableStructAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(string? lhsOption, double? rhsOption, string? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => lhs + rhs.ToString(CultureInfo.InvariantCulture));
@@ -69,10 +68,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("5", 10.5, 15.5)]
-    [InlineData("5", null, null)]
-    [InlineData(null, 10.5, null)]
+    [Test]
+    [Arguments("5", 10.5, 15.5)]
+    [Arguments("5", null, null)]
+    [Arguments(null, 10.5, null)]
     public void Combine_When_LhsIsNullableClassAndRhsIsNullableStructAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(string? lhsOption, double? rhsOption, double? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => int.Parse(lhs) + rhs);
@@ -80,10 +79,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(10.5, "5", "10.55")]
-    [InlineData(null, "5", null)]
-    [InlineData(10.5, null, null)]
+    [Test]
+    [Arguments(10.5, "5", "10.55")]
+    [Arguments(null, "5", null)]
+    [Arguments(10.5, null, null)]
     public void Combine_When_LhsIsNullableStructAndRhsIsNullableClassAndResultIsNullableClass_Then_ResultShouldBeExpectedResult(double? lhsOption, string? rhsOption, string? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => lhs.ToString(CultureInfo.InvariantCulture) + rhs);
@@ -91,10 +90,10 @@ public class OExtensionsCombineTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(10.5, "5", 15.5)]
-    [InlineData(null, "5", null)]
-    [InlineData(10.5, null, null)]
+    [Test]
+    [Arguments(10.5, "5", 15.5)]
+    [Arguments(null, "5", null)]
+    [Arguments(10.5, null, null)]
     public void Combine_When_LhsIsNullableStructAndRhsIsNullableClassAndResultIsNullableStruct_Then_ResultShouldBeExpectedResult(double? lhsOption, string? rhsOption, double? expectedResult)
     {
         var result = lhsOption.Combine(rhsOption, (lhs, rhs) => lhs + int.Parse(rhs));

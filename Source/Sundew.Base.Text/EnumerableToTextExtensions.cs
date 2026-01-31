@@ -140,7 +140,7 @@ public static class EnumerableToTextExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues = true)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, char separator, IFormatProvider? formatProvider, bool skipNullValues = true)
     {
         return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, formatProvider, skipNullValues).ToString();
     }
@@ -156,7 +156,7 @@ public static class EnumerableToTextExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues = true)
+    public static string JoinToString<TItem>(this IEnumerable<TItem> enumerable, string separator, IFormatProvider? formatProvider, bool skipNullValues = true)
     {
         return StringBuilderExtensions.InternalAppendItems(new StringBuilder(), enumerable, separator, formatProvider, skipNullValues).ToString();
     }

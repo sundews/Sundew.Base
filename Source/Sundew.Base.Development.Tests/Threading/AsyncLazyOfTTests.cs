@@ -13,13 +13,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Threading;
-using Xunit;
 
+[Repeat(100)]
 public class AsyncLazyOfTTests
 {
     private const string ExpectedResult = "Computed";
 
-    [Fact]
+    [Test]
     public async Task Await_Then_TaskResultShouldBeExpectedResult()
     {
         var expectedResult = new List<int> { 3 };
@@ -31,13 +31,13 @@ public class AsyncLazyOfTTests
         result.Should().BeSameAs(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public async Task GetValueAsync_When_CancellationTokenIsCancelled_Then_TaskCancelledExceptionIsThrown()
     {
         var cancellationTokenSource = new CancellationTokenSource();
-        var testee = new AsyncLazy<string, string>(async cancellationToken =>
+        var testee = new AsyncLazy<string, string>(async () =>
         {
-            await Task.Delay(500, cancellationToken);
+            await Task.Delay(500);
             return ExpectedResult;
         });
 
@@ -48,17 +48,17 @@ public class AsyncLazyOfTTests
         });
 
         await cancelTask;
-        await Assert.ThrowsAsync<TaskCanceledException>(
+        await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await testee.GetValueAsync(cancellationTokenSource.Token));
     }
 
-    [Fact]
+    [Test]
     public async Task GetValueAsync_When_FirstAttemptIsCancelledAndASecondAttemptIsMade_Then_ResultShouldBeExpectedResult()
     {
         var cancellationTokenSource = new CancellationTokenSource();
-        var testee = new AsyncLazy<string, string>(async cancellationToken =>
+        var testee = new AsyncLazy<string, string>(async () =>
         {
-            await Task.Delay(500, cancellationToken);
+            await Task.Delay(500);
             return ExpectedResult;
         });
 
@@ -69,7 +69,7 @@ public class AsyncLazyOfTTests
         });
 
         await cancelTask;
-        await Assert.ThrowsAsync<TaskCanceledException>(
+        await Assert.ThrowsAsync<OperationCanceledException>(
             async () => await testee.GetValueAsync(cancellationTokenSource.Token));
 
         var cancellationTokenSource2 = new CancellationTokenSource();
@@ -79,19 +79,19 @@ public class AsyncLazyOfTTests
         result.Should().Be(ExpectedResult);
     }
 
-    [Fact]
+    [Test]
     public async Task GetValueAsync_When_CalledTwice_Then_ResultShouldBeExpectedResult()
     {
         var cancellationTokenSource = new CancellationTokenSource();
         var hasRun = false;
-        var testee = new AsyncLazy<string, string>(async cancellationToken =>
+        var testee = new AsyncLazy<string, string>(async () =>
         {
             if (hasRun)
             {
                 throw new NotSupportedException("Was only allowed to run once");
             }
 
-            await Task.Delay(25, cancellationToken);
+            await Task.Delay(25, cancellationTokenSource.Token);
             hasRun = true;
             return ExpectedResult;
         });

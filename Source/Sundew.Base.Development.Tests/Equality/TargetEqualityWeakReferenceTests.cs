@@ -9,11 +9,10 @@ namespace Sundew.Base.Development.Tests.Equality;
 
 using AwesomeAssertions;
 using Sundew.Base.Equality;
-using Xunit;
 
 public class TargetEqualityWeakReferenceTests
 {
-    [Fact]
+    [Test]
     public void Equals_When_BothTargetsAreNull_Then_ResultShouldBeTrue()
     {
         var testee = new TargetEqualityWeakReference<Target>(null!);
@@ -24,7 +23,7 @@ public class TargetEqualityWeakReferenceTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void Equals_When_TargetsAreTheSame_Then_ResultShouldBeTrue()
     {
         var target = new Target();
@@ -36,7 +35,7 @@ public class TargetEqualityWeakReferenceTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void Equals_When_TargetsDiffer_Then_ResultShouldBeFalse()
     {
         var target1 = new Target();
@@ -49,7 +48,7 @@ public class TargetEqualityWeakReferenceTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void Equals_When_Target2IsNull_Then_ResultShouldBeFalse()
     {
         var target1 = new Target();
@@ -61,7 +60,7 @@ public class TargetEqualityWeakReferenceTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void Equals_When_Target1IsNull_Then_ResultShouldBeFalse()
     {
         var target2 = new Target();
@@ -73,7 +72,7 @@ public class TargetEqualityWeakReferenceTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void GetHashCode_When_TargetIsNull_Then_ResultShouldBe0()
     {
         var testee = new TargetEqualityWeakReference<Target>(null!);
@@ -83,7 +82,7 @@ public class TargetEqualityWeakReferenceTests
         result.Should().Be(0);
     }
 
-    [Fact]
+    [Test]
     public void GetHashCode_When_TargetIsNull_Then_ResultShouldNotBe0()
     {
         var testee = new TargetEqualityWeakReference<Target>(new Target());

@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Collections.Generic;
 using AwesomeAssertions;
 using Sundew.Base.Collections;
-using Xunit;
 
 public class CollectionExtensionsTests
 {
-    [Fact]
+    [Test]
     public void AddAllThatHasValue_Then_ResultShouldBeEqualToExpectedResult()
     {
         var resultList = new List<int>();
@@ -27,7 +26,7 @@ public class CollectionExtensionsTests
         resultList.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void AddAllThatHasValue_WhenInputIsReferenceType_Then_ResultShouldBeEqualToExpectedResult()
     {
         var resultList = new List<string>();

@@ -9,7 +9,6 @@ namespace Sundew.Base.Development.Tests.Numeric;
 
 using AwesomeAssertions;
 using Sundew.Base.Numeric;
-using Xunit;
 
 public class ComparableExtensionsTests
 {
@@ -18,7 +17,7 @@ public class ComparableExtensionsTests
     private const double ALowerComparisionValue = 3;
     private const double AEqualComparisionValue = 4;
 
-    [Fact]
+    [Test]
     public void IsGreaterThanOrEqualTo_When_ValueIsLower_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsGreaterThanOrEqualTo(ALowerComparisionValue);
@@ -26,7 +25,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsGreaterThanOrEqualTo_When_ValueIsGreater_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsGreaterThanOrEqualTo(AHigherComparisionValue);
@@ -34,7 +33,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsGreaterThanOrEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsGreaterThanOrEqualTo(AEqualComparisionValue);
@@ -42,7 +41,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsLessThanOrEqualTo_When_ValueIsLower_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsLessThanOrEqualTo(ALowerComparisionValue);
@@ -50,7 +49,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsLessThanOrEqualTo_When_ValueIsGreater_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsLessThanOrEqualTo(AHigherComparisionValue);
@@ -58,7 +57,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsLessThanOrEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsLessThanOrEqualTo(AEqualComparisionValue);
@@ -66,7 +65,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsLessThan_When_ValueIsLower_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsLessThan(ALowerComparisionValue);
@@ -74,7 +73,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsLessThan_When_ValueIsGreater_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsLessThan(AHigherComparisionValue);
@@ -82,7 +81,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsLessThan_When_ValuesAreEqual_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsLessThan(AEqualComparisionValue);
@@ -90,7 +89,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsGreaterThan_When_ValueIsLower_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsGreaterThan(ALowerComparisionValue);
@@ -98,7 +97,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsGreaterThan_When_ValueIsGreater_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsGreaterThan(AHigherComparisionValue);
@@ -106,7 +105,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsGreaterThan_When_ValuesAreEqual_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsGreaterThan(AEqualComparisionValue);
@@ -114,7 +113,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsEqualTo_When_ValuesAreEqual_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsEqualTo(AEqualComparisionValue);
@@ -122,7 +121,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsEqualTo_When_ValuesAreNotEqual_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsEqualTo(ALowerComparisionValue);
@@ -130,7 +129,7 @@ public class ComparableExtensionsTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsNotEqualTo_When_ValuesAreNotEqual_Then_ResultShouldBeTrue()
     {
         var result = AValue.IsNotEqualTo(ALowerComparisionValue);
@@ -138,7 +137,7 @@ public class ComparableExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsNotEqualTo_When_ValuesAreEqual_Then_ResultShouldBeFalse()
     {
         var result = AValue.IsNotEqualTo(AEqualComparisionValue);

@@ -9,11 +9,10 @@ namespace Sundew.Base.Development.Tests.Text;
 
 using AwesomeAssertions;
 using Sundew.Base.Text;
-using Xunit;
 
 public class CharExtensionsTests
 {
-    [Fact]
+    [Test]
     public void Repeat_Then_ResultShouldContainRepeatedCharacters()
     {
         var result = ' '.Repeat(5);

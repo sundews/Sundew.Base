@@ -12,12 +12,11 @@ using System.Collections.Generic;
 using System.Linq;
 using AwesomeAssertions;
 using Sundew.Base.Memory;
-using Xunit;
 
 public class ReadOnlyMemoryExtensionsTests
 {
-    [Theory]
-    [InlineData("1|2|3,4|5|6", new[] { "123", "456" })]
+    [Test]
+    [Arguments("1|2|3,4|5|6", new[] { "123", "456" })]
     public void Split_When_IgnoringInSection_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
     {
         var result = input.AsMemory().Split(
@@ -39,8 +38,8 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("123   1234", 3, new[] { "   ", "1234" })]
+    [Test]
+    [Arguments("123   1234", 3, new[] { "   ", "1234" })]
     public void Split_When_TrimmingWhitespaceAndTheStart_Then_ResultShouldBeExpectedResult(string input, int startIndex, string[] expectedResult)
     {
         var result = input.AsMemory().Split(
@@ -62,8 +61,8 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("ValuE1234", new[] { "ValuE", "1234" })]
+    [Test]
+    [Arguments("ValuE1234", new[] { "ValuE", "1234" })]
     public void Split_When_UsingIncludeAndSplit_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
     {
         var result = input.AsMemory().Split(
@@ -80,12 +79,12 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("warm:;up", new[] { "warm", "up" })]
-    [InlineData(":;ok:;correct:;", new[] { "ok", "correct" })]
-    [InlineData(":;ok:;correct", new[] { "ok", "correct" })]
-    [InlineData("ok:;correct:;", new[] { "ok", "correct" })]
-    [InlineData("ok:;cor:rect:;", new[] { "ok", "cor:rect" })]
+    [Test]
+    [Arguments("warm:;up", new[] { "warm", "up" })]
+    [Arguments(":;ok:;correct:;", new[] { "ok", "correct" })]
+    [Arguments(":;ok:;correct", new[] { "ok", "correct" })]
+    [Arguments("ok:;correct:;", new[] { "ok", "correct" })]
+    [Arguments("ok:;cor:rect:;", new[] { "ok", "cor:rect" })]
     public void Split_Then_ResultShouldBeExpectedResults(string input, string[] expectedResults)
     {
         var testee = input.AsMemory();
@@ -105,10 +104,10 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResults);
     }
 
-    [Theory]
-    [InlineData(@"-a -b ""1 _ ewr _ 23"" -c -d 32 -e 34", new[] { "-a", "-b", "1 _ ewr _ 23", "-c", "-d", "32", "-e", "34" })]
-    [InlineData(@"-a -b ""1 \"" ewr \"" 23"" -c -d 32 -e 34", new[] { "-a", "-b", @"1 "" ewr "" 23", "-c", "-d", "32", "-e", "34" })]
-    [InlineData("a warm up", new[] { "a", "warm", "up" })]
+    [Test]
+    [Arguments(@"-a -b ""1 _ ewr _ 23"" -c -d 32 -e 34", new[] { "-a", "-b", "1 _ ewr _ 23", "-c", "-d", "32", "-e", "34" })]
+    [Arguments(@"-a -b ""1 \"" ewr \"" 23"" -c -d 32 -e 34", new[] { "-a", "-b", @"1 "" ewr "" 23", "-c", "-d", "32", "-e", "34" })]
+    [Arguments("a warm up", new[] { "a", "warm", "up" })]
     public void Split_When_LexingCommandLine_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
     {
         var result = SplitBasedCommandLineLexer(input.AsMemory());
@@ -116,7 +115,7 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Split_When_InputIsNull_ThenResultShouldBeEmpty()
     {
         const string? input = null;
@@ -126,7 +125,7 @@ public class ReadOnlyMemoryExtensionsTests
         result.Should().BeEmpty();
     }
 
-    [Fact]
+    [Test]
     public void Split_When_SplittingOnLastCharacterAndRemoveEmptyEntriesIsSet_Then_LastEntryShouldBeRemoved()
     {
         const string input = "m:s:t:";
@@ -145,16 +144,16 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal("m", "s", "t");
     }
 
-    [Theory]
-    [InlineData("Name", new[] { "Name" })]
-    [InlineData("Person.Name.Length", new[] { "Person", ".", "Name", ".", "Length" })]
-    [InlineData("(DockPanel.Dock)", new[] { "(", "DockPanel", ".", "Dock", ")" })]
-    [InlineData("(DockPanel.Dock).Length", new[] { "(", "DockPanel", ".", "Dock", ")", ".", "Length" })]
-    [InlineData("Child.(DockPanel.Dock)", new[] { "Child", ".", "(", "DockPanel", ".", "Dock", ")" })]
-    [InlineData("Persons[(sys:Int32)6].Length", new[] { "Persons", "[", "(", "sys", ":", "Int32", ")", "6", "]", ".", "Length" })]
-    [InlineData("[Name,Age]", new[] { "[", "Name", ",", "Age", "]" })]
-    [InlineData(".", new[] { "." })]
-    [InlineData("", new string[0])]
+    [Test]
+    [Arguments("Name", new[] { "Name" })]
+    [Arguments("PersonDto.Name.Length", new[] { "PersonDto", ".", "Name", ".", "Length" })]
+    [Arguments("(DockPanel.Dock)", new[] { "(", "DockPanel", ".", "Dock", ")" })]
+    [Arguments("(DockPanel.Dock).Length", new[] { "(", "DockPanel", ".", "Dock", ")", ".", "Length" })]
+    [Arguments("Child.(DockPanel.Dock)", new[] { "Child", ".", "(", "DockPanel", ".", "Dock", ")" })]
+    [Arguments("Persons[(sys:Int32)6].Length", new[] { "Persons", "[", "(", "sys", ":", "Int32", ")", "6", "]", ".", "Length" })]
+    [Arguments("[Name,Age]", new[] { "[", "Name", ",", "Age", "]" })]
+    [Arguments(".", new[] { "." })]
+    [Arguments("", new string[0])]
     public void Split_Then_LaResultShouldBeExpectedResult(string input, string[] expectedResult)
     {
         var result = input.AsMemory().Split(
@@ -177,8 +176,8 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("123   1234", 3, new[] { "   ", "1234" })]
+    [Test]
+    [Arguments("123   1234", 3, new[] { "   ", "1234" })]
     public void Splity_When_TrimmingWhitespaceAndTheStart_Then_ResultShouldBeExpectedResult(string input, int startIndex, string[] expectedResult)
     {
         var result = input.AsMemory().Split(
@@ -200,8 +199,8 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("ValuE1234", new[] { "ValuE", "1234" })]
+    [Test]
+    [Arguments("ValuE1234", new[] { "ValuE", "1234" })]
     public void SplitMemory_When_UsingIncludeAndSplit_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
     {
         var result = input.AsMemory().Split(
@@ -218,11 +217,11 @@ public class ReadOnlyMemoryExtensionsTests
         result.Select(x => x.ToString()).Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData(
+    [Test]
+    [Arguments(
         @"Sundew ""Text with space"" ""Multiple space after this""     http:\\url.com\ \""Sundew\""With\""Quotes\""\",
         new[] { "Sundew", "Text with space", "Multiple space after this", @"http:\\url.com\", @"""Sundew""With""Quotes""\" })]
-    [InlineData(@"-fl \""\""", new[] { "-fl", @"""""" })]
+    [Arguments(@"-fl \""\""", new[] { "-fl", @"""""" })]
     public void Split_Then_ResultShouldBeExpectedResult(string input, string[] expectedResult)
     {
         var result = SplitBasedCommandLineLexer(input.AsMemory());

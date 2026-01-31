@@ -328,7 +328,7 @@ public static partial class StringBuilderExtensions
     /// The <see cref="StringBuilder" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider formatProvider, bool condition)
+    public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider? formatProvider, bool condition)
     {
         return condition ? stringBuilder.AppendFormat(formatProvider, Format, value) : stringBuilder;
     }
@@ -343,7 +343,7 @@ public static partial class StringBuilderExtensions
     /// The <see cref="StringBuilder" />.
     /// </returns>
     [MethodImpl((MethodImplOptions)0x300)]
-    public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider formatProvider)
+    public static StringBuilder Append(this StringBuilder stringBuilder, object value, IFormatProvider? formatProvider)
     {
         return stringBuilder.AppendFormat(formatProvider, Format, value);
     }

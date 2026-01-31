@@ -53,9 +53,9 @@ public class AlignAndLimitFormatProvider : IFormatProvider, ICustomFormatter
     /// Initializes a new instance of the <see cref="AlignAndLimitFormatProvider" /> class.
     /// </summary>
     /// <param name="formatProvider">The format provider.</param>
-    public AlignAndLimitFormatProvider(IFormatProvider formatProvider)
+    public AlignAndLimitFormatProvider(IFormatProvider? formatProvider)
     {
-        this.formatProvider = formatProvider;
+        this.formatProvider = formatProvider ?? CultureInfo.CurrentCulture;
     }
 
     /// <summary>
@@ -114,7 +114,7 @@ public class AlignAndLimitFormatProvider : IFormatProvider, ICustomFormatter
         return default!;
     }
 
-    private static string GetValue(object? value, Group valueFormatGroup, IFormatProvider formatProvider)
+    private static string GetValue(object? value, Group valueFormatGroup, IFormatProvider? formatProvider)
     {
         value ??= string.Empty;
 

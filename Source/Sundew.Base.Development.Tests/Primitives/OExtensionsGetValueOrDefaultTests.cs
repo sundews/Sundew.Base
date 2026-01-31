@@ -8,13 +8,12 @@
 namespace Sundew.Base.Development.Tests.Primitives;
 
 using AwesomeAssertions;
-using Xunit;
 
 public class OExtensionsGetValueOrDefaultTests
 {
-    [Theory]
-    [InlineData(5, 10)]
-    [InlineData(null, -1)]
+    [Test]
+    [Arguments(5, 10)]
+    [Arguments(null, -1)]
     public void GetValueOrDefault_When_OperandIsNullableStructAndAlternativeIsStruct_Then_ResultShouldBeExpectedResult(int? lhsOption, int expectedResult)
     {
         var result = lhsOption.GetValueOrDefault(lhs => lhs + 5, () => -1);
@@ -22,9 +21,9 @@ public class OExtensionsGetValueOrDefaultTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("5", "55")]
-    [InlineData(null, "-1")]
+    [Test]
+    [Arguments("5", "55")]
+    [Arguments(null, "-1")]
     public void GetValueOrDefault_When_OperandIsNullableStructAndAlternativeIsClass_Then_ResultShouldBeExpectedResult(string? lhsOption, string expectedResult)
     {
         var result = lhsOption.GetValueOrDefault(lhs => lhs + 5, () => "-1");

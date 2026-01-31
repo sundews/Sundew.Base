@@ -10,15 +10,14 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Linq;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Linq;
-using Xunit;
 
 public class EnumerableExtensionsOnlyOneTests
 {
-    [Theory]
-    [InlineData(new int[] { 1 }, 1)]
-    [InlineData(null, 0)]
-    [InlineData(new int[0], 0)]
-    [InlineData(new[] { 1, 2 }, 0)]
+    [Test]
+    [Arguments(new int[] { 1 }, 1)]
+    [Arguments(null, 0)]
+    [Arguments(new int[0], 0)]
+    [Arguments(new[] { 1, 2 }, 0)]
     public void OnlyOneOrDefault_When_ItemTypeIsStruct_Then_ResultShouldBeExpectedResult(int[]? items, int? expectedResult)
     {
         var result = items.OnlyOneOrDefaultValue();
@@ -26,13 +25,13 @@ public class EnumerableExtensionsOnlyOneTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(null, null)]
-    [InlineData(new[] { "1" }, 1)]
-    [InlineData(new[] { "1", "2" }, null)]
-    [InlineData(new string?[] { null }, null)]
-    [InlineData(new string?[] { null, null }, null)]
-    [InlineData(new string?[0], null)]
+    [Test]
+    [Arguments(null, null)]
+    [Arguments(new[] { "1" }, 1)]
+    [Arguments(new[] { "1", "2" }, null)]
+    [Arguments(new string?[] { null }, null)]
+    [Arguments(new string?[] { null, null }, null)]
+    [Arguments(new string?[0], null)]
     public void OnlyOneOrDefault_When_ItemTypeIsNullableStruct_Then_ResultShouldBeExpectedResult(string?[]? items, int? expectedResult)
     {
         var result = (items?.Select<string?, int?>(x => x != null ? int.Parse(x) : null) ?? null).OnlyOneOrDefault();
@@ -40,11 +39,11 @@ public class EnumerableExtensionsOnlyOneTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(new[] { "1" }, "1")]
-    [InlineData(null, null)]
-    [InlineData(new string?[] { null }, null)]
-    [InlineData(new[] { "1", "2" }, null)]
+    [Test]
+    [Arguments(new[] { "1" }, "1")]
+    [Arguments(null, null)]
+    [Arguments(new string?[] { null }, null)]
+    [Arguments(new[] { "1", "2" }, null)]
     public void OnlyOneOrDefault_When_ItemTypeIsClass_Then_ResultShouldBeExpectedResult(string?[]? items, string? expectedResult)
     {
         var result = items.OnlyOneOrDefault();
@@ -52,11 +51,11 @@ public class EnumerableExtensionsOnlyOneTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(new int[] { 1 }, true, 1)]
-    [InlineData(null, false, 0)]
-    [InlineData(new int[0], false, 0)]
-    [InlineData(new[] { 1, 2 }, false, 0)]
+    [Test]
+    [Arguments(new int[] { 1 }, true, 1)]
+    [Arguments(null, false, 0)]
+    [Arguments(new int[0], false, 0)]
+    [Arguments(new[] { 1, 2 }, false, 0)]
     public void TryGetOnlyOneOrDefault_When_ItemTypeIsStruct_Then_ResultShouldBeExpectedResult(int[]? items, bool expectedResult, int expectedItem)
     {
         bool result = false;
@@ -70,13 +69,13 @@ public class EnumerableExtensionsOnlyOneTests
         item.Should().Be(expectedItem);
     }
 
-    [Theory]
-    [InlineData(new[] { "1" }, true, 1)]
-    [InlineData(null, false, 0)]
-    [InlineData(new[] { "1", "2" }, false, 0)]
-    [InlineData(new string?[] { null }, false, 0)]
-    [InlineData(new string?[] { null, null }, false, 0)]
-    [InlineData(new string?[0], false, 0)]
+    [Test]
+    [Arguments(new[] { "1" }, true, 1)]
+    [Arguments(null, false, 0)]
+    [Arguments(new[] { "1", "2" }, false, 0)]
+    [Arguments(new string?[] { null }, false, 0)]
+    [Arguments(new string?[] { null, null }, false, 0)]
+    [Arguments(new string?[0], false, 0)]
     public void TryGetOnlyOneOrDefault_When_ItemTypeIsNullableStruct_Then_ResultShouldBeExpectedResult(string?[]? items, bool expectedResult, int? expectedItem)
     {
         var result = (items?.Select<string?, int?>(x => x != null ? int.Parse(x) : null) ?? null).TryGetOnlyOne(out var item);
@@ -89,11 +88,11 @@ public class EnumerableExtensionsOnlyOneTests
         }
     }
 
-    [Theory]
-    [InlineData(new[] { "1" }, true, "1")]
-    [InlineData(null, false, null)]
-    [InlineData(new string?[] { null }, false, null)]
-    [InlineData(new[] { "1", "2" }, false, null)]
+    [Test]
+    [Arguments(new[] { "1" }, true, "1")]
+    [Arguments(null, false, null)]
+    [Arguments(new string?[] { null }, false, null)]
+    [Arguments(new[] { "1", "2" }, false, null)]
     public void TryGetOnlyOneOrDefault_When_ItemTypeIsClass_Then_ResultShouldBeExpectedResult(string?[]? items, bool expectedResult, string? expectedItem)
     {
         bool result = false;

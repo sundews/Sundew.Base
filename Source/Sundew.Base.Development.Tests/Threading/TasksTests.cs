@@ -12,11 +12,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Threading;
-using Xunit;
 
 public class TasksTests
 {
-    [Fact]
+    [Test]
     public async Task WhenAll_When_ATaskIsCancelled_Then_OuterTaskIsCancelled()
     {
         async Task<(int, int, int)> Test()
@@ -36,10 +35,12 @@ public class TasksTests
             return await Tasks.WhenAll(task1, task2, task3);
         }
 
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(Test);
+        var act = Test;
+
+        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Fact]
+    [Test]
     public async Task WhenAll_When_ATaskThrow_Then_ExceptionIsRethrown()
     {
         async Task<(int, int, int)> Test()
@@ -57,7 +58,7 @@ public class TasksTests
         await Assert.ThrowsAsync<InvalidOperationException>(Test);
     }
 
-    [Fact]
+    [Test]
     public async Task WhenAll_Then_ResultAreExpectedResults()
     {
         var task1 = Task.FromResult(1);

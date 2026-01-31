@@ -11,11 +11,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Disposal;
-using Xunit;
 
 public class DisposeAsyncActionTests
 {
-    [Fact]
+    [Test]
     public async Task DisposeAsync_When_UsedWithAsyncAwait_Then_DisposeShouldBeCompleted()
     {
         var manualResetEvent = new ManualResetEventSlim(false);
@@ -31,7 +30,7 @@ public class DisposeAsyncActionTests
         manualResetEvent.IsSet.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void DisposeAsync_When_UsedWithAsyncAwait_Then_DisposeShouldNotBeCompleted()
     {
         var manualResetEvent = new ManualResetEventSlim(false);

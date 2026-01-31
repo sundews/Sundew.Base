@@ -10,18 +10,18 @@ namespace Sundew.Base.Development.Tests.Threading;
 using System;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Sundew.Base.Collections.Concurrent;
 using Sundew.Base.Threading;
-using Xunit;
 
 public class LastUpdateEmitterTests
 {
-    [Fact]
+    [Test]
     public async Task Update_When_UsingValueType_Then_ShouldContainOnlyProcessedValues()
     {
         const int finalExpectedValue = 5;
         var expectedResult = new ConcurrentList<int>();
-        var manualResetEvent = new ManualResetEventAsync(false);
+        var manualResetEvent = new ManualResetEventAsync();
         var testee = new LastUpdateEmitter<int>(async x =>
         {
             await Task.Delay(50);
@@ -39,19 +39,21 @@ public class LastUpdateEmitterTests
 
         _ = testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
+        var successfullyWaited = await manualResetEvent.WaitAsync();
 
-        Assert.Multiple(
-            () => expectedResult.Should().Equal([1, finalExpectedValue]),
-            () => successfullyWaited.Should().BeTrue());
+        using (new AssertionScope())
+        {
+            expectedResult.Should().Equal([1, finalExpectedValue]);
+            successfullyWaited.Should().BeTrue();
+        }
     }
 
-    [Fact]
+    [Test]
     public async Task Update_When_UsingReferenceType_Then_ShouldContainOnlyProcessedValues()
     {
         const string finalExpectedValue = "5";
         var expectedResult = new ConcurrentList<string?>();
-        var manualResetEvent = new ManualResetEventAsync(false);
+        var manualResetEvent = new ManualResetEventAsync();
         var testee = new LastUpdateEmitter<string>(async x =>
         {
             await Task.Delay(50);
@@ -69,19 +71,21 @@ public class LastUpdateEmitterTests
 
         _ = testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(1000));
+        var successfullyWaited = await manualResetEvent.WaitAsync();
 
-        Assert.Multiple(
-            () => expectedResult.Should().Equal(["1", finalExpectedValue]),
-            () => successfullyWaited.Should().BeTrue());
+        using (new AssertionScope())
+        {
+            expectedResult.Should().Equal(["1", finalExpectedValue]);
+            successfullyWaited.Should().BeTrue();
+        }
     }
 
-    [Fact]
+    [Test]
     public async Task Update_When_UsingOptionalReferenceType_Then_ShouldContainOnlyProcessedValues()
     {
         const string? finalExpectedValue = null;
         var expectedResult = new ConcurrentList<string?>();
-        var manualResetEvent = new ManualResetEventAsync(false);
+        var manualResetEvent = new ManualResetEventAsync();
         var testee = new LastUpdateEmitter<string?>(async x =>
         {
             await Task.Delay(50);
@@ -99,9 +103,10 @@ public class LastUpdateEmitterTests
 
         _ = testee.Update(finalExpectedValue);
 
-        var successfullyWaited = await manualResetEvent.WaitAsync(TimeSpan.FromMilliseconds(700));
-        Assert.Multiple(
-            () => expectedResult.Should().Equal("1", finalExpectedValue),
-            () => successfullyWaited.Should().BeTrue());
+        await manualResetEvent.WaitAsync();
+        using (new AssertionScope())
+        {
+            expectedResult.Should().Equal("1", finalExpectedValue);
+        }
     }
 }

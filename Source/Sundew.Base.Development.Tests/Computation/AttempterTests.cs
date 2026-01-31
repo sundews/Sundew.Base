@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Computation;
-using Xunit;
 
 public class AttempterTests
 {
-    [Fact]
+    [Test]
     public void Attempt_Then_ResultsShouldEqualExpectedResults()
     {
         var expectedResults = new[] { true, true, false };
@@ -31,7 +30,7 @@ public class AttempterTests
         results.Should().Equal(expectedResults);
     }
 
-    [Fact]
+    [Test]
     public void Attempt_When_SucceedingAtFirstAttempt_Then_ResultShouldBeExpectedResult()
     {
         const int expectedResult = 5;
@@ -51,7 +50,7 @@ public class AttempterTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Attempt_When_SucceedingAtSecondAttempt_Then_ResultShouldBeExpectedResult()
     {
         const int expectedResult = 5;
@@ -76,7 +75,7 @@ public class AttempterTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Attempt_When_HandlingSystemExceptionAndInvalidOperationExceptionIsThrown_Then_AggregateExceptionShouldBeThrownAfter2Attempts()
     {
         var testee = new Attempter(2);
@@ -94,7 +93,7 @@ public class AttempterTests
         numberOfCalls.Should().Be(2);
     }
 
-    [Fact]
+    [Test]
     public void Attempt_When_HandlingAllExceptionsAndTaskCancelledExceptionIsThrown_Then_ItShouldBeThrownAfter1Attempt()
     {
         var testee = new Attempter(2);
@@ -112,7 +111,7 @@ public class AttempterTests
         numberOfCalls.Should().Be(1);
     }
 
-    [Fact]
+    [Test]
     public void Attempt_When_HandlingAllExceptionOperationCancelledExceptionAndDifferentExceptionIsThrown_Then_AggregateExceptionShouldBeThrownAfter2Attempts()
     {
         var testee = new Attempter(2);

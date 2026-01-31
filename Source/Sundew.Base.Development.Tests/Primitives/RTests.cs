@@ -9,11 +9,10 @@ namespace Sundew.Base.Development.Tests.Primitives;
 
 using System;
 using AwesomeAssertions;
-using Xunit;
 
 public class RTests
 {
-    [Fact]
+    [Test]
     public void ImplicitCast_When_CastingToResultOfError_Then_ValueShouldBeExpectedValue()
     {
         const int expectedError = 0;
@@ -24,7 +23,7 @@ public class RTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingRequiredValueTypeAndCastingToResult_Then_ValueShouldBeExpectedValue()
     {
         const int expectedValue = 0;
@@ -35,7 +34,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingOptionalValueTypeAndCastingToResultOption_Then_ValueShouldBeExpectedValue()
     {
         int? expectedValue = 0;
@@ -46,7 +45,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingRequiredReferenceTypeAndCastingToResult_Then_ValueShouldBeExpectedValue()
     {
         const string expectedValue = "expected";
@@ -57,7 +56,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingOptionalReferenceTypeAndCastingToResultOption_Then_ValueShouldBeExpectedValue()
     {
         const string? expectedValue = "expected";
@@ -68,7 +67,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingRequiredValueTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
     {
         const int expectedValue = 42;
@@ -79,7 +78,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingOptionalValueTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
     {
         int? expectedValue = 42;
@@ -90,7 +89,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingRequiredReferenceTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
     {
         const string expectedValue = "42";
@@ -101,7 +100,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_UsingOptionalReferenceTypeAndCastingToResultOfBoth_Then_ValueShouldBeExpectedValue()
     {
         const string expectedValue = "42";
@@ -112,7 +111,7 @@ public class RTests
         r.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_CastingToResultOfError_Then_ErrorShouldBeExpectedError()
     {
         const string expectedError = "Failed";
@@ -123,7 +122,7 @@ public class RTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_CastingToResultOfBoth_Then_ErrorShouldBeExpectedError()
     {
         const int expectedValue = 0;
@@ -136,7 +135,7 @@ public class RTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public void Map_Then_ResultShouldBeExpectedValue()
     {
         object? expectedValue = new Random().Next(0, 1) > -1 ? 42 : null;
@@ -148,7 +147,7 @@ public class RTests
         result.Value.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void MapToObjectOption_When_SourceIsResultOfOptionTypeAndTargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue()
     {
         int? expectedValue = new Random().Next(0, 1) > -1 ? 42 : null;
@@ -160,9 +159,9 @@ public class RTests
         result.Value.Should().Be(expectedValue);
     }
 
-    [Theory]
-    [InlineData(42)]
-    [InlineData(0)]
+    [Test]
+    [Arguments(42)]
+    [Arguments(0)]
     public void ImplicitCast_When_SourceIsResultOfTypeAndTargetIsResultOptionOfObject_Then_ResultShouldBeExpectedValue(int expectedValue)
     {
         R<int> r = R.Success(expectedValue);
@@ -173,9 +172,9 @@ public class RTests
         result.Value.Should().Be(expectedValue);
     }
 
-    [Theory]
-    [InlineData(42, true)]
-    [InlineData(null, false)]
+    [Test]
+    [Arguments(42, true)]
+    [Arguments(null, false)]
     public void ImplicitCast_When_SourceIsResultOfTypeAndTargetIsResultOfObject_Then_ResultShouldBeExpectedValue(int? expectedValue, bool expectedResult)
     {
         R<int?> r = R.SuccessOption(expectedValue);
@@ -186,9 +185,9 @@ public class RTests
         result.Value.Should().Be(expectedValue);
     }
 
-    [Theory]
-    [InlineData(true, 0)]
-    [InlineData(false, 34)]
+    [Test]
+    [Arguments(true, 0)]
+    [Arguments(false, 34)]
     public void Map_Then_ResultErrorShouldBeExpectedError(
         bool expectedResult,
         int expectedError)
@@ -202,9 +201,9 @@ public class RTests
         result.Error.Should().BeOfType(typeof(double));
     }
 
-    [Theory]
-    [InlineData(true, 34, 0)]
-    [InlineData(false, 0, 23)]
+    [Test]
+    [Arguments(true, 34, 0)]
+    [Arguments(false, 0, 23)]
     public void To_Then_ResultValueShouldBeExpectedValue(
         bool expectedResult,
         int expectedValue,
@@ -219,7 +218,7 @@ public class RTests
         result.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public void Deconstruction_When_DeconstructingAllParameters_Then_DeconstructedValuesShouldBedExpectedResult()
     {
         const bool expectedIsSuccess = true;
@@ -233,7 +232,7 @@ public class RTests
         error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_SuccessResultAndTargetIsOptionalStruct_Then_ResultShouldBeSuccessAndValueShouldBeNull()
     {
         var testee = R.Success();
@@ -244,7 +243,7 @@ public class RTests
         result.Value.Should().BeNull();
     }
 
-    [Fact]
+    [Test]
     public void ImplicitCast_When_SuccessResultAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeNull()
     {
         var testee = R.Success();
@@ -255,9 +254,9 @@ public class RTests
         result.Value.Should().BeNull();
     }
 
-    [Theory]
-    [InlineData("Value")]
-    [InlineData(null)]
+    [Test]
+    [Arguments("Value")]
+    [Arguments(null)]
     public void ImplicitCast_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
     {
         var testee = R.SuccessOption(expectedResult);
@@ -268,7 +267,7 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void MapToOption_When_SuccessResultAndTargetIsReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         const string expectedResult = "Value";
@@ -282,7 +281,7 @@ public class RTests
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void MapToResultOption_When_SuccessResultOptionAndTargetIsOptionalClass_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var testee = R.SuccessOption(default(string));
@@ -295,7 +294,7 @@ public class RTests
         result.GetValueOrDefault().Value.Should().BeNull();
     }
 
-    [Fact]
+    [Test]
     public void ToResultOption_When_NullAndTargetIsOptionalReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         string? expectedResult = "Value";
@@ -309,9 +308,9 @@ public class RTests
         result.GetValueOrDefault().Value.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(4)]
-    [InlineData(null)]
+    [Test]
+    [Arguments(4)]
+    [Arguments(null)]
     public void SuccessOption_When_NullableIntComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
     {
         static R<TValue> Generic<TValue>(TValue value)
@@ -325,7 +324,7 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void SuccessOption_When_Int32ComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         static R<TValue> Generic<TValue>(TValue value)
@@ -340,9 +339,9 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("string")]
-    [InlineData(null)]
+    [Test]
+    [Arguments("string")]
+    [Arguments(null)]
     public void SuccessOption_When_NullableStringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
     {
         static R<TValue> Generic<TValue>(TValue value)
@@ -356,7 +355,7 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ToResultOption_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         static R<TValue> Generic<TValue>(TValue value)
@@ -371,7 +370,7 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ToOptionResult_When_NullAndTargetIsReferenceType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var expectedResult = "Value";
@@ -385,7 +384,7 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ToValueOptionResult_When_NullAndTargetIsValueType_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         var expectedResult = 4;
@@ -400,9 +399,9 @@ public class RTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("value", "value")]
-    [InlineData(null, "fallback")]
+    [Test]
+    [Arguments("value", "value")]
+    [Arguments(null, "fallback")]
     public void Evaluate_Then_ResultShouldBeExpectedValue(string? input, string? expectedValue)
     {
         var testee = R.From(input);
@@ -413,7 +412,7 @@ public class RTests
         result.Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public void EvaluateOption_When_Success_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = "value";
@@ -426,7 +425,7 @@ public class RTests
         result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Evaluate_When_Success_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = "value";
@@ -439,9 +438,9 @@ public class RTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("value", -1, 0, true)]
-    [InlineData(null, 42, 42, false)]
+    [Test]
+    [Arguments("value", -1, 0, true)]
+    [Arguments(null, 42, 42, false)]
     public void MapToResultOptionMap_Then_ResultShouldBeExpectedResult(string? input, int error, int expectedError, bool expectedResult)
     {
         var testee = R.SuccessOption(input);
@@ -455,9 +454,9 @@ public class RTests
         result.Error.Should().Be(expectedError);
     }
 
-    [Theory]
-    [InlineData("value", -1, 0, true)]
-    [InlineData(null, 42, 42, false)]
+    [Test]
+    [Arguments("value", -1, 0, true)]
+    [Arguments(null, 42, 42, false)]
     public void MapToResult_Then_ResultShouldBeExpectedResult(string? input, int error, int expectedError, bool expectedResult)
     {
         var testee = R.SuccessOption(input);

@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Linq;
-using Xunit;
 
 public class EnumerableExtensionsByCardinalityTests
 {
-    [Fact]
+    [Test]
     public void ByCardinality_When_ListIsEmpty_Then_ResultShouldBeEmpty()
     {
         var testee = Array.Empty<int>();
@@ -26,7 +25,7 @@ public class EnumerableExtensionsByCardinalityTests
         result.Should().BeOfType<Empty<int>>();
     }
 
-    [Fact]
+    [Test]
     public void ByCardinality_When_ListHasOneItem_Then_ResultShouldBeSingle()
     {
         var testee = new[] { 1 };
@@ -36,7 +35,7 @@ public class EnumerableExtensionsByCardinalityTests
         result.Should().BeOfType<Single<int>>().Which.Item.Should().Be(1);
     }
 
-    [Fact]
+    [Test]
     public void ByCardinality_When_ListHasMultipleItems_Then_ResultShouldBeMultiple()
     {
         var testee = new[] { 1, 2, 3 };
@@ -46,7 +45,7 @@ public class EnumerableExtensionsByCardinalityTests
         result.Should().BeOfType<Multiple<int>>().Which.Items.Should().Equal(testee);
     }
 
-    [Fact]
+    [Test]
     public void ByCardinality_When_EnumerableYieldsNoItems_Then_ResultShouldBeEmpty()
     {
         var testee = new[] { 1, 2, 3 }.Where(x => x < 1);
@@ -56,7 +55,7 @@ public class EnumerableExtensionsByCardinalityTests
         result.Should().BeOfType<Empty<int>>();
     }
 
-    [Fact]
+    [Test]
     public void ByCardinality_When_EnumerableHasSingleItem_Then_ResultShouldBeSingle()
     {
         var testee = new[] { 1, 2, 3 }.Where(x => x < 2);
@@ -66,7 +65,7 @@ public class EnumerableExtensionsByCardinalityTests
         result.Should().BeOfType<Single<int>>().Which.Item.Should().Be(1);
     }
 
-    [Fact]
+    [Test]
     public void ByCardinality_When_EnumerableHasMultipleItems_Then_ResultShouldBeMultiple()
     {
         var testee = new[] { 1, 2, 3 }.Where(x => x < 3);
@@ -76,7 +75,7 @@ public class EnumerableExtensionsByCardinalityTests
         result.Should().BeOfType<Multiple<int>>().Which.Items.Should().Equal(new[] { 1, 2 });
     }
 
-    [Fact]
+    [Test]
     public void ByCardinality_When_EnumerableIsNull_Then_ResultShouldBeEmpty()
     {
         IEnumerable<int>? testee = null;

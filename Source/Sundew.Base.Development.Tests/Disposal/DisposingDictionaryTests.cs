@@ -11,11 +11,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Disposal;
-using Xunit;
 
 public class DisposingDictionaryTests
 {
-    [Fact]
+    [Test]
     public void Dispose_Then_ItemsShouldBeDisposedInExpectedOrder()
     {
         var expectedOrder = new[] { 1, 2 };
@@ -30,7 +29,7 @@ public class DisposingDictionaryTests
         disposeOrder.Should().Equal(expectedOrder);
     }
 
-    [Fact]
+    [Test]
     public async Task DisposeAsync_Then_ItemsShouldBeDisposedInExpectedOrder()
     {
         var expectedOrder = new[] { 1, 2 };
@@ -53,7 +52,7 @@ public class DisposingDictionaryTests
         disposeOrder.Should().Equal(expectedOrder);
     }
 
-    [Fact]
+    [Test]
     public async Task DisposeAsync_When_OneItemIsDisposed_Then_ItemsShouldBeDisposedInExpectedOrder()
     {
         var expectedOrder = new[] { 2 };
@@ -77,7 +76,7 @@ public class DisposingDictionaryTests
         disposeOrder.Should().Equal(expectedOrder);
     }
 
-    [Fact]
+    [Test]
     public async Task DisposeAsync_When_OneItemAndKeyIsDisposed_Then_ItemShouldBeDisposedInExpectedOrder()
     {
         var expectedOrder = new[] { 3, 2 };

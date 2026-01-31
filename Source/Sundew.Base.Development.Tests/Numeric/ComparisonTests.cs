@@ -9,11 +9,10 @@ namespace Sundew.Base.Development.Tests.Numeric;
 
 using AwesomeAssertions;
 using Sundew.Base.Numeric;
-using Xunit;
 
 public class ComparisonTests
 {
-    [Fact]
+    [Test]
     public void Min_Then_ResultShouldBeExpected()
     {
         var expectedPercentage = new Percentage(0.5);
@@ -24,7 +23,7 @@ public class ComparisonTests
         result.Should().Be(expectedPercentage);
     }
 
-    [Fact]
+    [Test]
     public void Max_Then_ResultShouldBeExpected()
     {
         var percentageLow = new Percentage(0.5);
@@ -35,7 +34,7 @@ public class ComparisonTests
         result.Should().Be(expectedPercentage);
     }
 
-    [Fact]
+    [Test]
     public void Min_When_BothAreEqual_Then_ResultShouldBeBoth()
     {
         var percentageLow = new Percentage(0.5);
@@ -47,7 +46,7 @@ public class ComparisonTests
         result.Should().Be(percentageHigh);
     }
 
-    [Fact]
+    [Test]
     public void Max_When_BothAreEqual_Then_ResultShouldBeBoth()
     {
         var percentageLow = new Percentage(0.6);

@@ -43,14 +43,14 @@ public interface IValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TVa
     /// <param name="parameter">The parameter.</param>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>A task representing the invalidation operation.</returns>
-    Task RefreshAsync(TParameter parameter, Cancellation cancellation);
+    Task RefreshAsync(TParameter parameter, Cancellation cancellation = default);
 
     /// <summary>
     /// Attempts to apply the specified asynchronous apply function.
     /// </summary>
     /// <param name="submissionId">The requester.</param>
-    /// <param name="applyFunc">A delegate that returns a task representing the apply action.</param>
+    /// <param name="submissionFunc">A delegate that returns a task representing the apply action.</param>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The task completes when the attempt to run the apply action has finished.</returns>
-    Task TrySubmitAsync(object submissionId, Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> applyFunc, Cancellation cancellation);
+    Task TrySubmitAsync(object submissionId,  Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> submissionFunc, Cancellation cancellation = default);
 }

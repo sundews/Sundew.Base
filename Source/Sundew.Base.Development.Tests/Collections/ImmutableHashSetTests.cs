@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Immutable;
-using Xunit;
 
 public class ImmutableHashSetTests
 {
-    [Fact]
+    [Test]
     public void TryAdd_Then_IsNewShouldBeTrue()
     {
         var immutableSet = ImmutableHashSet.Create(4);
@@ -25,7 +24,7 @@ public class ImmutableHashSetTests
         set.Should().Equal(new[] { 4, 5 });
     }
 
-    [Fact]
+    [Test]
     public void TryAdd_When_ItemExists_Then_IsNewShouldBeFalse()
     {
         var immutableSet = ImmutableHashSet.Create(4);

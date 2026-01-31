@@ -25,14 +25,14 @@ public static class SynchronizationContextExtensions
     public static Task SendAsync(this SynchronizationContext synchronizationContext, Func<Task> action)
     {
         var sendContext = new AsyncVoidContext(action);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (AsyncVoidContext)o!;
                 try
                 {
                     context.SendOrPostCallback().GetAwaiter().GetResult();
-                    context.TaskCompletionSource.SetResult();
+                    context.TaskCompletionSource.SetResult(__._);
                 }
                 catch (Exception e)
                 {
@@ -54,7 +54,7 @@ public static class SynchronizationContextExtensions
     public static Task<TResult> SendAsync<TResult>(this SynchronizationContext synchronizationContext, Func<Task<TResult>> func)
     {
         var sendContext = new AsyncResultContext<TResult>(func);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (AsyncResultContext<TResult>)o!;
@@ -81,14 +81,14 @@ public static class SynchronizationContextExtensions
     public static Task SendAsync(this SynchronizationContext synchronizationContext, Action action)
     {
         var sendContext = new VoidContext(action);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (VoidContext)o!;
                 try
                 {
                     context.SendOrPostCallback();
-                    context.TaskCompletionSource.SetResult();
+                    context.TaskCompletionSource.SetResult(__._);
                 }
                 catch (Exception e)
                 {
@@ -110,7 +110,7 @@ public static class SynchronizationContextExtensions
     public static Task<TResult> SendAsync<TResult>(this SynchronizationContext synchronizationContext, Func<TResult> func)
     {
         var sendContext = new ResultContext<TResult>(func);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (ResultContext<TResult>)o!;
@@ -139,14 +139,14 @@ public static class SynchronizationContextExtensions
     public static Task SendAsync<TState>(this SynchronizationContext synchronizationContext, Func<TState, Task> action, TState state)
     {
         var sendContext = new AsyncVoidContext<TState>(action, state);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (AsyncVoidContext<TState>)o!;
                 try
                 {
                     context.SendOrPostCallback(context.State).GetAwaiter().GetResult();
-                    context.TaskCompletionSource.SetResult();
+                    context.TaskCompletionSource.SetResult(__._);
                 }
                 catch (Exception e)
                 {
@@ -170,7 +170,7 @@ public static class SynchronizationContextExtensions
     public static Task<TResult> SendAsync<TState, TResult>(this SynchronizationContext synchronizationContext, Func<TState, Task<TResult>> func, TState state)
     {
         var sendContext = new AsyncResultContext<TState, TResult>(func, state);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (AsyncResultContext<TState, TResult>)o!;
@@ -199,14 +199,14 @@ public static class SynchronizationContextExtensions
     public static Task SendAsync<TState>(this SynchronizationContext synchronizationContext, Action<TState> action, TState state)
     {
         var sendContext = new VoidContext<TState>(action, state);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (VoidContext<TState>)o!;
                 try
                 {
                     context.SendOrPostCallback(context.State);
-                    context.TaskCompletionSource.SetResult();
+                    context.TaskCompletionSource.SetResult(__._);
                 }
                 catch (Exception e)
                 {
@@ -230,7 +230,7 @@ public static class SynchronizationContextExtensions
     public static Task<TResult> SendAsync<TState, TResult>(this SynchronizationContext synchronizationContext, Func<TState, TResult> func, TState state)
     {
         var sendContext = new ResultContext<TState, TResult>(func, state);
-        synchronizationContext.Send(
+        synchronizationContext.Post(
             o =>
             {
                 var context = (ResultContext<TState, TResult>)o!;
@@ -266,11 +266,11 @@ public static class SynchronizationContextExtensions
     {
         public VoidContext(Action sendOrPostCallback)
         {
-            this.TaskCompletionSource = new TaskCompletionSource();
+            this.TaskCompletionSource = new TaskCompletionSource<__>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
         }
 
-        public TaskCompletionSource TaskCompletionSource { get; }
+        public TaskCompletionSource<__> TaskCompletionSource { get; }
 
         public Action SendOrPostCallback { get; }
     }
@@ -279,7 +279,7 @@ public static class SynchronizationContextExtensions
     {
         public ResultContext(Func<TResult> sendOrPostCallback)
         {
-            this.TaskCompletionSource = new TaskCompletionSource<TResult>();
+            this.TaskCompletionSource = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
         }
 
@@ -292,11 +292,11 @@ public static class SynchronizationContextExtensions
     {
         public AsyncVoidContext(Func<Task> sendOrPostCallback)
         {
-            this.TaskCompletionSource = new TaskCompletionSource();
+            this.TaskCompletionSource = new TaskCompletionSource<__>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
         }
 
-        public TaskCompletionSource TaskCompletionSource { get; }
+        public TaskCompletionSource<__> TaskCompletionSource { get; }
 
         public Func<Task> SendOrPostCallback { get; }
     }
@@ -305,7 +305,7 @@ public static class SynchronizationContextExtensions
     {
         public AsyncResultContext(Func<Task<TResult>> sendOrPostCallback)
         {
-            this.TaskCompletionSource = new TaskCompletionSource<TResult>();
+            this.TaskCompletionSource = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
         }
 
@@ -318,12 +318,12 @@ public static class SynchronizationContextExtensions
     {
         public VoidContext(Action<TState> sendOrPostCallback, TState state)
         {
-            this.TaskCompletionSource = new TaskCompletionSource();
+            this.TaskCompletionSource = new TaskCompletionSource<__>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
             this.State = state;
         }
 
-        public TaskCompletionSource TaskCompletionSource { get; }
+        public TaskCompletionSource<__> TaskCompletionSource { get; }
 
         public Action<TState> SendOrPostCallback { get; }
 
@@ -334,7 +334,7 @@ public static class SynchronizationContextExtensions
     {
         public ResultContext(Func<TState, TResult> sendOrPostCallback, TState state)
         {
-            this.TaskCompletionSource = new TaskCompletionSource<TResult>();
+            this.TaskCompletionSource = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
             this.State = state;
         }
@@ -350,12 +350,12 @@ public static class SynchronizationContextExtensions
     {
         public AsyncVoidContext(Func<TState, Task> sendOrPostCallback, TState state)
         {
-            this.TaskCompletionSource = new TaskCompletionSource();
+            this.TaskCompletionSource = new TaskCompletionSource<__>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
             this.State = state;
         }
 
-        public TaskCompletionSource TaskCompletionSource { get; }
+        public TaskCompletionSource<__> TaskCompletionSource { get; }
 
         public Func<TState, Task> SendOrPostCallback { get; }
 
@@ -366,7 +366,7 @@ public static class SynchronizationContextExtensions
     {
         public AsyncResultContext(Func<TState, Task<TResult>> sendOrPostCallback, TState state)
         {
-            this.TaskCompletionSource = new TaskCompletionSource<TResult>();
+            this.TaskCompletionSource = new TaskCompletionSource<TResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             this.SendOrPostCallback = sendOrPostCallback;
             this.State = state;
         }

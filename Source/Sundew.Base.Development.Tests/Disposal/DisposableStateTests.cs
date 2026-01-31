@@ -12,11 +12,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Disposal;
-using Xunit;
 
 public class DisposableStateTests
 {
-    [Fact]
+    [Test]
     public async Task DisposeAsync_WhenDisposableDerivedIsUsed_Then_DisposableDerivedShouldBeCalledFirst()
     {
         var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };
@@ -27,7 +26,7 @@ public class DisposableStateTests
         testee.Calls.Should().Equal(expectedCalls);
     }
 
-    [Fact]
+    [Test]
     public async Task DisposeAsync_WhenDisposableDerivedIsUsedAndDisposeAsyncIsCalledTwice_Then_DisposeShouldOnlyBeCalledOnce()
     {
         var expectedCalls = new[] { nameof(DisposableDerived), nameof(DisposableBase) };

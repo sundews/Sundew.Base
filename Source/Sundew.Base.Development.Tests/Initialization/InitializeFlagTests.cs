@@ -10,12 +10,12 @@ namespace Sundew.Base.Development.Tests.Initialization;
 using System;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Sundew.Base.Initialization;
-using Xunit;
 
 public class InitializeFlagTests
 {
-    [Fact]
+    [Test]
     public void Initialize_Then_ResultShouldBeTrue()
     {
         var testee = new InitializeFlag();
@@ -25,7 +25,7 @@ public class InitializeFlagTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsInitialize_Then_ResultShouldBeFalse()
     {
         var testee = new InitializeFlag();
@@ -35,7 +35,7 @@ public class InitializeFlagTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void IsInitialize_When_Initialize_Then_ResultShouldBeTrue()
     {
         var testee = new InitializeFlag();
@@ -46,7 +46,7 @@ public class InitializeFlagTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void Initialize_When_Initialize_Then_ResultShouldBeFalse()
     {
         var testee = new InitializeFlag();
@@ -57,7 +57,7 @@ public class InitializeFlagTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public async Task WhenInitialized_Then_IsInitializedShouldBeTrue()
     {
         var testee = new InitializeFlag();
@@ -69,12 +69,14 @@ public class InitializeFlagTests
 
         var result = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(500)));
 
-        Assert.Multiple(
-            () => result.Should().BeTrue(),
-            () => testee.IsInitialized.Should().BeTrue());
+        using (new AssertionScope())
+        {
+            result.Should().BeTrue();
+            testee.IsInitialized.Should().BeTrue();
+        }
     }
 
-    [Fact]
+    [Test]
     public async Task WhenInitialized_When_Timedout_Then_IsInitializedShouldBeFalse()
     {
         var testee = new InitializeFlag();
@@ -86,8 +88,10 @@ public class InitializeFlagTests
 
         var result = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(50)));
 
-        Assert.Multiple(
-            () => result.Should().BeFalse(),
-            () => testee.IsInitialized.Should().BeFalse());
+        using (new AssertionScope())
+        {
+            result.Should().BeFalse();
+            testee.IsInitialized.Should().BeFalse();
+        }
     }
 }

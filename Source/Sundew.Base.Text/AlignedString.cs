@@ -99,7 +99,7 @@ public static class AlignedString
     /// <param name="format">The format.</param>
     /// <param name="arguments">The arguments.</param>
     /// <returns>the formatted string.</returns>
-    public static string Format(IFormatProvider formatProvider, string format, params object?[] arguments)
+    public static string Format(IFormatProvider? formatProvider, string format, params object?[] arguments)
     {
         return string.Format(new AlignAndLimitFormatProvider(formatProvider), format, arguments);
     }

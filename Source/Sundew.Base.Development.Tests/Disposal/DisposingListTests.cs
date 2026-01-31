@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Disposal;
 using System.Collections.Generic;
 using AwesomeAssertions;
 using Sundew.Base.Disposal;
-using Xunit;
 
 public class DisposingListTests
 {
-    [Fact]
+    [Test]
     public void Dispose_Then_ItemsShouldBeDisposedInExpectedOrder()
     {
         var expectedOrder = new[] { 1, 2 };
@@ -29,7 +28,7 @@ public class DisposingListTests
         disposeOrder.Should().Equal(expectedOrder);
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_AddedThroughAddRange_Then_ItemsShouldBeDisposedInExpectedOrder()
     {
         var expectedOrder = new[] { 1, 2 };

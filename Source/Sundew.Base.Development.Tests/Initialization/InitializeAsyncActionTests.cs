@@ -11,11 +11,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Initialization;
-using Xunit;
 
 public class InitializeAsyncActionTests
 {
-    [Fact]
+    [Test]
     public async Task InitializeAsync_When_Awaiting_Then_ManualResetEventShouldBeSet()
     {
         var manualResetEvent = new ManualResetEventSlim(false);
@@ -32,7 +31,7 @@ public class InitializeAsyncActionTests
         manualResetEvent.IsSet.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void InitializeAsync_When_NotAwaitingAndUsingYield_Then_ManualResetEventShouldNotYetHaveBeenSet()
     {
         var manualResetEvent = new ManualResetEventSlim(false);

@@ -7,5 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Migrations\Sundew.Base.Migrations.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
   </ItemGroup>
 </Project>

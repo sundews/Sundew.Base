@@ -11,20 +11,19 @@ using System;
 using System.Collections.Generic;
 using AwesomeAssertions;
 using Sundew.Base.Text;
-using Xunit;
 
 public class NamedFormatStringTests
 {
-    [Theory]
-    [InlineData("Can this {Resemble->A.Path}.", new string[] { "Resemble->A.Path" }, new object[] { "work" }, "Can this work.")]
-    [InlineData("Hello {Name}.", new string[] { "Name" }, new object[] { "World" }, "Hello World.")]
-    [InlineData("{Greeting} how are you?", new string[] { "Greeting" }, new object[] { "Hello" }, "Hello how are you?")]
-    [InlineData("What do you mean{Punctuation}", new string[] { "Punctuation" }, new object[] { "?" }, "What do you mean?")]
-    [InlineData("Don't insert here: {{Escaped}}, but here: {Insertion}", new string[] { "Insertion" }, new object[] { "Inserted" }, "Don't insert here: {Escaped}, but here: Inserted")]
-    [InlineData("Multiple insertions: {One}, {Two}", new string[] { "One", "Two" }, new object[] { "first", "second" }, "Multiple insertions: first, second")]
-    [InlineData("Formatted number insertions: {One:N2}, {Two:N4}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Formatted number insertions: 1.23, 9.8765")]
-    [InlineData("Accept normal indices: {0:N2}, {1:N4}, {One:N3}, {Two:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Accept normal indices: 1.23, 9.8765, 1.235, 9.88")]
-    [InlineData("Padding: {0,-10:N2}, {1,10:N4}, {One,-10:N3}, {Two,10:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Padding: 1.23      ,     9.8765, 1.235     ,       9.88")]
+    [Test]
+    [Arguments("Can this {Resemble->A.Path}.", new string[] { "Resemble->A.Path" }, new object[] { "work" }, "Can this work.")]
+    [Arguments("Hello {Name}.", new string[] { "Name" }, new object[] { "World" }, "Hello World.")]
+    [Arguments("{Greeting} how are you?", new string[] { "Greeting" }, new object[] { "Hello" }, "Hello how are you?")]
+    [Arguments("What do you mean{Punctuation}", new string[] { "Punctuation" }, new object[] { "?" }, "What do you mean?")]
+    [Arguments("Don't insert here: {{Escaped}}, but here: {Insertion}", new string[] { "Insertion" }, new object[] { "Inserted" }, "Don't insert here: {Escaped}, but here: Inserted")]
+    [Arguments("Multiple insertions: {One}, {Two}", new string[] { "One", "Two" }, new object[] { "first", "second" }, "Multiple insertions: first, second")]
+    [Arguments("Formatted number insertions: {One:N2}, {Two:N4}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Formatted number insertions: 1.23, 9.8765")]
+    [Arguments("Accept normal indices: {0:N2}, {1:N4}, {One:N3}, {Two:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Accept normal indices: 1.23, 9.8765, 1.235, 9.88")]
+    [Arguments("Padding: {0,-10:N2}, {1,10:N4}, {One,-10:N3}, {Two,10:N2}", new string[] { "One", "Two" }, new object[] { 1.23456, 9.87654321 }, "Padding: 1.23      ,     9.8765, 1.235     ,       9.88")]
     public void FormatInvariant_Then_ResultShouldBeExpectedResult(string format, string[] names, object[] input, string expectedResult)
     {
         var testee = NamedFormatString.CreateInvariant(format, names);
@@ -34,7 +33,7 @@ public class NamedFormatStringTests
         result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ImplicitFormatOperator_Then_ResultShouldBeExpectedResult()
     {
         var testee = NamedFormatString.CreateInvariant("{One}, {Two}, {0}", ["One", "Two"]);
@@ -45,7 +44,7 @@ public class NamedFormatStringTests
         testee.FormatNames.Should().Equal(new[] { ("One", 0), ("Two", 1) });
     }
 
-    [Fact]
+    [Test]
     public void GetNullArguments_Then_NullNamesShouldBeExpectedResult()
     {
         var expectedResult = new List<(string Name, int Index)>() { ("Two", 1) };
@@ -57,7 +56,7 @@ public class NamedFormatStringTests
         result.IsValid.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_When_PassingNullArray_Then_ArgumentNullExceptionShouldBeThrown()
     {
         var testee = NamedFormatString.CreateInvariant("{One}", ["One"]);
@@ -70,7 +69,7 @@ public class NamedFormatStringTests
         act.Should().Throw<ArgumentNullException>();
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_Then_ResultShouldBeStringFormattedWithExpectedResult()
     {
         const string expectedResult = "$, \", 4";
@@ -81,7 +80,7 @@ public class NamedFormatStringTests
         content!.Result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_Then_ContentShouldBeExpectedResult()
     {
         const string expectedResult = "$, \", 4";
@@ -93,7 +92,7 @@ public class NamedFormatStringTests
         content!.Result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_When_PassingStringArray_Then_ContentShouldBeExpectedResult()
     {
         const string expectedResult = "$, \", 4";
@@ -106,7 +105,7 @@ public class NamedFormatStringTests
         content!.Result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_When_AllNamesAreFound_Then_ContentShouldBeExpectedResult()
     {
         const string expectedResult = "$, \", 4";
@@ -120,7 +119,7 @@ public class NamedFormatStringTests
         content.HasNulls.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_When_SomeNameMapToNull_Then_ContentShouldBeExpectedResult()
     {
         const string expectedResult = "$, , 4";
@@ -134,7 +133,7 @@ public class NamedFormatStringTests
         content.HasNulls.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void FormatInvariant_When_OneNameCannotBeFound_Then_ContentShouldBeExpectedResult()
     {
         var arguments = new[] { "4" };

@@ -8,13 +8,12 @@
 namespace Sundew.Base.Development.Tests.Threading;
 
 using AwesomeAssertions;
-using Xunit;
 
 public class FlagTests
 {
     private readonly Flag testee = new();
 
-    [Fact]
+    [Test]
     public void IsSet_When_Set_Then_ResultShouldBeTrue()
     {
         this.testee.Set();
@@ -22,13 +21,13 @@ public class FlagTests
         this.testee.IsSet.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsSet_Then_ResultShouldBeFalse()
     {
         this.testee.IsSet.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void Clear_When_Set_Then_ResultShouldBeTrue()
     {
         this.testee.Set();
@@ -39,7 +38,7 @@ public class FlagTests
         this.testee.IsSet.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public void Clear_Then_ResultShouldBeFalse()
     {
         var result = this.testee.Clear();

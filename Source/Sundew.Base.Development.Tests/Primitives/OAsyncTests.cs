@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Primitives;
 using System;
 using System.Threading.Tasks;
 using AwesomeAssertions;
-using Xunit;
 
 public class OAsyncTests
 {
-    [Fact]
+    [Test]
     public async Task ToAsync_Then_ValueShouldBeExpectedValue()
     {
         const int expectedValue = 34;
@@ -26,7 +25,7 @@ public class OAsyncTests
         result.GetValueOrDefault().Should().Be(expectedValue);
     }
 
-    [Fact]
+    [Test]
     public async Task ToResult_When_CastingToResult_Then_ValueShouldBeExpectedValue()
     {
         const int expectedValue = 34;
@@ -42,7 +41,7 @@ public class OAsyncTests
         result.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public async Task ToResult_When_OptionIsNoneOption_Then_ErrorShouldBeExpectedError()
     {
         const string expectedError = "Failed";
@@ -54,9 +53,9 @@ public class OAsyncTests
         result.Error.Should().Be(expectedError);
     }
 
-    [Theory]
-    [InlineData(true, "341")]
-    [InlineData(false, null)]
+    [Test]
+    [Arguments(true, "341")]
+    [Arguments(false, null)]
     public async Task Map_Then_ResultValueShouldBeExpectedValue(
         bool expectedResult,
         string? expectedValue)
@@ -71,9 +70,9 @@ public class OAsyncTests
         result.Should().Be(expectedValue);
     }
 
-    [Theory]
-    [InlineData(true, 34, 0)]
-    [InlineData(false, 0, 23)]
+    [Test]
+    [Arguments(true, 34, 0)]
+    [Arguments(false, 0, 23)]
     public async Task ToResult_Then_ResultShouldHaveExpectedValues(
         bool expectedResult,
         int expectedValue,

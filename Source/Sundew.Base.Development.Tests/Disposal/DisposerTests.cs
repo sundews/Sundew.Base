@@ -12,11 +12,10 @@ using System.Threading.Tasks;
 using global::Disposal.Interfaces;
 using Sundew.Base.Disposal;
 using Telerik.JustMock;
-using Xunit;
 
 public class DisposerTests
 {
-    [Fact]
+    [Test]
     public void Dispose_Then_DisposedShouldBeCalledOncePerDisposableInOrder()
     {
         var disposableReporter = Mock.Create<IDisposalReporter>();
@@ -32,7 +31,7 @@ public class DisposerTests
         Mock.Assert(disposableReporter);
     }
 
-    [Fact]
+    [Test]
     public void Dispose_Then_DisposedAndOnDisposedAsyncShouldBeCalledOnceInOrder()
     {
         var disposableReporter = Mock.Create<IDisposalReporter>();
@@ -47,7 +46,7 @@ public class DisposerTests
         Mock.Assert(disposableReporter);
     }
 
-    [Fact]
+    [Test]
     public async Task DisposeAsync_Then_DisposedShouldBeCalledOncePerDisposableInOrder()
     {
         var disposableReporter = Mock.Create<IDisposalReporter>();
@@ -63,7 +62,7 @@ public class DisposerTests
         Mock.Assert(disposableReporter);
     }
 
-    [Fact]
+    [Test]
     public async Task DisposeAsync_Then_DisposedAndOnDisposedAsyncShouldBeCalledOnceInOrder()
     {
         var disposableReporter = Mock.Create<IDisposalReporter>();

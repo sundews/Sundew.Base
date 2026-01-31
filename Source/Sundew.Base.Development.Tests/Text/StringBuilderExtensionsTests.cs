@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Text;
 using System.Text;
 using AwesomeAssertions;
 using Sundew.Base.Text;
-using Xunit;
 
 public class StringBuilderExtensionsTests
 {
-    [Fact]
+    [Test]
     public void ToString_When_PassingRange_Then_ResultShouldBeExpectedResult()
     {
         const string expectedResult = "1,2,3,4";
@@ -27,7 +26,7 @@ public class StringBuilderExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ToStringWithoutLast_Then_ResultShouldBeExpectedResult()
     {
         const string expectedResult = "1,2,3,4";
@@ -39,7 +38,7 @@ public class StringBuilderExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ToString_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
     {
         const string expectedResult = "1, 2, 3, 4";
@@ -52,7 +51,7 @@ public class StringBuilderExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Remove_When_UserEndOffset_Then_ResultShouldBeExpectedResult()
     {
         const string expectedResult = "1, 2, 3, 4";

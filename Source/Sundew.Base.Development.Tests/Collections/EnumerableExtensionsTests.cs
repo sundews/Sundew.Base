@@ -12,7 +12,6 @@ using System.Linq;
 using AwesomeAssertions;
 using Sundew.Base.Collections;
 using Sundew.Base.Collections.Linq;
-using Xunit;
 
 public class EnumerableExtensionsTests
 {
@@ -25,7 +24,7 @@ public class EnumerableExtensionsTests
         this.numberArray = this.numberList.ToArray();
     }
 
-    [Fact]
+    [Test]
     public void WhereNotDefault_When_InputIsNullable_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { 1 };
@@ -36,7 +35,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void WhereNotDefault_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { 1 };
@@ -47,7 +46,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void WhereNotNull_When_InputIsNullableValueType_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { 0, 1 };
@@ -58,7 +57,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal((IEnumerable<int>)expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void WhereNotNull_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { "0", "1" };
@@ -69,7 +68,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ForEach_When_PassingEnumerableWithAction_Then_ActionIsCalledForAllElements()
     {
         var resultList = new List<int>();
@@ -79,7 +78,7 @@ public class EnumerableExtensionsTests
         resultList.ForEachItem((x, i) => x.Should().Be(this.numberList[i] + 1));
     }
 
-    [Fact]
+    [Test]
     public void ToReadOnlyCollection_When_PassingLinqQuery_Then_ResultShouldBeEquivalentToExpectedEnumerable()
     {
         var expectedEnumerable = this.numberList.Where(x => x > 2 && x < 6);
@@ -89,7 +88,7 @@ public class EnumerableExtensionsTests
         result.Should().BeEquivalentTo(expectedEnumerable);
     }
 
-    [Fact]
+    [Test]
     public void ToReadOnlyCollection_When_PassingList_Then_ResultShouldContainTheSameList()
     {
         var result = this.numberList.ToReadOnlyCollection();
@@ -97,7 +96,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(this.numberList);
     }
 
-    [Fact]
+    [Test]
     public void ToReadOnlyCollection_When_PassingArray_Then_ResultShouldContainTheSameArray()
     {
         var result = this.numberArray.ToReadOnlyCollection();
@@ -105,7 +104,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(this.numberArray);
     }
 
-    [Fact]
+    [Test]
     public void ToReadOnlyCollection_When_PassingReadOnly_Then_ResultShouldBeTheSameIterable()
     {
         var expectedIterable = this.numberList.Where(x => x > 2 && x < 6).ToReadOnlyCollection();
@@ -115,7 +114,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedIterable);
     }
 
-    [Fact]
+    [Test]
     public void Concat_Then_ResultShouldBeExpectedResult()
     {
         var items1 = new List<int> { 1, 2, 3, 4 };
@@ -129,7 +128,7 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void Concat_When_OneItemIsEnumerable_Then_ResultShouldBeExpectedResult()
     {
         var items1 = new List<int> { 1, 2, 3, 4 };
@@ -143,9 +142,9 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData(1, new int[] { 1 })]
-    [InlineData(null, new int[0])]
+    [Test]
+    [Arguments(1, new int[] { 1 })]
+    [Arguments(null, new int[0])]
     public void ToReadOnlyList_When_PassingNullableStruct_Then_ResultShouldBeExpectedResult(int? value, int[] expectedResult)
     {
         var result = value.ToReadOnlyList();
@@ -153,9 +152,9 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("hello", new string[] { "hello" })]
-    [InlineData(null, new string[0])]
+    [Test]
+    [Arguments("hello", new string[] { "hello" })]
+    [Arguments(null, new string[0])]
     public void ToReadOnlyList_When_PassingNullableClass_Then_ResultShouldBeExpectedResult(string? value, string[] expectedResult)
     {
         var result = value.ToReadOnlyList();
@@ -163,8 +162,8 @@ public class EnumerableExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Theory]
-    [InlineData("hello", new string[] { "hello" })]
+    [Test]
+    [Arguments("hello", new string[] { "hello" })]
     public void ToReadOnlyList_When_PassingNonNullableClass_Then_ResultShouldBeExpectedResult(string value, string[] expectedResult)
     {
         var result = value.ToReadOnlyList();

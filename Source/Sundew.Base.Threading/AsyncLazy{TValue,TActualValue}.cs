@@ -21,18 +21,7 @@ using System.Threading.Tasks;
 public sealed class AsyncLazy<TValue, TActualValue> : IAsyncLazy<TValue>
     where TActualValue : TValue
 {
-    private readonly AsyncLock asyncLock = new();
-    private readonly Func<CancellationToken, Task<TActualValue>> factory;
-    private Task<TActualValue>? task;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsyncLazy{TValue, TActualValue}" /> class.
-    /// </summary>
-    /// <param name="valueFunc">The value function.</param>
-    public AsyncLazy(Func<CancellationToken, Task<TActualValue>> valueFunc)
-    {
-        this.factory = valueFunc;
-    }
+    private readonly Microsoft.VisualStudio.Threading.AsyncLazy<TActualValue> lazy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AsyncLazy{TValue, TActualValue}" /> class.
@@ -40,16 +29,7 @@ public sealed class AsyncLazy<TValue, TActualValue> : IAsyncLazy<TValue>
     /// <param name="valueFunc">The value function.</param>
     public AsyncLazy(Func<Task<TActualValue>> valueFunc)
     {
-        this.factory = _ => valueFunc();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsyncLazy{TValue, TActualValue}" /> class.
-    /// </summary>
-    /// <param name="valueFunc">The value function.</param>
-    public AsyncLazy(Func<CancellationToken, TActualValue> valueFunc)
-     : this(cancellationToken => Task.FromResult(valueFunc(cancellationToken)))
-    {
+        this.lazy = new Microsoft.VisualStudio.Threading.AsyncLazy<TActualValue>(valueFunc);
     }
 
     /// <summary>
@@ -64,7 +44,7 @@ public sealed class AsyncLazy<TValue, TActualValue> : IAsyncLazy<TValue>
     /// <summary>
     /// Gets a value indicating whether the value has been created.
     /// </summary>
-    public bool IsValueCreated => this.task is { IsCompleted: true, IsCanceled: false };
+    public bool IsValueCreated => this.lazy.IsValueCreated;
 
     /// <summary>
     /// Gets the value or default.
@@ -73,9 +53,9 @@ public sealed class AsyncLazy<TValue, TActualValue> : IAsyncLazy<TValue>
     [return: MaybeNull]
     public TActualValue GetValueOrDefault()
     {
-        if (this.task != null && this.IsValueCreated)
+        if (this.IsValueCreated)
         {
-            return this.task.Result;
+            return this.lazy.GetValue();
         }
 
         return default;
@@ -96,33 +76,9 @@ public sealed class AsyncLazy<TValue, TActualValue> : IAsyncLazy<TValue>
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A cancellable task.</returns>
-    public async Task<TActualValue> GetValueAsync(CancellationToken cancellationToken = default)
+    public Task<TActualValue> GetValueAsync(CancellationToken cancellationToken = default)
     {
-        using var unlocker = await this.asyncLock.LockAsync(cancellationToken).ConfigureAwait(false);
-        var task = this.task;
-        if (task is { IsCanceled: false })
-        {
-#if NET6_0_OR_GREATER
-            return await task.WaitAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var cancelTaskCompletionSource = new TaskCompletionSource<TActualValue>();
-#if NETSTANDARD1_3 || NETSTANDARD2_0
-            using var cancellationTokenRegistration = cancellationToken.Register(() => cancelTaskCompletionSource.SetResult(default!));
-#else
-            await using var cancellationTokenRegistration = cancellationToken.Register(() => cancelTaskCompletionSource.SetResult(default!));
-#endif
-            var completedTask = await Task.WhenAny(task, cancelTaskCompletionSource.Task);
-            if (completedTask == task)
-            {
-                return await task.ConfigureAwait(false);
-            }
-
-            return await Task.FromCanceled<TActualValue>(cancellationToken).ConfigureAwait(false);
-#endif
-        }
-
-        task = this.task = Task.Run(() => this.factory(cancellationToken), cancellationToken);
-        return await task.ConfigureAwait(false);
+        return this.lazy.GetValueAsync(cancellationToken);
     }
 
     /// <summary>Configures the await.</summary>

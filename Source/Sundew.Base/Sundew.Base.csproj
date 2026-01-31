@@ -18,6 +18,8 @@ Sundew.Base.Memory
 Sundew.Base.Primitives
 Sundew.Base.Computation
 Sundew.Base.Numeric
+Sundew.Base.Globalization
+Sundew.Base.Notifications
 Sundew.Base.Time
 Sundew.Base.IO
 Sundew.Base.Reporting
@@ -33,15 +35,13 @@ Sundew.Base.Timers
   </ItemGroup>
 
   <ItemGroup>
-
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
     <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />
     <ProjectReference Include="..\Sundew.Base.Equality\Sundew.Base.Equality.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Globalization\Sundew.Base.Globalization.csproj" />
     <ProjectReference Include="..\Sundew.Base.Initialization\Sundew.Base.Initialization.csproj" />
     <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
     <ProjectReference Include="..\Sundew.Base.Computation\Sundew.Base.Computation.csproj" />
     <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />

@@ -9,11 +9,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 
 using AwesomeAssertions;
 using Sundew.Base.Collections;
-using Xunit;
 
 public class ArrayExtensionsTests
 {
-    [Fact]
+    [Test]
     public void GetSegment_Then_ResultShouldBeEqualToExpectedResult()
     {
         var values = new[] { 0, 1, 2, 3, 4, 5 };

@@ -54,10 +54,10 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
     /// <returns>A task representing the processing.</returns>
     public ValueTask Update(TValue value)
     {
-        var needUpdate = !this.comparer.Equals(value, this.currentValue);
         lock (this.lockObject)
         {
             this.nextValue = value;
+            var needUpdate = !this.comparer.Equals(value, this.currentValue);
             if (this.currentTask == null && needUpdate)
             {
                 this.currentTask = Task.Run(() => this.ProcessAsync(value));
@@ -85,34 +85,18 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
                     this.updateEmitterReporter?.ErrorDuringUpdate(ex);
                 }
 
-                this.EnterIfNeeded();
-                value = this.nextValue;
+                lock (this.lockObject)
+                {
+                    value = this.nextValue;
+                }
             }
         }
         finally
         {
-            this.EnterIfNeeded();
-            this.currentTask = null;
-#if NET9_0_OR_GREATER
-            this.lockObject.Exit();
-#else
-            Monitor.Exit(this.lockObject);
-#endif
+            lock (this.lockObject)
+            {
+                this.currentTask = null;
+            }
         }
-    }
-
-    private void EnterIfNeeded()
-    {
-#if NET9_0_OR_GREATER
-                if (!this.lockObject.IsHeldByCurrentThread)
-                {
-                    this.lockObject.Enter();
-                }
-#else
-        if (!Monitor.IsEntered(this.lockObject))
-        {
-            Monitor.Enter(this.lockObject);
-        }
-#endif
     }
 }

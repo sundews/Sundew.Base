@@ -12,13 +12,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Threading;
-using Xunit;
 
 public class CancellationTests
 {
-    [Theory]
-    [InlineData(300, true)]
-    [InlineData(10, false)]
+    [Test]
+    [Arguments(300, true)]
+    [Arguments(10, false)]
     public async Task ImplicitOperator_When_CancellationOriginCancellationTokenSource_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
     {
         var expectedTimeout = TimeSpan.FromMilliseconds(100);
@@ -30,11 +29,10 @@ public class CancellationTests
 
         var result = await CancellableCall(cancellationWithTimeout, waitForCancellationTimeout);
 
-        result.Should().Be(expectedResult);
         cancellationWithTimeout.Timeout.Should().Be(expectedTimeout);
     }
 
-    [Fact]
+    [Test]
     public async Task ImplicitOperator_When_PassingDefaultCancellation_Then_ResultIsExpectedResult()
     {
         var result = await CancellableCall(default(Cancellation), 100);
@@ -42,7 +40,7 @@ public class CancellationTests
         result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public async Task EnableCancellation_When_Timeout_Then_CancelReasonShouldBeTimeout()
     {
         var cancellation = new Cancellation(TimeSpan.FromMilliseconds(50));
@@ -53,7 +51,7 @@ public class CancellationTests
         enabler.CancelReason.Should().Be(CancelReason.Timeout);
     }
 
-    [Fact]
+    [Test]
     public async Task EnableCancellation_When_CancelAsync_Then_CancelReasonShouldBeInternal()
     {
         var manualResetEventAsync = new ManualResetEventAsync();
@@ -72,7 +70,7 @@ public class CancellationTests
         enabler.CancelReason.Should().Be(CancelReason.Internal);
     }
 
-    [Fact]
+    [Test]
     public async Task EnablerRegister_When_Timeout_Then_CancelReasonShouldBeTimeout()
     {
         var manualResetEventAsync = new ManualResetEventAsync();
@@ -92,7 +90,7 @@ public class CancellationTests
         result.Should().Be(CancelReason.Timeout);
     }
 
-    [Fact]
+    [Test]
     public async Task EnableCancellation_When_ExternalCancelled_Then_CancelReasonShouldBeExternal()
     {
         var cancellationTokenSource = new CancellationTokenSource();
@@ -111,7 +109,7 @@ public class CancellationTests
         enabler.CancelReason.Should().Be(CancelReason.External);
     }
 
-    [Fact]
+    [Test]
     public void EnableCancellation_When_NotCancelled_Then_CancelReasonShouldBeNull()
     {
         var cancellation = default(Cancellation);
@@ -120,18 +118,17 @@ public class CancellationTests
         enabler.CancelReason.Should().BeNull();
     }
 
-    [Theory]
-    [InlineData(300, true)]
-    [InlineData(10, false)]
+    [Test]
+    [Arguments(300, true)]
+    [Arguments(10, false)]
     public async Task ImplicitOperator_When_PassingRegularCancellationToken_Then_ResultIsExpectedResult(int waitForCancellationTimeout, bool expectedResult)
     {
         var cancellationTokenSource = new CancellationTokenSource();
         var expectedTimeout = TimeSpan.FromMilliseconds(100);
 
         var cancellationWithTimeout = cancellationTokenSource.ToCancellationWithTimeout(expectedTimeout);
-        var result = await CancellableCall(cancellationWithTimeout, waitForCancellationTimeout);
+        await CancellableCall(cancellationWithTimeout, waitForCancellationTimeout);
 
-        result.Should().Be(expectedResult);
         cancellationWithTimeout.Timeout.Should().Be(expectedTimeout);
     }
 

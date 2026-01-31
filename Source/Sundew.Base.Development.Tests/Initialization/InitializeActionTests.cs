@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Initialization;
 using System.Threading;
 using AwesomeAssertions;
 using Sundew.Base.Initialization;
-using Xunit;
 
 public class InitializeActionTests
 {
-    [Fact]
+    [Test]
     public void Initialize_When_Awaiting_Then_ManualResetEventShouldBeSet()
     {
         var manualResetEvent = new ManualResetEventSlim(false);

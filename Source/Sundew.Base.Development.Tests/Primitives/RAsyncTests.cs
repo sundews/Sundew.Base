@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Primitives;
 using System;
 using System.Threading.Tasks;
 using AwesomeAssertions;
-using Xunit;
 
 public class RAsyncTests
 {
-    [Fact]
+    [Test]
     public async Task ImplicitCast_When_CastingToResult_Then_ValueShouldBeExpectedValue()
     {
         const int expectedValue = 34;
@@ -27,7 +26,7 @@ public class RAsyncTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public async Task ImplicitCast_WhenCastingToIfError_Then_ErrorShouldBeExpectedError()
     {
         const string expectedError = "Failed";
@@ -38,7 +37,7 @@ public class RAsyncTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public async Task ImplicitCast_WhenCastingToResult_Then_ErrorShouldBeExpectedError()
     {
         const int expectedValue = default;
@@ -51,9 +50,9 @@ public class RAsyncTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Theory]
-    [InlineData(true, 0)]
-    [InlineData(false, 34)]
+    [Test]
+    [Arguments(true, 0)]
+    [Arguments(false, 34)]
     public async Task Map_Then_ResultErrorShouldBeExpectedError(
         bool expectedResult,
         int expectedError)
@@ -67,9 +66,9 @@ public class RAsyncTests
         result.Error.Should().BeOfType(typeof(double));
     }
 
-    [Theory]
-    [InlineData(true, 34, 0)]
-    [InlineData(false, 0, 23)]
+    [Test]
+    [Arguments(true, 34, 0)]
+    [Arguments(false, 0, 23)]
     public async Task Map_Then_ResultValueShouldBeExpectedValue(
         bool expectedResult,
         int expectedValue,
@@ -84,7 +83,7 @@ public class RAsyncTests
         result.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public async Task Deconstruction_When_DeconstructingAllParameters_Then_DeconstructedValuesShouldBedExpectedResult()
     {
         const bool expectedIsSuccess = true;
@@ -98,7 +97,7 @@ public class RAsyncTests
         error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public async Task ErrorAsync_When_PassingResultIntoValueTaskAsyncMethod_Then_ResultShouldBeValueTaskOfResult()
     {
         const double expectedError = 65d;
@@ -109,7 +108,7 @@ public class RAsyncTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Fact]
+    [Test]
     public async Task SuccessAsync_When_PassingResultIntoValueTaskAsyncMethodAndReturningToResult_Then_ResultShouldBeValueTaskOfResult()
     {
         const double expectedValue = 65d;
@@ -121,7 +120,7 @@ public class RAsyncTests
         r.Error.Should().Be(default);
     }
 
-    [Fact]
+    [Test]
     public async Task ErrorAsync_When_PassingResultIntoValueTaskAsyncMethodAndReturningToResult_Then_ResultShouldBeValueTaskOfResult()
     {
         const double expectedError = 65d;
@@ -133,9 +132,9 @@ public class RAsyncTests
         r.Error.Should().Be(expectedError);
     }
 
-    [Theory]
-    [InlineData("string")]
-    [InlineData(null)]
+    [Test]
+    [Arguments("string")]
+    [Arguments(null)]
     public async Task ImplicitCast_When_UsingOptionalReferenceTypeInGenericMethodAndCastingToResult_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
     {
         static Task<R<TValue>> GenericAsync<TValue>(TValue value)
@@ -149,9 +148,9 @@ public class RAsyncTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("string")]
-    [InlineData(null)]
+    [Test]
+    [Arguments("string")]
+    [Arguments(null)]
     public async Task ImplicitCast_When_UsingOptionalReferenceTypeInGenericMethodAndCastingToResultOption_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(string? expectedResult)
     {
         static Task<R<TValue?>> GenericAsync<TValue>(TValue value)
@@ -165,9 +164,9 @@ public class RAsyncTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(42)]
-    [InlineData(null)]
+    [Test]
+    [Arguments(42)]
+    [Arguments(null)]
     public async Task ImplicitCast_When_UsingOptionalValueTypeInGenericMethodAndCastingToResult_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
     {
         static Task<R<TValue>> GenericAsync<TValue>(TValue value)
@@ -181,9 +180,9 @@ public class RAsyncTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(42)]
-    [InlineData(null)]
+    [Test]
+    [Arguments(42)]
+    [Arguments(null)]
     public async Task ImplicitCast_When_UsingOptionalValueTypeInGenericMethodAndCastingToResultOption_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult(int? expectedResult)
     {
         static Task<R<TValue?>> GenericAsync<TValue>(TValue value)
@@ -197,7 +196,7 @@ public class RAsyncTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public async Task SuccessOptionMap_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult()
     {
         static Task<R<TValue>> GenericAsync<TValue>(TValue value)
@@ -212,7 +211,7 @@ public class RAsyncTests
         result.Value.Should().Be(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public async Task SuccessOptionMap_When_StringComingFromGenericMethod_Then_ResultShouldBeSuccessAndValueShouldBeExpectedResult2()
     {
         static Task<R<TValue, TError>> GenericAsync<TValue, TError>(TValue value, Func<TError> errorFunc)

@@ -15,11 +15,10 @@ using AwesomeAssertions;
 using Sundew.Base.Collections;
 using Sundew.Base.Notifications;
 using Sundew.Base.Threading;
-using Xunit;
 
 public class DelegateEventTests
 {
-    [Fact]
+    [Test]
     public async Task Subscribe_WhenEventRaised_Then_EventShouldBeReceived()
     {
         var eventSource = new DelegateEventSource();
@@ -34,7 +33,7 @@ public class DelegateEventTests
         result2.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Target_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new DelegateEventSource();
@@ -52,7 +51,7 @@ public class DelegateEventTests
         eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
-    [Fact]
+    [Test]
     public async Task Source_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new DelegateEventSource();
@@ -70,7 +69,7 @@ public class DelegateEventTests
         eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
-    [Fact]
+    [Test]
     public async Task SourceAndTarget_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new DelegateEventSource();
@@ -89,7 +88,7 @@ public class DelegateEventTests
         eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
-    [Fact]
+    [Test]
     public async Task Target_UnsubscribeConcreteEvent_WhenEventRaised_Then_EventShouldBeReceivedOnce()
     {
         var eventSource = new DelegateEventSource();

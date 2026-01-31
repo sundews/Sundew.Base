@@ -16,11 +16,10 @@ using AwesomeAssertions;
 using Sundew.Base.Notifications;
 using Sundew.Base.Notifications.Reactive;
 using Sundew.Base.Threading;
-using Xunit;
 
 public class ReactiveEventTests
 {
-    [Fact]
+    [Test]
     public async Task Subscribe_WhenEventRaised_Then_EventShouldBeReceived()
     {
         var eventSource = new ReactiveEventSource();
@@ -33,7 +32,7 @@ public class ReactiveEventTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Target_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new ReactiveEventSource();
@@ -49,7 +48,7 @@ public class ReactiveEventTests
         eventSource.ReactiveSubscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
-    [Fact]
+    [Test]
     public async Task Source_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new ReactiveEventSource();
@@ -65,7 +64,7 @@ public class ReactiveEventTests
         eventSource.ReactiveSubscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
-    [Fact]
+    [Test]
     public async Task SourceAndTarget_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new ReactiveEventSource();

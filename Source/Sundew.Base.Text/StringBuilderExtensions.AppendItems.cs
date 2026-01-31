@@ -157,7 +157,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder AppendItems<TItem>(this StringBuilder stringBuilder, IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues = true)
+    public static StringBuilder AppendItems<TItem>(this StringBuilder stringBuilder, IEnumerable<TItem> enumerable, char separator, IFormatProvider? formatProvider, bool skipNullValues = true)
     {
         return InternalAppendItems(stringBuilder, enumerable, separator, formatProvider, skipNullValues);
     }
@@ -174,7 +174,7 @@ public static partial class StringBuilderExtensions
     /// <returns>
     /// The result of the result function.
     /// </returns>
-    public static StringBuilder AppendItems<TItem>(this StringBuilder stringBuilder, IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues = true)
+    public static StringBuilder AppendItems<TItem>(this StringBuilder stringBuilder, IEnumerable<TItem> enumerable, string separator, IFormatProvider? formatProvider, bool skipNullValues = true)
     {
         return InternalAppendItems(stringBuilder, enumerable, separator, formatProvider, skipNullValues);
     }
@@ -599,7 +599,7 @@ public static partial class StringBuilderExtensions
         return stringBuilder;
     }
 
-    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, string separator, IFormatProvider formatProvider, bool skipNullValues)
+    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, string separator, IFormatProvider? formatProvider, bool skipNullValues)
     {
         using (IEnumerator<TItem> enumerator = enumerable.GetEnumerator())
         {
@@ -634,7 +634,7 @@ public static partial class StringBuilderExtensions
         return stringBuilder;
     }
 
-    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, char separator, IFormatProvider formatProvider, bool skipNullValues)
+    internal static StringBuilder InternalAppendItems<TItem>(StringBuilder stringBuilder, IEnumerable<TItem> enumerable, char separator, IFormatProvider? formatProvider, bool skipNullValues)
     {
         using (IEnumerator<TItem> enumerator = enumerable.GetEnumerator())
         {

@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MemoryPack" />
     <PackageReference Include="Microsoft.VisualStudio.Threading" />
     <PackageReference Include="Sundew.DiscriminatedUnions" />
     <PackageReference Include="System.Reactive" />

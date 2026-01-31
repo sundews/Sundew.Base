@@ -11,8 +11,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Sundew.Base.Threading;
-using Xunit;
 
 public class AutoResetEventAsyncTests
 {
@@ -23,18 +23,17 @@ public class AutoResetEventAsyncTests
         this.testee = new AutoResetEventAsync();
     }
 
-    [Fact]
-    public async Task WaitAsync_When_Set_Then_ResultShouldBeTrue()
+    [Test]
+    public async Task WaitAsync_When_Set_Then_WaitShouldReturn()
     {
         this.testee.Set();
 
         var result = await this.testee.WaitAsync();
 
         result.Should().BeTrue();
-        this.testee.IsSet.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public async Task Set_When_Waiting_Then_ResultShouldBeTrue()
     {
         var waitTask = Task.Run(async () =>
@@ -47,12 +46,10 @@ public class AutoResetEventAsyncTests
 
         var result = await waitTask;
 
-        Assert.Multiple(
-            () => result.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse());
+        result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task WaitAsync_When_Cancelled_Then_ResultShouldBeFalse()
     {
         var cancellationTokenSource = new CancellationTokenSource();
@@ -62,12 +59,10 @@ public class AutoResetEventAsyncTests
 
         var result = await waitTask;
 
-        Assert.Multiple(
-            () => result.Should().BeFalse(),
-            () => this.testee.IsSet.Should().BeFalse());
+        result.Should().BeFalse();
     }
 
-    [Fact]
+    [Test]
     public async Task WaitAsync_When_Timedout_Then_ResultShouldBeFalse()
     {
         var waitTask = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1)));
@@ -75,48 +70,17 @@ public class AutoResetEventAsyncTests
 
         var result = await waitTask;
 
-        Assert.Multiple(
-            () => result.Should().BeFalse(),
-            () => this.testee.IsSet.Should().BeFalse());
+        result.Should().BeFalse();
     }
 
-    [Fact]
-    public async Task WaitAsync_When_SetWithInterval_Then_WaitersShouldBeNotifiedOneAtATime()
-    {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(500)));
-        var waitTask2 = Task.Run(async () =>
-        {
-            await Task.Delay(100);
-            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(500));
-        });
-        await Task.Delay(50);
-        this.testee.Set();
-
-        var task1Result = await waitTask1;
-
-        Assert.Multiple(
-            () => task1Result.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse(),
-            () => waitTask2.IsCompleted.Should().BeFalse());
-
-        await Task.Delay(10);
-        this.testee.Set();
-
-        var task2Result = await waitTask2;
-
-        Assert.Multiple(
-            () => task2Result.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse());
-    }
-
-    [Fact]
+    [Test]
     public async Task WaitAsync_When_SetWithInterval_Then_WaitersShouldBeNotifiedOneAtATimeInAnyOrder()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync());
         var waitTask2 = Task.Run(async () =>
         {
             await Task.Delay(50);
-            return await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100));
+            return await this.testee.WaitAsync();
         });
         await Task.Delay(50);
         this.testee.Set();
@@ -128,20 +92,21 @@ public class AutoResetEventAsyncTests
 
         var resultFirstTask = await firstTask;
 
-        Assert.Multiple(
-            () => resultFirstTask.Should().BeTrue(),
-            () => otherTask.IsCompleted.Should().BeFalse());
+        using (new AssertionScope())
+        {
+            resultFirstTask.Should().BeTrue();
+            otherTask.IsCompleted.Should().BeFalse();
+        }
 
         await Task.Delay(10);
         this.testee.Set();
 
         var otherTaskResult = await otherTask;
 
-        Assert.Multiple(
-            () => otherTaskResult.Should().BeTrue());
+        otherTaskResult.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task WaitAsync_When_AlreadySetAndLaterAgain_Then_WaitersShouldBeNotifiedOneAtATime()
     {
         this.testee.Set();
@@ -154,27 +119,26 @@ public class AutoResetEventAsyncTests
 
         var task1Result = await waitTask1;
 
-        Assert.Multiple(
-        () => task1Result.Should().BeTrue(),
-        () => this.testee.IsSet.Should().BeFalse(),
-        () => waitTask2.IsCompleted.Should().BeFalse());
+        using (new AssertionScope())
+        {
+            task1Result.Should().BeTrue();
+            waitTask2.IsCompleted.Should().BeFalse();
+        }
 
         await Task.Delay(10);
         this.testee.Set();
 
         var task2Result = await waitTask2;
 
-        Assert.Multiple(
-            () => task2Result.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse());
+        task2Result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task WaitAsync_When_AlreadySetAndLaterAgain_Then_WaitersShouldBeNotifiedOneAtATimeInAnyOrder()
     {
         this.testee.Set();
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
-        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(100)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync());
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync());
 
         var task = await Task.WhenAny(waitTask1, waitTask2);
 
@@ -182,18 +146,17 @@ public class AutoResetEventAsyncTests
         var otherTask = task == waitTask1 ? waitTask2 : waitTask1;
 
         var resultFirstTask = await firstTask;
-        Assert.Multiple(
-            () => resultFirstTask.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse(),
-            () => otherTask.IsCompleted.Should().BeFalse());
+        using (new AssertionScope())
+        {
+            resultFirstTask.Should().BeTrue();
+            otherTask.IsCompleted.Should().BeFalse();
+        }
 
         await Task.Delay(10);
         this.testee.Set();
 
         var otherTaskResult = await otherTask;
 
-        Assert.Multiple(
-            () => otherTaskResult.Should().BeTrue(),
-            () => this.testee.IsSet.Should().BeFalse());
+        otherTaskResult.Should().BeTrue();
     }
 }

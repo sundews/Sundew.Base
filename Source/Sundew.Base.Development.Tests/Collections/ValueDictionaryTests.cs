@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Immutable;
-using Xunit;
 
 public class ValueDictionaryTests
 {
-    [Fact]
+    [Test]
     public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueDictionary<int, int> lhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);
@@ -23,7 +22,7 @@ public class ValueDictionaryTests
         ((object)lhs).Should().Be(rhs);
     }
 
-    [Fact]
+    [Test]
     public void GetHashCode_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueDictionary<int, int> lhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);

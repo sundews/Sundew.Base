@@ -29,10 +29,10 @@ public readonly struct NamedFormatString
     private readonly string format;
     private readonly IFormatProvider formatProvider;
 
-    private NamedFormatString(string format, IReadOnlyCollection<(string Name, int Index)> formatNames, IFormatProvider formatProvider)
+    private NamedFormatString(string format, IReadOnlyCollection<(string Name, int Index)> formatNames, IFormatProvider? formatProvider)
     {
         this.format = format;
-        this.formatProvider = formatProvider;
+        this.formatProvider = formatProvider ?? CultureInfo.CurrentCulture;
         this.FormatNames = formatNames;
     }
 
@@ -109,7 +109,7 @@ public readonly struct NamedFormatString
     /// <param name="names">The names.</param>
     /// <param name="formatProvider">The format provider.</param>
     /// <returns>The new <see cref="NamedFormatString"/>.</returns>
-    public static NamedFormatString Create(string format, IReadOnlyList<string> names, IFormatProvider formatProvider)
+    public static NamedFormatString Create(string format, IReadOnlyList<string> names, IFormatProvider? formatProvider)
     {
         if (!TryCreate(format, names, formatProvider, out var namedFormattedString, out var unknownNames))
         {
@@ -163,7 +163,7 @@ public readonly struct NamedFormatString
     /// <returns>
     /// <c>true</c> if the NamedFormatString could be created, otherwise <c>false</c>.
     /// </returns>
-    public static bool TryCreate(string format, IReadOnlyList<string> names, IFormatProvider formatProvider, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
+    public static bool TryCreate(string format, IReadOnlyList<string> names, IFormatProvider? formatProvider, out NamedFormatString namedFormatString, out IReadOnlyList<string> unknownNames)
     {
         var (indexedFormat, formatNames, actualUnknownNames) = ConvertToIndexedFormat(names, format, CreateStringComparer(formatProvider, false));
         unknownNames = actualUnknownNames;
@@ -209,7 +209,7 @@ public readonly struct NamedFormatString
     /// <param name="namedValues">The named strings.</param>
     /// <param name="additionalValues">The additional values.</param>
     /// <returns>A <see cref="R{StringFormatted, FormatContainedUnknownNames}"/>.</returns>
-    public static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider formatProvider, string format, NamedValues namedValues, params string?[] additionalValues)
+    public static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider? formatProvider, string format, NamedValues namedValues, params string?[] additionalValues)
     {
         return Format(formatProvider, format, namedValues, new ReadOnlySpan<object?>(additionalValues));
     }
@@ -296,7 +296,7 @@ public readonly struct NamedFormatString
     /// <param name="getNamedValueFunc">The named value func.</param>
     /// <param name="arguments">The arguments.</param>
     /// <returns>A <see cref="R{StringFormatted, FormatContainedUnknownNames}"/>.</returns>
-    public static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider formatProvider, string namedFormat, Func<string, IFormatProvider, R<string?>> getNamedValueFunc, params object?[] arguments)
+    public static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider? formatProvider, string namedFormat, Func<string, IFormatProvider, R<string?>> getNamedValueFunc, params object?[] arguments)
     {
         return Format(formatProvider, namedFormat, CreateStringComparer(formatProvider, false), getNamedValueFunc, arguments);
     }
@@ -311,7 +311,7 @@ public readonly struct NamedFormatString
     /// <param name="arguments">The arguments.</param>
     /// <returns>A <see cref="R{StringFormatted, FormatContainedUnknownNames}"/>.</returns>
     public static R<StringFormatted, FormatContainedUnknownNames> Format(
-        IFormatProvider formatProvider,
+        IFormatProvider? formatProvider,
         string namedFormat,
         StringComparer namedFormatComparer,
         Func<string, IFormatProvider, R<string?>> getNamedValueFunc,
@@ -349,7 +349,7 @@ public readonly struct NamedFormatString
                     return match.Value;
                 }
 
-                var result = getNamedValueFunc(match.Value, formatProvider);
+                var result = getNamedValueFunc(match.Value, formatProvider ?? CultureInfo.CurrentCulture);
                 if (result.TryGet(out var value))
                 {
                     index = actualArguments.Length;
@@ -383,7 +383,7 @@ public readonly struct NamedFormatString
     /// <param name="namedValues">The named strings.</param>
     /// <param name="additionalValues">The additional values.</param>
     /// <returns>A <see cref="R{StringFormatted, FormatContainedUnknownNames}"/>.</returns>
-    public static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider formatProvider, string format, NamedValues namedValues, params object?[] additionalValues)
+    public static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider? formatProvider, string format, NamedValues namedValues, params object?[] additionalValues)
     {
         return Format(formatProvider, format, namedValues, new ReadOnlySpan<object?>(additionalValues));
     }
@@ -445,7 +445,7 @@ public readonly struct NamedFormatString
     /// <param name="namedValues">The named strings.</param>
     /// <param name="additionalValues">The additional values.</param>
     /// <returns>A <see cref="R{StringFormatted, FormatContainedUnknownNames}"/>.</returns>
-    private static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider formatProvider, string format, NamedValues namedValues, ReadOnlySpan<object?> additionalValues)
+    private static R<StringFormatted, FormatContainedUnknownNames> Format(IFormatProvider? formatProvider, string format, NamedValues namedValues, ReadOnlySpan<object?> additionalValues)
     {
         var arguments = new Buffer<object?>(additionalValues.Length + namedValues.Pairs.Length);
         var names = new Buffer<string>(arguments.Capacity);
@@ -544,7 +544,7 @@ public readonly struct NamedFormatString
         return index != -1;
     }
 
-    private static StringComparer CreateStringComparer(IFormatProvider formatProvider, bool ignoreCase)
+    private static StringComparer CreateStringComparer(IFormatProvider? formatProvider, bool ignoreCase)
     {
         if (formatProvider is CultureInfo cultureInfo)
         {

@@ -8,22 +8,21 @@
 namespace Sundew.Base.Development.Tests.Primitives;
 
 using AwesomeAssertions;
-using Xunit;
 
 public class OExtensionsToOptionTests
 {
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public void GetValueOrDefault_When_OperandIsNullableStructAndAlternativeIsStruct_Then_ResultShouldBeExpectedResult(bool isSuccess)
     {
         var option = isSuccess.ToOption(3);
         option.HasValue.Should().Be(isSuccess);
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [Test]
+    [Arguments(true)]
+    [Arguments(false)]
     public void HasValue_When_OperandIsNullableStructAndAlternativeIsStruct_Then_ResultShouldBeExpectedResult2(bool isSuccess)
     {
         var option = isSuccess.ToOption("text");

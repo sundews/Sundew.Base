@@ -11,6 +11,7 @@ using global::System;
 using global::System.Linq;
 using global::System.Text.Json;
 using global::System.Text.Json.Serialization;
+using Sundew.Base.Text;
 
 /// <summary>
 /// Converts migratable objects to and from JSON, supporting versioned deserialization and migration scenarios.
@@ -21,6 +22,24 @@ public class MigratableJsonConverter<TMigratable> : JsonConverter<TMigratable>
     where TMigratable : IMigratable
 {
     private const string VersionName = "version";
+    private readonly bool allowNewerVersions;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigratableJsonConverter{TMigratable}"/> class.
+    /// </summary>
+    public MigratableJsonConverter()
+        : this(false)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MigratableJsonConverter{TMigratable}"/> class.
+    /// </summary>
+    /// <param name="allowNewerVersions">A value indicating whether deserializing a newer version than support should be attempted.</param>
+    public MigratableJsonConverter(bool allowNewerVersions)
+    {
+        this.allowNewerVersions = allowNewerVersions;
+    }
 
     /// <summary>
     /// Reads a migratable object from the provided JSON reader, deserializing it according to its version information.
@@ -42,14 +61,31 @@ public class MigratableJsonConverter<TMigratable> : JsonConverter<TMigratable>
         reader.Read();
         var newOptions = new JsonSerializerOptions(options);
         newOptions.Converters.Remove(this);
-        var migratableData = JsonSerializer.Deserialize(ref reader, TMigratable.GetMigrationInfo().FirstOrDefault(x => x.Version == version).Type, newOptions);
+        var migrationInfos = TMigratable.GetMigrationInfo();
+        var migrationInfo = migrationInfos.FirstOrDefault(x => x.Version == version);
+        if (migrationInfo.Equals(default))
+        {
+            if (this.allowNewerVersions && version > migrationInfos.Max(x => x.Version))
+            {
+                // Allow deserializing to the highest known version when the version is newer than supported.
+                migrationInfo = migrationInfos.OrderByDescending(x => x.Version).First();
+            }
+            else
+            {
+                const string separator = ", ";
+                throw new UnsupportedVersionJsonException(
+                    $"Failed to deserialize to {typeof(TMigratable).FullName}. The target version was {version}, but this build only supports versions: {migrationInfos.JoinToString((builder, item) => builder.Append(item.Type.Name).Append(':').Append(' ').Append(item.Version), separator)}");
+            }
+        }
+
+        var migratableData = JsonSerializer.Deserialize(ref reader, migrationInfo.Type, newOptions);
         reader.Read();
         if (migratableData is TMigratable migratable)
         {
             return migratable;
         }
 
-        throw new JsonException();
+        throw new JsonException($"Failed cast deserialized data was: {migratableData} to {typeof(TMigratable).FullName}.");
     }
 
     /// <summary>

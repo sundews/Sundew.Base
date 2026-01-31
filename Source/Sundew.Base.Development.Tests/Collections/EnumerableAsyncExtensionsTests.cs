@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Collections;
-using Xunit;
 
 public class EnumerableAsyncExtensionsTests
 {
-    [Fact]
+    [Test]
     public async Task ForEachAsync_When_UsingADelayProcessingItems_Then_ProcessingShouldAtLeastTakeTheItemsTimesTheDelay()
     {
         var numbers = new[] { 1, 2, 3, 4, 5 };

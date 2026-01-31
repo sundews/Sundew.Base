@@ -25,7 +25,11 @@ public delegate void JobExceptionHandler(Exception exception, ref bool retry);
 /// <typeparam name="TState">The type of the state.</typeparam>
 public sealed class CancellableJob<TState> : IJob
 {
-    private readonly AsyncLock @lock = new();
+#if NET9_0_OR_GREATER
+    private readonly Lock @lock = new Lock();
+#else
+    private readonly object @lock = new object();
+#endif
     private readonly Func<TState, CancellationToken, Task> taskAction;
     private readonly JobExceptionHandler? onException;
     private readonly TaskScheduler? taskScheduler;
@@ -77,7 +81,16 @@ public sealed class CancellableJob<TState> : IJob
     /// <value>
     /// The exception.
     /// </value>
-    public AggregateException? Exception => this.aggregateException;
+    public AggregateException? Exception
+    {
+        get
+        {
+            lock (this.@lock)
+            {
+                return this.aggregateException;
+            }
+        }
+    }
 
     /// <summary>
     /// Starts the job.
@@ -94,28 +107,28 @@ public sealed class CancellableJob<TState> : IJob
     /// </summary>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>The job start result.</returns>
-    public async Task<JobStartResult> StartAsync(Cancellation cancellation)
+    public Task<JobStartResult> StartAsync(Cancellation cancellation)
     {
-        using (await this.@lock.LockAsync(cancellation).ConfigureAwait(false))
+        var cancellationEnabler = cancellation.EnableCancellation();
+        //// using (await this.@lock.LockAsync(cancellationEnabler.Token).ConfigureAwait(false))
+        lock (this.@lock)
         {
             if (!this.jobContext.HasValue)
             {
                 this.aggregateException = null;
-                var cancellationEnabler = cancellation.EnableCancellation();
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
                 this.jobContext = new JobContext(
                     cancellationEnabler,
-                    Task.Factory
-                        .StartNew(
-                            () => this.TaskAction(cancellation),
-                            cancellation,
+                    Task.Factory.StartNew(
+                            () => this.TaskAction(cancellationEnabler.Token),
+                            cancellationEnabler.Token,
                             taskCreationOptions,
                             this.taskScheduler ?? TaskScheduler.Default).Unwrap().ContinueWith(this.DisposeTask, this.taskScheduler ?? TaskScheduler.Default));
 
-                return new JobStartResult(this.jobContext.CancellationEnabler, JobStartStatus.Started);
+                return Task.FromResult(new JobStartResult(this.jobContext.CancellationEnabler, JobStartStatus.Started));
             }
 
-            return new JobStartResult(this.jobContext.CancellationEnabler, cancellation.IsCancellationRequested ? JobStartStatus.Canceled : JobStartStatus.WasAlreadyRunning);
+            return Task.FromResult(new JobStartResult(this.jobContext.CancellationEnabler, cancellation.IsCancellationRequested ? JobStartStatus.Canceled : JobStartStatus.WasAlreadyRunning));
         }
     }
 
@@ -136,27 +149,33 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>An async task.</returns>
     public async Task<RoE<AggregateException>> StopAsync()
     {
-        Task? task = null;
-        using (await this.@lock.LockAsync().ConfigureAwait(false))
+        Task<AggregateException?>? task = null;
+        //// using (await this.@lock.LockAsync().ConfigureAwait(false))
+        JobContext? jobContext = null;
+        AggregateException? aggregateException = null;
+        lock (this.@lock)
         {
-            var jobContext = this.jobContext;
-            if (jobContext.HasValue)
-            {
+            jobContext = this.jobContext;
+            aggregateException = this.aggregateException;
+        }
+
+        if (jobContext.HasValue)
+        {
 #if NET7_0_OR_GREATER
-                await jobContext.CancellationEnabler.CancelAsync().ConfigureAwait(false);
+            await jobContext.CancellationEnabler.CancelAsync().ConfigureAwait(false);
 #else
-                jobContext.CancellationEnabler.Cancel();
+            jobContext.CancellationEnabler.Cancel();
 #endif
-                task = jobContext.JobContinuationTask;
-            }
+            task = jobContext.JobContinuationTask;
         }
 
         if (task.HasValue)
         {
             await task.ConfigureAwait(false);
+            return R.FromError(task.Result);
         }
 
-        return R.FromError(this.aggregateException);
+        return R.FromError(aggregateException);
     }
 
     /// <summary>
@@ -167,21 +186,20 @@ public sealed class CancellableJob<TState> : IJob
     /// </returns>
     public async Task<RoE<AggregateException>> WaitAsync()
     {
-        Task? task = null;
-        using (await this.@lock.LockAsync().ConfigureAwait(false))
+        Task<AggregateException?>? task = null;
+        //// using (await this.@lock.LockAsync().ConfigureAwait(false))
+        lock (this.@lock)
         {
-            if (this.jobContext.HasValue)
-            {
-                task = this.jobContext.JobContinuationTask;
-            }
+            task = this.jobContext?.JobContinuationTask;
         }
 
         if (task.HasValue)
         {
             await task.ConfigureAwait(false);
+            return R.FromError(task.Result);
         }
 
-        return R.FromError(this.aggregateException);
+        return R.Success();
     }
 
     /// <summary>
@@ -212,13 +230,15 @@ public sealed class CancellableJob<TState> : IJob
         };
     }
 
-    private void DisposeTask(Task jobTask)
+    private AggregateException? DisposeTask(Task jobTask)
     {
-        using (this.@lock.Lock())
+        //// using (this.@lock.Lock())
+        lock (this.@lock)
         {
             this.jobContext?.CancellationEnabler.Dispose();
             this.aggregateException = jobTask.Exception;
             this.jobContext = null;
+            return jobTask.Exception;
         }
     }
 
@@ -259,7 +279,7 @@ public sealed class CancellableJob<TState> : IJob
 
     private sealed class JobContext
     {
-        public JobContext(Cancellation.Enabler cancellationEnabler, Task jobContinuationTask)
+        public JobContext(Cancellation.Enabler cancellationEnabler, Task<AggregateException?> jobContinuationTask)
         {
             this.CancellationEnabler = cancellationEnabler;
             this.JobContinuationTask = jobContinuationTask;
@@ -267,6 +287,6 @@ public sealed class CancellableJob<TState> : IJob
 
         public Cancellation.Enabler CancellationEnabler { get; }
 
-        public Task JobContinuationTask { get; }
+        public Task<AggregateException?> JobContinuationTask { get; }
     }
 }

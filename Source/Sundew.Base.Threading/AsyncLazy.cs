@@ -19,18 +19,7 @@ using System.Threading.Tasks;
 /// <typeparam name="TValue">The type of the value.</typeparam>
 public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
 {
-    private readonly AsyncLock asyncLock = new();
-    private readonly Func<CancellationToken, Task<TValue>> factory;
-    private Task<TValue>? task;
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
-    /// </summary>
-    /// <param name="valueFunc">The value function.</param>
-    public AsyncLazy(Func<CancellationToken, Task<TValue>> valueFunc)
-    {
-        this.factory = valueFunc;
-    }
+    private readonly Microsoft.VisualStudio.Threading.AsyncLazy<TValue> lazy;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
@@ -38,16 +27,7 @@ public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
     /// <param name="valueFunc">The value function.</param>
     public AsyncLazy(Func<Task<TValue>> valueFunc)
     {
-        this.factory = _ => valueFunc();
-    }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="AsyncLazy{TValue}" /> class.
-    /// </summary>
-    /// <param name="valueFunc">The value function.</param>
-    public AsyncLazy(Func<CancellationToken, TValue> valueFunc)
-        : this(cancellationToken => Task.FromResult(valueFunc(cancellationToken)))
-    {
+        this.lazy = new Microsoft.VisualStudio.Threading.AsyncLazy<TValue>(valueFunc);
     }
 
     /// <summary>
@@ -62,7 +42,7 @@ public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
     /// <summary>
     /// Gets a value indicating whether the value has been created.
     /// </summary>
-    public bool IsValueCreated => this.task is { IsCompleted: true, IsCanceled: false };
+    public bool IsValueCreated => this.lazy.IsValueCreated;
 
     /// <summary>
     /// Gets the value or default.
@@ -71,9 +51,9 @@ public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
     [return: MaybeNull]
     public TValue GetValueOrDefault()
     {
-        if (this.task != null && this.IsValueCreated)
+        if (this.IsValueCreated)
         {
-            return this.task.Result;
+            return this.lazy.GetValue();
         }
 
         return default;
@@ -84,33 +64,9 @@ public sealed class AsyncLazy<TValue> : IAsyncLazy<TValue>
     /// </summary>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A cancellable task.</returns>
-    public async Task<TValue> GetValueAsync(CancellationToken cancellationToken = default)
+    public Task<TValue> GetValueAsync(CancellationToken cancellationToken = default)
     {
-        using var unlocker = await this.asyncLock.LockAsync(cancellationToken).ConfigureAwait(false);
-        var task = this.task;
-        if (task is { IsCanceled: false })
-        {
-#if NET6_0_OR_GREATER
-            return await task.WaitAsync(cancellationToken).ConfigureAwait(false);
-#else
-            var cancelTaskCompletionSource = new TaskCompletionSource<TValue>();
-#if NETSTANDARD1_3 || NETSTANDARD2_0
-            using var cancellationTokenRegistration = cancellationToken.Register(() => cancelTaskCompletionSource.SetResult(default!));
-#else
-            await using var cancellationTokenRegistration = cancellationToken.Register(() => cancelTaskCompletionSource.SetResult(default!));
-#endif
-            var completedTask = await Task.WhenAny(task, cancelTaskCompletionSource.Task);
-            if (completedTask == task)
-            {
-                return await task.ConfigureAwait(false);
-            }
-
-            return await Task.FromCanceled<TValue>(cancellationToken).ConfigureAwait(false);
-#endif
-        }
-
-        task = this.task = Task.Run(() => this.factory(cancellationToken), cancellationToken);
-        return await task.ConfigureAwait(false);
+        return this.lazy.GetValueAsync(cancellationToken);
     }
 
     /// <summary>Configures the await.</summary>

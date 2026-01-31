@@ -10,13 +10,12 @@ namespace Sundew.Base.Development.Tests.Equality;
 using System;
 using AwesomeAssertions;
 using Sundew.Base.Equality;
-using Xunit;
 
 public class EqualityTests
 {
-    [Theory]
-    [InlineData(1, 2, 1, 2, true)]
-    [InlineData(1, 3, 1, 2, false)]
+    [Test]
+    [Arguments(1, 2, 1, 2, true)]
+    [Arguments(1, 3, 1, 2, false)]
     public void StructEquals_Then_ResultShouldBeExpectedResult(double x1, double y1, double x2, double y2, bool expectedResult)
     {
         var point1 = new Point(x1, y1);
@@ -27,10 +26,10 @@ public class EqualityTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(1, 2, 1, 2, true)]
-    [InlineData(1, 3, 1, 2, false)]
-    [InlineData(2, 1, 1, 2, false)]
+    [Test]
+    [Arguments(1, 2, 1, 2, true)]
+    [Arguments(1, 3, 1, 2, false)]
+    [Arguments(2, 1, 1, 2, false)]
     public void StructGetHashCode_Then_ResultShouldBeExpectedResult(double x1, double y1, double x2, double y2, bool expectedResult)
     {
         var point1 = new Point(x1, y1);
@@ -41,9 +40,9 @@ public class EqualityTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(1, 2, 1, 2, true)]
-    [InlineData(1, 3, 1, 2, false)]
+    [Test]
+    [Arguments(1, 2, 1, 2, true)]
+    [Arguments(1, 3, 1, 2, false)]
     public void ClassEquals_Then_ResultShouldBeExpectedResult(double x1, double y1, double x2, double y2, bool expectedResult)
     {
         var vector1 = new Vector(x1, y1);
@@ -54,10 +53,10 @@ public class EqualityTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData(1, 2, 1, 2, true)]
-    [InlineData(1, 3, 1, 2, false)]
-    [InlineData(2, 1, 1, 2, false)]
+    [Test]
+    [Arguments(1, 2, 1, 2, true)]
+    [Arguments(1, 3, 1, 2, false)]
+    [Arguments(2, 1, 1, 2, false)]
     public void ClassGetHashCode_Then_ResultShouldBeExpectedResult(double x1, double y1, double x2, double y2, bool expectedResult)
     {
         var vector1 = new Vector(x1, y1);

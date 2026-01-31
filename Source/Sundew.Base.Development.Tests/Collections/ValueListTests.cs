@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Collections.Immutable;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Immutable;
-using Xunit;
 
 public class ValueListTests
 {
-    [Fact]
+    [Test]
     public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<int> lhs = System.Collections.Immutable.ImmutableList.Create(4, 5, 6);
@@ -23,7 +22,7 @@ public class ValueListTests
         ((object)lhs).Should().Be(rhs);
     }
 
-    [Fact]
+    [Test]
     public void GetHashCode_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<int> lhs = System.Collections.Immutable.ImmutableList.Create(4, 5, 6);
@@ -32,7 +31,7 @@ public class ValueListTests
         lhs.GetHashCode().Should().Be(rhs.GetHashCode());
     }
 
-    [Fact]
+    [Test]
     public void Equals_When_UsedWithString_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<string> lhs = System.Collections.Immutable.ImmutableList.Create("4", "5", "6");
@@ -41,7 +40,7 @@ public class ValueListTests
         ((object)lhs).Should().Be(rhs);
     }
 
-    [Fact]
+    [Test]
     public void GetHashCode_When_UsedWithString_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<string> lhs = System.Collections.Immutable.ImmutableList.Create("4", "5", "6");
@@ -50,7 +49,7 @@ public class ValueListTests
         lhs.GetHashCode().Should().Be(rhs.GetHashCode());
     }
 
-    [Fact]
+    [Test]
     public void Equals_When_UsedWithAnotherArray_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<ValueList<string>> lhs = ImmutableArray.Create<ValueList<string>>(["1", "2", "3"], ["4", "5", "6"]);
@@ -59,7 +58,7 @@ public class ValueListTests
         ((object)lhs).Should().Be(rhs);
     }
 
-    [Fact]
+    [Test]
     public void GetHashCode_When_UsedWithAnotherArray_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<ValueList<string>> lhs = ImmutableArray.Create<ValueList<string>>(["1", "2", "3"], ["4", "5", "6"]);

@@ -107,15 +107,6 @@ public struct Cancellation
     public bool CanBeCanceled => this.Token.CanBeCanceled;
 
     /// <summary>
-    /// Converts the <see cref="Cancellation"/> into a regular <see cref="CancellationToken"/>.
-    /// </summary>
-    /// <param name="cancellation">The timeout cancellation token.</param>
-    public static implicit operator CancellationToken(Cancellation cancellation)
-    {
-        return cancellation.Token;
-    }
-
-    /// <summary>
     /// Converts the <see cref="TimeSpan"/> into a <see cref="Cancellation"/>.
     /// </summary>
     /// <param name="timeout">The timeout.</param>

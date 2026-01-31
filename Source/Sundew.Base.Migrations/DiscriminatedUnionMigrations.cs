@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Sundew.Base.Collections;
 using Sundew.DiscriminatedUnions;
 
 /// <summary>
@@ -33,19 +34,42 @@ public static partial class DiscriminatedUnionMigrations
     public static IReadOnlyCollection<MigrationInfo> FromVersionNamedUnion<TDiscriminatedUnion>()
         where TDiscriminatedUnion : IDiscriminatedUnion
     {
-        return TDiscriminatedUnion.Cases.OrderBy(x => x.Name).Select((x, index) =>
-        {
-            const string version = "Version";
-            var match = GetVersionNameRegex().Match(x.Name);
-            if (match.Success)
-            {
-                return new MigrationInfo(x, int.Parse(match.Groups[version].ValueSpan, CultureInfo.InvariantCulture));
-            }
+        var orderedCases = TDiscriminatedUnion.Cases
+            .Select((caseType, index) =>
+                {
+                    const string version = "Version";
+                    var match = GetVersionNameRegex().Match(caseType.Name);
+                    if (match.Success)
+                    {
+                        var versionNumberGroup = match.Groups[version];
+                        var versionNumber = versionNumberGroup.Success ? int.Parse(versionNumberGroup.Value, CultureInfo.InvariantCulture) : typeof(TDiscriminatedUnion).Name.Contains(caseType.Name) ? int.MaxValue : throw InvalidUnion(caseType);
+                        return new MigrationInfo(caseType, versionNumber);
+                    }
 
-            throw new InvalidOperationException($"The union case '{x.Name}' in discriminated union type '{typeof(TDiscriminatedUnion).FullName}' does not follow the expected version naming convention.");
-        }).ToArray();
+                    throw InvalidUnion(caseType);
+                })
+          .OrderBy(x => x.Version)
+          .ToArray();
+        return orderedCases
+          .Select(migrationInfo => migrationInfo.Version == int.MaxValue ? new MigrationInfo(migrationInfo.Type, GetLatestVersion(migrationInfo, orderedCases)) : migrationInfo).ToArray();
+
+        InvalidOperationException InvalidUnion(Type unionType)
+        {
+            return new InvalidOperationException($"The union case '{unionType.Name}' in discriminated union type '{typeof(TDiscriminatedUnion).FullName}' does not follow the expected version naming convention.");
+        }
     }
 
-    [GeneratedRegex(@"\D+(?<Version>\d+)$")]
+    private static int GetLatestVersion(MigrationInfo migrationInfo, MigrationInfo[] migrationInfos)
+    {
+        var index = migrationInfos.IndexOf(migrationInfo);
+        if (index >= 1)
+        {
+            return migrationInfos[index - 1].Version + 1;
+        }
+
+        return 1;
+    }
+
+    [GeneratedRegex(@"\D+(?<Version>\d+)?$")]
     private static partial Regex GetVersionNameRegex();
 }

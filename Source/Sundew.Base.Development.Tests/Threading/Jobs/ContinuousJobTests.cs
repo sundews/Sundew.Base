@@ -11,11 +11,10 @@ using System;
 using System.Threading;
 using AwesomeAssertions;
 using Sundew.Base.Threading.Jobs;
-using Xunit;
 
 public class ContinuousJobTests
 {
-    [Fact]
+    [Test]
     public void Start_When_AlreadyStarted_Then_ResultShouldBeAlreadyStarted()
     {
         using var testee = new ContinuousJob(_ => { });
@@ -25,7 +24,7 @@ public class ContinuousJobTests
         result.Status.Should().Be(JobStartStatus.WasAlreadyRunning);
     }
 
-    [Fact]
+    [Test]
     public void Stop_When_NotStarted_Then_ResultShouldBeSuccess()
     {
         using var testee = new ContinuousJob(_ => { });
@@ -34,7 +33,7 @@ public class ContinuousJobTests
         ((bool)result).Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void Start_When_ExceptionIsThrownAndHandled4Times_Then_TesteExceptionShouldContainThrownException()
     {
         using var resetEvent = new ManualResetEventSlim();
@@ -52,7 +51,7 @@ public class ContinuousJobTests
         testee.Exception!.InnerException.Should().BeOfType<InvalidOperationException>();
     }
 
-    [Fact]
+    [Test]
     public void Stop_When_ExceptionIsThrown_Then_ResultShouldContainThrownException()
     {
         using var resetEvent = new ManualResetEventSlim();
@@ -72,7 +71,7 @@ public class ContinuousJobTests
         result.Error!.InnerException.Should().BeOfType<InvalidOperationException>();
     }
 
-    [Fact]
+    [Test]
     public void Stop_Then_ResultShouldBeSuccess()
     {
         using var resetEvent = new ManualResetEventSlim();

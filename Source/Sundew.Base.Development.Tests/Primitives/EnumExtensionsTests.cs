@@ -9,7 +9,6 @@ namespace Sundew.Base.Development.Tests.Primitives;
 
 using System;
 using AwesomeAssertions;
-using Xunit;
 
 public class EnumExtensionsTests
 {
@@ -38,10 +37,10 @@ public class EnumExtensionsTests
 #pragma warning restore SA1136 // Enum values should be on separate lines
     }
 
-    [Theory]
-    [InlineData("Max", NumbersUlong.Max)]
-    [InlineData("One, Two, Four,Max", NumbersUlong.One | NumbersUlong.Four | NumbersUlong.Max)]
-    [InlineData("Two, Four,Max", NumbersUlong.Two | NumbersUlong.Four | NumbersUlong.Max)]
+    [Test]
+    [Arguments("Max", NumbersUlong.Max)]
+    [Arguments("One, Two, Four,Max", NumbersUlong.One | NumbersUlong.Four | NumbersUlong.Max)]
+    [Arguments("Two, Four,Max", NumbersUlong.Two | NumbersUlong.Four | NumbersUlong.Max)]
     public void ParseFlagsEnum_When_EnumTypeIsUlong_Then_ResultShouldBeExpectedResult(string value, NumbersUlong expectedResult)
     {
         var result = value.ParseFlagsEnum<NumbersUlong>();
@@ -49,10 +48,10 @@ public class EnumExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("Max", NumbersInt.Max)]
-    [InlineData("One, Two, Four,Max", NumbersInt.One | NumbersInt.Four | NumbersInt.Max)]
-    [InlineData("Two, Four,Max", NumbersInt.Two | NumbersInt.Four | NumbersInt.Max)]
+    [Test]
+    [Arguments("Max", NumbersInt.Max)]
+    [Arguments("One, Two, Four,Max", NumbersInt.One | NumbersInt.Four | NumbersInt.Max)]
+    [Arguments("Two, Four,Max", NumbersInt.Two | NumbersInt.Four | NumbersInt.Max)]
     public void ParseFlagsEnum_When_EnumTypeIsInt_Then_ResultShouldBeExpectedResult(string value, NumbersInt expectedResult)
     {
         var result = value.ParseFlagsEnum<NumbersInt>();
@@ -60,10 +59,10 @@ public class EnumExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("Max", NumbersSbyte.Max)]
-    [InlineData("One, Two, Four,Max", NumbersSbyte.One | NumbersSbyte.Four | NumbersSbyte.Max)]
-    [InlineData("Two, Four,Max", NumbersSbyte.Two | NumbersSbyte.Four | NumbersSbyte.Max)]
+    [Test]
+    [Arguments("Max", NumbersSbyte.Max)]
+    [Arguments("One, Two, Four,Max", NumbersSbyte.One | NumbersSbyte.Four | NumbersSbyte.Max)]
+    [Arguments("Two, Four,Max", NumbersSbyte.Two | NumbersSbyte.Four | NumbersSbyte.Max)]
     public void ParseFlagsEnum_When_EnumTypeIsSbyte_Then_ResultShouldBeExpectedResult(string value, NumbersSbyte expectedResult)
     {
         var result = value.ParseFlagsEnum<NumbersSbyte>();
@@ -71,11 +70,11 @@ public class EnumExtensionsTests
         result.Should().Be(expectedResult);
     }
 
-    [Theory]
-    [InlineData("Max", true, NumbersSbyte.Max)]
-    [InlineData("One, Two, Four,Max", true, NumbersSbyte.One | NumbersSbyte.Four | NumbersSbyte.Max)]
-    [InlineData("Two, Four,Max", true, NumbersSbyte.Two | NumbersSbyte.Four | NumbersSbyte.Max)]
-    [InlineData(null, false, NumbersSbyte.One)]
+    [Test]
+    [Arguments("Max", true, NumbersSbyte.Max)]
+    [Arguments("One, Two, Four,Max", true, NumbersSbyte.One | NumbersSbyte.Four | NumbersSbyte.Max)]
+    [Arguments("Two, Four,Max", true, NumbersSbyte.Two | NumbersSbyte.Four | NumbersSbyte.Max)]
+    [Arguments(null, false, NumbersSbyte.One)]
     public void TryParseFlagsEnum_When_EnumTypeIsSbyte_Then_ResultShouldBeExpectedResult(string? value, bool expectedResult, NumbersSbyte expectedNumbers)
     {
         var result = value.TryParseFlagsEnum(out NumbersSbyte numbers);
@@ -84,10 +83,10 @@ public class EnumExtensionsTests
         numbers.Should().Be(expectedNumbers);
     }
 
-    [Theory]
-    [InlineData("One", true, Number.One)]
-    [InlineData("Two", true, Number.Two)]
-    [InlineData(null, false, Number.One)]
+    [Test]
+    [Arguments("One", true, Number.One)]
+    [Arguments("Two", true, Number.Two)]
+    [Arguments(null, false, Number.One)]
     public void TryParseEnum_Then_ResultShouldBeExpectedResult(string? input, bool expectedResult, Number expectedNumber)
     {
         var result = input.TryParseEnum(out Number number);
@@ -96,9 +95,9 @@ public class EnumExtensionsTests
         number.Should().Be(expectedNumber);
     }
 
-    [Theory]
-    [InlineData(null, Number.One)]
-    [InlineData(Number.Two, Number.Two)]
+    [Test]
+    [Arguments(null, Number.One)]
+    [Arguments(Number.Two, Number.Two)]
     public void ToEnumOrDefault_Then_ResultShouldBeExpected(object? value, Number expectedNumber)
     {
         var result = value.ToEnumOrDefault<Number>();
@@ -106,9 +105,9 @@ public class EnumExtensionsTests
         result.Should().Be(expectedNumber);
     }
 
-    [Theory]
-    [InlineData(null, Number.One)]
-    [InlineData(Number.Two, Number.Two)]
+    [Test]
+    [Arguments(null, Number.One)]
+    [Arguments(Number.Two, Number.Two)]
     public void ToEnumOrDefault_When_PassingDefaultValue_Then_ResultShouldBeExpected(object? value, Number expectedNumber)
     {
         var result = value.ToEnumOrDefault(expectedNumber);

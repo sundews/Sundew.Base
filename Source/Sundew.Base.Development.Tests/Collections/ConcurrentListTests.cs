@@ -9,11 +9,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 
 using AwesomeAssertions;
 using Sundew.Base.Collections.Concurrent;
-using Xunit;
 
 public class ConcurrentListTests
 {
-    [Fact]
+    [Test]
     public void Add_Then_ListShouldBeExpectedList()
     {
         var testee = new ConcurrentList<int>();
@@ -23,7 +22,7 @@ public class ConcurrentListTests
         testee.Should().Equal([1]);
     }
 
-    [Fact]
+    [Test]
     public void Insert_When_IndexIsHigherThanCount_Then_ListShouldGrowAndItemBeAdded()
     {
         var testee = new ConcurrentList<int>();
@@ -34,7 +33,7 @@ public class ConcurrentListTests
         testee.Should().Equal([1, 0, 2]);
     }
 
-    [Fact]
+    [Test]
     public void Insert_Then_ListShouldGrowAndItemBeAdded()
     {
         var testee = new ConcurrentList<int>();
@@ -47,7 +46,7 @@ public class ConcurrentListTests
         testee.Should().Equal([1, 2, 3, 4]);
     }
 
-    [Fact]
+    [Test]
     public void Indexer_When_IndexIsHigherThanCount_Then_ListShouldGrowAndItemBeAdded()
     {
         var testee = new ConcurrentList<int>();

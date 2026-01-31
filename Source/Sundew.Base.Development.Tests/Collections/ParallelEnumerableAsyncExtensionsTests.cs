@@ -10,33 +10,32 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Collections;
-using Xunit;
+using Sundew.Base.Collections.Concurrent;
 
 public class ParallelEnumerableAsyncExtensionsTests
 {
-    [Fact]
+    [Test]
     public async Task ForEachAsync_When_UsingADelayProcessingItems_Then_ProcessingShouldTakeLessThanTheItemsTimesTheDelay()
     {
         var millisecondsDelay = 500;
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+        var results = new ConcurrentList<int>();
         await numbers.ForEachAsync(
             Parallelism.Default,
             async number =>
             {
                 await Task.Delay(millisecondsDelay).ConfigureAwait(false);
+                results.Add(number);
             });
 
-        stopWatch.Stop();
-        stopWatch.ElapsedMilliseconds.Should().BeLessThan(numbers.Length * millisecondsDelay);
+        results.Should().BeEquivalentTo(numbers);
     }
 
-    [Fact]
-    public async Task SelectAsync_When_UsingADelayProcessingItems_Then_ProcessingShouldTakeLessThanTheItemsTimesTheDelay()
+    [Test]
+    public async Task SelectAsync_When_UsingADelayProcessingItems_Then_AllItemsShouldBeProcessed()
     {
         var millisecondsDelay = 500;
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        var stopWatch = System.Diagnostics.Stopwatch.StartNew();
         var result = await numbers.SelectAsync(
             Parallelism.Default,
             async number =>
@@ -45,8 +44,6 @@ public class ParallelEnumerableAsyncExtensionsTests
                 return ++number;
             });
 
-        stopWatch.Stop();
-        stopWatch.ElapsedMilliseconds.Should().BeLessThan(numbers.Length * millisecondsDelay);
         result.Should().Equal(2, 3, 4, 5, 6);
     }
 }

@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Sundew.Base.Collections;
 using Sundew.Base.Notifications;
+using static Sundew.Base.Cancellation;
 
 /// <summary>
 /// Provides a thread-safe mechanism for synchronizing and updating a value based on a parameter, supporting
@@ -25,12 +26,16 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     where TValue : class
 {
     private readonly Func<TParameter, CancellationToken, Task<TValue>> getValueFunc;
-    private readonly AsyncLock @lock = new();
+#if NET9_0_OR_GREATER
+    private readonly Lock @lock = new Lock();
+#else
+    private readonly object @lock = new object();
+#endif
     private readonly DelegateEvent<TValue> updateEvent = new();
-    private readonly Dictionary<object, Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>>> pendingSubmissions = new();
+    private readonly Dictionary<object, SubmissionContext> pendingSubmissions = new();
     private Task<TValue> getCurrentValueTask;
-    private Task? submitValueTask;
-    private PostSubmitAction<TParameter, TValue>.RefreshOnIdle? invalidateOnIdle;
+    private Task? lastSubmitValueTask;
+    private PostSubmitAction<TParameter, TValue>.RefreshOnIdle? refreshOnIdle;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ValueSynchronizer{TParameter,TValue}"/> class.
@@ -51,7 +56,13 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     /// retrieving the value.</remarks>
     public Task<TValue> Value
     {
-        get => this.getCurrentValueTask;
+        get
+        {
+            lock (this.@lock)
+            {
+                return this.getCurrentValueTask;
+            }
+        }
     }
 
     /// <summary>
@@ -76,16 +87,17 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     /// <param name="parameter">The parameter used to obtain the new value. The value provided will be passed to the value retrieval function.</param>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>A task that represents the asynchronous invalidate operation.</returns>
-    public async Task RefreshAsync(TParameter parameter, Cancellation cancellation)
+    public async Task RefreshAsync(TParameter parameter, Cancellation cancellation = default)
     {
         using var enabler = cancellation.EnableCancellation();
         try
         {
-            using (await this.@lock.LockAsync().ConfigureAwait(false))
+            lock (this.@lock)
             {
                 this.getCurrentValueTask = this.getValueFunc(parameter, enabler.Token);
-                await this.getCurrentValueTask.ConfigureAwait(false);
             }
+
+            await this.getCurrentValueTask.ConfigureAwait(false);
         }
         catch (OperationCanceledException)
         {
@@ -95,15 +107,6 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
             enabler.Cancel();
 #endif
         }
-    }
-
-    /// <summary>
-    /// Disposes the resources used by the ValueSynchronizer.
-    /// </summary>
-    public void Dispose()
-    {
-        this.@lock.Dispose();
-        this.updateEvent.Dispose();
     }
 
     /// <summary>
@@ -112,26 +115,31 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     /// <remarks>If multiple updates are requested concurrently, they are queued and applied in order. This
     /// method ensures that updates are applied in a thread-safe manner.</remarks>
     /// <param name="submissionId">The object that identifies the submission for which the update is being submitted. Cannot be null.</param>
-    /// <param name="applyFunc">A function that asynchronously produces a PostApplyAction to be applied. Cannot be null.</param>
+    /// <param name="submissionFunc">A function that asynchronously produces a PostApplyAction to be applied. Cannot be null.</param>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The task completes when the update has been applied.</returns>
-    public async Task TrySubmitAsync(object submissionId, Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> applyFunc, Cancellation cancellation)
+    public async Task TrySubmitAsync(object submissionId, Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> submissionFunc, Cancellation cancellation = default)
     {
         using var enabler = cancellation.EnableCancellation();
-        Task? currentSubmitValueTask = null;
         try
         {
-            using (await this.@lock.LockAsync(enabler.Token).ConfigureAwait(false))
+            Task? currentSubmitValueTask = null;
+            lock (this.@lock)
             {
-                ref var entry =
-                    ref CollectionsMarshal.GetValueRefOrAddDefault(this.pendingSubmissions, submissionId, out bool exists);
-                entry = applyFunc;
+                ref var entry = ref CollectionsMarshal.GetValueRefOrAddDefault(this.pendingSubmissions, submissionId, out bool exists);
+                entry.SubmissionFunc = submissionFunc;
                 if (!exists)
                 {
-                    var token = enabler.Token;
-                    this.submitValueTask = currentSubmitValueTask = this.submitValueTask.HasValue && !this.submitValueTask.IsCompleted
-                        ? this.submitValueTask.ContinueWith(task => ApplyValue(token), token, TaskContinuationOptions.None, TaskScheduler.Default)
-                        : Task.Run(() => ApplyValue(token), token);
+                    var cancellationToken = enabler.Token;
+                    currentSubmitValueTask = this.lastSubmitValueTask.HasValue
+                        ? this.lastSubmitValueTask.ContinueWith(task => ApplyValueAndTryRefresh(submissionId, cancellationToken), cancellationToken, TaskContinuationOptions.None, TaskScheduler.Default).Unwrap()
+                        : Task.Run(() => ApplyValueAndTryRefresh(submissionId, cancellationToken), cancellationToken);
+                    this.lastSubmitValueTask = currentSubmitValueTask;
+                    entry = new SubmissionContext(currentSubmitValueTask, submissionFunc);
+                }
+                else
+                {
+                    currentSubmitValueTask = entry.SubmissionTask;
                 }
             }
 
@@ -139,81 +147,103 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
             {
                 await currentSubmitValueTask.ConfigureAwait(false);
             }
-
-            async Task ApplyValue(CancellationToken cancellationToken)
-            {
-                try
-                {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    using (await this.@lock.LockAsync(cancellationToken).ConfigureAwait(false))
-                    {
-                        if (this.pendingSubmissions.Remove(submissionId, out var actualUpdateFunc))
-                        {
-                            await this.PrivateApply(actualUpdateFunc, cancellationToken).ConfigureAwait(false);
-                        }
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    await HandleCancellation().ConfigureAwait(false);
-                }
-            }
         }
         catch (OperationCanceledException)
         {
-            await HandleCancellation().ConfigureAwait(false);
+            await this.HandleCancellation(submissionId, enabler).ConfigureAwait(false);
         }
 
-        async Task HandleCancellation()
+        async Task ApplyValueAndTryRefresh(object submissionId, CancellationToken cancellationToken)
         {
-#if NET7_0_OR_GREATER
-            await enabler.CancelAsync().ConfigureAwait(false);
-#else
-            enabler.Cancel();
-#endif
-            using (await this.@lock.LockAsync(CancellationToken.None).ConfigureAwait(false))
+            try
             {
-                this.pendingSubmissions.Remove(submissionId, out var _);
+                cancellationToken.ThrowIfCancellationRequested();
+                SubmissionContext submissionContext = default;
+                lock (this.@lock)
+                {
+                    this.pendingSubmissions.Remove(submissionId, out submissionContext);
+                }
+
+                if (!submissionContext.Equals(default))
+                {
+                    await this.PrivateSubmit(submissionContext.SubmissionFunc, cancellationToken).ConfigureAwait(false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                await this.HandleCancellation(submissionId, enabler).ConfigureAwait(false);
             }
         }
     }
 
-    private async Task PrivateApply(Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> applyFunc, CancellationToken cancellationToken)
+    /// <summary>
+    /// Disposes the resources used by the ValueSynchronizer.
+    /// </summary>
+    public void Dispose()
     {
-        var postApply = await applyFunc(cancellationToken).ConfigureAwait(false);
+        this.updateEvent.Dispose();
+    }
+
+    private async Task PrivateSubmit(Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> submissionFunc, CancellationToken cancellationToken)
+    {
+        var postApply = await submissionFunc(cancellationToken).ConfigureAwait(false);
 
         switch (postApply)
         {
-            case PostSubmitAction<TParameter, TValue>.Refresh invalidate:
-                this.getCurrentValueTask = this.getValueFunc(invalidate.Parameter, cancellationToken);
-                await this.updateEvent.RaiseAsync(await this.getCurrentValueTask.ConfigureAwait(false), Parallelism.Default, CancellationToken.None);
-                this.invalidateOnIdle = null;
-                break;
-            case PostSubmitAction<TParameter, TValue>.RefreshOnIdle invalidateOnIdle:
+            case PostSubmitAction<TParameter, TValue>.Refresh refresh:
+                {
+                    this.getCurrentValueTask = this.getValueFunc(refresh.Parameter, cancellationToken);
+                    var value = await this.getCurrentValueTask.ConfigureAwait(false);
+                    await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
+                    this.refreshOnIdle = null;
+                    break;
+                }
+
+            case PostSubmitAction<TParameter, TValue>.RefreshOnIdle refreshOnIdle:
                 if (this.pendingSubmissions.IsEmpty)
                 {
-                    this.getCurrentValueTask = this.getValueFunc(invalidateOnIdle.Parameter, cancellationToken);
-                    await this.updateEvent.RaiseAsync(await this.getCurrentValueTask.ConfigureAwait(false), Parallelism.Default, CancellationToken.None);
-                    this.invalidateOnIdle = null;
+                    this.getCurrentValueTask = this.getValueFunc(refreshOnIdle.Parameter, cancellationToken);
+                    var value = await this.getCurrentValueTask.ConfigureAwait(false);
+                    await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
+                    this.refreshOnIdle = null;
                 }
                 else
                 {
-                    this.invalidateOnIdle = invalidateOnIdle;
+                    this.refreshOnIdle = refreshOnIdle;
                 }
 
                 break;
             case PostSubmitAction<TParameter, TValue>.None:
-                if (this.invalidateOnIdle.HasValue)
+                if (this.refreshOnIdle.HasValue)
                 {
-                    this.getCurrentValueTask = this.getValueFunc(this.invalidateOnIdle.Parameter, cancellationToken);
-                    await this.updateEvent.RaiseAsync(await this.getCurrentValueTask.ConfigureAwait(false), Parallelism.Default, CancellationToken.None);
+                    this.getCurrentValueTask = this.getValueFunc(this.refreshOnIdle.Parameter, cancellationToken);
+                    var value = await this.getCurrentValueTask.ConfigureAwait(false);
+                    await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
                 }
 
                 break;
             case PostSubmitAction<TParameter, TValue>.SetValue setValue:
                 this.getCurrentValueTask = Task.FromResult(setValue.Value);
-                await this.updateEvent.RaiseAsync(await this.getCurrentValueTask.ConfigureAwait(false), Parallelism.Default, CancellationToken.None);
+                await this.updateEvent.RaiseAsync(setValue.Value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
                 break;
         }
     }
+
+    private async Task HandleCancellation(object submissionId, Enabler enabler)
+    {
+#if NET7_0_OR_GREATER
+        await enabler.CancelAsync().ConfigureAwait(false);
+#else
+        enabler.Cancel();
+#endif
+        //// using (await this.@lock.LockAsync(CancellationToken.None).ConfigureAwait(false))
+        lock (this.@lock)
+        {
+            this.pendingSubmissions.Remove(submissionId, out var _);
+        }
+    }
+
+    private record struct SubmissionContext(
+        Task SubmissionTask,
+        Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> SubmissionFunc);
 }

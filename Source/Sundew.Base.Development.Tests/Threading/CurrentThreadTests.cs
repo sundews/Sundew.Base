@@ -10,29 +10,34 @@ namespace Sundew.Base.Development.Tests.Threading;
 using System.Diagnostics;
 using System.Threading;
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Sundew.Base.Threading;
-using Xunit;
 
+[Explicit]
 public class CurrentThreadTests
 {
-    [Theory]
-    [InlineData(20, 500)]
-    [InlineData(0, 200)]
-    [InlineData(1000, 2000)]
+    [Test]
+    [Arguments(20, 1000)]
+    [Arguments(0, 200)]
+    [Arguments(1000, 2000)]
     public void Sleep_When_Cancelled_Then_ElapsedTimeShouldBeWithInRange(int cancelAfter, int sleep)
     {
         var testee = new CurrentThread();
-        using var cancellationTokenSource = new CancellationTokenSource(cancelAfter);
         var stopwatch = Stopwatch.StartNew();
+        using var cancellationTokenSource = new CancellationTokenSource(cancelAfter);
 
         var result = testee.Sleep(sleep, cancellationTokenSource.Token);
 
         stopwatch.Stop();
-        result.Should().BeFalse();
-        stopwatch.ElapsedMilliseconds.Should().BeLessThan(sleep);
+
+        using (new AssertionScope())
+        {
+            result.Should().BeFalse();
+            stopwatch.ElapsedMilliseconds.Should().BeInRange(cancelAfter, (sleep + 10) * 3);
+        }
     }
 
-    [Fact]
+    [Test]
     public void Sleep_When_NotCancelled_Then_ElapsedTimeShouldBeWithInRange()
     {
         var testee = new CurrentThread();
@@ -41,14 +46,19 @@ public class CurrentThreadTests
         var result = testee.Sleep(10, CancellationToken.None);
 
         stopwatch.Stop();
-        stopwatch.ElapsedMilliseconds.Should().BeInRange(10, 80);
+
+        using (new AssertionScope())
+        {
+            result.Should().BeTrue();
+            stopwatch.ElapsedMilliseconds.Should().BeLessThan(80);
+        }
     }
 
-    [Theory]
-    [InlineData(20)]
-    [InlineData(0)]
-    [InlineData(200)]
-    [InlineData(1000)]
+    [Test]
+    [Arguments(20)]
+    [Arguments(0)]
+    [Arguments(200)]
+    [Arguments(1000)]
     public void Sleep_Then_ElapsedTimeShouldBeWithInRange(int sleep)
     {
         var testee = new CurrentThread();

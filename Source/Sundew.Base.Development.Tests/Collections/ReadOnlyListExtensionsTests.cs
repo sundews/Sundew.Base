@@ -11,11 +11,10 @@ using System;
 using System.Collections.Generic;
 using AwesomeAssertions;
 using Sundew.Base.Collections;
-using Xunit;
 
 public class ReadOnlyListExtensionsTests
 {
-    [Fact]
+    [Test]
     public void ConvertAll_Then_SourceIsArray_Then_ResultShouldBeExpectedResult()
     {
         var array = new[] { 0, 1, 2, 3, 4 };
@@ -26,7 +25,7 @@ public class ReadOnlyListExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void ConvertAll_Then_SourceIsList_Then_ResultShouldBeExpectedResult()
     {
         var list = new List<int> { 0, 1, 2, 3, 4 };
@@ -37,7 +36,7 @@ public class ReadOnlyListExtensionsTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void HasAny_When_SourceIsListAndHasItems_Then_ResultShouldBeTrue()
     {
         var list = new List<int> { 0, 1, 2, 3, 4 };
@@ -47,7 +46,7 @@ public class ReadOnlyListExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void HasAny_When_SourceIsArrayAndHasItems_Then_ResultShouldBeTrue()
     {
         var list = new int[] { 0, 1, 2, 3, 4 };
@@ -57,7 +56,7 @@ public class ReadOnlyListExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsEmpty_When_SourceIsListAndHasItems_Then_ResultShouldBeTrue()
     {
         var list = new List<int>();
@@ -67,7 +66,7 @@ public class ReadOnlyListExtensionsTests
         result.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void IsEmpty_When_SourceIsArrayAndHasItems_Then_ResultShouldBeTrue()
     {
         var list = Array.Empty<int>();

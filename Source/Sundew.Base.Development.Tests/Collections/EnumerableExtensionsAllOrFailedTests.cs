@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Collections;
 using System.Linq;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Linq;
-using Xunit;
 
 public class EnumerableExtensionsAllOrFailedTests
 {
-    [Fact]
+    [Test]
     public void AllOrFailed_When_Int32AndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new int?[] { 1, 2, 3, 4 };
@@ -31,7 +30,7 @@ public class EnumerableExtensionsAllOrFailedTests
         result.Value.Items.Should().Equal(expectedItems.Cast<int>());
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_Int32AndSelectorHasOneError_Then_ResultShouldBeErrorResult()
     {
         var result = new int?[] { 1, 2, null, 4, null }.AllOrFailed(x =>
@@ -48,7 +47,7 @@ public class EnumerableExtensionsAllOrFailedTests
             .Items.Should().Equal(new[] { new FailedItem<int?>(2, null), new FailedItem<int?>(4, null) });
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_NonNullInt32AndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new int?[] { 1, 2, 3, 4 };
@@ -59,7 +58,7 @@ public class EnumerableExtensionsAllOrFailedTests
             .Items.Should().Equal(expectedItems.Cast<int>());
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_Int32AndSelectorHasOneError_Then_ResultShouldBeNone()
     {
         var result = new int?[] { 1, 2, null, 4, null }.AllOrFailed();
@@ -68,7 +67,7 @@ public class EnumerableExtensionsAllOrFailedTests
             .Items.Should().Equal(new[] { new FailedItem<int?>(2, null), new FailedItem<int?>(4, null) });
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_StringAndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new string?[] { "1", "2", "3", "4" };
@@ -86,7 +85,7 @@ public class EnumerableExtensionsAllOrFailedTests
             .Items.Should().Equal(expectedItems.Cast<string>());
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_StringAndSelectorHasTwoErrors_Then_ResultShouldBeErrorResult()
     {
         var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed(x =>
@@ -102,7 +101,7 @@ public class EnumerableExtensionsAllOrFailedTests
         result.Error.Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_NonNullStringAndSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new string?[] { "1", "2", "3", "4" };
@@ -112,7 +111,7 @@ public class EnumerableExtensionsAllOrFailedTests
         result.Value.Items.Should().Equal(expectedItems.Cast<string>());
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_SelectorHasOneError_Then_ResultShouldBeNothing()
     {
         var result = new string?[] { "1", "2", null, "4", null }.AllOrFailed();
@@ -120,7 +119,7 @@ public class EnumerableExtensionsAllOrFailedTests
         result.Error.Items.Should().Equal(new[] { new FailedItem<string?>(2, null), new FailedItem<string?>(4, null) });
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_NonNullStringSelectorSucceeds_Then_ResultShouldBeAllItemWithExpectedItems()
     {
         var expectedItems = new string?[] { "1", "2", "3", "4" };
@@ -138,7 +137,7 @@ public class EnumerableExtensionsAllOrFailedTests
         result.Value.Items.Should().Equal(expectedItems.Select(x => double.Parse(x!)));
     }
 
-    [Fact]
+    [Test]
     public void AllOrFailed_When_NonNullStringSelectorReturnsError_Then_ResultShouldBeFailedWithFailedItems()
     {
         var expectedItems = new string?[] { "1", "2", null, "4", null };

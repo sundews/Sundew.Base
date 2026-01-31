@@ -5,32 +5,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+#pragma warning disable SA1302
 #pragma warning disable SA1402
 #pragma warning disable SA1201 // Elements should appear in the correct order
-namespace Sundew.Base.Development.Tests.Migrations;
+namespace Sundew.Base.Development.Tests.Migrations.System_Text_Json;
 
-using System.Collections.Generic;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
-using AwesomeAssertions;
-using Sundew.Base.Migrations;
-using Sundew.Base.Migrations.System.Text.Json;
-using Sundew.DiscriminatedUnions;
-using Xunit;
+using System;
+using global::AwesomeAssertions;
+using global::Sundew.Base.Migrations;
+using global::Sundew.Base.Migrations.System.Text.Json;
+using global::Sundew.DiscriminatedUnions;
+using global::System.Collections.Generic;
+using global::System.Text.Json;
+using global::System.Threading;
+using global::System.Threading.Tasks;
 
 public class MigrationTests
 {
-    [Fact]
+    [Test]
     public async Task Migrate_When_MigratingV1_Then_ResultShouldBeValidV3()
     {
         var personDefaultsProvider = new PersonValueProvider(new AddressValueProvider());
-        var testee = new Migrator<Person, Person.V3, IPersonValueProvider>(personDefaultsProvider);
+        var testee = new Migrator<PersonDto, Person, IPersonValueProvider>(personDefaultsProvider);
 
-        var person = new Person.V1("John");
-        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<Person>() } };
-        var person_text = JsonSerializer.Serialize<Person>(person, jsonSerializerOptions);
-        var person_deserialized = JsonSerializer.Deserialize<Person>(person_text, jsonSerializerOptions)!;
+        var person = new PersonDto.V1("John");
+        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<PersonDto>() } };
+        var person_text = JsonSerializer.Serialize<PersonDto>(person, jsonSerializerOptions);
+        var person_deserialized = JsonSerializer.Deserialize<PersonDto>(person_text, jsonSerializerOptions)!;
 
         var migrationResult = await testee.Migrate(person_deserialized);
 
@@ -41,16 +42,16 @@ public class MigrationTests
         migrationResult.Value.Age.Should().Be(0);
     }
 
-    [Fact]
+    [Test]
     public async Task Migrate_When_MigratingV2_Then_ResultShouldBeValidV3()
     {
         var personDefaultsProvider = new PersonValueProvider(new AddressValueProvider());
-        var testee = new Migrator<Person, Person.V3, IPersonValueProvider>(personDefaultsProvider);
+        var testee = new Migrator<PersonDto, Person, IPersonValueProvider>(personDefaultsProvider);
 
-        var person = new Person.V2("John", "Doe", new Address.V1("Some Street", "Some Number", "Some Code", "Some City"));
-        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<Person>() } };
-        var person_text = JsonSerializer.Serialize<Person>(person, jsonSerializerOptions);
-        var person_deserialized = JsonSerializer.Deserialize<Person>(person_text, jsonSerializerOptions)!;
+        var person = new PersonDto.V2("John", "Doe", new Address.V1("Some Street", "Some Number", "Some Code", "Some City"));
+        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<PersonDto>() } };
+        var person_text = JsonSerializer.Serialize<PersonDto>(person, jsonSerializerOptions);
+        var person_deserialized = JsonSerializer.Deserialize<PersonDto>(person_text, jsonSerializerOptions)!;
 
         var migrationResult = await testee.Migrate(person_deserialized);
 
@@ -61,16 +62,16 @@ public class MigrationTests
         migrationResult.Value.Age.Should().Be(0);
     }
 
-    [Fact]
+    [Test]
     public async Task Migrate_When_MigratingV3_Then_ResultShouldBeValidV3()
     {
         var personDefaultsProvider = new PersonValueProvider(new AddressValueProvider());
-        var testee = new Migrator<Person, Person.V3, IPersonValueProvider>(personDefaultsProvider);
+        var testee = new Migrator<PersonDto, Person, IPersonValueProvider>(personDefaultsProvider);
 
-        var person = new Person.V3("John", "Doe", 45, new Address.V2("Some Street", "Some Number", "Some Code", "Some City", "Some Apartment", "Some second line"));
-        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<Person>() } };
-        var person_text = JsonSerializer.Serialize<Person>(person, jsonSerializerOptions);
-        var person_deserialized = JsonSerializer.Deserialize<Person>(person_text, jsonSerializerOptions)!;
+        var person = new Person("John", "Doe", 45, new Address.V2("Some Street", "Some Number", "Some Code", "Some City", "Some Apartment", "Some second line"));
+        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<PersonDto>() } };
+        var person_text = JsonSerializer.Serialize<PersonDto>(person, jsonSerializerOptions);
+        var person_deserialized = JsonSerializer.Deserialize<PersonDto>(person_text, jsonSerializerOptions)!;
 
         var migrationResult = await testee.Migrate(person_deserialized);
 
@@ -81,16 +82,16 @@ public class MigrationTests
         migrationResult.Value.Age.Should().Be(person.Age);
     }
 
-    [Fact]
+    [Test]
     public async Task Migrate_When_MigratingList_Then_ResultShouldBeValidListOfV3()
     {
         var personDefaultsProvider = new PersonValueProvider(new AddressValueProvider());
-        var testee = new Migrator<Person, Person.V3, IPersonValueProvider>(personDefaultsProvider);
+        var testee = new Migrator<PersonDto, Person, IPersonValueProvider>(personDefaultsProvider);
 
-        var persons = new Person[] { new Person.V1("John"), new Person.V2("Jane", "Doe", new Address.V1("Some Street", "Some Number", "Some Code", "Some City")), new Person.V3("John", "Doe", 30, new Address.V2("Some Street", "Some Number", "Some Code", "Some City", "Some Apartment", "Some second line")) };
-        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<Person>() } };
+        var persons = new PersonDto[] { new PersonDto.V1("John"), new PersonDto.V2("Jane", "Doe", new Address.V1("Some Street", "Some Number", "Some Code", "Some City")), new Person("John", "Doe", 30, new Address.V2("Some Street", "Some Number", "Some Code", "Some City", "Some Apartment", "Some second line")) };
+        var jsonSerializerOptions = new JsonSerializerOptions { Converters = { new MigratableJsonConverter<PersonDto>() } };
         var persons_text = JsonSerializer.Serialize(persons, jsonSerializerOptions);
-        var persons_deserialized = JsonSerializer.Deserialize<Person[]>(persons_text, jsonSerializerOptions)!;
+        var persons_deserialized = JsonSerializer.Deserialize<PersonDto[]>(persons_text, jsonSerializerOptions)!;
 
         var migrationResult = await testee.Migrate(persons_deserialized);
 
@@ -100,26 +101,26 @@ public class MigrationTests
 }
 
 [DiscriminatedUnion]
-public abstract partial record Person : IMigratable<Person, IPersonValueProvider>
+public abstract partial record PersonDto : IMigratable<PersonDto, IPersonValueProvider>
 {
-    public sealed record V1(string Name) : Person;
+    public sealed record V1(string Name) : PersonDto;
 
-    public sealed record V2(string Name, string LastName, Address.V1? Address) : Person;
+    public sealed record V2(string Name, string LastName, Address.V1? Address) : PersonDto;
 
-    public sealed record V3(string Name, string LastName, int Age, Address.V2? Address) : Person;
-
-    public static async ValueTask<MigrationResult<Person>> Migrate(Person person, IPersonValueProvider valueProvider, CancellationToken cancellationToken)
+    public static async ValueTask<MigrationResult<PersonDto>> Migrate(PersonDto personDto, IPersonValueProvider valueProvider, CancellationToken cancellationToken)
     {
-        return person switch
+        return personDto switch
         {
-            V1 v1 => new MigrationResult<Person>(MigrationOutcome.Migrated, new V2(v1.Name, valueProvider.GetDefaultLastName(), await valueProvider.GetAddressV1(v1.Name, valueProvider.GetDefaultLastName()))),
-            V2 v2 => new MigrationResult<Person>(MigrationOutcome.Migrated, new V3(v2.Name, v2.LastName, valueProvider.GetDefaultAge(), await valueProvider.GetAddressV2(v2.Address, v2.Name, v2.LastName))),
-            V3 v3 => new MigrationResult<Person>(MigrationOutcome.Migrated, v3),
+            V1 v1 => new MigrationResult<PersonDto>(MigrationOutcome.Migrated, new V2(v1.Name, valueProvider.GetDefaultLastName(), await valueProvider.GetAddressV1(v1.Name, valueProvider.GetDefaultLastName()))),
+            V2 v2 => new MigrationResult<PersonDto>(MigrationOutcome.Migrated, new Person(v2.Name, v2.LastName, valueProvider.GetDefaultAge(), await valueProvider.GetAddressV2(v2.Address, v2.Name, v2.LastName))),
+            Person person => new MigrationResult<PersonDto>(MigrationOutcome.Migrated, person),
         };
     }
 
-    public static IReadOnlyCollection<MigrationInfo> GetMigrationInfo() => DiscriminatedUnionMigrations.FromVersionNamedUnion<Person>();
+    public static IReadOnlyCollection<MigrationInfo> GetMigrationInfo() => DiscriminatedUnionMigrations.FromVersionNamedUnion<PersonDto>();
 }
+
+public sealed record Person(string Name, string LastName, int Age, Address.V2? Address) : PersonDto;
 
 [DiscriminatedUnion]
 public abstract record Address

@@ -11,11 +11,10 @@ using System.Collections.Immutable;
 using System.Globalization;
 using AwesomeAssertions;
 using Sundew.Base.Collections.Linq;
-using Xunit;
 
 public class ImmutableListTests
 {
-    [Fact]
+    [Test]
     public void AddAllIfSuccess_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { 1, 4 };
@@ -28,7 +27,7 @@ public class ImmutableListTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void AddFailedIfError_When_InputIsStruct_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { -1 };
@@ -42,7 +41,7 @@ public class ImmutableListTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void AddFailedIfError_When_InputIsClass_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { "-1" };
@@ -64,7 +63,7 @@ public class ImmutableListTests
         result.Should().Equal(expectedResult);
     }
 
-    [Fact]
+    [Test]
     public void AddFailedIfAnyError_When_InputIsClass_Then_ResultShouldBeExpectedResult()
     {
         var expectedResult = new[] { "0" };

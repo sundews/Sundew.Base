@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 /// <seealso cref="Sundew.Base.Threading.ICurrentThread" />
 public sealed class CurrentThread : ICurrentThread
 {
+    private static readonly TimeSpan ShortSleep = TimeSpan.FromMilliseconds(100);
+
     /// <summary>
     /// Gets the managed thread identifier.
     /// </summary>
@@ -71,26 +73,23 @@ public sealed class CurrentThread : ICurrentThread
     /// <returns><c>true</c>, if sleep completed, otherwise <c>false</c>.</returns>
     public bool Sleep(TimeSpan timeSpan, CancellationToken cancellationToken)
     {
-        var cancelSignal = new object();
-        lock (cancelSignal)
+        if (cancellationToken.IsCancellationRequested)
         {
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return false;
-            }
-
-            using (cancellationToken.Register(() =>
-            {
-                lock (cancelSignal)
-                {
-                    Monitor.Pulse(cancelSignal);
-                }
-            }))
-            {
-                var completedWait = Monitor.Wait(cancelSignal, timeSpan);
-                return !completedWait;
-            }
+            return false;
         }
+
+        if (cancellationToken == CancellationToken.None)
+        {
+            Thread.Sleep(timeSpan);
+            return !cancellationToken.IsCancellationRequested;
+        }
+
+        if (timeSpan <= ShortSleep)
+        {
+            Thread.Sleep(1);
+        }
+
+        return !cancellationToken.WaitHandle.WaitOne(timeSpan);
     }
 
     /// <summary>

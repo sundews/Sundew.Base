@@ -10,15 +10,14 @@ namespace Sundew.Base.Development.Tests.Numeric;
 using System.Globalization;
 using AwesomeAssertions;
 using Sundew.Base.Numeric;
-using Xunit;
 
 public class PercentageTests
 {
-    [Theory]
-    [InlineData("-3.5%", "en-US", -0.035)]
-    [InlineData("1.5%", "en-US", 0.015)]
-    [InlineData("-3,5 %", "da-DK", -0.035)]
-    [InlineData("1,5 %", "da-DK", 0.015)]
+    [Test]
+    [Arguments("-3.5%", "en-US", -0.035)]
+    [Arguments("1.5%", "en-US", 0.015)]
+    [Arguments("-3,5 %", "da-DK", -0.035)]
+    [Arguments("1,5 %", "da-DK", 0.015)]
     public void Parse_When_CultureInfoIsSpecified_Then_ResultShouldBeExpectedResult(string input, string culture, double expectedResult)
     {
         var result = Percentage.Parse(input, new CultureInfo(culture));

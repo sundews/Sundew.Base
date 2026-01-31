@@ -11,13 +11,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using Microsoft.VisualStudio.Threading;
 using Sundew.Base.Threading;
 using Telerik.JustMock;
-using Xunit;
+using AsyncManualResetEvent = Microsoft.VisualStudio.Threading.AsyncManualResetEvent;
 
 public class QuestTests
 {
-    [Fact]
+    [Test]
     public async Task Start_When_Completed_Then_IsCompletedSuccessfullyShouldBeTrue()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -26,7 +27,7 @@ public class QuestTests
         quest.Task.IsCompletedSuccessfully.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_TaskIsRunningAndCanceled_Then_IsCanceledShouldBeTrue()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -50,7 +51,7 @@ public class QuestTests
         quest.Task.IsCanceled.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_TaskIsRunningAndExceptionThrow_Then_IsFaultedShouldBeTrue()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -69,7 +70,7 @@ public class QuestTests
         quest.Task.IsFaulted.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_UnstartedAndCanceled_Then_IsCanceledShouldBeTrue()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -93,7 +94,7 @@ public class QuestTests
         quest.Task.IsCanceled.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_UnstartedTaskAndExceptionThrow_Then_IsFaultedShouldBeTrue()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -112,7 +113,7 @@ public class QuestTests
         quest.Task.IsFaulted.Should().BeTrue();
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_GuideIsDisposable_Then_DisposeShouldBeCalledOnce()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -127,7 +128,7 @@ public class QuestTests
         Mock.Assert(() => mock.Dispose(), Occurs.Once());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_GuideAndDisposableAreTheSame_Then_DisposeShouldBeCalledOnce()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -143,7 +144,7 @@ public class QuestTests
         Mock.Assert(() => mock.Dispose(), Occurs.Once());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_GuideAndDisposableAreDifferent_Then_DisposeShouldBeCalledOnceForEach()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -161,7 +162,7 @@ public class QuestTests
         Mock.Assert(() => mock2.Dispose(), Occurs.Once());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_GuideAndDisposableAreDifferentAndResultIsDisposableButQuestNotStarted_Then_DisposeShouldBeCalledOnceButNotForResult()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -181,7 +182,7 @@ public class QuestTests
         Mock.Assert(() => mock3.Dispose(), Occurs.Never());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_GuideAndDisposableAreDifferentAndResultIsDisposableAndQuestStarted_Then_DisposeShouldBeCalledOnceForAll()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -202,7 +203,7 @@ public class QuestTests
         Mock.Assert(() => mock3.Dispose(), Occurs.Never());
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_AsyncAndCompleted_Then_IsCompletedSuccessfullyShouldBeTrueAndResultShouldBeExpected()
     {
         const int expected = 42;
@@ -222,7 +223,7 @@ public class QuestTests
         (await quest.Task).Should().Be(expected);
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_Completed_Then_IsCompletedSuccessfullyShouldBeTrueAndResultShouldBeExpected()
     {
         const int expected = 42;
@@ -242,16 +243,16 @@ public class QuestTests
         (await quest.Task).Should().Be(expected);
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_TaskIsRunningAndCanceledShortlyAfter_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
     {
-        var manualResetEvent = new ManualResetEventAsync();
+        var manualResetEvent = new AsyncManualResetEvent();
         using var cancellationTokenSource = new CancellationTokenSource();
         var quest = Quest.Create(
             __._,
-            Task.Run(() =>
+            Task.Run(async () =>
             {
-                manualResetEvent.Wait(TimeSpan.FromMilliseconds(2000));
+                await manualResetEvent.WaitAsync();
                 return 42;
             }),
             cancellationTokenSource.Token);
@@ -271,7 +272,7 @@ public class QuestTests
         await result.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_TaskIsRunningAndCanceled_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -298,7 +299,7 @@ public class QuestTests
         await result.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_TaskIsRunningAndExceptionThrow_Then_IsFaultedShouldBeTrueAndResultShouldThrow()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -320,7 +321,7 @@ public class QuestTests
         await result.Should().ThrowAsync<AggregateException>();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_UnstartedAndCanceled_Then_IsCanceledShouldBeTrueAndResultShouldThrow()
     {
         const int expected = 42;
@@ -348,7 +349,7 @@ public class QuestTests
         await result.Should().ThrowAsync<OperationCanceledException>();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_UnstartedTaskAndExceptionThrow_Then_IsFaultedShouldBeTrueAndResultShouldThrow()
     {
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -370,7 +371,7 @@ public class QuestTests
         await result.Should().ThrowAsync<AggregateException>();
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_MappedAndCompleted_Then_IsCompletedSuccessfullyShouldBeTrueAndResultShouldBeExpected()
     {
         const int expected = 42;
@@ -393,7 +394,7 @@ public class QuestTests
         (await newQuest.Task).Should().Be(expected.ToString());
     }
 
-    [Fact]
+    [Test]
     public async Task Start_When_TriggeredAncestorAndCompleted_Then_IsCompletedSuccessfullyShouldBeTrueAndResultShouldBeExpected()
     {
         const int expected = 42;
@@ -416,7 +417,7 @@ public class QuestTests
         (await newQuest.Task).Should().Be(expected.ToString());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_MappedAndGuideIsDisposable_Then_DisposeShouldBeCalledOnce()
     {
         const int expected = 42;
@@ -434,7 +435,7 @@ public class QuestTests
         Mock.Assert(() => mock.Dispose(), Occurs.Once());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_MappedAndGuideAndDisposableAreTheSame_Then_DisposeShouldBeCalledOnce()
     {
         const int expected = 42;
@@ -453,7 +454,7 @@ public class QuestTests
         Mock.Assert(() => mock.Dispose(), Occurs.Once());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_MappedAndGuideAndDisposableAreDifferent_Then_DisposeShouldBeCalledOnceForEach()
     {
         const int expected = 42;
@@ -474,7 +475,7 @@ public class QuestTests
         Mock.Assert(() => mock2.Dispose(), Occurs.Once());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableButQuestNot_Then_DisposeShouldBeCalledOnceButNotForResult()
     {
         const int expected = 42;
@@ -497,7 +498,7 @@ public class QuestTests
         Mock.Assert(() => mock3.Dispose(), Occurs.Never());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndQuestStarted_Then_DisposeShouldNotBeCalledForResults()
     {
         const int expected = 42;
@@ -521,7 +522,7 @@ public class QuestTests
         Mock.Assert(() => mock3.Dispose(), Occurs.Never());
     }
 
-    [Fact]
+    [Test]
     public void Dispose_When_MappedAndGuideAndDisposableAreDifferentAndResultIsDisposableAndNewResultIsDisposableQuestStarted_Then_DisposeShouldNotBeCalledForResults()
     {
         using var cancellationTokenSource = new CancellationTokenSource();

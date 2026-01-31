@@ -11,34 +11,46 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using Sundew.Base.Threading;
-using Xunit;
+
 using SingleThreadedSynchronizationContext = Microsoft.VisualStudio.Threading.SingleThreadedSynchronizationContext;
 
+[Repeat(100)]
 public class SynchronizationContextTests
 {
-    [Fact]
-    public async Task SendAsync()
+    [Test]
+    public async Task SendAsync_When_CalledMultipleTimesOnASingleThreadedSynchronizationContext_Then_AllShouldRunOnTheSameThread()
     {
         var currentThread = new CurrentThread();
         var expectedThreadId = currentThread.ManagedThreadId;
         var currentThreadList = new List<int> { currentThread.ManagedThreadId };
         var synchronizationContext = new SingleThreadedSynchronizationContext();
         var frame = new SingleThreadedSynchronizationContext.Frame();
+        var pumpStarted = new TaskCompletionSource<bool>();
+
         var task = Task.Run(async () =>
         {
+            // Wait for pump to start
+#pragma warning disable VSTHRD003
+            await pumpStarted.Task;
+#pragma warning restore VSTHRD003
+
             await synchronizationContext.SendAsync(() =>
             {
                 currentThreadList.Add(currentThread.ManagedThreadId);
             });
+
+            await synchronizationContext.SendAsync(() =>
+            {
+                currentThreadList.Add(currentThread.ManagedThreadId);
+            });
+
             frame.Continue = false;
         });
 
+        // Signal that pump is about to start
+        pumpStarted.SetResult(true);
         synchronizationContext.PushFrame(frame);
         await task.ConfigureAwait(true);
-        await synchronizationContext.SendAsync(() =>
-        {
-            currentThreadList.Add(currentThread.ManagedThreadId);
-        });
 
         currentThreadList.Should().Equal(new List<int> { expectedThreadId, expectedThreadId, expectedThreadId });
     }

@@ -35,6 +35,7 @@
   <Project Path="Sundew.Base.Computation/Sundew.Base.Computation.csproj" />
   <Project Path="Sundew.Base.Disposal/Sundew.Base.Disposal.csproj" />
   <Project Path="Sundew.Base.Equality/Sundew.Base.Equality.csproj" />
+  <Project Path="Sundew.Base.Globalization/Sundew.Base.Globalization.csproj" />
   <Project Path="Sundew.Base.Initialization/Sundew.Base.Initialization.csproj" />
   <Project Path="Sundew.Base.IO/Sundew.Base.IO.csproj" />
   <Project Path="Sundew.Base.Memory/Sundew.Base.Memory.csproj" />

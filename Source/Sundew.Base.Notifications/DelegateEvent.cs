@@ -92,7 +92,7 @@ public sealed class DelegateEvent<TEvent> : IDisposable
     /// <returns>A ValueTask that represents the asynchronous operation of invoking all event handlers.</returns>
     public async ValueTask RaiseAsync(TEvent @event, Parallelism parallelism, CancellationToken cancellationToken = default)
     {
-        await this.handlers.ForEachAsync(parallelism, handler => handler(@event, cancellationToken));
+        await this.handlers.ForEachAsync(parallelism, handler => handler(@event, cancellationToken)).ConfigureAwait(false);
     }
 
     /// <summary>

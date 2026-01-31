@@ -10,11 +10,10 @@ namespace Sundew.Base.Development.Tests.Disposal;
 using System.Threading;
 using AwesomeAssertions;
 using Sundew.Base.Disposal;
-using Xunit;
 
 public class DisposeActionTests
 {
-    [Fact]
+    [Test]
     public void Dispose_When_Awaiting_Then_ManualResetEventShouldBeSet()
     {
         var manualResetEvent = new ManualResetEventSlim(false);
