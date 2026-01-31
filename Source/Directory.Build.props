@@ -34,6 +34,7 @@
 7.0 - Split into separate packages and cleanup
     </PackageReleaseNotes>
     <Configurations>Debug;Release;Debug-Publish;Release-Publish;Release-Stable</Configurations>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
     <IncludeSymbols>true</IncludeSymbols>

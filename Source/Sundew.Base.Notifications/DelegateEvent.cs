@@ -78,7 +78,7 @@ public sealed class DelegateEvent<TEvent> : IDisposable
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
     public void Raise(TEvent @event, Parallelism parallelism, CancellationToken cancellationToken = default)
     {
-        this.RaiseAsync(@event, parallelism, cancellationToken).GetAwaiter().GetResult();
+        this.RaiseAsync(@event, parallelism, cancellationToken).AsTask().GetAwaiter().GetResult();
     }
 
     /// <summary>

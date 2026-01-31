@@ -182,6 +182,7 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     public void Dispose()
     {
         this.updateEvent.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     private async Task PrivateSubmit(Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> submissionFunc, CancellationToken cancellationToken)
