@@ -19,20 +19,20 @@
     <PackageVersion Include="Paket.Core" Version="9.0.2" />
     <PackageVersion Include="PolySharp" Version="1.15.0" />
     <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
-    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.4.0" />
+    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="5.4.1" />
     <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.12" />
     <PackageVersion Include="System.Reactive" Version="6.1.0" />
     <PackageVersion Include="System.Reflection.Metadata" Version="9.0.4" />
     <PackageVersion Include="System.Security.Permissions" Version="10.0.2" />
     <PackageVersion Include="TransparentMoq" Version="4.20.70.2" />
-    <PackageVersion Include="TUnit" Version="1.12.102" />
+    <PackageVersion Include="TUnit" Version="1.12.111" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' != 'net6.0'">
     <PackageVersion Include="System.Collections.Immutable" Version="10.0.2" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0'">
     <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
-    <PackageVersion Update="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageVersion Update="Microsoft.Bcl.AsyncInterfaces" Version="10.0.2" />
     <PackageVersion Update="Microsoft.VisualStudio.Threading.Only" Version="17.13.61" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
