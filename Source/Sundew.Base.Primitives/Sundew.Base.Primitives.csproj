@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-		<PackageReference Include="Sundew.DiscriminatedUnions"  />
+		<PackageReference Include="Sundew.DiscriminatedUnions" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces"  />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" />
 	</ItemGroup>
 
   <ItemGroup>

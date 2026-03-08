@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
+    <Description>The IReporter interface for assisting with implementation of reporter/loggers.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Sundew.Base.Collections.Immutable\Sundew.Base.Collections.Immutable.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
+  </ItemGroup>
+
+</Project>
