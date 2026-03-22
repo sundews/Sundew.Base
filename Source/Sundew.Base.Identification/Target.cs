@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Text;
 
 /// <summary>
@@ -22,11 +21,11 @@ using System.Text;
 public sealed record Target(Source Source, Path? Path) : IParsable<Target>
 {
     /// <summary>
-    /// Parses the specified input string into an instance of the <see cref="Arguments"/> type.
+    /// Parses the specified input string into an instance of the <see cref="ValueIds"/> type.
     /// </summary>
     /// <param name="inputTarget">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="Target"/>> type.</param>
     /// <param name="formatProvider">The format formatProvider.</param>
-    /// <returns>An instance of Argument that represents the parsed value from the input string.</returns>
+    /// <returns>An instance of ValueId that represents the parsed value from the input string.</returns>
     /// <exception cref="FormatException">Thrown if the input string is not in a valid format for the <see cref="Target"/>> type.</exception>
     public static Target Parse(string inputTarget, IFormatProvider? formatProvider)
     {
@@ -39,7 +38,7 @@ public sealed record Target(Source Source, Path? Path) : IParsable<Target>
     }
 
     /// <summary>
-    /// Tries to parse the specified input string into an instance of the <see cref="Arguments"/> type.
+    /// Tries to parse the specified input string into an instance of the <see cref="ValueIds"/> type.
     /// </summary>
     /// <param name="inputTarget">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="Target"/>> type.</param>
     /// <param name="formatProvider">The format provider.</param>
@@ -54,9 +53,9 @@ public sealed record Target(Source Source, Path? Path) : IParsable<Target>
             {
                 var targetString = inputTarget.Substring(0, argumentsSeparatorIndex);
                 var argumentsString = inputTarget.Substring(argumentsSeparatorIndex + 1);
-                if (Source.TryParse(targetString, formatProvider, out var entry) && Path.TryParse(argumentsString, formatProvider, out var path))
+                if (Source.TryParse(targetString, formatProvider, out var entry) /* && Path.TryParse(argumentsString, formatProvider, out var path)*/)
                 {
-                    result = new Target(entry, path);
+                    result = new Target(entry, null);
                     return true;
                 }
             }
@@ -121,7 +120,7 @@ public sealed record Target(Source Source, Path? Path) : IParsable<Target>
     /// <returns>A result containing the input types if successful.</returns>
     public R<IReadOnlyList<Type>> TryGetInputTypes()
     {
-        return TargetEvaluator.GetInputTypes(this.Source, this.Path);
+        return TargetEvaluator.GetInputTypes(this.Source, this.Path, null);
     }
 
     /// <summary>
@@ -131,27 +130,5 @@ public sealed record Target(Source Source, Path? Path) : IParsable<Target>
     public R<Type> TryGetContainingType()
     {
         return TargetEvaluator.GetDeclaringType(this.Source, this.Path);
-    }
-
-    /// <summary>
-    /// Gets an <see cref="Target"/> from the specified source and expression.
-    /// </summary>
-    /// <typeparam name="TSource">The source type.</typeparam>
-    /// <param name="targetExpression">The target expression.</param>
-    /// <returns>A new <see cref="Target"/>.</returns>
-    public static Target From<TSource>(Expression<Action<TSource>> targetExpression)
-    {
-        return new Target(Source.FromType(typeof(TSource)), Path.From(targetExpression));
-    }
-
-    /// <summary>
-    /// Gets an <see cref="Target"/> from the specified source and expression.
-    /// </summary>
-    /// <typeparam name="TSource">The source type.</typeparam>
-    /// <param name="targetExpression">The target expression.</param>
-    /// <returns>A new <see cref="Target"/>.</returns>
-    public static Target From<TSource>(Expression<Func<TSource, object>> targetExpression)
-    {
-        return new Target(Source.FromType(typeof(TSource)), Path.From(targetExpression));
     }
 }

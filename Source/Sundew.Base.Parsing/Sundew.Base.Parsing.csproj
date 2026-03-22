@@ -2,12 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>net10.0;net9.0;net8.0</TargetFrameworks>
-    <Description>The AIdRoute, AId and ValueId for generic identification.</Description>
+    <Description>The common concepts for implementing a parser.</Description>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Sundew.Base.Collections.Immutable\Sundew.Base.Collections.Immutable.csproj" />
-    <ProjectReference Include="..\Sundew.Base.Parsing\Sundew.Base.Parsing.csproj" />
     <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
   </ItemGroup>
 

@@ -8,12 +8,8 @@
 namespace Sundew.Base.Identification;
 
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq.Expressions;
-using System.Reflection;
 using System.Text;
 using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Text;
@@ -22,14 +18,11 @@ using Sundew.Base.Text;
 /// Represents a path composed of multiple segments separated by a forward slash ('/').
 /// </summary>
 /// <param name="Segments">The collection of segments that make up the path, in order from root to leaf.</param>
-public sealed record Path(ValueArray<string> Segments) : IParsable<Path>
+public sealed record Path(ValueArray<Segment> Segments)
 {
     /// <summary>The path separator.</summary>
     public const char Separator = '/';
-
-    /// <summary>The parameter separator.</summary>
-    public const char ParameterSeparator = ',';
-
+ /*
     /// <summary>
     /// Get the <see cref="Path"/> from input path.
     /// </summary>
@@ -45,7 +38,7 @@ public sealed record Path(ValueArray<string> Segments) : IParsable<Path>
     /// </summary>
     /// <param name="inputPath">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="Path"/>> type.</param>
     /// <param name="formatProvider">The format provider.</param>
-    /// <returns>An instance of Argument that represents the parsed value from the input string.</returns>
+    /// <returns>An instance of ValueId that represents the parsed value from the input string.</returns>
     /// <exception cref="FormatException">Thrown if the input string is not in a valid format for the <see cref="Path"/>> type.</exception>
     public static Path Parse(string inputPath, IFormatProvider? formatProvider)
     {
@@ -78,7 +71,7 @@ public sealed record Path(ValueArray<string> Segments) : IParsable<Path>
 
         result = null;
         return false;
-    }
+    }*/
 
     /// <summary>
     /// Appends this <see cref="Path"/> to the specified <see cref="StringBuilder"/>.
@@ -87,7 +80,7 @@ public sealed record Path(ValueArray<string> Segments) : IParsable<Path>
     /// <param name="formatProvider">The format provider.</param>
     public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider)
     {
-        stringBuilder.AppendJoin(Separator, this.Segments);
+        stringBuilder.AppendItems(this.Segments, (builder, segment) => segment.AppendInto(builder, formatProvider), Separator);
     }
 
     /// <summary>
@@ -98,50 +91,6 @@ public sealed record Path(ValueArray<string> Segments) : IParsable<Path>
     {
         var stringBuilder = new StringBuilder();
         this.AppendInto(stringBuilder, CultureInfo.CurrentCulture);
-        return stringBuilder.ToString();
-    }
-
-    /// <summary>
-    /// Gets a <see cref="Path"/> for the specified expression.
-    /// </summary>
-    /// <param name="pathExpression">The path expression.</param>
-    /// <returns>A new <see cref="Path"/>.</returns>
-    public static Path From(Expression pathExpression)
-    {
-        var segments = ImmutableArray.CreateBuilder<string>();
-        EvaluateToPath(pathExpression);
-
-        return new Path(segments.ToImmutable());
-
-        void EvaluateToPath(Expression expression)
-        {
-            switch (expression)
-            {
-                case LambdaExpression lambdaExpression:
-                    EvaluateToPath(lambdaExpression.Body);
-                    break;
-                case MethodCallExpression methodCallExpression:
-                    segments.Add($"{methodCallExpression.Method.Name}({GetParameters(methodCallExpression.Method.GetParameters())})");
-                    break;
-                case MemberExpression memberExpression:
-                    if (memberExpression.Expression.HasValue)
-                    {
-                        EvaluateToPath(memberExpression.Expression);
-                    }
-
-                    segments.Add(memberExpression.Member.Name);
-                    break;
-                case UnaryExpression unaryExpression:
-                    EvaluateToPath(unaryExpression.Operand);
-                    break;
-            }
-        }
-    }
-
-    private static string GetParameters(ParameterInfo[] parameterInfos)
-    {
-        var stringBuilder = new StringBuilder();
-        stringBuilder.AppendItems(parameterInfos, (stringBuilder, parameter) => stringBuilder.Append(TargetEvaluator.GetTypeName(parameter.ParameterType)), ParameterSeparator);
         return stringBuilder.ToString();
     }
 }

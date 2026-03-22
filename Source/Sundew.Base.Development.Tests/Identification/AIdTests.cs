@@ -28,10 +28,16 @@ public class AIdTests
         Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(person,description)?Person=(Address=Home,Number=15)&Description=(Eyes=Blue)", UriKind.Absolute, out var uri6);
         Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(person,description)?Person={Address=Home,Number=15}&Description={Eyes=Blue}", UriKind.Absolute, out var uri7);
         Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(Person,Description[])?person={Address=Home,Number=15}&description={Eyes=Blue}", UriKind.Absolute, out var uri8);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(Person,IList[Description])?person=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri9);
+        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(person,IList[Description])?person=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri9);
+        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(person,descriptions)?person=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri10);
+        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Find(query,descriptions)?Query!Name.Name.Space$Assembly=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri11);
+        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested.Name.Space$Assembly/Start(!Name.Name.Space$Assembly=15)/Find?!Name.Name.Space$Assembly=(Address=Home,Number=15)&string[]=[Blue,Green]", UriKind.Absolute, out var uri12);
         var t1 = Uri.EscapeUriString(uri6!.OriginalString);
         var t2 = Uri.EscapeUriString(uri8!.OriginalString);
         var t3 = Uri.EscapeUriString(uri9!.OriginalString);
+        var t4 = Uri.EscapeUriString(uri10!.OriginalString);
+        var t5 = Uri.EscapeUriString(uri11!.OriginalString);
+        var t6 = Uri.EscapeUriString(uri12!.OriginalString);
     }
 
     [Test]
@@ -42,7 +48,9 @@ public class AIdTests
     [Arguments("Name+Nested.Namespace$Assembly/Some.Path?Name=John&LastName=Doe")]
     [Arguments("Name+Nested.Name.Space$Assembly/Find?Person=(Address=Home,Number=15)&Description=(Eyes=Blue)")]
     [Arguments("Name+Nested.Name.Space$Assembly/Find(Person,Description)?person=(Address=Home,Number=15)&description=(Eyes=Blue)")]
-    [Arguments("Name+Nested.Name.Space$Assembly/Find(Person,IList[Description])?person=(Address=Home,Number=15)&descriptions=[Blue,Green]")]
+    [Arguments("Name+Nested.Name.Space$Assembly/Find((Address=Home,Number=15)&descriptions=[Blue,Green])")]
+    [Arguments("Name+Nested.Name.Space$Assembly/Find(Query!Name.Name.Space$Assembly=(Address=Home,Number=15)&descriptions=[Blue,Green])")]
+    [Arguments("Name+Nested.Name.Space$Assembly/Find(!Name.Name.Space$Assembly=(Address=Home,Number=15)&descriptions=[Blue,Green])")]
     public void Parse_Then_ResultShouldNotBeNull(string input)
     {
         var result = AId.Parse(input, CultureInfo.InvariantCulture);
@@ -73,8 +81,24 @@ public class AIdTests
     [Test]
     public void From_When_TargetIsMethodWith1Parameter_Then_ResultShouldNotBeNull()
     {
-        const string expectedResult = "AIdTests+INavigator.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate(AIdTests+Position)";
-        var result = AId.From<INavigator>(x => x.Navigate(null!));
+        const string expectedResult = "AIdTests+INavigator.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo((position!AIdTests+Position.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null))";
+        var result = AId.From<INavigator>(x => x.NavigateTo(null!));
+
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.ToString().Should().Be(expectedResult);
+            result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
+            result.TryGetResultType().Value.Should().Be(typeof(void));
+            result.TryGetTargetContainingType().Value.Should().Be(typeof(INavigator));
+        }
+    }
+
+    [Test]
+    public void From_When_TargetIsMethodWith1Parameter_Then_ResultShouldNotBeNull2()
+    {
+        const string expectedResult = "AIdTests+INavigator.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo((position!AIdTests+Position.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4)))";
+        var result = AId.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
 
         using (new AssertionScope())
         {
@@ -89,8 +113,8 @@ public class AIdTests
     [Test]
     public void From_When_TargetIsMethodWith2Parameters_Then_ResultShouldNotBeNull()
     {
-        const string expectedResult = "AIdTests+INavigator.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate(AIdTests+Position,bool)";
-        var result = AId.From<INavigator>(x => x.Navigate(null!, default));
+        const string expectedResult = "AIdTests+INavigator.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo((position!AIdTests+Position.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null&addToHistory=False))";
+        var result = AId.From<INavigator>(x => x.NavigateTo(null!, default));
 
         using (new AssertionScope())
         {
@@ -121,15 +145,15 @@ public class AIdTests
     [Test]
     public void AsArguments_Then_ResultShouldBeExpectedResult()
     {
-        const string expectedResult = "X=4&Y=5";
+        const string expectedResult = "!AIdTests+Position.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=5)";
         var position = new Position(4, 5);
 
-        var arguments = position.AsArguments();
-        var result = Position.From(new Position(0, 0), arguments);
+        var valueId = position.GetValueId(true);
+        var result = valueId.ToValue(new Position(0, 0));
 
         using (new AssertionScope())
         {
-            arguments.ToString().Should().Be(expectedResult);
+            valueId.ToString().Should().Be(expectedResult);
             result.Should().Be(position);
         }
     }
@@ -137,16 +161,48 @@ public class AIdTests
     [Test]
     public void AsArguments_Then_ResultShouldBeExpectedResult2()
     {
-        const string expectedResult = "Position=(X=4&Y=5)&Z=6";
+        const string expectedResult = "!AIdTests+Position3D.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Position=(X=4&Y=5)&Z=6)";
         var position = new Position3D(new Position(4, 5), 6);
 
-        var arguments = position.AsArguments();
-        var result = Position3D.From(new Position3D(new Position(0, 0), 0), arguments);
+        var valueId = position.GetValueId(true);
+        var result = valueId.ToValue(new Position3D(new Position(0, 0), 0));
 
         using (new AssertionScope())
         {
-            arguments.ToString().Should().Be(expectedResult);
+            valueId.ToString().Should().Be(expectedResult);
             result.Should().Be(position);
+        }
+    }
+
+    [Test]
+    public void From_When_TargetIsMethodWith2Parameters_Then_ResultShouldNotBeNull2()
+    {
+        const string expectedResult = "AIdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate/Execute((parameter!AIdTests+Position.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6)))";
+        var result = AId.From<INavigator>(x => x.Navigate.Execute(AId.Argument<Position>()), new Position(4, 6));
+
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.ToString().Should().Be(expectedResult);
+            result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
+            result.TryGetResultType().Value.Should().Be(typeof(void));
+            result.TryGetTargetContainingType().Value.Should().Be(typeof(ICommand<Position>));
+        }
+    }
+
+    [Test]
+    public void From_When_TargetIsMethodWith2Parameters_Then_ResultShouldNotBeNull3()
+    {
+        const string expectedResult = "AIdTests+INavigator.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate?wAIdTests+Position.Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6)";
+        var result = AId.From<INavigator>(x => x.Navigate, new Position(4, 6));
+
+        using (new AssertionScope())
+        {
+            result.Should().NotBeNull();
+            result.ToString().Should().Be(expectedResult);
+            result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
+            result.TryGetResultType().Value.Should().Be(typeof(ICommand<Position>));
+            result.TryGetTargetContainingType().Value.Should().Be(typeof(INavigator));
         }
     }
 
@@ -154,37 +210,44 @@ public class AIdTests
     public interface INavigator
 #pragma warning restore SA1201
     {
+        ICommand<Position> Navigate { get; }
+
         void GoBack();
 
-        void Navigate(Position position);
+        void NavigateTo(Position position);
 
-        void Navigate(Position position, bool addToHistory);
+        void NavigateTo(Position position, bool addToHistory);
+    }
+
+    public interface ICommand<TParameter>
+    {
+        void Execute(TParameter parameter);
     }
 
     public record Position(int X, int Y) : IValueIdentifiable<Position>
     {
-        public Arguments AsArguments() => Arguments.From(builder => builder.Add(this.X).Add(this.Y));
+        public ValueId GetValueId(bool isRoot) => ValueId.From(this, (value, builder) => builder.Add(value.X).Add(value.Y), isRoot);
 
-        public static Position From(Position position, Arguments arguments)
+        public static Position From(Position position, ValueId valueId)
         {
             return new Position(
-                arguments.Get(position.X, CultureInfo.InvariantCulture),
-                arguments.Get(position.Y, CultureInfo.InvariantCulture));
+                valueId.Value.Get(position.X, CultureInfo.InvariantCulture),
+                valueId.Value.Get(position.Y, CultureInfo.InvariantCulture));
         }
     }
 
     public record Position3D(Position Position, int Z) : IValueIdentifiable<Position3D>
     {
-        public Arguments AsArguments()
+        public ValueId GetValueId(bool isRoot)
         {
-            return Arguments.From(builder => builder.Add(this.Position).Add(this.Z));
+            return ValueId.From(this, (value, builder) => builder.Add(value.Position).Add(value.Z), isRoot);
         }
 
-        public static Position3D From(Position3D value, Arguments arguments)
+        public static Position3D From(Position3D value, ValueId valueId)
         {
             return new Position3D(
-                arguments.Get2(value.Position, CultureInfo.InvariantCulture),
-                arguments.Get(value.Z, CultureInfo.InvariantCulture));
+                valueId.Value.Get2(value.Position, CultureInfo.InvariantCulture),
+                valueId.Value.Get(value.Z, CultureInfo.InvariantCulture));
         }
     }
 }

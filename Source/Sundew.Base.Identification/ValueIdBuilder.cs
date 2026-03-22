@@ -12,13 +12,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Sundew.Base.Collections.Immutable;
+using Sundew.Base.Collections.Linq;
 
 /// <summary>
-/// Builder for constructing <see cref="Arguments"/> for dynamic construction of identifiers.
+/// Builder for constructing <see cref="ValueIds"/> for dynamic construction of identifiers.
 /// </summary>
-public sealed class ValueIdBuilder
+/// <param name="type">The .</param>
+/// <param name="isRoot">Indicates whether the builder is for a root identifier.</param>
+public sealed class ValueIdBuilder(Type type, bool isRoot)
 {
-    private readonly List<(string Name, object Value)> values = new();
+    private readonly List<ValueId> values = new();
 
     /// <summary>
     /// Adds a value to the builder for dynamic construction of identifiers.
@@ -29,22 +32,31 @@ public sealed class ValueIdBuilder
     /// <returns>The current instance of the builder, enabling method chaining.</returns>
     public ValueIdBuilder Add<TValue>(TValue? value, [CallerArgumentExpression(nameof(value))] string? name = null)
     {
-        if (!name.HasValue)
+        if (string.IsNullOrEmpty(name))
         {
             throw new NotSupportedException($"{nameof(name)} should be filled by compiler!");
         }
 
-        name = name.Replace("this.", string.Empty);
-        if (value is IValueIdentifiable<TValue> valueIdentifiable)
+        if (char.IsLower(name[0]))
         {
-            this.values.Add((name, $"{Arguments.GroupStartSeparator}{valueIdentifiable.AsArguments().ToString()}{Arguments.GroupEndSeparator}"));
+            var dotIndex = name.IndexOf('.');
+            if (dotIndex > -1)
+            {
+                name = name.Substring(dotIndex + 1);
+            }
+        }
+
+        if (value != null && value is IValueIdentifiable<TValue> valueIdentifiable)
+        {
+            var valueId = valueIdentifiable.GetValueId(false);
+            this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), valueId.Value));
         }
         else if (value != null)
         {
             var stringValue = value.ToString();
             if (stringValue.HasValue)
             {
-                this.values.Add((name, stringValue));
+                this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), new SingleValue(stringValue)));
             }
         }
 
@@ -52,14 +64,33 @@ public sealed class ValueIdBuilder
     }
 
     /// <summary>
-    /// Builds the <see cref="Arguments"/> instance based on the values added to the builder. Each value is converted to an <see cref="Argument"/> with its name and string representation of the value. The resulting <see cref="Arguments"/>.
+    /// Builds the <see cref="ValueIds"/> instance based on the values added to the builder. Each value is converted to an <see cref="ValueId"/> with its name and string representation of the value. The resulting <see cref="ValueIds"/>.
     /// </summary>
-    /// <returns>A new <see cref="Arguments"/>.</returns>
-    public Arguments Build()
+    /// <returns>A new <see cref="ValueIds"/>.</returns>
+    public ValueId Build()
     {
-        return new Arguments()
+        var cardinality = this.values.ByCardinality();
+        var metadata = isRoot ? Source.FromType(type).ToString() : null;
+        return cardinality switch
         {
-            Items = this.values.Select(x => new Argument(x.Name, x.Value.ToString()!)).ToValueArray(),
+            Empty<ValueId> empty => new ValueId(null, metadata, new SingleValue("null")),
+            Multiple<ValueId> valueIds => new ValueId(null, metadata, new ValueIds(this.values.ToValueArray())),
+            Single<ValueId> single => single.Item,
         };
+    }
+
+    private static string? GetMetadata(Type actualType, Type knownType, bool isRoot)
+    {
+        if (!isRoot && IsKnownType(actualType, knownType))
+        {
+            return null;
+        }
+
+        return Source.FromType(actualType).ToString();
+    }
+
+    private static bool IsKnownType(Type type, Type knownType)
+    {
+        return type == knownType || type.IsValueType;
     }
 }

@@ -45,6 +45,7 @@
   <Project Path="Sundew.Base.Notifications.Reactive/Sundew.Base.Notifications.Reactive.csproj" />
   <Project Path="Sundew.Base.Notifications/Sundew.Base.Notifications.csproj" />
   <Project Path="Sundew.Base.Numeric/Sundew.Base.Numeric.csproj" />
+  <Project Path="Sundew.Base.Parsing/Sundew.Base.Parsing.csproj" />
   <Project Path="Sundew.Base.Primitives/Sundew.Base.Primitives.csproj" />
   <Project Path="Sundew.Base.Reporting/Sundew.Base.Reporting.csproj" />
   <Project Path="Sundew.Base.Text/Sundew.Base.Text.csproj" />

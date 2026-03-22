@@ -9,8 +9,14 @@ namespace Sundew.Base.Identification;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text;
+using Sundew.Base.Collections;
+using Sundew.Base.Collections.Linq;
+using Sundew.Base.Text;
 
 internal static class TargetEvaluator
 {
@@ -62,12 +68,17 @@ internal static class TargetEvaluator
         return R.Error();
     }
 
-    public static R<IReadOnlyList<Type>> GetInputTypes(Source source, Path? path)
+    public static R<IReadOnlyList<Type>> GetInputTypes(Source source, Path? path, ValueId? valueId)
     {
         var sourceType = source.TryGetType();
         if (sourceType.IsError)
         {
             return R.Error();
+        }
+
+        if (valueId.HasValue)
+        {
+            return valueId.TryGetType().Map(x => (IReadOnlyList<Type>)[x]);
         }
 
         if (!path.HasValue)
@@ -112,14 +123,32 @@ internal static class TargetEvaluator
         return R.Error();
     }
 
-    internal static string? GetTypeName(Type type)
+    public static bool IsKnownType(Type type)
     {
+        return PrimitiveAliases.ContainsKey(type);
+    }
+
+    internal static R<Type> TryGetKnownType(string? inputSource)
+    {
+        return R.From(PrimitiveAliases.FirstOrDefault(x => x.Value == inputSource).Key);
+    }
+
+    internal static bool GetTypeName(Type type, StringBuilder stringBuilder)
+    {
+        if (PrimitiveAliases.TryGetValue(type, out var alias))
+        {
+            stringBuilder.Append(alias);
+            return true;
+        }
+
         if (type.IsArray)
         {
             var elementType = type.GetElementType()!;
             var rank = type.GetArrayRank();
             var commas = rank > 1 ? new string(',', rank - 1) : string.Empty;
-            return $"{GetTypeName(elementType)}[{commas}]";
+            GetTypeName(elementType, stringBuilder);
+            stringBuilder.Append($"[{commas}]");
+            return false;
         }
 
         if (type.IsGenericType)
@@ -132,14 +161,13 @@ internal static class TargetEvaluator
                 baseName = baseName[..backtickIndex];
             }
 
-            var genericParameters = type.GetGenericArguments().Select(GetTypeName);
+            stringBuilder
+                .Append(baseName)
+                .Append('[')
+                .AppendItems(type.GetGenericArguments(), (builder, x) => GetTypeName(x, builder), ExpressionEvaluator.ArgumentSeparator)
+                .Append(']');
 
-            return $"{baseName}[{string.Join(',', genericParameters)}]";
-        }
-
-        if (PrimitiveAliases.TryGetValue(type, out var alias))
-        {
-            return alias;
+            return false;
         }
 
         // Nested types: strip the declaring type prefix, keep the + separator
@@ -147,11 +175,26 @@ internal static class TargetEvaluator
         if (type.IsNested)
         {
             // Walk up to build "OuterType+InnerType" without namespace
-            return BuildNestedName(type);
+            BuildNestedName(type, stringBuilder);
+            return false;
         }
 
         // Regular type: just the simple name
-        return type.Name;
+        stringBuilder.Append(type.Name);
+        return false;
+    }
+
+    private static void BuildNestedName(Type type, StringBuilder stringBuilder)
+    {
+        if (!type.DeclaringType.HasValue)
+        {
+            stringBuilder.Append(type.Name);
+            return;
+        }
+
+        BuildNestedName(type.DeclaringType, stringBuilder);
+        stringBuilder.Append('+');
+        stringBuilder.Append(type.Name);
     }
 
     private static MemberInfo? GetTargetMemberInfo(Type sourceType, Path path)
@@ -160,49 +203,70 @@ internal static class TargetEvaluator
         MemberInfo? memberInfo = null;
         foreach (var segment in path.Segments)
         {
-            var segmentType = GetSegment(segment);
-            var memberInfos = currentType.GetMember(segmentType.Name, MemberTypes.Method | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-            if (segmentType.IsProperty)
+            var memberInfos = currentType.GetMember(segment.Name, MemberTypes.Method | MemberTypes.Property, BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+            var cardinality = memberInfos.ByCardinality();
+            switch (cardinality)
             {
-                var propertyInfo = memberInfos.OfType<PropertyInfo>().FirstOrDefault();
-                memberInfo = propertyInfo;
-                if (propertyInfo.HasValue)
-                {
-                    currentType = propertyInfo.PropertyType;
-                }
-            }
-            else
-            {
-                var methodInfo = memberInfos.OfType<MethodInfo>().FirstOrDefault(x => x.GetParameters().Select(x => GetTypeName(x.ParameterType)).SequenceEqual(segmentType.ParameterNames));
-                memberInfo = methodInfo;
-                if (methodInfo.HasValue)
-                {
-                    currentType = methodInfo.ReturnType;
-                }
+                case Empty<MemberInfo> empty:
+                    break;
+                case Multiple<MemberInfo> multiple:
+                    var valueIds = segment.ValueId?.Value.ToValueIds() ?? new ValueIds([]);
+                    var methodInfo = multiple.Items.OfType<MethodInfo>()
+                        .Select(methodInfo => (methodInfo, parameters: methodInfo.GetParameters()))
+                        .Where(x => x.parameters.Length == valueIds.Items.Count)
+                        .FirstOrDefault(x => IsMatch(x.parameters, valueIds)).methodInfo;
+                    memberInfo = methodInfo;
+                    if (methodInfo.HasValue)
+                    {
+                        currentType = methodInfo.ReturnType;
+                    }
+
+                    break;
+                case Single<MemberInfo> single:
+                    if (single.Item is MethodInfo singleMethodInfo)
+                    {
+                        memberInfo = singleMethodInfo;
+                        currentType = singleMethodInfo.ReturnType;
+                    }
+                    else if (single.Item is PropertyInfo propertyInfo)
+                    {
+                        memberInfo = propertyInfo;
+                        currentType = propertyInfo.PropertyType;
+                    }
+
+                    break;
             }
         }
 
         return memberInfo;
     }
 
-    private static (string Name, bool IsProperty, IReadOnlyList<string> ParameterNames) GetSegment(string segment)
+    private static bool IsMatch(ParameterInfo[] parameterInfos, ValueIds valueIds)
     {
-        if (segment.EndsWith(')'))
+        if (!valueIds.HasValue)
         {
-            var parametersStartIndex = segment.IndexOf('(');
-            return (segment.Substring(0, parametersStartIndex), false, segment.Substring(parametersStartIndex + 1, segment.Length - parametersStartIndex - 2).Split(',', StringSplitOptions.RemoveEmptyEntries));
+            return parameterInfos.Length == 0;
         }
 
-        return (segment, true, Array.Empty<string>());
+        return parameterInfos.Zip(valueIds.Items).All(x =>
+        {
+            var argumentType = x.Second.Metadata.HasValue
+                ? Source.Parse(x.Second.Metadata, CultureInfo.InvariantCulture).TryGetType().Value
+                : GetTypeFromArgument(x.First.ParameterType, x.Second.Value);
+            return x.First.ParameterType.IsAssignableFrom(argumentType);
+        });
     }
 
-    private static string BuildNestedName(Type type)
+    private static Type? GetTypeFromArgument(Type firstParameterType, IValue secondValue)
     {
-        if (!type.DeclaringType.HasValue)
+        const string parseName = "Parse";
+        var parseMethod = firstParameterType.GetMethod(parseName, BindingFlags.Public | BindingFlags.Static, [typeof(string), typeof(IFormatProvider)]);
+        if (parseMethod.HasValue)
         {
-            return type.Name;
+            return parseMethod.Invoke(null, [secondValue.ToString(), CultureInfo.InvariantCulture])?.GetType();
         }
 
-        return $"{BuildNestedName(type.DeclaringType)}+{type.Name}";
+        parseMethod = firstParameterType.GetMethod(parseName, BindingFlags.Public | BindingFlags.Static, [typeof(string)]);
+        return parseMethod?.Invoke(null, [secondValue.ToString()])?.GetType();
     }
 }

@@ -31,7 +31,7 @@ public sealed record Source(string Origin, string Path, string Name) : IParsable
     /// </summary>
     /// <param name="inputSource">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="Source"/>> type.</param>
     /// <param name="formatProvider">The format provider.</param>
-    /// <returns>An instance of Argument that represents the parsed value from the input string.</returns>
+    /// <returns>An instance of ValueId that represents the parsed value from the input string.</returns>
     /// <exception cref="FormatException">Thrown if the input string is not in a valid format for the <see cref="Source"/>> type.</exception>
     public static Source Parse(string inputSource, IFormatProvider? formatProvider)
     {
@@ -68,8 +68,8 @@ public sealed record Source(string Origin, string Path, string Name) : IParsable
             return true;
         }
 
-        result = null;
-        return false;
+        result = new Source(string.Empty, string.Empty, inputSource);
+        return true;
     }
 
     /// <summary>
@@ -79,7 +79,18 @@ public sealed record Source(string Origin, string Path, string Name) : IParsable
     /// <param name="formatProvider">The format provider.</param>
     public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider)
     {
-        stringBuilder.Append($"{this.Name}{NameSeparator}{this.Path}{OriginSeparator}{this.Origin}");
+        stringBuilder.Append(this.Name);
+        if (!string.IsNullOrEmpty(this.Path))
+        {
+            stringBuilder.Append(NameSeparator);
+            stringBuilder.Append(this.Path);
+        }
+
+        if (!string.IsNullOrEmpty(this.Origin))
+        {
+            stringBuilder.Append(OriginSeparator);
+            stringBuilder.Append(this.Origin);
+        }
     }
 
     /// <summary>
@@ -101,20 +112,9 @@ public sealed record Source(string Origin, string Path, string Name) : IParsable
     public static Source FromType(Type type)
     {
         var stringBuilder = new StringBuilder();
-        GetName(type, false);
-
-        void GetName(Type type, bool isParent)
+        if (TargetEvaluator.GetTypeName(type, stringBuilder))
         {
-            if (type.DeclaringType.HasValue)
-            {
-                GetName(type.DeclaringType, true);
-            }
-
-            stringBuilder.Append(type.Name);
-            if (isParent)
-            {
-                stringBuilder.Append('+');
-            }
+            return new Source(string.Empty, string.Empty, stringBuilder.ToString());
         }
 
         return new Source(type.Assembly.GetName().Name ?? string.Empty, type.Namespace ?? string.Empty, stringBuilder.ToString());
@@ -126,6 +126,12 @@ public sealed record Source(string Origin, string Path, string Name) : IParsable
     /// <returns>A result containing the type if successful.</returns>
     public R<Type> TryGetType()
     {
+        var knownType = TargetEvaluator.TryGetKnownType(this.Name);
+        if (knownType.IsSuccess)
+        {
+            return knownType;
+        }
+
         var type = Type.GetType($"{this.Path}.{this.Name}, {this.Origin}");
         return R.From(type);
     }
