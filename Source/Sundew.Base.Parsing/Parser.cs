@@ -8,15 +8,18 @@
 namespace Sundew.Base.Parsing;
 
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 
 /// <summary>
 /// Provides functionality to parse a sequence of tokens from an input string using a specified lexer.
 /// </summary>
 /// <typeparam name="TToken">The type of tokens produced by the lexer.</typeparam>
 public class Parser<TToken>
+    where TToken : notnull
 {
     private readonly ILexer<TToken> lexer;
-    private readonly string input;
+    private readonly Stack<State> stateStack = new Stack<State>();
     private State state;
 
     /// <summary>
@@ -24,12 +27,24 @@ public class Parser<TToken>
     /// </summary>
     /// <param name="lexer">The lexer used to tokenize the input string. This parameter must not be null.</param>
     /// <param name="input">The input string to be parsed. This parameter cannot be null or empty.</param>
-    public Parser(ILexer<TToken> lexer, string input)
+    /// <param name="formatProvider">The format provider.</param>
+    public Parser(ILexer<TToken> lexer, string input, IFormatProvider? formatProvider)
     {
         this.lexer = lexer;
-        this.input = input;
+        this.Input = input;
+        this.FormatProvider = formatProvider ?? CultureInfo.CurrentCulture;
         this.state = new State(0);
     }
+
+    /// <summary>
+    /// Gets the input being processed.
+    /// </summary>
+    public string Input { get; }
+
+    /// <summary>
+    /// Gets the format provider used to control formatting operations for values such as numbers and dates.
+    /// </summary>
+    public IFormatProvider FormatProvider { get; }
 
     /// <summary>
     /// Determines whether the specified token is accepted at the current position and retrieves the corresponding
@@ -41,7 +56,7 @@ public class Parser<TToken>
     /// <returns>true if the token is accepted at the current position; otherwise, false.</returns>
     public bool Accept(TToken token, out string lexeme)
     {
-        if (this.lexer.TryGetLexeme(token, this.input, this.state, out lexeme, out var consumedLength))
+        if (this.lexer.TryGetLexeme(token, this.Input, this.state, out lexeme, out var consumedLength))
         {
             this.state = new State(this.state.Position + consumedLength);
             return true;
@@ -52,6 +67,79 @@ public class Parser<TToken>
     }
 
     /// <summary>
+    /// Determines whether the specified token is accepted at the current position and retrieves the corresponding
+    /// lexeme if accepted.
+    /// </summary>
+    /// <param name="token">The token to evaluate for acceptance at the current input position.</param>
+    /// <returns>true if the token is accepted at the current position; otherwise, false.</returns>
+    public R<string, LexerError> Accept(TToken token)
+    {
+        if (this.lexer.TryGetLexeme(token, this.Input, this.state, out var lexeme, out var consumedLength))
+        {
+            this.state = new State(this.state.Position + consumedLength);
+            return R.Success(lexeme);
+        }
+
+        return R.Error(LexerError._TokenTypeError(token, this.state.Position, 0));
+    }
+
+    /// <summary>
+    /// Determines whether the specified token is accepted at the current position and retrieves the corresponding
+    /// lexeme if accepted.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the first output.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="token">The token to evaluate for acceptance at the current input position.</param>
+    /// <param name="matchNextFunc">The next match func.</param>
+    /// <returns>true if the token is accepted at the current position; otherwise, false.</returns>
+    public R<TSuccess, TError> TryAccept<TSuccess, TError>(TToken token, Func<R<string, LexerError>, R<TSuccess, TError>> matchNextFunc)
+    {
+        var stateBefore = this.state;
+        if (this.lexer.TryGetLexeme(token, this.Input, this.state, out var lexeme, out var consumedLength))
+        {
+            this.state = new State(this.state.Position + consumedLength);
+            var result = matchNextFunc(R.Success(lexeme));
+            if (result.IsSuccess)
+            {
+                return result;
+            }
+
+            this.state = stateBefore;
+            return R.Error(result.Error);
+        }
+
+        return matchNextFunc(R.Error(LexerError._TokenTypeError(token, this.state.Position, 0)));
+    }
+
+    /// <summary>
+    /// Determines whether the specified token is accepted at the current position and retrieves the corresponding
+    /// lexeme if accepted.
+    /// </summary>
+    /// <typeparam name="TSuccess">The type of the first output.</typeparam>
+    /// <typeparam name="TError">The type of the error.</typeparam>
+    /// <param name="input">The character to evaluate against the expected input for the current parsing state.</param>
+    /// <param name="matchNextFunc">The next match func.</param>
+    /// <returns>true if the token is accepted at the current position; otherwise, false.</returns>
+    public R<TSuccess, TError> TryAccept<TSuccess, TError>(char input, Func<R<string, LexerError>, R<TSuccess, TError>> matchNextFunc)
+    {
+        var stateBefore = this.state;
+        if (this.IsNext(input))
+        {
+            this.state = new State(this.state.Position + 1);
+            var result = matchNextFunc(R.Success(input.ToString()));
+            if (result.IsSuccess)
+            {
+                return result;
+            }
+
+            this.state = stateBefore;
+            return R.Error(result.Error);
+        }
+
+        return matchNextFunc(R.Error(LexerError._TokenError(input.ToString(), this.state.Position, 0)));
+    }
+
+    /// <summary>
     /// Determines whether the specified character matches the expected input for the current parsing state and advances
     /// the state if a match is found.
     /// </summary>
@@ -59,15 +147,34 @@ public class Parser<TToken>
     /// position. Otherwise, the state remains unchanged.</remarks>
     /// <param name="input">The character to evaluate against the expected input for the current parsing state.</param>
     /// <returns>true if the input character matches the expected input and the state is advanced; otherwise, false.</returns>
-    public bool Accept(char input)
+    public RoE<LexerError> TryAccept(char input)
     {
         if (this.IsNext(input))
         {
             this.state = new State(this.state.Position + 1);
-            return true;
+            return R.Success();
         }
 
-        return false;
+        return R.Error(LexerError._TokenError(input.ToString(), this.state.Position, 1));
+    }
+
+    /// <summary>
+    /// Determines whether the specified character matches the expected input for the current parsing state and advances
+    /// the state if a match is found.
+    /// </summary>
+    /// <remarks>If the input character matches the expected value, the parsing state is updated to the next
+    /// position. Otherwise, the state remains unchanged.</remarks>
+    /// <param name="input">The character to evaluate against the expected input for the current parsing state.</param>
+    /// <returns>true if the input character matches the expected input and the state is advanced; otherwise, false.</returns>
+    public RoE<LexerError> Accept(char input)
+    {
+        if (this.IsNext(input))
+        {
+            this.state = new State(this.state.Position + 1);
+            return R.Success();
+        }
+
+        return R.Error(LexerError._TokenError(input.ToString(), this.state.Position, 1));
     }
 
     /// <summary>
@@ -94,7 +201,7 @@ public class Parser<TToken>
     /// <returns>true if the specified character matches the current character in the input; otherwise, false.</returns>
     public bool IsNext(char input)
     {
-        if (this.input[this.state.Position] == input)
+        if (this.Input.Length > this.state.Position && this.Input[this.state.Position] == input)
         {
             return true;
         }
@@ -110,7 +217,8 @@ public class Parser<TToken>
     /// <returns>true if the specified string matches the input sequence at the current position; otherwise, false.</returns>
     public bool IsNext(string input)
     {
-        if (this.input.AsSpan(this.state.Position, input.Length).SequenceEqual(input.AsSpan()))
+        if (this.Input.Length > this.state.Position + input.Length - 1 &&
+            this.Input.AsSpan(this.state.Position, input.Length).SequenceEqual(input.AsSpan()))
         {
             return true;
         }
@@ -122,9 +230,9 @@ public class Parser<TToken>
     /// Determines whether the current position in the input has reached the end of the input sequence.
     /// </summary>
     /// <returns>true if the current position is at the end of the input; otherwise, false.</returns>
-    public bool AcceptEnd()
+    public RoE<LexerError> IsEnd()
     {
-        return this.state.Position == this.input.Length;
+        return R.FromError(this.state.Position == this.Input.Length, () => LexerError._End(this.state.Position));
     }
 
     /// <summary>

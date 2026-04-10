@@ -17,6 +17,7 @@ using System.Text.RegularExpressions;
 /// <param name="token">The token to associate with input that matches the regular expression.</param>
 /// <param name="regex">The regular expression used to identify matching lexemes in the input text.</param>
 public class RegexLexerRule<TToken>(TToken token, Regex regex) : ILexerRule<TToken>
+    where TToken : notnull
 {
     private const string TokenGroupName = "TOKEN";
 
@@ -45,12 +46,12 @@ public class RegexLexerRule<TToken>(TToken token, Regex regex) : ILexerRule<TTok
                     return R.Success((matchingGroup.Value, match.Length));
                 }
 
-                return R.Error(new LexerError(input, state.Position, -1));
+                return R.Error(LexerError._TokenError(input, state.Position, -1));
             }
 
             return R.Success((match.Value, match.Length));
         }
 
-        return R.Error(new LexerError(input, state.Position, -1));
+        return R.Error(LexerError._TokenError(input, state.Position, -1));
     }
 }

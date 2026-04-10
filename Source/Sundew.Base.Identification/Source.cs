@@ -13,7 +13,7 @@ using System.Globalization;
 using System.Text;
 
 /// <summary>
-/// Represents a source for an <see cref="AId"/>.
+/// Represents a source for an <see cref="Id"/>.
 /// </summary>
 /// <param name="Origin">The Origin.</param>
 /// <param name="Path">The Path.</param>
@@ -24,7 +24,7 @@ public sealed record Source(string Origin, string Path, string Name) : IParsable
     public const char OriginSeparator = '$';
 
     /// <summary>The name separator.</summary>
-    public const char NameSeparator = '.';
+    public const char NameSeparator = '~';
 
     /// <summary>
     /// Parses the specified input string into an instance of the <see cref="Source"/> type.

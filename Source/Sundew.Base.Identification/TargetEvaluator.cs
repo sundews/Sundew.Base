@@ -12,10 +12,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
-using Sundew.Base.Collections;
 using Sundew.Base.Collections.Linq;
+using Sundew.Base.Identification.Parsing;
 using Sundew.Base.Text;
 
 internal static class TargetEvaluator
@@ -68,7 +67,7 @@ internal static class TargetEvaluator
         return R.Error();
     }
 
-    public static R<IReadOnlyList<Type>> GetInputTypes(Source source, Path? path, ValueId? valueId)
+    public static R<IReadOnlyList<Type>> GetInputTypes(Source source, Path? path, IArguments? arguments)
     {
         var sourceType = source.TryGetType();
         if (sourceType.IsError)
@@ -76,9 +75,9 @@ internal static class TargetEvaluator
             return R.Error();
         }
 
-        if (valueId.HasValue)
+        if (arguments.HasValue)
         {
-            return valueId.TryGetType().Map(x => (IReadOnlyList<Type>)[x]);
+            return arguments.ToValueIds().Items.Select(x => x.TryGetType()).AllOrFailed(x => x.ToItem()).Map(x => (IReadOnlyList<Type>)x.Items);
         }
 
         if (!path.HasValue)
@@ -163,9 +162,9 @@ internal static class TargetEvaluator
 
             stringBuilder
                 .Append(baseName)
-                .Append('[')
-                .AppendItems(type.GetGenericArguments(), (builder, x) => GetTypeName(x, builder), ExpressionEvaluator.ArgumentSeparator)
-                .Append(']');
+                .Append(Grammar.ArrayStart)
+                .AppendItems(type.GetGenericArguments(), (builder, x) => GetTypeName(x, builder), Grammar.ArgumentSeparator)
+                .Append(Grammar.ArrayEnd);
 
             return false;
         }
@@ -210,7 +209,7 @@ internal static class TargetEvaluator
                 case Empty<MemberInfo> empty:
                     break;
                 case Multiple<MemberInfo> multiple:
-                    var valueIds = segment.ValueId?.Value.ToValueIds() ?? new ValueIds([]);
+                    var valueIds = segment.Arguments?.ToValueIds() ?? new ComplexValue([]);
                     var methodInfo = multiple.Items.OfType<MethodInfo>()
                         .Select(methodInfo => (methodInfo, parameters: methodInfo.GetParameters()))
                         .Where(x => x.parameters.Length == valueIds.Items.Count)
@@ -241,14 +240,14 @@ internal static class TargetEvaluator
         return memberInfo;
     }
 
-    private static bool IsMatch(ParameterInfo[] parameterInfos, ValueIds valueIds)
+    private static bool IsMatch(ParameterInfo[] parameterInfos, ComplexValue complexValue)
     {
-        if (!valueIds.HasValue)
+        if (!complexValue.HasValue)
         {
             return parameterInfos.Length == 0;
         }
 
-        return parameterInfos.Zip(valueIds.Items).All(x =>
+        return parameterInfos.Zip(complexValue.Items).All(x =>
         {
             var argumentType = x.Second.Metadata.HasValue
                 ? Source.Parse(x.Second.Metadata, CultureInfo.InvariantCulture).TryGetType().Value
@@ -257,16 +256,16 @@ internal static class TargetEvaluator
         });
     }
 
-    private static Type? GetTypeFromArgument(Type firstParameterType, IValue secondValue)
+    private static Type? GetTypeFromArgument(Type firstParameterType, IValue value)
     {
         const string parseName = "Parse";
         var parseMethod = firstParameterType.GetMethod(parseName, BindingFlags.Public | BindingFlags.Static, [typeof(string), typeof(IFormatProvider)]);
         if (parseMethod.HasValue)
         {
-            return parseMethod.Invoke(null, [secondValue.ToString(), CultureInfo.InvariantCulture])?.GetType();
+            return parseMethod.Invoke(null, [value.ToString(), CultureInfo.InvariantCulture])?.GetType();
         }
 
         parseMethod = firstParameterType.GetMethod(parseName, BindingFlags.Public | BindingFlags.Static, [typeof(string)]);
-        return parseMethod?.Invoke(null, [secondValue.ToString()])?.GetType();
+        return parseMethod?.Invoke(null, [value.ToString()])?.GetType();
     }
 }

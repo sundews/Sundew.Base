@@ -14,8 +14,8 @@ using System.Text;
 /// Represents a segment with a specified name and optional associated value identifiers.
 /// </summary>
 /// <param name="Name">The name of the segment, which serves as its identifier.</param>
-/// <param name="ValueId">A value id for the segment.</param>
-public sealed record Segment(string Name, ValueId? ValueId = null)
+/// <param name="Arguments">A value for the segment.</param>
+public sealed record Segment(string Name, IArguments? Arguments = null)
 {
     /// <summary>
     /// Appends the name of the current instance to the specified StringBuilder, followed by parentheses.
@@ -27,10 +27,10 @@ public sealed record Segment(string Name, ValueId? ValueId = null)
     {
         builder.Append(this.Name);
 
-        if (this.ValueId.HasValue)
+        if (this.Arguments.HasValue)
         {
             builder.Append('(');
-            this.ValueId.AppendInto(builder, formatProvider);
+            this.Arguments.AppendInto(builder, formatProvider, new AppendOptions(true));
             builder.Append(')');
         }
 

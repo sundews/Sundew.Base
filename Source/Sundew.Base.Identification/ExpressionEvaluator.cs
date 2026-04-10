@@ -19,9 +19,6 @@ using Sundew.Base.Collections.Immutable;
 /// </summary>
 internal static class ExpressionEvaluator
 {
-    /// <summary>The argument separator.</summary>
-    public const char ArgumentSeparator = ',';
-
     /// <summary>
     /// Gets a <see cref="Path"/> for the specified expression.
     /// </summary>
@@ -56,7 +53,7 @@ internal static class ExpressionEvaluator
                     var parameterInfos = methodCallExpression.Method.GetParameters();
                     foreach (var argument in methodCallExpression.Arguments.Zip(parameterInfos))
                     {
-                        if (argument.First is MethodCallExpression argumentMethodCallExpression && argumentMethodCallExpression.Method.DeclaringType == typeof(AId) && argumentMethodCallExpression.Method.Name == nameof(AId.Argument) && valueId.HasValue)
+                        if (argument.First is MethodCallExpression argumentMethodCallExpression && argumentMethodCallExpression.Method.DeclaringType == typeof(Id) && argumentMethodCallExpression.Method.Name == nameof(Id.Argument) && valueId.HasValue)
                         {
                             valueIds.Add(valueId with { Name = argument.Second.Name + valueId.Name });
                             isUsed = true;
@@ -67,7 +64,7 @@ internal static class ExpressionEvaluator
                         }
                     }
 
-                    segments.Add(new Segment(methodCallExpression.Method.Name, new ValueId(null, null, new ValueIds(valueIds.ToValueArray()))));
+                    segments.Add(new Segment(methodCallExpression.Method.Name, new ComplexValue(valueIds.ToValueArray())));
 
                     break;
                 case MemberExpression memberExpression:
@@ -90,7 +87,7 @@ internal static class ExpressionEvaluator
         switch (argument)
         {
             case ConstantExpression constantExpression:
-                builder.Add(new ValueId(parameterInfo.Name, GetMetadata(argument), new SingleValue(constantExpression.Value?.ToString() ?? (argument.Type.IsClass ? "null" : "default"))));
+                builder.Add(new ValueId(parameterInfo.Name, GetMetadata(argument), new ScalarValue(constantExpression.Value?.ToString() ?? (argument.Type.IsClass ? "null" : "default"))));
                 break;
             case MemberExpression memberExpression:
                 if (memberExpression.Expression is ConstantExpression constantExpression2)
@@ -99,13 +96,13 @@ internal static class ExpressionEvaluator
                     if (memberExpression.Member is FieldInfo fieldInfo)
                     {
                         var value = fieldInfo.GetValue(container);
-                        builder.Add(new ValueId(null, null, new SingleValue(value?.ToString() ?? string.Empty)));
+                        builder.Add(new ValueId(null, null, new ScalarValue(value?.ToString() ?? string.Empty)));
                     }
 
                     if (memberExpression.Member is PropertyInfo propertyInfo)
                     {
                         var value = propertyInfo.GetValue(container);
-                        builder.Add(new ValueId(null, null, new SingleValue(value?.ToString() ?? string.Empty)));
+                        builder.Add(new ValueId(null, null, new ScalarValue(value?.ToString() ?? string.Empty)));
                     }
                 }
 
@@ -119,7 +116,7 @@ internal static class ExpressionEvaluator
                         GetArgument(valueTuple.First, valueTuple.Second, newBuilder);
                     }
 
-                    builder.Add(new ValueId(parameterInfo.Name, GetMetadata(argument), new ValueIds(newBuilder.ToImmutable())));
+                    builder.Add(new ValueId(parameterInfo.Name, GetMetadata(argument), new ComplexValue(newBuilder.ToImmutable())));
                 }
 
                 break;

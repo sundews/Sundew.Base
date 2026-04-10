@@ -23,6 +23,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) OR $(TargetFramework.StartsWith('netstandard')) OR $(TargetFramework.StartsWith('net6'))">
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+  </PropertyGroup>
+
   <PropertyGroup Condition="$(AssemblyName.EndsWith('Tests'))">
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>

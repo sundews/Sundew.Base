@@ -18,6 +18,18 @@ public static class Item
     /// Converts the item into an item result.
     /// </summary>
     /// <typeparam name="TSuccess">The success type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>An Item result.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static Item<TSuccess> PassIfSuccess<TSuccess>(R<TSuccess> result)
+    {
+        return result.ToItem();
+    }
+
+    /// <summary>
+    /// Converts the item into an item result.
+    /// </summary>
+    /// <typeparam name="TSuccess">The success type.</typeparam>
     /// <typeparam name="TError">The error type.</typeparam>
     /// <param name="result">The result.</param>
     /// <returns>An Item result.</returns>
@@ -165,6 +177,18 @@ public static class Item
         where TValue : class
     {
         return new Item<TValue>(option, option.HasValue);
+    }
+
+    /// <summary>
+    /// Converts the option to an item.
+    /// </summary>
+    /// <typeparam name="TResult">The value type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>The new item.</returns>
+    [MethodImpl((MethodImplOptions)0x300)]
+    public static Item<TResult> ToItem<TResult>(this R<TResult> result)
+    {
+        return new Item<TResult>(result.Value, result.IsSuccess);
     }
 
     /// <summary>

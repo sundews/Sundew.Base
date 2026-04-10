@@ -15,7 +15,7 @@ internal enum Tokens
 
     SourceOrigin,
 
-    SegmentName,
+    PathSegmentName,
 
     ValueIdName,
 

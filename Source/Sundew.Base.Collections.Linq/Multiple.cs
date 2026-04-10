@@ -15,9 +15,9 @@ using System.Collections.Generic;
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-public sealed record Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
+public sealed partial record Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
 #else
-public sealed class Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
+public sealed partial class Multiple<TItem> : ListCardinality<TItem>, IEnumerable<TItem>
 #endif
 {
     /// <summary>

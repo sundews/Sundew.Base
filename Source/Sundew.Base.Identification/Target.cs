@@ -21,7 +21,7 @@ using System.Text;
 public sealed record Target(Source Source, Path? Path) : IParsable<Target>
 {
     /// <summary>
-    /// Parses the specified input string into an instance of the <see cref="ValueIds"/> type.
+    /// Parses the specified input string into an instance of the <see cref="ComplexValue"/> type.
     /// </summary>
     /// <param name="inputTarget">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="Target"/>> type.</param>
     /// <param name="formatProvider">The format formatProvider.</param>
@@ -38,7 +38,7 @@ public sealed record Target(Source Source, Path? Path) : IParsable<Target>
     }
 
     /// <summary>
-    /// Tries to parse the specified input string into an instance of the <see cref="ValueIds"/> type.
+    /// Tries to parse the specified input string into an instance of the <see cref="ComplexValue"/> type.
     /// </summary>
     /// <param name="inputTarget">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="Target"/>> type.</param>
     /// <param name="formatProvider">The format provider.</param>

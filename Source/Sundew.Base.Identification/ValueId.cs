@@ -8,25 +8,19 @@
 namespace Sundew.Base.Identification;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
+using Sundew.Base.Identification.Parsing;
 
 /// <summary>
-/// Represents a value id for an <see cref="AId"/> argument.
+/// Represents a value id for an <see cref="Id"/> argument.
 /// </summary>
 /// <param name="Name">The name.</param>
 /// <param name="Metadata">The metadata.</param>
 /// <param name="Value">The value.</param>
 public sealed partial record ValueId(string? Name, string? Metadata, IValue Value)
 {
-    /// <summary>Key Value separator.</summary>
-    public const char KeyValueSeparator = '=';
-
-    /// <summary>Metadata separator.</summary>
-    public const char MetadataSeparator = '!';
-
     /// <summary>
     /// Gets the type of the source.
     /// </summary>
@@ -42,28 +36,29 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
     }
 
     /// <summary>
-    /// Creates a string representation of the <see cref="ValueIds"/>.
+    /// Creates a string representation of the <see cref="ComplexValue"/>.
     /// </summary>
     /// <returns>A string.</returns>
     public override string ToString()
     {
         var stringBuilder = new StringBuilder();
-        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture);
+        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true));
         return stringBuilder.ToString();
     }
 
     /// <summary>
-    /// Appends this <see cref="ValueIds"/> to the specified <see cref="StringBuilder"/>.
+    /// Appends this <see cref="ComplexValue"/> to the specified <see cref="StringBuilder"/>.
     /// </summary>
     /// <param name="stringBuilder">The string builder.</param>
     /// <param name="formatProvider">The format provider.</param>
-    public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider)
+    /// <param name="appendOptions">The append options.</param>
+    public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions)
     {
         bool TryAppendMetadata()
         {
             if (!string.IsNullOrEmpty(this.Metadata))
             {
-                stringBuilder.Append(MetadataSeparator);
+                stringBuilder.Append(Grammar.NameMetadataSeparator);
                 stringBuilder.Append(this.Metadata);
                 return true;
             }
@@ -75,30 +70,31 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
         {
             stringBuilder.Append(this.Name);
             TryAppendMetadata();
-            stringBuilder.Append(KeyValueSeparator);
-        }
-        else
-        {
-            if (TryAppendMetadata())
-            {
-                stringBuilder.Append(KeyValueSeparator);
-            }
+            stringBuilder.Append(Grammar.KeyValueSeparator);
+
+            this.Value.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false });
+
+            return;
         }
 
-        this.Value.AppendInto(stringBuilder, formatProvider);
+        if (TryAppendMetadata())
+        {
+            stringBuilder.Append(Grammar.KeyValueSeparator);
+        }
+
+        this.Value.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false });
     }
 
     /// <summary>
-    /// Creates an <see cref="ValueIds"/> from the specified builder func.
+    /// Creates an <see cref="ComplexValue"/> from the specified builder func.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
     /// <param name="value">The value.</param>
     /// <param name="valueIdFunc">The value id func.</param>
-    /// <param name="isRoot">Indicated whether this is a root id.</param>
-    /// <returns>A new <see cref="ValueIds"/>.</returns>
-    public static ValueId From<TValue>(TValue value, Action<TValue, ValueIdBuilder> valueIdFunc, bool isRoot)
+    /// <returns>A new <see cref="ComplexValue"/>.</returns>
+    public static ValueId From<TValue>(TValue value, Action<TValue, ValueIdBuilder> valueIdFunc)
     {
-        var valueIdBuilder = new ValueIdBuilder(value?.GetType() ?? typeof(TValue), isRoot);
+        var valueIdBuilder = new ValueIdBuilder(value?.GetType() ?? typeof(TValue));
         valueIdFunc(value, valueIdBuilder);
         return valueIdBuilder.Build();
     }
@@ -138,30 +134,30 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
             while (index < inputArg.Length)
             {
                 var character = inputArg[index++];
-                if (character == ValueIds.GroupStartSeparator)
+                if (character == Grammar.GroupStart)
                 {
                     level++;
                 }
 
-                if (character == ValueIds.GroupEndSeparator)
+                if (character == Grammar.GroupEnd)
                 {
                     level--;
                 }
 
-                if (character == MetadataSeparator && level == 0)
+                if (character == Grammar.NameMetadataSeparator && level == 0)
                 {
                     metadataIndex = index;
                 }
 
-                if (character == KeyValueSeparator && level == 0)
+                if (character == Grammar.KeyValueSeparator && level == 0)
                 {
                     var (nameLength, metadataStart, metadataLength) = metadataIndex > -1 ? (metadataIndex - 1, metadataIndex, index - metadataIndex - 1) : (index - 1, 0, 0);
-                    result = new ValueId(inputArg.Substring(0, nameLength), inputArg.Substring(metadataStart, metadataLength), new SingleValue(inputArg.Substring(index)));
+                    result = new ValueId(inputArg.Substring(0, nameLength), inputArg.Substring(metadataStart, metadataLength), new ScalarValue(inputArg.Substring(index)));
                     return true;
                 }
             }
 
-            result = new ValueId(null, null, new SingleValue(inputArg));
+            result = new ValueId(null, null, new ScalarValue(inputArg));
             return true;
         }
 

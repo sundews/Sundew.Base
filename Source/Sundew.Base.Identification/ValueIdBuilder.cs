@@ -9,17 +9,15 @@ namespace Sundew.Base.Identification;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Collections.Linq;
 
 /// <summary>
-/// Builder for constructing <see cref="ValueIds"/> for dynamic construction of identifiers.
+/// Builder for constructing <see cref="ComplexValue"/> for dynamic construction of identifiers.
 /// </summary>
 /// <param name="type">The .</param>
-/// <param name="isRoot">Indicates whether the builder is for a root identifier.</param>
-public sealed class ValueIdBuilder(Type type, bool isRoot)
+public sealed class ValueIdBuilder(Type type)
 {
     private readonly List<ValueId> values = new();
 
@@ -48,7 +46,7 @@ public sealed class ValueIdBuilder(Type type, bool isRoot)
 
         if (value != null && value is IValueIdentifiable<TValue> valueIdentifiable)
         {
-            var valueId = valueIdentifiable.GetValueId(false);
+            var valueId = valueIdentifiable.Id;
             this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), valueId.Value));
         }
         else if (value != null)
@@ -56,7 +54,7 @@ public sealed class ValueIdBuilder(Type type, bool isRoot)
             var stringValue = value.ToString();
             if (stringValue.HasValue)
             {
-                this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), new SingleValue(stringValue)));
+                this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), new ScalarValue(stringValue)));
             }
         }
 
@@ -64,17 +62,17 @@ public sealed class ValueIdBuilder(Type type, bool isRoot)
     }
 
     /// <summary>
-    /// Builds the <see cref="ValueIds"/> instance based on the values added to the builder. Each value is converted to an <see cref="ValueId"/> with its name and string representation of the value. The resulting <see cref="ValueIds"/>.
+    /// Builds the <see cref="ComplexValue"/> instance based on the values added to the builder. Each value is converted to an <see cref="ValueId"/> with its name and string representation of the value. The resulting <see cref="ComplexValue"/>.
     /// </summary>
-    /// <returns>A new <see cref="ValueIds"/>.</returns>
+    /// <returns>A new <see cref="ComplexValue"/>.</returns>
     public ValueId Build()
     {
         var cardinality = this.values.ByCardinality();
-        var metadata = isRoot ? Source.FromType(type).ToString() : null;
+        var metadata = Source.FromType(type).ToString();
         return cardinality switch
         {
-            Empty<ValueId> empty => new ValueId(null, metadata, new SingleValue("null")),
-            Multiple<ValueId> valueIds => new ValueId(null, metadata, new ValueIds(this.values.ToValueArray())),
+            Empty<ValueId> empty => new ValueId(null, metadata, new ScalarValue("null")),
+            Multiple<ValueId> valueIds => new ValueId(null, metadata, new ComplexValue(valueIds.Items.ToValueArray())),
             Single<ValueId> single => single.Item,
         };
     }

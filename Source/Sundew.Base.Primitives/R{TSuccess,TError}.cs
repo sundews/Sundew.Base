@@ -77,7 +77,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     /// </value>
     public TError? Error { get; }
 
-    /// <summary>
+    /*/// <summary>
     /// Gets the result's success property.
     /// </summary>
     /// <param name="r">The result.</param>
@@ -88,7 +88,7 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     public static implicit operator bool(R<TSuccess, TError> r)
     {
         return r.IsSuccess;
-    }
+    }*/
 
     /// <summary>
     /// Gets the result's success property.
@@ -240,6 +240,26 @@ public readonly struct R<TSuccess, TError> : IEquatable<R<TSuccess, TError>>
     public static bool operator !=(R<TSuccess, TError> left, R<TSuccess, TError> right)
     {
         return !(left == right);
+    }
+
+    /// <summary>
+    /// Implements the true operator.
+    /// </summary>
+    /// <param name="result">the result.</param>
+    /// <returns><c>true</c> if the result is successful, otherwise <c>false</c>.</returns>
+    public static bool operator true(R<TSuccess, TError> result)
+    {
+        return result.IsSuccess;
+    }
+
+    /// <summary>
+    /// Implements the false operator.
+    /// </summary>
+    /// <param name="result">the result.</param>
+    /// <returns><c>true</c> if the result is erroneous, otherwise <c>false</c>.</returns>
+    public static bool operator false(R<TSuccess, TError> result)
+    {
+        return result.IsError;
     }
 
     /// <summary>

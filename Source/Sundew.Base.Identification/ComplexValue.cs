@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ValueIds.cs" company="Sundews">
+// <copyright file="ComplexValue.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -15,117 +15,39 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Sundew.Base.Collections.Immutable;
+using Sundew.Base.Identification.Parsing;
 using Sundew.Base.Text;
 
 /// <summary>
-/// Represents arguments for an <see cref="AId"/>.
+/// Represents arguments for an <see cref="Id"/>.
 /// </summary>
 /// <param name="Items">The value ids.</param>
-public sealed record ValueIds(ValueArray<ValueId> Items) : IValue
+public sealed partial record ComplexValue(ValueArray<ValueId> Items) : IValue
 {
-    /// <summary>The value id separator.</summary>
-    public const char ValueIdsSeparator = '&';
-
-    /// <summary>The group start separator.</summary>
-    public const char GroupStartSeparator = '(';
-
-    /// <summary>The group end separator.</summary>
-    public const char GroupEndSeparator = ')';
-
     /// <summary>
-    /// Parses the specified input string into an instance of the <see cref="ValueIds"/> type.
-    /// </summary>
-    /// <param name="inputValueId">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="ValueIds"/>> type.</param>
-    /// <param name="formatProvider">The format formatProvider.</param>
-    /// <returns>An instance of ValueId that represents the parsed value from the input string.</returns>
-    /// <exception cref="FormatException">Thrown if the input string is not in a valid format for the <see cref="ValueIds"/>> type.</exception>
-    public static ValueIds Parse(string inputValueId, IFormatProvider? formatProvider)
-    {
-        if (TryParse(inputValueId, formatProvider, out var result))
-        {
-            return result;
-        }
-
-        throw new FormatException($"The string: {inputValueId} is not a valid {nameof(ValueIds)}.");
-    }
-
-    /// <summary>
-    /// Tries to parse the specified input string into an instance of the <see cref="ValueIds"/> type.
-    /// </summary>
-    /// <param name="inputValueId">The string representation of the argument to be parsed. This value must be a valid format for the <see cref="ValueIds"/>> type.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="result">The result.</param>
-    /// <returns><c>true</c> if parsing was successful, otherwise <c>false</c>.</returns>
-    public static bool TryParse([NotNullWhen(true)] string? inputValueId, IFormatProvider? formatProvider, [MaybeNullWhen(false)] out ValueIds result)
-    {
-        var args = ImmutableArray.CreateBuilder<ValueId>();
-        if (inputValueId.HasValue)
-        {
-            //// var argStartIndex = 0;
-            var index = 0;
-            var level = 0;
-            while (index < inputValueId.Length)
-            {
-                var character = inputValueId[index++];
-                if (character == GroupStartSeparator)
-                {
-                    level++;
-                }
-                else if (character == GroupEndSeparator)
-                {
-                    level--;
-                }
-                else if (character == ValueIdsSeparator && level == 0)
-                {
-                    /*if (ValueId.TryParse(inputValueId.Substring(argStartIndex, index - argStartIndex - 1), formatProvider, out var arg))
-                    {
-                        args.Add(arg);
-                        argStartIndex = index;
-                    }
-                    else
-                    {
-                        result = null;
-                        return false;
-                    }*/
-                }
-            }
-
-            /*if (ValueId.TryParse(inputValueId.Substring(argStartIndex, index - argStartIndex), formatProvider, out var arg2))
-            {
-                args.Add(arg2);
-            }*/
-
-            result = new ValueIds(args.ToImmutable());
-            return true;
-        }
-
-        result = null;
-        return false;
-    }
-
-    /// <summary>
-    /// Appends this <see cref="ValueIds"/> to the specified <see cref="StringBuilder"/>.
+    /// Appends this <see cref="ComplexValue"/> to the specified <see cref="StringBuilder"/>.
     /// </summary>
     /// <param name="stringBuilder">The string builder.</param>
     /// <param name="formatProvider">The format provider.</param>
-    public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider)
+    /// <param name="appendOptions">The append options.</param>
+    public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions)
     {
         stringBuilder.AppendItems(
             this.Items,
-            (builder) => builder.Append(GroupStartSeparator),
-            (stringBuilder, arg) => arg.AppendInto(stringBuilder, formatProvider),
-            (builder) => builder.Append(GroupEndSeparator),
-            ValueIds.ValueIdsSeparator);
+            (builder) => builder.If(!appendOptions.IsRoot, builder => builder.Append(Grammar.GroupStart)),
+            (stringBuilder, arg) => arg.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false }),
+            (builder) => builder.If(!appendOptions.IsRoot, builder => builder.Append(Grammar.GroupEnd)),
+            Grammar.ValueIdsSeparator);
     }
 
     /// <summary>
-    /// Creates a string representation of the <see cref="ValueIds"/>.
+    /// Creates a string representation of the <see cref="ComplexValue"/>.
     /// </summary>
     /// <returns>A string.</returns>
     public override string ToString()
     {
         var stringBuilder = new StringBuilder();
-        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture);
+        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true));
         return stringBuilder.ToString();
     }
 

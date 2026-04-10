@@ -133,6 +133,26 @@ public readonly struct R<TSuccess> : IEquatable<R<TSuccess>>
     }
 
     /// <summary>
+    /// Implements the true operator.
+    /// </summary>
+    /// <param name="result">the result.</param>
+    /// <returns><c>true</c> if the result is successful, otherwise <c>false</c>.</returns>
+    public static bool operator true(R<TSuccess> result)
+    {
+        return result.IsSuccess;
+    }
+
+    /// <summary>
+    /// Implements the false operator.
+    /// </summary>
+    /// <param name="result">the result.</param>
+    /// <returns><c>true</c> if the result is erroneous, otherwise <c>false</c>.</returns>
+    public static bool operator false(R<TSuccess> result)
+    {
+        return result.IsError;
+    }
+
+    /// <summary>
     /// Evaluates the result into a single value.
     /// </summary>
     /// <param name="resultIfIsErroneous">The value if the result is erroneous.</param>

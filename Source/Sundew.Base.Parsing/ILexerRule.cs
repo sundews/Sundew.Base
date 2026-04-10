@@ -13,6 +13,7 @@ namespace Sundew.Base.Parsing;
 /// </summary>
 /// <typeparam name="TToken">The type of token produced by this lexer rule.</typeparam>
 public interface ILexerRule<TToken>
+    where TToken : notnull
 {
     /// <summary>
     /// Gets the token associated with this instance.

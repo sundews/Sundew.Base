@@ -12,6 +12,7 @@ namespace Sundew.Base.Parsing;
 /// </summary>
 /// <typeparam name="TToken">Specifies the type of tokens that the lexer processes.</typeparam>
 public interface ILexer<TToken>
+    where TToken : notnull
 {
     /// <summary>
     /// Attempts to extract the lexeme associated with the specified token from the input string.

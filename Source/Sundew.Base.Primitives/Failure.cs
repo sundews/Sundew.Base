@@ -24,7 +24,7 @@ public abstract partial record Failure<TFailure>
     /// the failure. It is commonly used in result-based patterns to distinguish between success and failure
     /// outcomes.</remarks>
     /// <param name="Reason">The reason.</param>
-    public sealed record Failed(TFailure Reason) : Failure<TFailure>;
+    public sealed partial record Failed(TFailure Reason) : Failure<TFailure>;
 
     /// <summary>
     /// Represents a failure state caused by a cancellation, including the reason for the cancellation.
@@ -33,7 +33,7 @@ public abstract partial record Failure<TFailure>
     /// for the cancellation through the <see cref="CancelReason"/> property. It is a specialized type of <see
     /// cref="Failure{TFailure}"/>.</remarks>
     /// <param name="CancelReason">The reason for the cancellation.</param>
-    public sealed record Canceled(CancelReason CancelReason) : Failure<TFailure>;
+    public sealed partial record Canceled(CancelReason CancelReason) : Failure<TFailure>;
 
     /// <summary>
     /// Represents a failure that occurred due to an exception.
@@ -42,7 +42,7 @@ public abstract partial record Failure<TFailure>
     /// caused by exceptions in a structured manner. It is typically used in scenarios where exceptions need to be
     /// propagated or logged as part of a failure result.</remarks>
     /// <param name="Exception">The exception.</param>
-    public sealed record ExceptionOccured(Exception Exception) : Failure<TFailure>;
+    public sealed partial record ExceptionOccured(Exception Exception) : Failure<TFailure>;
 }
 
 /// <summary>
@@ -58,7 +58,7 @@ public abstract partial record Failure
     /// for the cancellation through the <see cref="CancelReason"/> property. It is a specialized type of <see
     /// cref="Failure{TFailure}"/>.</remarks>
     /// <param name="CancelReason">The reason for the cancellation.</param>
-    public sealed record Canceled(CancelReason CancelReason) : Failure;
+    public sealed partial record Canceled(CancelReason CancelReason) : Failure;
 
     /// <summary>
     /// Represents a failure that occurred due to an exception.
@@ -67,5 +67,5 @@ public abstract partial record Failure
     /// caused by exceptions in a structured manner. It is typically used in scenarios where exceptions need to be
     /// propagated or logged as part of a failure result.</remarks>
     /// <param name="Exception">The exception.</param>
-    public sealed record ExceptionOccured(Exception Exception) : Failure;
+    public sealed partial record ExceptionOccured(Exception Exception) : Failure;
 }

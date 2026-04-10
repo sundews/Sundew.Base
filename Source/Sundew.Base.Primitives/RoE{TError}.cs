@@ -130,6 +130,26 @@ public readonly struct RoE<TError> : IEquatable<RoE<TError>>
     }
 
     /// <summary>
+    /// Implements the true operator.
+    /// </summary>
+    /// <param name="result">the result.</param>
+    /// <returns><c>true</c> if the result is successful, otherwise <c>false</c>.</returns>
+    public static bool operator true(RoE<TError> result)
+    {
+        return result.IsSuccess;
+    }
+
+    /// <summary>
+    /// Implements the false operator.
+    /// </summary>
+    /// <param name="result">the result.</param>
+    /// <returns><c>true</c> if the result is erroneous, otherwise <c>false</c>.</returns>
+    public static bool operator false(RoE<TError> result)
+    {
+        return result.IsError;
+    }
+
+    /// <summary>
     /// Checks if the result is an error and passes the error through the out parameter.
     /// </summary>
     /// <param name="error">The error.</param>
