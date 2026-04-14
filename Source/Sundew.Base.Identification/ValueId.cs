@@ -10,16 +10,17 @@ namespace Sundew.Base.Identification;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Sundew.Base.Identification.Parsing;
 
 /// <summary>
 /// Represents a value id for an <see cref="Id"/> argument.
 /// </summary>
-/// <param name="Name">The name.</param>
 /// <param name="Metadata">The metadata.</param>
 /// <param name="Value">The value.</param>
-public sealed partial record ValueId(string? Name, string? Metadata, IValue Value)
+public sealed partial record ValueId(string? Metadata, IValue Value)
 {
     /// <summary>
     /// Gets the type of the source.
@@ -42,7 +43,7 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
     public override string ToString()
     {
         var stringBuilder = new StringBuilder();
-        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true));
+        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true), false);
         return stringBuilder.ToString();
     }
 
@@ -52,7 +53,8 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
     /// <param name="stringBuilder">The string builder.</param>
     /// <param name="formatProvider">The format provider.</param>
     /// <param name="appendOptions">The append options.</param>
-    public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions)
+    /// <param name="requiresKeySeparation">Indicates whether the value id has a name.</param>
+    public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions, bool requiresKeySeparation)
     {
         bool TryAppendMetadata()
         {
@@ -66,18 +68,7 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
             return false;
         }
 
-        if (!string.IsNullOrEmpty(this.Name))
-        {
-            stringBuilder.Append(this.Name);
-            TryAppendMetadata();
-            stringBuilder.Append(Grammar.KeyValueSeparator);
-
-            this.Value.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false });
-
-            return;
-        }
-
-        if (TryAppendMetadata())
+        if (TryAppendMetadata() || requiresKeySeparation)
         {
             stringBuilder.Append(Grammar.KeyValueSeparator);
         }
@@ -125,44 +116,22 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
     /// <returns><c>true</c> if parsing was successful, otherwise <c>false</c>.</returns>
     public static bool TryParse([NotNullWhen(true)] string? inputArg, IFormatProvider? formatProvider, [MaybeNullWhen(false)] out ValueId result)
     {
-        if (inputArg.HasValue)
-        {
-            string key = string.Empty;
-            var level = 0;
-            var index = 0;
-            var metadataIndex = -1;
-            while (index < inputArg.Length)
-            {
-                var character = inputArg[index++];
-                if (character == Grammar.GroupStart)
-                {
-                    level++;
-                }
+        var valueIdResult = IdRouteParser.ParseValueId(inputArg, formatProvider);
+        result = valueIdResult.Value;
+        return valueIdResult.IsSuccess;
+    }
 
-                if (character == Grammar.GroupEnd)
-                {
-                    level--;
-                }
-
-                if (character == Grammar.NameMetadataSeparator && level == 0)
-                {
-                    metadataIndex = index;
-                }
-
-                if (character == Grammar.KeyValueSeparator && level == 0)
-                {
-                    var (nameLength, metadataStart, metadataLength) = metadataIndex > -1 ? (metadataIndex - 1, metadataIndex, index - metadataIndex - 1) : (index - 1, 0, 0);
-                    result = new ValueId(inputArg.Substring(0, nameLength), inputArg.Substring(metadataStart, metadataLength), new ScalarValue(inputArg.Substring(index)));
-                    return true;
-                }
-            }
-
-            result = new ValueId(null, null, new ScalarValue(inputArg));
-            return true;
-        }
-
-        result = null;
-        return false;
+    /// <summary>
+    /// Converts the specified initial value to a value of the specified type, using the current instance as context.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value to convert. Must implement the <see cref="IIdentifiable{TValue}"/> interface.</typeparam>
+    /// <param name="defaultValue">The default value to be converted. Must be of type TValue.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <returns>A value of type TValue that is derived from the initial value and the current instance.</returns>
+    public TValue ToValue<TValue>(TValue defaultValue, IFormatProvider formatProvider)
+        where TValue : IValueIdentifiable<TValue>
+    {
+        return TValue.From(defaultValue, this, formatProvider);
     }
 
     /// <summary>
@@ -174,6 +143,86 @@ public sealed partial record ValueId(string? Name, string? Metadata, IValue Valu
     public TValue ToValue<TValue>(TValue defaultValue)
         where TValue : IValueIdentifiable<TValue>
     {
-        return TValue.From(defaultValue, this);
+        return TValue.From(defaultValue, this, CultureInfo.CurrentCulture);
+    }
+
+    /// <summary>
+    /// Gets the value from the arguments.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="defaultValue">The default value.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <param name="referenceName">The argument name.</param>
+    /// <returns>The retrieved value or the default value.</returns>
+    public TValue GetScalar<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
+        where TValue : IParsable<TValue>
+    {
+        if (!referenceName.HasValue)
+        {
+            throw new NotSupportedException("ReferenceName should be filled by compiler.");
+        }
+
+        if (this.Value is not ComplexValue complexValue)
+        {
+            return defaultValue;
+        }
+
+        var argument = complexValue.Items.FirstOrDefault(x => x.Name == referenceName);
+        if (argument.HasValue)
+        {
+            return TValue.Parse(Uri.UnescapeDataString(argument.ValueId.Value.ToString() ?? string.Empty), formatProvider);
+        }
+
+        var firstDotIndex = referenceName.IndexOf('.');
+        var fallback = firstDotIndex > -1
+            ? referenceName.Substring(firstDotIndex + 1, referenceName.Length - firstDotIndex - 1)
+            : null;
+        argument = complexValue.Items.FirstOrDefault(x => x.Name == fallback);
+        if (argument.HasValue)
+        {
+            return TValue.Parse(Uri.UnescapeDataString(argument.ValueId.Value.ToString() ?? string.Empty), formatProvider);
+        }
+
+        return defaultValue;
+    }
+
+    /// <summary>
+    /// Gets the value from the arguments.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <param name="defaultValue">The default value.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <param name="referenceName">The argument name.</param>
+    /// <returns>The retrieved value or the default value.</returns>
+    public TValue GetValue<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
+        where TValue : IValueIdentifiable<TValue>
+    {
+        if (!referenceName.HasValue)
+        {
+            throw new NotSupportedException("ReferenceName should be filled by compiler.");
+        }
+
+        if (this.Value is not ComplexValue complexValue)
+        {
+            return defaultValue;
+        }
+
+        var argument = complexValue.Items.FirstOrDefault(x => x.Name == referenceName);
+        if (argument.HasValue)
+        {
+            return TValue.From(defaultValue, argument.ValueId, formatProvider);
+        }
+
+        var firstDotIndex = referenceName.IndexOf('.');
+        var fallback = firstDotIndex > -1
+            ? referenceName.Substring(firstDotIndex + 1, referenceName.Length - firstDotIndex - 1)
+            : null;
+        argument = complexValue.Items.FirstOrDefault(x => x.Name == fallback);
+        if (argument.HasValue)
+        {
+            return TValue.From(defaultValue, argument.ValueId, formatProvider);
+        }
+
+        return defaultValue;
     }
 }

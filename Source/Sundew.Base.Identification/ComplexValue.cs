@@ -8,11 +8,7 @@
 namespace Sundew.Base.Identification;
 
 using System;
-using System.Collections.Immutable;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Identification.Parsing;
@@ -22,7 +18,7 @@ using Sundew.Base.Text;
 /// Represents arguments for an <see cref="Id"/>.
 /// </summary>
 /// <param name="Items">The value ids.</param>
-public sealed partial record ComplexValue(ValueArray<ValueId> Items) : IValue
+public sealed partial record ComplexValue(ValueArray<Argument> Items) : IValue
 {
     /// <summary>
     /// Appends this <see cref="ComplexValue"/> to the specified <see cref="StringBuilder"/>.
@@ -34,10 +30,10 @@ public sealed partial record ComplexValue(ValueArray<ValueId> Items) : IValue
     {
         stringBuilder.AppendItems(
             this.Items,
-            (builder) => builder.If(!appendOptions.IsRoot, builder => builder.Append(Grammar.GroupStart)),
+            (stringBuilder) => stringBuilder.If(!appendOptions.IsRoot, builder => builder.Append(Grammar.GroupStart)),
             (stringBuilder, arg) => arg.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false }),
-            (builder) => builder.If(!appendOptions.IsRoot, builder => builder.Append(Grammar.GroupEnd)),
-            Grammar.ValueIdsSeparator);
+            (stringBuilder) => stringBuilder.If(!appendOptions.IsRoot, builder => builder.Append(Grammar.GroupEnd)),
+            Grammar.ArgumentSeparator);
     }
 
     /// <summary>
@@ -49,75 +45,5 @@ public sealed partial record ComplexValue(ValueArray<ValueId> Items) : IValue
         var stringBuilder = new StringBuilder();
         this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true));
         return stringBuilder.ToString();
-    }
-
-    /// <summary>
-    /// Gets the value from the arguments.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="defaultValue">The default value.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="referenceName">The argument name.</param>
-    /// <returns>The retrieved value or the default value.</returns>
-    public TValue Get<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
-        where TValue : IParsable<TValue>
-    {
-        if (!referenceName.HasValue)
-        {
-            throw new NotSupportedException("ReferenceName should be filled by compiler.");
-        }
-
-        var argument = this.Items.FirstOrDefault(x => x.Name == referenceName);
-        if (argument.HasValue)
-        {
-            return TValue.Parse(argument.Value.ToString() ?? string.Empty, formatProvider);
-        }
-
-        var firstDotIndex = referenceName.IndexOf('.');
-        var fallback = firstDotIndex > -1
-            ? referenceName.Substring(firstDotIndex + 1, referenceName.Length - firstDotIndex - 1)
-            : null;
-        argument = this.Items.FirstOrDefault(x => x.Name == fallback);
-        if (argument.HasValue)
-        {
-            return TValue.Parse(argument.Value.ToString() ?? string.Empty, formatProvider);
-        }
-
-        return defaultValue;
-    }
-
-    /// <summary>
-    /// Gets the value from the arguments.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="defaultValue">The default value.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="referenceName">The argument name.</param>
-    /// <returns>The retrieved value or the default value.</returns>
-    public TValue Get2<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
-        where TValue : IValueIdentifiable<TValue>
-    {
-        if (!referenceName.HasValue)
-        {
-            throw new NotSupportedException("ReferenceName should be filled by compiler.");
-        }
-
-        var argument = this.Items.FirstOrDefault(x => x.Name == referenceName);
-        if (argument.HasValue)
-        {
-            return TValue.From(defaultValue, argument);
-        }
-
-        var firstDotIndex = referenceName.IndexOf('.');
-        var fallback = firstDotIndex > -1
-            ? referenceName.Substring(firstDotIndex + 1, referenceName.Length - firstDotIndex - 1)
-            : null;
-        argument = this.Items.FirstOrDefault(x => x.Name == fallback);
-        if (argument.HasValue)
-        {
-            return TValue.From(defaultValue, argument);
-        }
-
-        return defaultValue;
     }
 }

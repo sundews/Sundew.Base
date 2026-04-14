@@ -17,7 +17,7 @@ internal enum Tokens
 
     PathSegmentName,
 
-    ValueIdName,
+    ArgumentName,
 
     ValueIdMetadata,
 

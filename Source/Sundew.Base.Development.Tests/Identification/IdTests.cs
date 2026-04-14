@@ -9,6 +9,7 @@ namespace Sundew.Base.Development.Tests.Identification;
 
 using System;
 using System.Globalization;
+using System.Linq;
 using AwesomeAssertions;
 using AwesomeAssertions.Execution;
 using Sundew.Base.Identification;
@@ -49,31 +50,34 @@ public class IdTests
     [Arguments("Name+Nested~Name.Space$Assembly/Find?Person=(Address=Home&Number=15)&Description=(Eyes=Blue)")]
     [Arguments("Name+Nested~Name.Space$Assembly/Find?Person=(Address=Home&Number=15)&Colors=[Blue,Green]")]
     [Arguments("Name+Nested~Name.Space$Assembly/Find((Address=Home&Number=15)&Colors=[Blue,Green])")]
-    [Arguments("Name+Nested~Name.Space$Assembly/Find(Query!Name.Name.Space$Assembly=(Address=Home&Number=15)&Colors=[Blue,Green])")]
-    [Arguments("Name+Nested~Name.Space$Assembly/Find(!Name.Name.Space$Assembly=(Address=Home&Number=15)&Colors=[Blue,Green])")]
-    [Arguments("Name+Nested~Name.Space$Assembly/Find(!Name.Name.Space$Assembly=(Address=Home&Number=15)&Colors=[!Colors~Assembly=Blue,Green])")]
-    [Arguments("Name+Nested~Name.Space$Assembly/Find(!Name.Name.Space$Assembly=(Address=Home&Number=15)&Colors=[!Colors~Namespace$Assembly=Blue,Green])")]
+    [Arguments("Name+Nested~Name.Space$Assembly/Find(Query!Name~Name.Space$Assembly=(Address=Home&Number=15)&Colors=[Blue,Green])")]
+    [Arguments("Name+Nested~Name.Space$Assembly/Find(!Name~Name.Space$Assembly=(Address=Home&Number=15)&Colors=[Blue,Green])")]
+    [Arguments("Name+Nested~Name.Space$Assembly/Find(!Name~Name.Space$Assembly=(Address=Home&Number=15)&Colors=[!Colors~Assembly=Blue,Green])")]
+    [Arguments("Name+Nested~Name.Space$Assembly/Find(!Name~Name.Space$Assembly=(Address=Home&Number=15)&Colors=[!Colors~Namespace$Assembly=Blue,Green])")]
     [Arguments("IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null)")]
     public void Parse_Then_ResultShouldNotBeNull(string input)
     {
         var result = Id.Parse(input, CultureInfo.InvariantCulture);
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             result.Should().NotBeNull();
             result.ToString().Should().Be(input);
         }
     }
 
     [Test]
-    public void From_When_TargetIsMethodWith0Parameters_Then_ResultShouldNotBeNull()
+    public void From_When_TargetIsMethodWith0Parameters_Then_ResultShouldBeExpected()
     {
         const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/GoBack()";
         var result = Id.From<INavigator>(x => x.GoBack());
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
-            result.Should().Be(Id.Parse(result.ToString(), CultureInfo.InvariantCulture));
+            scope.FormattingOptions.MaxDepth = 20;
+            var expected = Id.Parse(result.ToString(), CultureInfo.InvariantCulture);
+            result.Should().Be(expected);
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([]);
             result.TryGetResultType().Value.Should().Be(typeof(void));
@@ -82,13 +86,14 @@ public class IdTests
     }
 
     [Test]
-    public void From_When_TargetIsMethodWith1Parameter_Then_ResultShouldNotBeNull()
+    public void From_When_TargetIsMethodWith1ParameterAsNull_Then_ResultShouldBeExpected()
     {
         const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null)";
         var result = Id.From<INavigator>(x => x.NavigateTo(null!));
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             result.Should().Be(Id.Parse(result.ToString(), CultureInfo.InvariantCulture));
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
@@ -98,13 +103,14 @@ public class IdTests
     }
 
     [Test]
-    public void From_When_TargetIsMethodWith1Parameter_Then_ResultShouldNotBeNull2()
+    public void From_When_TargetIsMethodWith1Parameter_Then_ResultShouldBeExpected()
     {
         const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
         var result = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             result.Should().Be(Id.Parse(result.ToString(), CultureInfo.InvariantCulture));
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
@@ -119,8 +125,9 @@ public class IdTests
         const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null&addToHistory=False)";
         var result = Id.From<INavigator>(x => x.NavigateTo(null!, default));
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             result.Should().Be(Id.Parse(result.ToString(), CultureInfo.InvariantCulture));
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([typeof(Position), typeof(bool)]);
@@ -135,8 +142,9 @@ public class IdTests
         const string expectedResult = "IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/X";
         var result = Id.From<Position>(x => x.X);
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             result.Should().Be(Id.Parse(result.ToString(), CultureInfo.InvariantCulture));
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([typeof(int)]);
@@ -146,7 +154,7 @@ public class IdTests
     }
 
     [Test]
-    public void AsArguments_Then_ResultShouldBeExpectedResult()
+    public void ToValue_Then_ResultShouldBeExpectedResult()
     {
         const string expectedResult = "!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=5)";
         var position = new Position(4, 5);
@@ -154,15 +162,16 @@ public class IdTests
         var valueId = position.Id;
         var result = valueId.ToValue(new Position(0, 0));
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             valueId.ToString().Should().Be(expectedResult);
             result.Should().Be(position);
         }
     }
 
     [Test]
-    public void AsArguments_Then_ResultShouldBeExpectedResult2()
+    public void ToValue_When_UsingNestedType_Then_ResultShouldBeExpectedResult()
     {
         const string expectedResult = "!IdTests+Position3D~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Position=(X=4&Y=5)&Z=6)";
         var position = new Position3D(new Position(4, 5), 6);
@@ -170,21 +179,23 @@ public class IdTests
         var valueId = position.Id;
         var result = valueId.ToValue(new Position3D(new Position(0, 0), 0));
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             valueId.ToString().Should().Be(expectedResult);
             result.Should().Be(position);
         }
     }
 
     [Test]
-    public void From_When_TargetIsMethodWith2Parameters_Then_ResultShouldNotBeNull2()
+    public void From_When_TargetIsMethodWith1Parameters_Then_ResultShouldBeExpected()
     {
         const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate/Execute(parameter!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6))";
         var result = Id.From<INavigator>(x => x.Navigate.Execute(Id.Argument<Position>()), new Position(4, 6));
 
-        using (new AssertionScope())
+        using (var scope = new AssertionScope())
         {
+            scope.FormattingOptions.MaxDepth = 20;
             result.Should().Be(Id.Parse(result.ToString(), CultureInfo.InvariantCulture));
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
@@ -194,7 +205,7 @@ public class IdTests
     }
 
     [Test]
-    public void From_When_TargetIsMethodWith2Parameters_Then_ResultShouldNotBeNull3()
+    public void From_When_TargetIsPropertyAndPassingArgument_Then_ResultShouldBeExpected()
     {
         const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate?!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6)";
         var result = Id.From<INavigator>(x => x.Navigate, new Position(4, 6));
@@ -202,7 +213,8 @@ public class IdTests
         using (var scope = new AssertionScope())
         {
             scope.FormattingOptions.MaxDepth = 20;
-            Id.Parse(result.ToString(), CultureInfo.InvariantCulture).Should().Be(result);
+            var expected = Id.Parse(result.ToString(), CultureInfo.InvariantCulture);
+            expected.Should().Be(result);
             result.ToString().Should().Be(expectedResult);
             result.TryGetInputTypes().Value.Should().Equal([typeof(Position)]);
             result.TryGetResultType().Value.Should().Be(typeof(ICommand<Position>));
@@ -232,11 +244,11 @@ public class IdTests
     {
         public ValueId Id => ValueId.From(this, (value, builder) => builder.Add(value.X).Add(value.Y));
 
-        public static Position From(Position position, ValueId valueId)
+        public static Position From(Position position, ValueId valueId, IFormatProvider? formatProvider)
         {
             return new Position(
-                valueId.Value.Get(position.X, CultureInfo.InvariantCulture),
-                valueId.Value.Get(position.Y, CultureInfo.InvariantCulture));
+                valueId.GetScalar(position.X, CultureInfo.InvariantCulture),
+                valueId.GetScalar(position.Y, CultureInfo.InvariantCulture));
         }
     }
 
@@ -244,11 +256,11 @@ public class IdTests
     {
         public ValueId Id => ValueId.From(this, (value, builder) => builder.Add(value.Position).Add(value.Z));
 
-        public static Position3D From(Position3D value, ValueId valueId)
+        public static Position3D From(Position3D value, ValueId valueId, IFormatProvider? formatProvider)
         {
             return new Position3D(
-                valueId.Value.Get2(value.Position, CultureInfo.InvariantCulture),
-                valueId.Value.Get(value.Z, CultureInfo.InvariantCulture));
+                valueId.GetValue(value.Position, CultureInfo.InvariantCulture),
+                valueId.GetScalar(value.Z, CultureInfo.InvariantCulture));
         }
     }
 }

@@ -158,6 +158,11 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     /// <returns><c>true</c>, if the values are equal otherwise false.</returns>
     public bool Equals(ValueList<TItem> other)
     {
+        if (this.Count == 0 && other.Count == 0)
+        {
+            return true;
+        }
+
         if (this.inner == null)
         {
             if (other.inner == null)

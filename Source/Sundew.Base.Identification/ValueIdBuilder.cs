@@ -19,7 +19,7 @@ using Sundew.Base.Collections.Linq;
 /// <param name="type">The .</param>
 public sealed class ValueIdBuilder(Type type)
 {
-    private readonly List<ValueId> values = new();
+    private readonly List<Argument> values = new();
 
     /// <summary>
     /// Adds a value to the builder for dynamic construction of identifiers.
@@ -47,14 +47,14 @@ public sealed class ValueIdBuilder(Type type)
         if (value != null && value is IValueIdentifiable<TValue> valueIdentifiable)
         {
             var valueId = valueIdentifiable.Id;
-            this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), valueId.Value));
+            this.values.Add(new Argument(name, new ValueId(GetMetadata(value.GetType(), typeof(TValue), false), valueId.Value)));
         }
         else if (value != null)
         {
             var stringValue = value.ToString();
             if (stringValue.HasValue)
             {
-                this.values.Add(new ValueId(name, GetMetadata(value.GetType(), typeof(TValue), false), new ScalarValue(stringValue)));
+                this.values.Add(new Argument(name, new ValueId(GetMetadata(value.GetType(), typeof(TValue), false), new ScalarValue(stringValue))));
             }
         }
 
@@ -71,9 +71,9 @@ public sealed class ValueIdBuilder(Type type)
         var metadata = Source.FromType(type).ToString();
         return cardinality switch
         {
-            Empty<ValueId> empty => new ValueId(null, metadata, new ScalarValue("null")),
-            Multiple<ValueId> valueIds => new ValueId(null, metadata, new ComplexValue(valueIds.Items.ToValueArray())),
-            Single<ValueId> single => single.Item,
+            Empty<Argument> empty => new ValueId(metadata, new ScalarValue("null")),
+            Multiple<Argument> valueIds => new ValueId(metadata, new ComplexValue(valueIds.Items.ToValueArray())),
+            Single<Argument> single => single.Item.ValueId,
         };
     }
 

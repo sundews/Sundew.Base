@@ -27,8 +27,8 @@ internal static class Grammar
     /// <summary>Key Value separator.</summary>
     public const char KeyValueSeparator = '=';
 
-    /// <summary>The argument separator.</summary>
-    public const char ArgumentSeparator = ',';
+    /// <summary>The array element separator.</summary>
+    public const char ArrayElementSeparator = ',';
 
     /// <summary>The start of and array.</summary>
     public const char ArrayStart = '[';
@@ -36,8 +36,8 @@ internal static class Grammar
     /// <summary>The end of an array.</summary>
     public const char ArrayEnd = ']';
 
-    /// <summary>The value id separator.</summary>
-    public const char ValueIdsSeparator = '&';
+    /// <summary>The argument separator.</summary>
+    public const char ArgumentSeparator = '&';
 
     /// <summary>The group start.</summary>
     public const char GroupStart = '(';

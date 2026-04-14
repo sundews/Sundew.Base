@@ -15,7 +15,7 @@ using System.Text;
 /// </summary>
 /// <param name="Name">The name of the segment, which serves as its identifier.</param>
 /// <param name="Arguments">A value for the segment.</param>
-public sealed record Segment(string Name, IArguments? Arguments = null)
+public sealed record Segment(string Name, Arguments? Arguments = null)
 {
     /// <summary>
     /// Appends the name of the current instance to the specified StringBuilder, followed by parentheses.

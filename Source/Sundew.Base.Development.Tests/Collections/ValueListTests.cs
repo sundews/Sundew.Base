@@ -14,6 +14,15 @@ using Sundew.Base.Collections.Immutable;
 public class ValueListTests
 {
     [Test]
+    public void Equals_When_OneIsDefaultAndTheOtherIsEmpty_Then_LhsAndRhsShouldBeEqual()
+    {
+        ValueList<int> lhs = ValueList<int>.Empty;
+        ValueList<int> rhs = default;
+
+        ((object)lhs).Should().Be(rhs);
+    }
+
+    [Test]
     public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueList<int> lhs = System.Collections.Immutable.ImmutableList.Create(4, 5, 6);

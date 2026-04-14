@@ -23,6 +23,15 @@ public class ValueArrayTests
     }
 
     [Test]
+    public void Equals_When_OneIsDefaultAndTheOtherIsEmpty_Then_LhsAndRhsShouldBeEqual()
+    {
+        ValueArray<int> lhs = ValueArray<int>.Empty;
+        ValueArray<int> rhs = default;
+
+        ((object)lhs).Should().Be(rhs);
+    }
+
+    [Test]
     public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueArray<int> lhs = System.Collections.Immutable.ImmutableArray.Create(4, 5, 6);

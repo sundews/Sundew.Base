@@ -70,7 +70,17 @@ public partial interface IArgumentsError : IParserError
 {
     public sealed partial record ValueIdError(IValueIdError Error) : IArgumentsError;
 
+    public sealed partial record ValueError(IValueError Error) : IArgumentsError;
+
     public sealed partial record GroupValueIdError(object Cause, LexerError? Error) : IArgumentsError;
+}
+
+/// <summary>
+/// Union for <see cref="ScalarValue"/> errors.
+/// </summary>
+[DiscriminatedUnion]
+public partial interface IParseValueIdError : IParserError
+{
 }
 
 /// <summary>
@@ -79,9 +89,6 @@ public partial interface IArgumentsError : IParserError
 [DiscriminatedUnion]
 public partial interface IValueIdError : IParserError
 {
-    public sealed partial record ValueIdError(object Cause, LexerError? Error) : IValueIdError;
-
-    public sealed partial record ValueIdValueError(IValueError Error) : IValueIdError;
 }
 
 /// <summary>
@@ -99,14 +106,24 @@ public partial interface IValueError : IParserError
     public sealed partial record ValueError(LexerError? Error) : IValueError;
 }
 
+public sealed partial record ValueIdError(object Cause, LexerError? Error) : IValueIdError, IParseValueIdError;
+
+public sealed partial record ValueIdValueError(IValueError Error) : IValueIdError, IParseValueIdError;
+
 /// <summary>
 /// Represents an error when there was still input to process.
 /// </summary>
-public sealed partial record NotAtEndError() : IIdError, IIdRouteError;
+public sealed partial record NotAtEndError() : IIdError, IIdRouteError, IParseValueIdError;
 
 /// <summary>
 /// Represents an error when an Id is empty or null.
 /// </summary>
-public sealed partial record EmptyOrNullError() : IIdError, IIdRouteError;
+public sealed partial record EmptyOrNullError() : IIdError, IIdRouteError, IParseValueIdError;
 
+/// <summary>
+/// Represents a lexer error.
+/// </summary>
+/// <param name="Cause">The cause.</param>
+/// <param name="LexerError">The lexer error.</param>
+public sealed partial record LexError(object Cause, LexerError LexerError) : IArgumentsError, IValueIdError;
 #pragma warning restore SA1402

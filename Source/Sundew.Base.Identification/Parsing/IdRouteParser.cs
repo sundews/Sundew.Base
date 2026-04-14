@@ -24,15 +24,15 @@ internal static class IdRouteParser
         var sourcePathLexerRule = new RegexLexerRule<Tokens>(Tokens.SourcePath, new Regex("[^$~]+", RegexOptions.Compiled));
         var sourceOriginLexerRule = new RegexLexerRule<Tokens>(Tokens.SourceOrigin, new Regex("[^$~//>]*", RegexOptions.Compiled));
         var segmentNameLexerRule = new RegexLexerRule<Tokens>(Tokens.PathSegmentName, new Regex("[^$~//?(>]+", RegexOptions.Compiled));
-        var valueIdNameLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdName, new Regex("[^!=]+", RegexOptions.Compiled));
+        var argumentNameLexerRule = new RegexLexerRule<Tokens>(Tokens.ArgumentName, new Regex(@"\G[^!=(]+", RegexOptions.Compiled));
         var valueIdMetadataLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdMetadata, new Regex("[^=]+", RegexOptions.Compiled));
-        var valueIdValueLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdValue, new Regex("[^)&]+", RegexOptions.Compiled));
+        var valueIdValueLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdValue, new Regex(@"[^),\]&]+", RegexOptions.Compiled));
         IdRouteLexer = new Lexer<Tokens>(
             [sourceNameLexerRule,
             sourcePathLexerRule,
             sourceOriginLexerRule,
             segmentNameLexerRule,
-            valueIdNameLexerRule,
+            argumentNameLexerRule,
             valueIdMetadataLexerRule,
             valueIdValueLexerRule]);
         IdLexer = new Lexer<Tokens>(
@@ -40,7 +40,7 @@ internal static class IdRouteParser
             sourcePathLexerRule,
             sourceOriginLexerRule,
             segmentNameLexerRule,
-            valueIdNameLexerRule,
+            argumentNameLexerRule,
             valueIdMetadataLexerRule,
             valueIdValueLexerRule]);
     }
@@ -77,6 +77,23 @@ internal static class IdRouteParser
         }
 
         return R.Error(IIdError.NotAtEndError);
+    }
+
+    public static R<ValueId, IParseValueIdError> ParseValueId(string? input, IFormatProvider? formatProvider)
+    {
+        if (!input.HasValue)
+        {
+            return R.Error(IParseValueIdError.EmptyOrNullError);
+        }
+
+        var parser = new Parser<Tokens>(IdLexer, input, formatProvider);
+        var valueIdResult = ValueId(parser);
+        if (valueIdResult.IsSuccess && parser.IsEnd())
+        {
+            return valueIdResult.MapError(x => (IParseValueIdError)x);
+        }
+
+        return R.Error(IParseValueIdError.NotAtEndError);
     }
 
     private static R<IdRoute, IIdRouteError> IdRoute(Parser<Tokens> parser)
@@ -120,7 +137,7 @@ internal static class IdRouteParser
             }
         }
 
-        IArguments? arguments = null;
+        Arguments? arguments = null;
         if (parser.TryAccept(Grammar.ArgumentsSeparator))
         {
             var valueIdsResult = Arguments(parser);
@@ -157,14 +174,21 @@ internal static class IdRouteParser
             {
                 if (parser.TryAccept(Grammar.GroupStart))
                 {
-                    var argumentsResult = Arguments(parser).MapError(IPathError._PathValueIdError)
-                        .And(() => parser.Accept(Grammar.GroupEnd).Map(le => IPathError._PathEndError(Grammar.GroupStart, le)));
-                    if (!argumentsResult.IsSuccess)
+                    if (parser.TryAccept(Grammar.GroupEnd))
                     {
-                        return R.Error(argumentsResult.Error);
+                        segments.Add(new Segment(segmentResult.Value, new Arguments(ValueArray<Argument>.Empty)));
                     }
+                    else
+                    {
+                        var argumentsResult = Arguments(parser).MapError(IPathError._PathValueIdError)
+                            .And(() => parser.Accept(Grammar.GroupEnd).Map(le => IPathError._PathEndError(Grammar.GroupStart, le)));
+                        if (!argumentsResult.IsSuccess)
+                        {
+                            return R.Error(argumentsResult.Error);
+                        }
 
-                    segments.Add(new Segment(segmentResult.Value, argumentsResult.Value));
+                        segments.Add(new Segment(segmentResult.Value, argumentsResult.Value));
+                    }
                 }
                 else
                 {
@@ -190,105 +214,81 @@ internal static class IdRouteParser
         return R.Success(new Path(segments.ToValueArray()));
     }
 
-    private static R<IArguments, IArgumentsError> Arguments(Parser<Tokens> parser)
+    private static R<Arguments, IArgumentsError> Arguments(Parser<Tokens> parser)
     {
-        var valueIds = ImmutableArray.CreateBuilder<ValueId>();
+        var valueIds = ImmutableArray.CreateBuilder<Argument>();
         while (!parser.IsEnd())
         {
-            var value = Value(parser);
-            if (value.IsSuccess)
+            var argumentResult = Argument(parser);
+            if (argumentResult.IsSuccess)
             {
-                valueIds.Add(new ValueId(null, null, value.Value));
-                if (!parser.Accept(Grammar.ValueIdsSeparator))
+                valueIds.Add(argumentResult.Value);
+                if (!parser.Accept(Grammar.ArgumentSeparator))
                 {
                     break;
                 }
-
-                continue;
-            }
-
-            var groupValueIdResult = parser.TryAccept(
-                Grammar.GroupStart,
-                r => r.MapError(lexerError => IArgumentsError._GroupValueIdError(Grammar.GroupStart, lexerError))
-                    .And(() => ValueId(parser).MapError(IArgumentsError._ValueIdError))
-                    .And(() => parser.Accept(Grammar.GroupEnd).Map(lexerError => IArgumentsError._GroupValueIdError(Grammar.GroupEnd, lexerError)))
-                    .Map(x => x.Value2));
-
-            /*var groupValueIdResult = parser.TryAccept(
-                Grammar.GroupStart,
-                r => r.MapError(lexerError => IArgumentsError._GroupValueIdError(Grammar.GroupStart, lexerError))
-                    .And(() => ValueId(parser).MapError(IArgumentsError._ValueIdError))
-                    .And(() => parser.Accept(Grammar.GroupEnd).Map(lexerError => IArgumentsError._GroupValueIdError(Grammar.GroupEnd, lexerError)))
-                    .Map(x => x.Value2));*/
-            if (groupValueIdResult.IsSuccess)
-            {
-                valueIds.Add(groupValueIdResult.Value);
-            }
-            else if (parser.IsNext(Grammar.GroupEnd))
-            {
             }
             else
             {
-                var valueIdResult = ValueId(parser);
-                if (valueIdResult.IsSuccess)
-                {
-                    valueIds.Add(valueIdResult.Value);
-                }
-            }
-
-            if (groupValueIdResult.Error is IArgumentsError.GroupValueIdError { Cause: Grammar.GroupEnd })
-            {
-                return R.Error(groupValueIdResult.Error);
-            }
-
-            if (!parser.Accept(Grammar.ValueIdsSeparator))
-            {
-                break;
+                return R.Error(argumentResult.Error);
             }
         }
 
-        return R.Success(IArguments.ComplexValue(valueIds.ToValueArray()));
+        return R.Success(new Arguments(valueIds.ToValueArray()));
+    }
+
+    private static R<Argument, IArgumentsError> Argument(Parser<Tokens> parser)
+    {
+        var argumentNameOption = parser.TryAccept(Tokens.ArgumentName);
+        var argumentResult = ValueId(parser).MapError(IArgumentsError._ValueIdError)
+            .Map(x => new Argument(argumentNameOption, x));
+        if (argumentResult.IsSuccess)
+        {
+            return argumentResult;
+        }
+
+        argumentResult = parser.TryAccept(
+            Grammar.KeyValueSeparator,
+            result => result.MapError(x => IArgumentsError.LexError(Grammar.KeyValueSeparator, x)))
+                .And(() => Value(parser).MapError(IArgumentsError._ValueError))
+                .Map(x => new Argument(argumentNameOption, new ValueId(null, x.Value2)));
+        if (argumentResult.IsSuccess)
+        {
+            return argumentResult;
+        }
+
+        var valueIdResult = Value(parser);
+        if (valueIdResult.IsSuccess)
+        {
+            return R.Success(new Argument(argumentNameOption, new ValueId(null, valueIdResult.Value)));
+        }
+
+        parser.Undo();
+        valueIdResult = Value(parser);
+        if (valueIdResult.IsSuccess)
+        {
+            return R.Success(new Argument(null, new ValueId(null, valueIdResult.Value)));
+        }
+
+        return R.Error(IArgumentsError._ValueError(valueIdResult.Error));
     }
 
     private static R<ValueId, IValueIdError> ValueId(Parser<Tokens> parser)
     {
-        var fullValueIdResult = parser.TryAccept(
-            Tokens.ValueIdName,
-            result => result.MapError(lexerError => IValueIdError._ValueIdError(Tokens.ValueIdName, lexerError))
-                .And(() => parser.Accept(Grammar.NameMetadataSeparator).Map(lexerError => IValueIdError._ValueIdError(Grammar.NameMetadataSeparator, lexerError)))
-                .And(() => parser.Accept(Tokens.ValueIdMetadata).MapError(lexerError => IValueIdError._ValueIdError(Tokens.ValueIdMetadata, lexerError)))
-                .And(() => parser.Accept(Grammar.KeyValueSeparator).Map(lexerError => IValueIdError._ValueIdError(Grammar.KeyValueSeparator, lexerError)))
-                .And(() => Value(parser).MapError(IValueIdError._ValueIdValueError))
-                .Map(x => new ValueId(x.Value1, x.Value2, x.Value3)));
-        if (fullValueIdResult.IsSuccess)
-        {
-            return fullValueIdResult;
-        }
-
-        fullValueIdResult = parser.TryAccept(
+        var metadataResult = parser.TryAccept(
             Grammar.NameMetadataSeparator,
-            result => result.MapError(lexerError => IValueIdError._ValueIdError(Grammar.NameMetadataSeparator, lexerError))
-                .And(() => parser.Accept(Tokens.ValueIdMetadata).MapError(lexerError => IValueIdError._ValueIdError(Tokens.ValueIdMetadata, lexerError)))
-                .And(() => parser.Accept(Grammar.KeyValueSeparator).Map(lexerError => IValueIdError._ValueIdError(Grammar.KeyValueSeparator, lexerError)))
-                .And(() => Value(parser).MapError(IValueIdError._ValueIdValueError))
-                .Map(x => new ValueId(null, x.Value2, x.Value3)));
-        if (fullValueIdResult.IsSuccess)
+            result => result.MapError(lexerError => IValueIdError.LexError(Grammar.NameMetadataSeparator, lexerError))
+                .And(() => parser.Accept(Tokens.ValueIdMetadata).MapError(lexerError => IValueIdError.ValueIdError(Tokens.ValueIdMetadata, lexerError))));
+
+        var valueIdResult = parser.TryAccept(Grammar.KeyValueSeparator).Map(lexerError => IValueIdError.ValueIdError(Grammar.KeyValueSeparator, lexerError))
+                .And(() => Value(parser).MapError(IValueIdError.ValueIdValueError))
+                .Map(x => new ValueId(metadataResult.Value.Value2, x));
+        if (valueIdResult.IsSuccess)
         {
-            return fullValueIdResult;
+            return valueIdResult;
         }
 
-        fullValueIdResult = parser.TryAccept(
-            Tokens.ValueIdName,
-            result => result.MapError(lexerError => IValueIdError._ValueIdError(Tokens.ValueIdName, lexerError))
-                .And(() => parser.Accept(Grammar.KeyValueSeparator).Map(lexerError => IValueIdError._ValueIdError(Grammar.KeyValueSeparator, lexerError)))
-                .And(() => Value(parser).MapError(IValueIdError._ValueIdValueError))
-                .Map(x => new ValueId(x.Value1, null, x.Value2)));
-        if (fullValueIdResult.IsSuccess)
-        {
-            return fullValueIdResult;
-        }
-
-        return Value(parser).Map(x => new ValueId(null, null, x), IValueIdError._ValueIdValueError);
+        return Value(parser).Map(x => new ValueId(null, x), IValueIdError.ValueIdValueError);
     }
 
     private static R<IValue, IValueError> Value(Parser<Tokens> parser)
@@ -298,32 +298,11 @@ internal static class IdRouteParser
             result =>
             {
                 return result.MapError(lexerError => IValueError._GroupError(Grammar.GroupStart, lexerError))
-                    .And(() =>
-                    {
-                        var valueIds = ImmutableArray.CreateBuilder<ValueId>();
-                        while (!parser.IsNext(Grammar.GroupStart))
-                        {
-                            var valueIdResult = ValueId(parser);
-                            if (valueIdResult.IsSuccess)
-                            {
-                                valueIds.Add(valueIdResult.Value);
-                                if (!parser.Accept(Grammar.ValueIdsSeparator))
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                return R.Error(IValueError._ValueIdError(valueIdResult.Error));
-                            }
-                        }
-
-                        return R.Success<IValue>(new ComplexValue(valueIds.ToValueArray())).Omits<IValueError>();
-                    })
+                    .And(() => Arguments(parser).MapError(x => IValueError._ValueError(null)))
                     .And(() => parser.Accept(Grammar.GroupEnd)
                         .Map(lexerError => IValueError._GroupError(Grammar.GroupEnd, lexerError)))
                     .Map(x => x.Value2);
-            });
+            }).Map(x => IValue.ComplexValue(x.Items));
         if (valueResult.IsSuccess)
         {
             return valueResult;
@@ -333,7 +312,7 @@ internal static class IdRouteParser
             Grammar.ArrayStart,
             result =>
             {
-                return result.MapError(lexerError => IValueError._ArrayError(Grammar.GroupStart, lexerError))
+                return result.MapError(lexerError => IValueError._ArrayError(Grammar.ArrayStart, lexerError))
                     .And(() =>
                     {
                         var valueIds = ImmutableArray.CreateBuilder<ValueId>();
@@ -343,7 +322,7 @@ internal static class IdRouteParser
                             if (singleValueIdResult.IsSuccess)
                             {
                                 valueIds.Add(singleValueIdResult.Value);
-                                if (!parser.Accept(Grammar.ValueIdsSeparator))
+                                if (!parser.Accept(Grammar.ArrayElementSeparator))
                                 {
                                     break;
                                 }
@@ -365,6 +344,6 @@ internal static class IdRouteParser
             return valueResult;
         }
 
-        return parser.Accept(Tokens.ValueIdValue).Map(x => IValue.ScalarValue(x), IValueError._ValueError);
+        return parser.Accept(Tokens.ValueIdValue).Map(IValue.ScalarValue, IValueError._ValueError);
     }
 }

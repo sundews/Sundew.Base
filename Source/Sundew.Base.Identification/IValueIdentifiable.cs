@@ -7,6 +7,8 @@
 
 namespace Sundew.Base.Identification;
 
+using System;
+
 /// <summary>
 /// Interface for implementing a value identifiable.
 /// </summary>
@@ -17,7 +19,8 @@ public interface IValueIdentifiable<TValue> : IIdentifiable<ValueId>
     /// Creates a value from the value id.
     /// </summary>
     /// <param name="value">The initial value.</param>
-    /// <param name="valueId">The valueId.</param>
+    /// <param name="valueId">The value id.</param>
+    /// <param name="formatProvider">The format provider.</param>
     /// <returns>The created value.</returns>
-    static abstract TValue From(TValue value, ValueId valueId);
+    static abstract TValue From(TValue value, ValueId valueId, IFormatProvider? formatProvider);
 }

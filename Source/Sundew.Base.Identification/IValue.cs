@@ -8,40 +8,20 @@
 namespace Sundew.Base.Identification;
 
 using System;
-using System.Runtime.CompilerServices;
+using System.Text;
 using Sundew.DiscriminatedUnions;
 
 /// <summary>
 /// Represents a value.
 /// </summary>
 [DiscriminatedUnion]
-public partial interface IValue : IArguments
+public partial interface IValue
 {
     /// <summary>
-    /// Gets the value from the arguments.
+    /// Appends this <see cref="ValueId"/> to the specified <see cref="StringBuilder"/>.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="defaultValue">The default value.</param>
+    /// <param name="stringBuilder">The string builder.</param>
     /// <param name="formatProvider">The format provider.</param>
-    /// <param name="referenceName">The argument name.</param>
-    /// <returns>The retrieved value or the default value.</returns>
-    public TValue Get<TValue>(
-        TValue defaultValue,
-        IFormatProvider formatProvider,
-        [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
-        where TValue : IParsable<TValue>;
-
-    /// <summary>
-    /// Gets the value from the arguments.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="defaultValue">The default value.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="referenceName">The argument name.</param>
-    /// <returns>The retrieved value or the default value.</returns>
-    public TValue Get2<TValue>(
-        TValue defaultValue,
-        IFormatProvider formatProvider,
-        [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
-        where TValue : IValueIdentifiable<TValue>;
+    /// <param name="appendOptions">The append options.</param>
+    void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions);
 }

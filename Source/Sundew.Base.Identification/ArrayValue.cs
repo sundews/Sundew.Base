@@ -9,8 +9,6 @@ namespace Sundew.Base.Identification;
 
 using System;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Identification.Parsing;
@@ -30,10 +28,12 @@ public sealed partial record ArrayValue(ValueArray<ValueId> Items) : IValue
     /// <param name="appendOptions">The append options.</param>
     public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions)
     {
+        stringBuilder.Append(Grammar.ArrayStart);
         stringBuilder.AppendItems(
             this.Items,
-            (stringBuilder, arg) => arg.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false }),
-            Grammar.ValueIdsSeparator);
+            (stringBuilder, valueId) => valueId.AppendInto(stringBuilder, formatProvider, appendOptions with { IsRoot = false }, false),
+            Grammar.ArrayElementSeparator);
+        stringBuilder.Append(Grammar.ArrayEnd);
     }
 
     /// <summary>
@@ -45,75 +45,5 @@ public sealed partial record ArrayValue(ValueArray<ValueId> Items) : IValue
         var stringBuilder = new StringBuilder();
         this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true));
         return stringBuilder.ToString();
-    }
-
-    /// <summary>
-    /// Gets the value from the arguments.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="defaultValue">The default value.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="referenceName">The argument name.</param>
-    /// <returns>The retrieved value or the default value.</returns>
-    public TValue Get<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
-        where TValue : IParsable<TValue>
-    {
-        if (!referenceName.HasValue)
-        {
-            throw new NotSupportedException("ReferenceName should be filled by compiler.");
-        }
-
-        var argument = this.Items.FirstOrDefault(x => x.Name == referenceName);
-        if (argument.HasValue)
-        {
-            return TValue.Parse(argument.Value.ToString() ?? string.Empty, formatProvider);
-        }
-
-        var firstDotIndex = referenceName.IndexOf('.');
-        var fallback = firstDotIndex > -1
-            ? referenceName.Substring(firstDotIndex + 1, referenceName.Length - firstDotIndex - 1)
-            : null;
-        argument = this.Items.FirstOrDefault(x => x.Name == fallback);
-        if (argument.HasValue)
-        {
-            return TValue.Parse(argument.Value.ToString() ?? string.Empty, formatProvider);
-        }
-
-        return defaultValue;
-    }
-
-    /// <summary>
-    /// Gets the value from the arguments.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    /// <param name="defaultValue">The default value.</param>
-    /// <param name="formatProvider">The format provider.</param>
-    /// <param name="referenceName">The argument name.</param>
-    /// <returns>The retrieved value or the default value.</returns>
-    public TValue Get2<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
-        where TValue : IValueIdentifiable<TValue>
-    {
-        if (!referenceName.HasValue)
-        {
-            throw new NotSupportedException("ReferenceName should be filled by compiler.");
-        }
-
-        var argument = this.Items.FirstOrDefault(x => x.Name == referenceName);
-        if (argument.HasValue)
-        {
-            return TValue.From(defaultValue, argument);
-        }
-
-        var firstDotIndex = referenceName.IndexOf('.');
-        var fallback = firstDotIndex > -1
-            ? referenceName.Substring(firstDotIndex + 1, referenceName.Length - firstDotIndex - 1)
-            : null;
-        argument = this.Items.FirstOrDefault(x => x.Name == fallback);
-        if (argument.HasValue)
-        {
-            return TValue.From(defaultValue, argument);
-        }
-
-        return defaultValue;
     }
 }

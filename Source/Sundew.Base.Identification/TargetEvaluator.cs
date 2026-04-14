@@ -13,6 +13,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Collections.Linq;
 using Sundew.Base.Identification.Parsing;
 using Sundew.Base.Text;
@@ -67,7 +68,7 @@ internal static class TargetEvaluator
         return R.Error();
     }
 
-    public static R<IReadOnlyList<Type>> GetInputTypes(Source source, Path? path, IArguments? arguments)
+    public static R<IReadOnlyList<Type>> GetInputTypes(Source source, Path? path, Arguments? arguments)
     {
         var sourceType = source.TryGetType();
         if (sourceType.IsError)
@@ -77,7 +78,7 @@ internal static class TargetEvaluator
 
         if (arguments.HasValue)
         {
-            return arguments.ToValueIds().Items.Select(x => x.TryGetType()).AllOrFailed(x => x.ToItem()).Map(x => (IReadOnlyList<Type>)x.Items);
+            return arguments.Items.Select(x => x.ValueId.TryGetType()).AllOrFailed(x => x.ToItem()).Map(x => (IReadOnlyList<Type>)x.Items);
         }
 
         if (!path.HasValue)
@@ -163,7 +164,7 @@ internal static class TargetEvaluator
             stringBuilder
                 .Append(baseName)
                 .Append(Grammar.ArrayStart)
-                .AppendItems(type.GetGenericArguments(), (builder, x) => GetTypeName(x, builder), Grammar.ArgumentSeparator)
+                .AppendItems(type.GetGenericArguments(), (builder, x) => GetTypeName(x, builder), Grammar.ArrayElementSeparator)
                 .Append(Grammar.ArrayEnd);
 
             return false;
@@ -209,10 +210,10 @@ internal static class TargetEvaluator
                 case Empty<MemberInfo> empty:
                     break;
                 case Multiple<MemberInfo> multiple:
-                    var valueIds = segment.Arguments?.ToValueIds() ?? new ComplexValue([]);
+                    var valueIds = segment.Arguments?.Items ?? [];
                     var methodInfo = multiple.Items.OfType<MethodInfo>()
                         .Select(methodInfo => (methodInfo, parameters: methodInfo.GetParameters()))
-                        .Where(x => x.parameters.Length == valueIds.Items.Count)
+                        .Where(x => x.parameters.Length == valueIds.Count)
                         .FirstOrDefault(x => IsMatch(x.parameters, valueIds)).methodInfo;
                     memberInfo = methodInfo;
                     if (methodInfo.HasValue)
@@ -240,18 +241,18 @@ internal static class TargetEvaluator
         return memberInfo;
     }
 
-    private static bool IsMatch(ParameterInfo[] parameterInfos, ComplexValue complexValue)
+    private static bool IsMatch(ParameterInfo[] parameterInfos, ValueArray<Argument> arguments)
     {
-        if (!complexValue.HasValue)
+        if (arguments.IsEmpty)
         {
             return parameterInfos.Length == 0;
         }
 
-        return parameterInfos.Zip(complexValue.Items).All(x =>
+        return parameterInfos.Zip(arguments).All(x =>
         {
-            var argumentType = x.Second.Metadata.HasValue
-                ? Source.Parse(x.Second.Metadata, CultureInfo.InvariantCulture).TryGetType().Value
-                : GetTypeFromArgument(x.First.ParameterType, x.Second.Value);
+            var argumentType = x.Second.ValueId.Metadata.HasValue
+                ? Source.Parse(x.Second.ValueId.Metadata, CultureInfo.InvariantCulture).TryGetType().Value
+                : GetTypeFromArgument(x.First.ParameterType, x.Second.ValueId.Value);
             return x.First.ParameterType.IsAssignableFrom(argumentType);
         });
     }

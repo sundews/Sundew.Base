@@ -24,7 +24,7 @@ public sealed record Path(ValueArray<Segment> Segments)
     public const char Separator = '/';
  /*
     /// <summary>
-    /// Get the <see cref="Path"/> from input path.
+    /// GetScalar the <see cref="Path"/> from input path.
     /// </summary>
     /// <param name="inputPath">The input path.</param>
     /// <returns>The path.</returns>

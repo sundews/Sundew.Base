@@ -198,6 +198,11 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     /// <returns><c>true</c>, if the values are equal otherwise false.</returns>
     public bool Equals(ValueDictionary<TKey, TValue> other)
     {
+        if (this.Count == 0 && other.Count == 0)
+        {
+            return true;
+        }
+
         if (this.inner == null)
         {
             if (other.inner == null)

@@ -19,7 +19,7 @@ using Sundew.Base.Identification.Parsing;
 /// <summary>
 /// Represents any Id.
 /// </summary>
-public record Id(Source Source, Path? Path, IArguments? Arguments = null) : IParsable<Id>
+public record Id(Source Source, Path? Path, Arguments? Arguments = null) : IParsable<Id>
 {
     /// <summary>
     /// Parses the specified input string into an instance of the <see cref="Id"/> type.
@@ -126,8 +126,8 @@ public record Id(Source Source, Path? Path, IArguments? Arguments = null) : IPar
     /// <returns>A new <see cref="Id"/>.</returns>
     public static Id From<TSource>(Expression<Action<TSource>> targetExpression)
     {
-        var (source, path, valueId) = ExpressionEvaluator.From(targetExpression);
-        return new Id(source, path, valueId.HasValue ? new ComplexValue([valueId]) : null);
+        var (source, path, arguments) = ExpressionEvaluator.From(targetExpression);
+        return new Id(source, path, arguments);
     }
 
     /// <summary>
@@ -152,7 +152,7 @@ public record Id(Source Source, Path? Path, IArguments? Arguments = null) : IPar
     public static Id From<TSource>(Expression<Action<TSource>> targetExpression, IIdentifiable<ValueId> value)
     {
         var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, value);
-        return new Id(source, path, valueId.HasValue ? new ComplexValue(ValueArray<ValueId>.Empty.Add(value.Id)) : null);
+        return new Id(source, path, valueId);
     }
 
     /// <summary>
@@ -165,7 +165,7 @@ public record Id(Source Source, Path? Path, IArguments? Arguments = null) : IPar
     public static Id From<TSource>(Expression<Func<TSource, object>> targetExpression, IIdentifiable<ValueId> value)
     {
         var target = ExpressionEvaluator.From(targetExpression, value);
-        return new Id(target.Source, target.Path, new ComplexValue(ValueArray<ValueId>.Empty.Add(value.Id)));
+        return new Id(target.Source, target.Path, target.Arguments);
     }
 
     /// <summary>

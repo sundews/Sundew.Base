@@ -14,6 +14,15 @@ using Sundew.Base.Collections.Immutable;
 public class ValueDictionaryTests
 {
     [Test]
+    public void Equals_When_OneIsDefaultAndTheOtherIsEmpty_Then_LhsAndRhsShouldBeEqual()
+    {
+        ValueDictionary<int, int> lhs = ValueDictionary<int, int>.Empty;
+        ValueDictionary<int, int> rhs = default;
+
+        ((object)lhs).Should().Be(rhs);
+    }
+
+    [Test]
     public void Equals_When_UsedWithInt_Then_LhsAndRhsShouldBeEqual()
     {
         ValueDictionary<int, int> lhs = ImmutableDictionary.Create<int, int>().Add(1, 2).Add(3, 4);

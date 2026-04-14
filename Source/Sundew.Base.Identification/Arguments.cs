@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ScalarValue.cs" company="Sundews">
+// <copyright file="Arguments.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -8,14 +8,16 @@
 namespace Sundew.Base.Identification;
 
 using System;
-using System.Globalization;
 using System.Text;
+using Sundew.Base.Collections.Immutable;
+using Sundew.Base.Identification.Parsing;
+using Sundew.Base.Text;
 
 /// <summary>
-/// Represents an argument in a <see cref="Id"/>.
+/// Represents a list of arguments.
 /// </summary>
-/// <param name="Value">The value.</param>
-public sealed partial record ScalarValue(string Value) : IValue
+/// <param name="Items">The arguments.</param>
+public sealed record Arguments(ValueArray<Argument> Items)
 {
     /// <summary>
     /// Appends this <see cref="ValueId"/> to the specified <see cref="StringBuilder"/>.
@@ -25,17 +27,6 @@ public sealed partial record ScalarValue(string Value) : IValue
     /// <param name="appendOptions">The append options.</param>
     public void AppendInto(StringBuilder stringBuilder, IFormatProvider formatProvider, AppendOptions appendOptions)
     {
-        stringBuilder.Append(Uri.EscapeDataString(this.Value));
-    }
-
-    /// <summary>
-    /// Creates a string representation of the <see cref="ValueId"/>.
-    /// </summary>
-    /// <returns>A string.</returns>
-    public override string ToString()
-    {
-        var stringBuilder = new StringBuilder();
-        this.AppendInto(stringBuilder, CultureInfo.CurrentCulture, new AppendOptions(true));
-        return stringBuilder.ToString();
+        stringBuilder.AppendItems(this.Items, (builder, argument) => argument.AppendInto(builder, formatProvider, appendOptions), Grammar.ArgumentSeparator);
     }
 }

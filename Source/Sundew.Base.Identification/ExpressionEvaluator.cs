@@ -25,16 +25,16 @@ internal static class ExpressionEvaluator
     /// <param name="pathExpression">The path expression.</param>
     /// <param name="value">The value.</param>
     /// <returns>A new <see cref="Path"/>.</returns>
-    public static (Source Source, Path Path, ValueId? ValueId) From(LambdaExpression pathExpression, IIdentifiable<ValueId>? value = null)
+    public static (Source Source, Path Path, Arguments? Arguments) From(LambdaExpression pathExpression, IIdentifiable<ValueId>? value = null)
     {
         var valueId = value?.Id;
         var isUsed = false;
         var segments = ImmutableArray.CreateBuilder<Segment>();
         var source = Source.FromType(pathExpression.Parameters.First().Type);
-        var valueIds = ImmutableArray.CreateBuilder<ValueId>();
+        var valueIds = ImmutableArray.CreateBuilder<Argument>();
         EvaluateToPath(pathExpression);
 
-        return (source, new Path(segments.ToImmutable()), isUsed ? null : valueId);
+        return (source, new Path(segments.ToImmutable()), !valueId.HasValue || isUsed || !valueId.HasValue ? null : new Arguments(ValueArray<Argument>.Empty.Add(new Argument(null, valueId))));
 
         void EvaluateToPath(Expression expression)
         {
@@ -49,13 +49,13 @@ internal static class ExpressionEvaluator
                         EvaluateToPath(methodCallExpression.Object);
                     }
 
-                    valueIds = ImmutableArray.CreateBuilder<ValueId>();
+                    valueIds = ImmutableArray.CreateBuilder<Argument>();
                     var parameterInfos = methodCallExpression.Method.GetParameters();
                     foreach (var argument in methodCallExpression.Arguments.Zip(parameterInfos))
                     {
                         if (argument.First is MethodCallExpression argumentMethodCallExpression && argumentMethodCallExpression.Method.DeclaringType == typeof(Id) && argumentMethodCallExpression.Method.Name == nameof(Id.Argument) && valueId.HasValue)
                         {
-                            valueIds.Add(valueId with { Name = argument.Second.Name + valueId.Name });
+                            valueIds.Add(new Argument(argument.Second.Name, valueId));
                             isUsed = true;
                         }
                         else
@@ -64,7 +64,7 @@ internal static class ExpressionEvaluator
                         }
                     }
 
-                    segments.Add(new Segment(methodCallExpression.Method.Name, new ComplexValue(valueIds.ToValueArray())));
+                    segments.Add(new Segment(methodCallExpression.Method.Name, new Arguments(valueIds.ToValueArray())));
 
                     break;
                 case MemberExpression memberExpression:
@@ -82,12 +82,12 @@ internal static class ExpressionEvaluator
         }
     }
 
-    private static void GetArgument(Expression argument, ParameterInfo parameterInfo, ImmutableArray<ValueId>.Builder builder)
+    private static void GetArgument(Expression argument, ParameterInfo parameterInfo, ImmutableArray<Argument>.Builder builder)
     {
         switch (argument)
         {
             case ConstantExpression constantExpression:
-                builder.Add(new ValueId(parameterInfo.Name, GetMetadata(argument), new ScalarValue(constantExpression.Value?.ToString() ?? (argument.Type.IsClass ? "null" : "default"))));
+                builder.Add(new Argument(parameterInfo.Name, new ValueId(GetMetadata(argument.Type), new ScalarValue(constantExpression.Value?.ToString() ?? (argument.Type.IsClass ? "null" : "default")))));
                 break;
             case MemberExpression memberExpression:
                 if (memberExpression.Expression is ConstantExpression constantExpression2)
@@ -96,19 +96,19 @@ internal static class ExpressionEvaluator
                     if (memberExpression.Member is FieldInfo fieldInfo)
                     {
                         var value = fieldInfo.GetValue(container);
-                        builder.Add(new ValueId(null, null, new ScalarValue(value?.ToString() ?? string.Empty)));
+                        builder.Add(new Argument(fieldInfo.Name, new ValueId(GetMetadata(fieldInfo.FieldType), new ScalarValue(value?.ToString() ?? string.Empty))));
                     }
 
                     if (memberExpression.Member is PropertyInfo propertyInfo)
                     {
                         var value = propertyInfo.GetValue(container);
-                        builder.Add(new ValueId(null, null, new ScalarValue(value?.ToString() ?? string.Empty)));
+                        builder.Add(new Argument(propertyInfo.Name, new ValueId(GetMetadata(propertyInfo.PropertyType), new ScalarValue(value?.ToString() ?? string.Empty))));
                     }
                 }
 
                 break;
             case NewExpression newExpression:
-                ImmutableArray<ValueId>.Builder newBuilder = ImmutableArray.CreateBuilder<ValueId>();
+                ImmutableArray<Argument>.Builder newBuilder = ImmutableArray.CreateBuilder<Argument>();
                 if (newExpression.Constructor.HasValue)
                 {
                     foreach (var valueTuple in newExpression.Arguments.Zip(newExpression.Constructor.GetParameters()))
@@ -116,15 +116,15 @@ internal static class ExpressionEvaluator
                         GetArgument(valueTuple.First, valueTuple.Second, newBuilder);
                     }
 
-                    builder.Add(new ValueId(parameterInfo.Name, GetMetadata(argument), new ComplexValue(newBuilder.ToImmutable())));
+                    builder.Add(new Argument(parameterInfo.Name, new ValueId(GetMetadata(argument.Type), new ComplexValue(newBuilder.ToImmutable()))));
                 }
 
                 break;
         }
     }
 
-    private static string? GetMetadata(Expression argument)
+    private static string? GetMetadata(Type argumentType)
     {
-        return TargetEvaluator.IsKnownType(argument.Type) ? null : Source.FromType(argument.Type).ToString();
+        return TargetEvaluator.IsKnownType(argumentType) ? null : Source.FromType(argumentType).ToString();
     }
 }
