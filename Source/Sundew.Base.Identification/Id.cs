@@ -13,14 +13,100 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
 using System.Text;
-using Sundew.Base.Collections.Immutable;
 using Sundew.Base.Identification.Parsing;
 
 /// <summary>
 /// Represents any Id.
 /// </summary>
-public record Id(Source Source, Path? Path, Arguments? Arguments = null) : IParsable<Id>
+public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) : IParsable<Id>
 {
+    /// <summary>
+    /// Creates an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUri()
+    {
+        return this.ToUriWithScheme(null);
+    }
+
+    /// <summary>
+    /// Creates an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <param name="scheme">The scheme.</param>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUriWithScheme(string? scheme)
+    {
+        return this.ToUri(scheme, null, null, 0);
+    }
+
+    /// <summary>
+    /// Creates an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <param name="host">The host.</param>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUriWithHost(string? host)
+    {
+        return this.ToUri(null, null, host, 0);
+    }
+
+    /// <summary>
+    /// Create an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <param name="host">The host.</param>
+    /// <param name="port">The port.</param>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUri(string? host, int port)
+    {
+        return this.ToUri(null, null, host, port);
+    }
+
+    /// <summary>
+    /// Create an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <param name="scheme">The scheme.</param>
+    /// <param name="host">The host.</param>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUri(string? scheme, string? host)
+    {
+        return this.ToUri(scheme, null, host, 0);
+    }
+
+    /// <summary>
+    /// Create an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <param name="scheme">The scheme.</param>
+    /// <param name="host">The host.</param>
+    /// <param name="port">The port.</param>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUri(string? scheme, string? host, int port)
+    {
+        return this.ToUri(scheme, null, host, port);
+    }
+
+    /// <summary>
+    /// Create an Uri from this <see cref="Id"/>.
+    /// </summary>
+    /// <param name="scheme">The scheme.</param>
+    /// <param name="userInfo">The user info.</param>
+    /// <param name="host">The host.</param>
+    /// <param name="port">The port.</param>
+    /// <returns>A new <see cref="Uri"/>.</returns>
+    public Uri ToUri(string? scheme, string? userInfo, string? host, int port)
+    {
+        var pathPrefix = string.Empty;
+        if (string.IsNullOrEmpty(host))
+        {
+            pathPrefix = @"///";
+        }
+
+        var uriBuilder = new UriBuilder(scheme, host, port, pathPrefix + this.ToString())
+        {
+            UserName = userInfo,
+        };
+
+        return uriBuilder.Uri;
+    }
+
     /// <summary>
     /// Parses the specified input string into an instance of the <see cref="Id"/> type.
     /// </summary>
@@ -116,6 +202,23 @@ public record Id(Source Source, Path? Path, Arguments? Arguments = null) : IPars
     public R<Type> TryGetTargetContainingType()
     {
         return TargetEvaluator.GetDeclaringType(this.Source, this.Path);
+    }
+
+    /// <summary>
+    /// Gets an <see cref="Id"/> from the specified source and expression.
+    /// </summary>
+    /// <param name="uri">The uri.</param>
+    /// <param name="formatProvider">The format provider.</param>
+    /// <returns>A new <see cref="Id"/>.</returns>
+    public static R<Id, IIdError> From(Uri uri, IFormatProvider? formatProvider = null)
+    {
+        var pathAndQuery = uri.PathAndQuery;
+        if (pathAndQuery.StartsWith('/'))
+        {
+            pathAndQuery = pathAndQuery.Substring(1);
+        }
+
+        return IdRouteParser.ParseId(pathAndQuery, formatProvider);
     }
 
     /// <summary>

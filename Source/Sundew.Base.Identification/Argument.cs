@@ -15,7 +15,7 @@ using System.Text;
 /// </summary>
 /// <param name="Name">The Name.</param>
 /// <param name="ValueId">The value id.</param>
-public record Argument(string? Name, ValueId ValueId)
+public sealed record Argument(string? Name, ValueId ValueId)
 {
     /// <summary>
     /// Appends this instance into the specified string builder.

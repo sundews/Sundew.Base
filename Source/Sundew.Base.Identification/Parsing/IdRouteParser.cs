@@ -344,6 +344,6 @@ internal static class IdRouteParser
             return valueResult;
         }
 
-        return parser.Accept(Tokens.ValueIdValue).Map(IValue.ScalarValue, IValueError._ValueError);
+        return parser.Accept(Tokens.ValueIdValue).Map(x => IValue.ScalarValue(Uri.UnescapeDataString(x)), IValueError._ValueError);
     }
 }

@@ -18,27 +18,40 @@ using static Sundew.Base.Development.Tests.Identification.IdTests;
 public class IdTests
 {
     [Test]
-    [Obsolete("Obsolete")]
-    public void T()
+    public void ToUri_Then_ResultShouldBeExpectedResult()
     {
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Namespace$Assembly/Path?1", UriKind.Absolute, out var uri);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Namespace$Assembly/Find?Person=(Address=Home)&Description=(Eyes=Blue)", UriKind.Absolute, out var uri2);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Namespace$Assembly/Path?Name=Kim&LastName=Hugener", UriKind.Absolute, out var uri3);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Nam?espace$Assembly/Path?Name=Kim&LastName=Hugener", UriKind.Absolute, out var uri4);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Namespace$Assembly/Path?Name=Kim?LastName=Hugener", UriKind.Absolute, out var uri5);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Find(person,description)?Person=(Address=Home,Number=15)&Description=(Eyes=Blue)", UriKind.Absolute, out var uri6);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Find(person,description)?Person={Address=Home,Number=15}&Description={Eyes=Blue}", UriKind.Absolute, out var uri7);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Find(Person,Description[])?person={Address=Home,Number=15}&description={Eyes=Blue}", UriKind.Absolute, out var uri8);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Find(person,IList[Description])?person=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri9);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Find(person,descriptions)?person=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri10);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Find(query,descriptions)?Query!Name.Name.Space$Assembly=(Address=Home,Number=15)&descriptions=[Blue,Green]", UriKind.Absolute, out var uri11);
-        Uri.TryCreate("aid://user:pwd@Host:80/Name+Nested~Name.Space$Assembly/Start(!Name~Name.Space$Assembly=15)/Find?!Name.Name.Space$Assembly=(Address=Home,Number=15)&string[]=[Blue,Green]", UriKind.Absolute, out var uri12);
-        var t1 = Uri.EscapeUriString(uri6!.OriginalString);
-        var t2 = Uri.EscapeUriString(uri8!.OriginalString);
-        var t3 = Uri.EscapeUriString(uri9!.OriginalString);
-        var t4 = Uri.EscapeUriString(uri10!.OriginalString);
-        var t5 = Uri.EscapeUriString(uri11!.OriginalString);
-        var t6 = Uri.EscapeUriString(uri12!.OriginalString);
+        const string expected = "appid://username@localhost:80/IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
+        var id = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
+
+        var result = id.ToUri("appid", "username", "localhost", 80);
+
+        result.ToString().Should().Be(expected);
+    }
+
+    [Test]
+    public void ToUriWithScheme_Then_ResultShouldBeExpectedResult()
+    {
+        const string expected = "appid:///IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
+        var id = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
+
+        var result = id.ToUriWithScheme("appid");
+
+        result.ToString().Should().Be(expected);
+    }
+
+    [Test]
+    public void FromUri_Then_ResultShouldBeExpectedResult()
+    {
+        var id = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
+
+        var result = Id.From(id.ToUriWithScheme("appid"));
+
+        using (var scope = new AssertionScope())
+        {
+            scope.FormattingOptions.MaxDepth = 20;
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(id);
+        }
     }
 
     [Test]
@@ -222,6 +235,24 @@ public class IdTests
         }
     }
 
+    [Test]
+    public void From_When_TargetIsPropertyAndPassingArgument_Then_ResultShouldBeExpected2()
+    {
+        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Search(pointOfInterest!IdTests+PointOfInterest~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Name=City%20with%20%28%20%29%20%7B%20%7D%20%2F%20%2C%20%3A%20%21%20%24%20~%20%3D%20%3C%20%3E%20%26%20%5B%20%5D%20%25))";
+        var result = Id.From<INavigator>(x => x.Search(new PointOfInterest("City with ( ) { } / , : ! $ ~ = < > & [ ] %")));
+
+        using (var scope = new AssertionScope())
+        {
+            scope.FormattingOptions.MaxDepth = 20;
+            var expected = Id.Parse(result.ToString(), CultureInfo.InvariantCulture);
+            expected.Should().Be(result);
+            result.ToString().Should().Be(expectedResult);
+            result.TryGetInputTypes().Value.Should().Equal([typeof(PointOfInterest)]);
+            result.TryGetResultType().Value.Should().Be(typeof(Position));
+            result.TryGetTargetContainingType().Value.Should().Be(typeof(INavigator));
+        }
+    }
+
 #pragma warning disable SA1201
     public interface INavigator
 #pragma warning restore SA1201
@@ -233,6 +264,8 @@ public class IdTests
         void NavigateTo(Position position);
 
         void NavigateTo(Position position, bool addToHistory);
+
+        Position Search(PointOfInterest pointOfInterest);
     }
 
     public interface ICommand<TParameter>
@@ -261,6 +294,16 @@ public class IdTests
             return new Position3D(
                 valueId.GetValue(value.Position, CultureInfo.InvariantCulture),
                 valueId.GetScalar(value.Z, CultureInfo.InvariantCulture));
+        }
+    }
+
+    public record PointOfInterest(string Name) : IValueIdentifiable<PointOfInterest>
+    {
+        public ValueId Id => ValueId.From(this, (value, builder) => builder.Add(value.Name));
+
+        public static PointOfInterest From(PointOfInterest value, ValueId valueId, IFormatProvider? formatProvider)
+        {
+            return new PointOfInterest(valueId.GetScalar(value.Name, CultureInfo.InvariantCulture));
         }
     }
 }

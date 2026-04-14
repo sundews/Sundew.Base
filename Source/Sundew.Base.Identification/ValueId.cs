@@ -154,7 +154,7 @@ public sealed partial record ValueId(string? Metadata, IValue Value)
     /// <param name="formatProvider">The format provider.</param>
     /// <param name="referenceName">The argument name.</param>
     /// <returns>The retrieved value or the default value.</returns>
-    public TValue GetScalar<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
+    public TValue GetScalar<TValue>(TValue defaultValue, IFormatProvider? formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
         where TValue : IParsable<TValue>
     {
         if (!referenceName.HasValue)
@@ -170,7 +170,7 @@ public sealed partial record ValueId(string? Metadata, IValue Value)
         var argument = complexValue.Items.FirstOrDefault(x => x.Name == referenceName);
         if (argument.HasValue)
         {
-            return TValue.Parse(Uri.UnescapeDataString(argument.ValueId.Value.ToString() ?? string.Empty), formatProvider);
+            return TValue.Parse(argument.ValueId.Value.ToString() ?? string.Empty, formatProvider);
         }
 
         var firstDotIndex = referenceName.IndexOf('.');
@@ -180,7 +180,7 @@ public sealed partial record ValueId(string? Metadata, IValue Value)
         argument = complexValue.Items.FirstOrDefault(x => x.Name == fallback);
         if (argument.HasValue)
         {
-            return TValue.Parse(Uri.UnescapeDataString(argument.ValueId.Value.ToString() ?? string.Empty), formatProvider);
+            return TValue.Parse(argument.ValueId.Value.ToString() ?? string.Empty, formatProvider);
         }
 
         return defaultValue;
@@ -194,7 +194,7 @@ public sealed partial record ValueId(string? Metadata, IValue Value)
     /// <param name="formatProvider">The format provider.</param>
     /// <param name="referenceName">The argument name.</param>
     /// <returns>The retrieved value or the default value.</returns>
-    public TValue GetValue<TValue>(TValue defaultValue, IFormatProvider formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
+    public TValue GetValue<TValue>(TValue defaultValue, IFormatProvider? formatProvider, [CallerArgumentExpression(nameof(defaultValue))] string? referenceName = null)
         where TValue : IValueIdentifiable<TValue>
     {
         if (!referenceName.HasValue)
