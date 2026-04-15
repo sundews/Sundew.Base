@@ -23,11 +23,10 @@ internal static class ExpressionEvaluator
     /// Gets a <see cref="Path"/> for the specified expression.
     /// </summary>
     /// <param name="pathExpression">The path expression.</param>
-    /// <param name="value">The value.</param>
+    /// <param name="valueId">The value id.</param>
     /// <returns>A new <see cref="Path"/>.</returns>
-    public static (Source Source, Path Path, Arguments? Arguments) From(LambdaExpression pathExpression, IIdentifiable<ValueId>? value = null)
+    public static (Source Source, Path Path, Arguments? Arguments) From(LambdaExpression pathExpression, ValueId? valueId = null)
     {
-        var valueId = value?.Id;
         var isUsed = false;
         var segments = ImmutableArray.CreateBuilder<Segment>();
         var source = Source.FromType(pathExpression.Parameters.First().Type);

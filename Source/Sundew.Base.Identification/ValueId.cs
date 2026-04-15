@@ -20,7 +20,7 @@ using Sundew.Base.Identification.Parsing;
 /// </summary>
 /// <param name="Metadata">The metadata.</param>
 /// <param name="Value">The value.</param>
-public sealed partial record ValueId(string? Metadata, IValue Value)
+public sealed record ValueId(string? Metadata, IValue Value)
 {
     /// <summary>
     /// Gets the type of the source.

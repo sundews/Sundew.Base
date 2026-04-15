@@ -9,11 +9,9 @@ namespace Sundew.Base.Development.Tests.Identification;
 
 using System;
 using System.Globalization;
-using System.Linq;
 using AwesomeAssertions;
 using AwesomeAssertions.Execution;
 using Sundew.Base.Identification;
-using static Sundew.Base.Development.Tests.Identification.IdTests;
 
 public class IdTests
 {
@@ -236,10 +234,10 @@ public class IdTests
     }
 
     [Test]
-    public void From_When_TargetIsPropertyAndPassingArgument_Then_ResultShouldBeExpected2()
+    public void From_When_TargetIsPropertyAndPassingArgumentByReferenceId_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Search(pointOfInterest!IdTests+PointOfInterest~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Name=City%20with%20%28%20%29%20%7B%20%7D%20%2F%20%2C%20%3A%20%21%20%24%20~%20%3D%20%3C%20%3E%20%26%20%5B%20%5D%20%25))";
-        var result = Id.From<INavigator>(x => x.Search(new PointOfInterest("City with ( ) { } / , : ! $ ~ = < > & [ ] %")));
+        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Description?%3A1";
+        var result = Id.From<INavigator>(x => x.Description, new PointOfInterest("Home"));
 
         using (var scope = new AssertionScope())
         {
@@ -247,7 +245,25 @@ public class IdTests
             var expected = Id.Parse(result.ToString(), CultureInfo.InvariantCulture);
             expected.Should().Be(result);
             result.ToString().Should().Be(expectedResult);
-            result.TryGetInputTypes().Value.Should().Equal([typeof(PointOfInterest)]);
+            result.TryGetInputTypes().Value.Should().Equal(null);
+            result.TryGetResultType().Value.Should().Be(typeof(ICommand<PointOfInterest, string>));
+            result.TryGetTargetContainingType().Value.Should().Be(typeof(INavigator));
+        }
+    }
+
+    [Test]
+    public void From_When_PassingArgumentsWithReservedCharacters_Then_ResultShouldBeExpected()
+    {
+        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Search(query!IdTests+Query~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Name=with%20%28%20%29%20%7B%20%7D%20%2F%20%2C%20%3A%20%21%20%24%20~%20%3D%20%3C%20%3E%20%26%20%5B%20%5D%20%25))";
+        var result = Id.From<INavigator>(x => x.Search(new Query("with ( ) { } / , : ! $ ~ = < > & [ ] %")));
+
+        using (var scope = new AssertionScope())
+        {
+            scope.FormattingOptions.MaxDepth = 20;
+            var expected = Id.Parse(result.ToString(), CultureInfo.InvariantCulture);
+            expected.Should().Be(result);
+            result.ToString().Should().Be(expectedResult);
+            result.TryGetInputTypes().Value.Should().Equal([typeof(Query)]);
             result.TryGetResultType().Value.Should().Be(typeof(Position));
             result.TryGetTargetContainingType().Value.Should().Be(typeof(INavigator));
         }
@@ -259,18 +275,25 @@ public class IdTests
     {
         ICommand<Position> Navigate { get; }
 
+        ICommand<PointOfInterest, string> Description { get; }
+
         void GoBack();
 
         void NavigateTo(Position position);
 
         void NavigateTo(Position position, bool addToHistory);
 
-        Position Search(PointOfInterest pointOfInterest);
+        Position Search(Query query);
     }
 
     public interface ICommand<TParameter>
     {
         void Execute(TParameter parameter);
+    }
+
+    public interface ICommand<TParameter, TResult>
+    {
+        TResult Execute(TParameter parameter);
     }
 
     public record Position(int X, int Y) : IValueIdentifiable<Position>
@@ -280,8 +303,8 @@ public class IdTests
         public static Position From(Position position, ValueId valueId, IFormatProvider? formatProvider)
         {
             return new Position(
-                valueId.GetScalar(position.X, CultureInfo.InvariantCulture),
-                valueId.GetScalar(position.Y, CultureInfo.InvariantCulture));
+                valueId.GetScalar(position.X, formatProvider),
+                valueId.GetScalar(position.Y, formatProvider));
         }
     }
 
@@ -292,18 +315,23 @@ public class IdTests
         public static Position3D From(Position3D value, ValueId valueId, IFormatProvider? formatProvider)
         {
             return new Position3D(
-                valueId.GetValue(value.Position, CultureInfo.InvariantCulture),
-                valueId.GetScalar(value.Z, CultureInfo.InvariantCulture));
+                valueId.GetValue(value.Position, formatProvider),
+                valueId.GetScalar(value.Z, formatProvider));
         }
     }
 
-    public record PointOfInterest(string Name) : IValueIdentifiable<PointOfInterest>
+    public record Query(string Name) : IValueIdentifiable<Query>
     {
         public ValueId Id => ValueId.From(this, (value, builder) => builder.Add(value.Name));
 
-        public static PointOfInterest From(PointOfInterest value, ValueId valueId, IFormatProvider? formatProvider)
+        public static Query From(Query value, ValueId valueId, IFormatProvider? formatProvider)
         {
-            return new PointOfInterest(valueId.GetScalar(value.Name, CultureInfo.InvariantCulture));
+            return new Query(valueId.GetScalar(value.Name, formatProvider));
         }
+    }
+
+    public record PointOfInterest(string Name) : IIdentifiable<InstanceId>
+    {
+        public InstanceId Id { get; } = InstanceId.Next();
     }
 }

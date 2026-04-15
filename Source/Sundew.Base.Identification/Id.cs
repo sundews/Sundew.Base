@@ -252,9 +252,35 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) 
     /// <param name="targetExpression">The target expression.</param>
     /// <param name="value">The value.</param>
     /// <returns>A new <see cref="Id"/>.</returns>
+    public static Id From<TSource>(Expression<Action<TSource>> targetExpression, IIdentifiable<InstanceId> value)
+    {
+        var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, new ValueId(null, new ScalarValue(value.Id.ToString())));
+        return new Id(source, path, valueId);
+    }
+
+    /// <summary>
+    /// Gets an <see cref="Id"/> from the specified source and expression.
+    /// </summary>
+    /// <typeparam name="TSource">The source type.</typeparam>
+    /// <param name="targetExpression">The target expression.</param>
+    /// <param name="value">The value.</param>
+    /// <returns>A new <see cref="Id"/>.</returns>
+    public static Id From<TSource>(Expression<Func<TSource, object>> targetExpression, IIdentifiable<InstanceId> value)
+    {
+        var target = ExpressionEvaluator.From(targetExpression, new ValueId(null, new ScalarValue(value.Id.ToString())));
+        return new Id(target.Source, target.Path, target.Arguments);
+    }
+
+    /// <summary>
+    /// Gets an <see cref="Id"/> from the specified source and expression.
+    /// </summary>
+    /// <typeparam name="TSource">The source type.</typeparam>
+    /// <param name="targetExpression">The target expression.</param>
+    /// <param name="value">The value.</param>
+    /// <returns>A new <see cref="Id"/>.</returns>
     public static Id From<TSource>(Expression<Action<TSource>> targetExpression, IIdentifiable<ValueId> value)
     {
-        var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, value);
+        var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, value?.Id);
         return new Id(source, path, valueId);
     }
 
@@ -267,7 +293,7 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) 
     /// <returns>A new <see cref="Id"/>.</returns>
     public static Id From<TSource>(Expression<Func<TSource, object>> targetExpression, IIdentifiable<ValueId> value)
     {
-        var target = ExpressionEvaluator.From(targetExpression, value);
+        var target = ExpressionEvaluator.From(targetExpression, value?.Id);
         return new Id(target.Source, target.Path, target.Arguments);
     }
 
