@@ -97,9 +97,13 @@ public partial interface IValueIdError : IParserError
 [DiscriminatedUnion]
 public partial interface IValueError : IParserError
 {
+    /*public sealed partial record LiteralError(char Expected, LexerError Error) : IValueError;
+
     public sealed partial record GroupError(char Expected, LexerError Error) : IValueError;
 
-    public sealed partial record ArrayError(char Expected, LexerError Error) : IValueError;
+    public sealed partial record ArrayError(char Expected, LexerError Error) : IValueError;*/
+
+    public sealed partial record ArgumentsError(IArgumentsError Error) : IValueError;
 
     public sealed partial record ValueIdError(IValueIdError Error) : IValueError;
 
@@ -116,7 +120,7 @@ public sealed partial record ValueIdValueError(IValueError Error) : IValueIdErro
 public sealed partial record NotAtEndError() : IIdError, IIdRouteError, IParseValueIdError;
 
 /// <summary>
-/// Represents an error when an Id is empty or null.
+/// Represents an error when the input is empty or null.
 /// </summary>
 public sealed partial record EmptyOrNullError() : IIdError, IIdRouteError, IParseValueIdError;
 
@@ -125,5 +129,5 @@ public sealed partial record EmptyOrNullError() : IIdError, IIdRouteError, IPars
 /// </summary>
 /// <param name="Cause">The cause.</param>
 /// <param name="LexerError">The lexer error.</param>
-public sealed partial record LexError(object Cause, LexerError LexerError) : IArgumentsError, IValueIdError;
+public sealed partial record ExpectedCharacterError(object Cause, LexerError LexerError) : IArgumentsError, IValueIdError, IValueError;
 #pragma warning restore SA1402

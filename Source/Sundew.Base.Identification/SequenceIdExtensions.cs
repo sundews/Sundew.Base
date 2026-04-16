@@ -7,8 +7,6 @@
 
 namespace Sundew.Base.Identification;
 
-using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -17,7 +15,7 @@ using System.Threading;
 /// </summary>
 public static class SequenceIdExtensions
 {
-    extension<TId>(ISequenceId<TId> id)
+    extension<TId>(TId id)
         where TId : ISequenceId<TId>
     {
         /// <summary>

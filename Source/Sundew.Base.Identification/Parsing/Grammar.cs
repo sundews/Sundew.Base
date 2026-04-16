@@ -15,11 +15,14 @@ internal static class Grammar
     /// <summary>The Source path/origin separator.</summary>
     public const char SourcePathOriginSeparator = '$';
 
-    /// <summary>The path segment.</summary>
+    /// <summary>The path segment separator.</summary>
     public const char PathSegmentSeparator = '/';
 
-    /// <summary>The value ids separator.</summary>
+    /// <summary>The arguments separator.</summary>
     public const char ArgumentsSeparator = '?';
+
+    /// <summary>The literal separator.</summary>
+    public const char LiteralSeparator = '^';
 
     /// <summary>Metadata separator.</summary>
     public const char NameMetadataSeparator = '!';

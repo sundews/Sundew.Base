@@ -22,4 +22,6 @@ internal enum Tokens
     ValueIdMetadata,
 
     ValueIdValue,
+
+    Fragment,
 }

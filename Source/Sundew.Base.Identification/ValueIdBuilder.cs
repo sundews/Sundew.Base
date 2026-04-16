@@ -47,7 +47,12 @@ public sealed class ValueIdBuilder(Type type)
         if (value != null && value is IValueIdentifiable<TValue> valueIdentifiable)
         {
             var valueId = valueIdentifiable.Id;
-            this.values.Add(new Argument(name, new ValueId(GetMetadata(value.GetType(), typeof(TValue), false), valueId.Value)));
+            this.values.Add(new Argument(name, valueId with { Metadata = GetMetadata(value.GetType(), typeof(TValue), false) }));
+        }
+        else if (value != null && value is IIdentifiable<InstanceId> instanceIdentifiable)
+        {
+            var instanceId = instanceIdentifiable.Id;
+            this.values.Add(new Argument(name, new ValueId(GetMetadata(value.GetType(), typeof(TValue), false), new LiteralValue(instanceId.Number.ToString()))));
         }
         else if (value != null)
         {
@@ -56,6 +61,10 @@ public sealed class ValueIdBuilder(Type type)
             {
                 this.values.Add(new Argument(name, new ValueId(GetMetadata(value.GetType(), typeof(TValue), false), new ScalarValue(stringValue))));
             }
+        }
+        else
+        {
+            this.values.Add(new Argument(name, new ValueId(null, new LiteralValue(LiteralValue.Null))));
         }
 
         return this;
@@ -69,9 +78,10 @@ public sealed class ValueIdBuilder(Type type)
     {
         var cardinality = this.values.ByCardinality();
         var metadata = Source.FromType(type).ToString();
+        const string @null = "null";
         return cardinality switch
         {
-            Empty<Argument> empty => new ValueId(metadata, new ScalarValue("null")),
+            Empty<Argument> empty => new ValueId(metadata, new LiteralValue(@null)),
             Multiple<Argument> valueIds => new ValueId(metadata, new ComplexValue(valueIds.Items.ToValueArray())),
             Single<Argument> single => single.Item.ValueId,
         };

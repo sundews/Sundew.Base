@@ -29,6 +29,6 @@ public readonly record struct InstanceId(uint Number) : ISequenceId<InstanceId>
     /// <returns>The id as a string.</returns>
     public override string ToString()
     {
-        return ':' + this.Number.ToString();
+        return '#' + this.Number.ToString();
     }
 }

@@ -86,7 +86,8 @@ internal static class ExpressionEvaluator
         switch (argument)
         {
             case ConstantExpression constantExpression:
-                builder.Add(new Argument(parameterInfo.Name, new ValueId(GetMetadata(argument.Type), new ScalarValue(constantExpression.Value?.ToString() ?? (argument.Type.IsClass ? "null" : "default")))));
+                var valueIdValue = GetValueIdValue(constantExpression.Value);
+                builder.Add(new Argument(parameterInfo.Name, new ValueId(GetMetadata(argument.Type), valueIdValue)));
                 break;
             case MemberExpression memberExpression:
                 if (memberExpression.Expression is ConstantExpression constantExpression2)
@@ -95,13 +96,13 @@ internal static class ExpressionEvaluator
                     if (memberExpression.Member is FieldInfo fieldInfo)
                     {
                         var value = fieldInfo.GetValue(container);
-                        builder.Add(new Argument(fieldInfo.Name, new ValueId(GetMetadata(fieldInfo.FieldType), new ScalarValue(value?.ToString() ?? string.Empty))));
+                        builder.Add(new Argument(fieldInfo.Name, new ValueId(GetMetadata(fieldInfo.FieldType), GetValueIdValue(value))));
                     }
 
                     if (memberExpression.Member is PropertyInfo propertyInfo)
                     {
                         var value = propertyInfo.GetValue(container);
-                        builder.Add(new Argument(propertyInfo.Name, new ValueId(GetMetadata(propertyInfo.PropertyType), new ScalarValue(value?.ToString() ?? string.Empty))));
+                        builder.Add(new Argument(propertyInfo.Name, new ValueId(GetMetadata(propertyInfo.PropertyType), GetValueIdValue(value))));
                     }
                 }
 
@@ -120,6 +121,14 @@ internal static class ExpressionEvaluator
 
                 break;
         }
+    }
+
+    private static IValue GetValueIdValue(object? value)
+    {
+        const string @null = "null";
+        var valueString = value?.ToString() ?? @null;
+        var valueIdValue = value != null ? IValue.ScalarValue(valueString) : IValue.LiteralValue(valueString);
+        return valueIdValue;
     }
 
     private static string? GetMetadata(Type argumentType)

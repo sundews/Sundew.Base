@@ -15,8 +15,8 @@ using Sundew.Base.Parsing;
 
 internal static class IdRouteParser
 {
-    private static readonly Lexer<Tokens> IdLexer;
     private static readonly Lexer<Tokens> IdRouteLexer;
+    private static readonly Lexer<Tokens> IdLexer;
 
     static IdRouteParser()
     {
@@ -26,7 +26,8 @@ internal static class IdRouteParser
         var segmentNameLexerRule = new RegexLexerRule<Tokens>(Tokens.PathSegmentName, new Regex("[^$~//?(>]+", RegexOptions.Compiled));
         var argumentNameLexerRule = new RegexLexerRule<Tokens>(Tokens.ArgumentName, new Regex(@"\G[^!=(]+", RegexOptions.Compiled));
         var valueIdMetadataLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdMetadata, new Regex("[^=]+", RegexOptions.Compiled));
-        var valueIdValueLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdValue, new Regex(@"[^),\]&]+", RegexOptions.Compiled));
+        var valueIdValueLexerRule = new RegexLexerRule<Tokens>(Tokens.ValueIdValue, new Regex(@"[^),\]&\#]+", RegexOptions.Compiled));
+        var fragmentLexerRule = new RegexLexerRule<Tokens>(Tokens.Fragment, new Regex(@"[^),\]&]+", RegexOptions.Compiled));
         IdRouteLexer = new Lexer<Tokens>(
             [sourceNameLexerRule,
             sourcePathLexerRule,
@@ -34,7 +35,8 @@ internal static class IdRouteParser
             segmentNameLexerRule,
             argumentNameLexerRule,
             valueIdMetadataLexerRule,
-            valueIdValueLexerRule]);
+            valueIdValueLexerRule,
+            fragmentLexerRule]);
         IdLexer = new Lexer<Tokens>(
         [sourceNameLexerRule,
             sourcePathLexerRule,
@@ -42,7 +44,8 @@ internal static class IdRouteParser
             segmentNameLexerRule,
             argumentNameLexerRule,
             valueIdMetadataLexerRule,
-            valueIdValueLexerRule]);
+            valueIdValueLexerRule,
+            fragmentLexerRule]);
     }
 
     public static R<IdRoute, IIdRouteError> ParseIdRoute(string? input, IFormatProvider? formatProvider)
@@ -151,7 +154,21 @@ internal static class IdRouteParser
             }
         }
 
-        return R.Success(new Id(sourceResult.Value, path, arguments));
+        string? fragment = null;
+        if (parser.TryAccept(Grammar.LiteralSeparator))
+        {
+            var valueIdsResult = Arguments(parser);
+            if (valueIdsResult.IsSuccess)
+            {
+                arguments = valueIdsResult.Value;
+            }
+            else
+            {
+                return R.Error(IIdError._IdValueIdError(valueIdsResult.Error));
+            }
+        }
+
+        return R.Success(new Id(sourceResult.Value, path, arguments, fragment));
     }
 
     private static R<Source, ISourceError> Source(Parser<Tokens> parser)
@@ -249,7 +266,7 @@ internal static class IdRouteParser
 
         argumentResult = parser.TryAccept(
             Grammar.KeyValueSeparator,
-            result => result.MapError(x => IArgumentsError.LexError(Grammar.KeyValueSeparator, x)))
+            result => result.MapError(x => IArgumentsError.ExpectedCharacterError(Grammar.KeyValueSeparator, x)))
                 .And(() => Value(parser).MapError(IArgumentsError._ValueError))
                 .Map(x => new Argument(argumentNameOption, new ValueId(null, x.Value2)));
         if (argumentResult.IsSuccess)
@@ -277,7 +294,7 @@ internal static class IdRouteParser
     {
         var metadataResult = parser.TryAccept(
             Grammar.NameMetadataSeparator,
-            result => result.MapError(lexerError => IValueIdError.LexError(Grammar.NameMetadataSeparator, lexerError))
+            result => result.MapError(lexerError => IValueIdError.ExpectedCharacterError(Grammar.NameMetadataSeparator, lexerError))
                 .And(() => parser.Accept(Tokens.ValueIdMetadata).MapError(lexerError => IValueIdError.ValueIdError(Tokens.ValueIdMetadata, lexerError))));
 
         var valueIdResult = parser.TryAccept(Grammar.KeyValueSeparator).Map(lexerError => IValueIdError.ValueIdError(Grammar.KeyValueSeparator, lexerError))
@@ -297,10 +314,9 @@ internal static class IdRouteParser
             Grammar.GroupStart,
             result =>
             {
-                return result.MapError(lexerError => IValueError._GroupError(Grammar.GroupStart, lexerError))
-                    .And(() => Arguments(parser).MapError(x => IValueError._ValueError(null)))
-                    .And(() => parser.Accept(Grammar.GroupEnd)
-                        .Map(lexerError => IValueError._GroupError(Grammar.GroupEnd, lexerError)))
+                return result.MapError(lexerError => IValueError.ExpectedCharacterError(Grammar.GroupStart, lexerError))
+                    .And(() => Arguments(parser).MapError(x => IValueError._ArgumentsError(x)))
+                    .And(() => parser.Accept(Grammar.GroupEnd).Map(lexerError => IValueError.ExpectedCharacterError(Grammar.GroupEnd, lexerError)))
                     .Map(x => x.Value2);
             }).Map(x => IValue.ComplexValue(x.Items));
         if (valueResult.IsSuccess)
@@ -312,7 +328,7 @@ internal static class IdRouteParser
             Grammar.ArrayStart,
             result =>
             {
-                return result.MapError(lexerError => IValueError._ArrayError(Grammar.ArrayStart, lexerError))
+                return result.MapError(lexerError => IValueError.ExpectedCharacterError(Grammar.ArrayStart, lexerError))
                     .And(() =>
                     {
                         var valueIds = ImmutableArray.CreateBuilder<ValueId>();
@@ -336,12 +352,22 @@ internal static class IdRouteParser
                         return R.Success<IValue>(new ArrayValue(valueIds.ToValueArray())).Omits<IValueError>();
                     })
                     .And(() => parser.Accept(Grammar.ArrayEnd)
-                        .Map(lexerError => IValueError._ArrayError(Grammar.ArrayEnd, lexerError)))
+                        .Map(lexerError => IValueError.ExpectedCharacterError(Grammar.ArrayEnd, lexerError)))
                     .Map(x => x.Value2);
             });
         if (valueResult.IsSuccess)
         {
             return valueResult;
+        }
+
+        var literalValueResult = parser.TryAccept(
+            Grammar.LiteralSeparator,
+            result => result.MapError(lexerError => IValueError.ExpectedCharacterError(Grammar.LiteralSeparator, lexerError))
+                .And(() => parser.Accept(Tokens.ValueIdValue).Map(x => IValue.LiteralValue(x), IValueError._ValueError)))
+            .Map(x => x.Value2);
+        if (literalValueResult.IsSuccess)
+        {
+            return literalValueResult;
         }
 
         return parser.Accept(Tokens.ValueIdValue).Map(x => IValue.ScalarValue(Uri.UnescapeDataString(x)), IValueError._ValueError);

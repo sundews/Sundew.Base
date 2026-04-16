@@ -10,6 +10,7 @@ namespace Sundew.Base.Development.Tests.Identification;
 using AwesomeAssertions;
 using Sundew.Base.Identification;
 
+[NotInParallel]
 public class RevisionIdTests
 {
     [Test]

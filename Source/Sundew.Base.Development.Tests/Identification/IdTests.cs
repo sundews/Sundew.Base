@@ -18,7 +18,8 @@ public class IdTests
     [Test]
     public void ToUri_Then_ResultShouldBeExpectedResult()
     {
-        const string expected = "appid://username@localhost:80/IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
+        const string expected =
+            "appid://username@localhost:80/IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
         var id = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
 
         var result = id.ToUri("appid", "username", "localhost", 80);
@@ -29,7 +30,8 @@ public class IdTests
     [Test]
     public void ToUriWithScheme_Then_ResultShouldBeExpectedResult()
     {
-        const string expected = "appid:///IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
+        const string expected =
+            "appid:///IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
         var id = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
 
         var result = id.ToUriWithScheme("appid");
@@ -81,7 +83,8 @@ public class IdTests
     [Test]
     public void From_When_TargetIsMethodWith0Parameters_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/GoBack()";
+        const string expectedResult =
+            "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/GoBack()";
         var result = Id.From<INavigator>(x => x.GoBack());
 
         using (var scope = new AssertionScope())
@@ -99,7 +102,8 @@ public class IdTests
     [Test]
     public void From_When_TargetIsMethodWith1ParameterAsNull_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null)";
+        const string expectedResult =
+            "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=^null)";
         var result = Id.From<INavigator>(x => x.NavigateTo(null!));
 
         using (var scope = new AssertionScope())
@@ -116,7 +120,8 @@ public class IdTests
     [Test]
     public void From_When_TargetIsMethodWith1Parameter_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
+        const string expectedResult =
+            "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=6&Y=4))";
         var result = Id.From<INavigator>(x => x.NavigateTo(new Position(6, 4)));
 
         using (var scope = new AssertionScope())
@@ -133,7 +138,8 @@ public class IdTests
     [Test]
     public void From_When_TargetIsMethodWith2Parameters_Then_ResultShouldNotBeNull()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=null&addToHistory=False)";
+        const string expectedResult =
+            "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/NavigateTo(position!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=^null&addToHistory=False)";
         var result = Id.From<INavigator>(x => x.NavigateTo(null!, default));
 
         using (var scope = new AssertionScope())
@@ -150,7 +156,8 @@ public class IdTests
     [Test]
     public void From_When_TargetIsProperty_Then_ResultShouldNotBeNull()
     {
-        const string expectedResult = "IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/X";
+        const string expectedResult =
+            "IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/X";
         var result = Id.From<Position>(x => x.X);
 
         using (var scope = new AssertionScope())
@@ -167,7 +174,8 @@ public class IdTests
     [Test]
     public void ToValue_Then_ResultShouldBeExpectedResult()
     {
-        const string expectedResult = "!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=5)";
+        const string expectedResult =
+            "!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=5)";
         var position = new Position(4, 5);
 
         var valueId = position.Id;
@@ -184,7 +192,8 @@ public class IdTests
     [Test]
     public void ToValue_When_UsingNestedType_Then_ResultShouldBeExpectedResult()
     {
-        const string expectedResult = "!IdTests+Position3D~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Position=(X=4&Y=5)&Z=6)";
+        const string expectedResult =
+            "!IdTests+Position3D~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Position=(X=4&Y=5)&Z=6)";
         var position = new Position3D(new Position(4, 5), 6);
 
         var valueId = position.Id;
@@ -199,9 +208,28 @@ public class IdTests
     }
 
     [Test]
+    public void ToValue_When_UsingNestedTypeWithNull_Then_ResultShouldBeExpectedResult()
+    {
+        const string expectedResult =
+            "!IdTests+Position3D~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Position=^null&Z=6)";
+        var position = new Position3D(null!, 6);
+
+        var valueId = position.Id;
+        var result = valueId.ToValue(new Position3D(null!, 0));
+
+        using (var scope = new AssertionScope())
+        {
+            scope.FormattingOptions.MaxDepth = 20;
+            valueId.ToString().Should().Be(expectedResult);
+            result.Should().Be(position);
+        }
+    }
+
+    [Test]
     public void From_When_TargetIsMethodWith1Parameters_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate/Execute(parameter!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6))";
+        const string expectedResult =
+            "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate/Execute(parameter!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6))";
         var result = Id.From<INavigator>(x => x.Navigate.Execute(Id.Argument<Position>()), new Position(4, 6));
 
         using (var scope = new AssertionScope())
@@ -218,7 +246,8 @@ public class IdTests
     [Test]
     public void From_When_TargetIsPropertyAndPassingArgument_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate?!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6)";
+        const string expectedResult =
+            "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Navigate?!IdTests+Position~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(X=4&Y=6)";
         var result = Id.From<INavigator>(x => x.Navigate, new Position(4, 6));
 
         using (var scope = new AssertionScope())
@@ -236,7 +265,7 @@ public class IdTests
     [Test]
     public void From_When_TargetIsPropertyAndPassingArgumentByReferenceId_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Description?%3A1";
+        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Description?^1";
         var result = Id.From<INavigator>(x => x.Description, new PointOfInterest("Home"));
 
         using (var scope = new AssertionScope())
@@ -254,8 +283,8 @@ public class IdTests
     [Test]
     public void From_When_PassingArgumentsWithReservedCharacters_Then_ResultShouldBeExpected()
     {
-        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Search(query!IdTests+Query~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Name=with%20%28%20%29%20%7B%20%7D%20%2F%20%2C%20%3A%20%21%20%24%20~%20%3D%20%3C%20%3E%20%26%20%5B%20%5D%20%25))";
-        var result = Id.From<INavigator>(x => x.Search(new Query("with ( ) { } / , : ! $ ~ = < > & [ ] %")));
+        const string expectedResult = "IdTests+INavigator~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests/Search(query!IdTests+Query~Sundew.Base.Development.Tests.Identification$Sundew.Base.Development.Tests=(Name=with%20%28%20%29%20%7B%20%7D%20%2F%20%2C%20%3A%20%21%20%24%20~%20%3D%20%3C%20%3E%20%26%20%5B%20%5D%20%25%20%5E))";
+        var result = Id.From<INavigator>(x => x.Search(new Query("with ( ) { } / , : ! $ ~ = < > & [ ] % ^")));
 
         using (var scope = new AssertionScope())
         {
@@ -302,6 +331,11 @@ public class IdTests
 
         public static Position From(Position position, ValueId valueId, IFormatProvider? formatProvider)
         {
+            if (!position.HasValue)
+            {
+                return position;
+            }
+
             return new Position(
                 valueId.GetScalar(position.X, formatProvider),
                 valueId.GetScalar(position.Y, formatProvider));

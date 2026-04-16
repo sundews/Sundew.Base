@@ -18,7 +18,7 @@ using Sundew.Base.Identification.Parsing;
 /// <summary>
 /// Represents any Id.
 /// </summary>
-public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) : IParsable<Id>
+public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null, string? Fragment = null) : IParsable<Id>
 {
     /// <summary>
     /// Creates an Uri from this <see cref="Id"/>.
@@ -155,6 +155,12 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) 
             stringBuilder.Append(Grammar.ArgumentsSeparator);
             this.Arguments.AppendInto(stringBuilder, formatProvider, new AppendOptions(true));
         }
+
+        if (this.Fragment.HasValue)
+        {
+            stringBuilder.Append(Grammar.LiteralSeparator);
+            stringBuilder.Append(this.Fragment);
+        }
     }
 
     /// <summary>
@@ -254,8 +260,8 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) 
     /// <returns>A new <see cref="Id"/>.</returns>
     public static Id From<TSource>(Expression<Action<TSource>> targetExpression, IIdentifiable<InstanceId> value)
     {
-        var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, new ValueId(null, new ScalarValue(value.Id.ToString())));
-        return new Id(source, path, valueId);
+        var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, new ValueId(null, new LiteralValue(value.Id.Number.ToString())));
+        return new Id(source, path, valueId, value.Id.Number.ToString());
     }
 
     /// <summary>
@@ -267,7 +273,7 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null) 
     /// <returns>A new <see cref="Id"/>.</returns>
     public static Id From<TSource>(Expression<Func<TSource, object>> targetExpression, IIdentifiable<InstanceId> value)
     {
-        var target = ExpressionEvaluator.From(targetExpression, new ValueId(null, new ScalarValue(value.Id.ToString())));
+        var target = ExpressionEvaluator.From(targetExpression, new ValueId(null, new LiteralValue(value.Id.Number.ToString())));
         return new Id(target.Source, target.Path, target.Arguments);
     }
 
