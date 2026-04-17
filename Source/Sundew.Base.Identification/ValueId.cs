@@ -210,6 +210,11 @@ public sealed record ValueId(string? Metadata, IValue Value)
         var argument = complexValue.Items.FirstOrDefault(x => x.Name == referenceName);
         if (argument.HasValue)
         {
+            if (argument.ValueId.Value is LiteralValue { Value: LiteralValue.Null })
+            {
+                return defaultValue;
+            }
+
             return TValue.From(defaultValue, argument.ValueId, formatProvider);
         }
 
@@ -220,6 +225,11 @@ public sealed record ValueId(string? Metadata, IValue Value)
         argument = complexValue.Items.FirstOrDefault(x => x.Name == fallback);
         if (argument.HasValue)
         {
+            if (argument.ValueId.Value is LiteralValue { Value: LiteralValue.Null })
+            {
+                return defaultValue;
+            }
+
             return TValue.From(defaultValue, argument.ValueId, formatProvider);
         }
 

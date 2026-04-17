@@ -331,11 +331,6 @@ public class IdTests
 
         public static Position From(Position position, ValueId valueId, IFormatProvider? formatProvider)
         {
-            if (!position.HasValue)
-            {
-                return position;
-            }
-
             return new Position(
                 valueId.GetScalar(position.X, formatProvider),
                 valueId.GetScalar(position.Y, formatProvider));
