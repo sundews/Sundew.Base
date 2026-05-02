@@ -47,12 +47,12 @@ public abstract partial record SingleVersionDto
 {
 }
 
-public sealed record SingleVersion(string Name) : SingleVersionDto;
+public sealed partial record SingleVersion(string Name) : SingleVersionDto;
 
 [DiscriminatedUnion]
 public abstract partial record TwoVersionDto
 {
-    public sealed record V1(string Name) : TwoVersionDto;
+    public sealed partial record V1(string Name) : TwoVersionDto;
 }
 
-public sealed record TwoVersion(string Name, int Number) : TwoVersionDto;
+public sealed partial record TwoVersion(string Name, int Number) : TwoVersionDto;

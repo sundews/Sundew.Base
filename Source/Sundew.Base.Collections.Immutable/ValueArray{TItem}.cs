@@ -160,12 +160,12 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns>The hashcode.</returns>
     public override int GetHashCode()
     {
-        if (this.inner.HasValue)
+        if (this.Count == 0)
         {
-            return StructuralComparisons.StructuralEqualityComparer.GetHashCode(this.inner);
+            return 0;
         }
 
-        return 0;
+        return StructuralComparisons.StructuralEqualityComparer.GetHashCode(this.inner!);
     }
 
     /// <summary>
@@ -175,6 +175,11 @@ public readonly partial struct ValueArray<TItem> : IReadOnlyList<TItem>, IEquata
     /// <returns><c>true</c>, if the values are equal otherwise false.</returns>
     public bool Equals(ValueArray<TItem> other)
     {
+        if (this.Count == 0 && other.Count == 0)
+        {
+            return true;
+        }
+
         return StructuralComparisons.StructuralEqualityComparer.Equals(this.inner, other.inner);
     }
 

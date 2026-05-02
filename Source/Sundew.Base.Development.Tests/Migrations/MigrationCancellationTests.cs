@@ -75,11 +75,11 @@ public class MigrationCancellationTests
 [DiscriminatedUnion]
 public abstract partial record CancelledPerson : IMigratable<CancelledPerson, __>
 {
-    public sealed record V1(string Name) : CancelledPerson;
+    public sealed partial record V1(string Name) : CancelledPerson;
 
-    public sealed record V2(string Name, string LastName) : CancelledPerson;
+    public sealed partial record V2(string Name, string LastName) : CancelledPerson;
 
-    public sealed record V3(string Name, string LastName, int Age) : CancelledPerson;
+    public sealed partial record V3(string Name, string LastName, int Age) : CancelledPerson;
 
     public static async ValueTask<MigrationResult<CancelledPerson>> Migrate(CancelledPerson person, __ valueProvider, CancellationToken cancellationToken)
     {

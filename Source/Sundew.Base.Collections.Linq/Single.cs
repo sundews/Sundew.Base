@@ -12,7 +12,7 @@ namespace Sundew.Base.Collections.Linq;
 /// </summary>
 /// <typeparam name="TItem">The item type.</typeparam>
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-public sealed record Single<TItem> : ListCardinality<TItem>
+public sealed partial record Single<TItem> : ListCardinality<TItem>
 #else
 public sealed class Single<TItem> : ListCardinality<TItem>
 #endif

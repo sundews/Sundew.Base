@@ -20,18 +20,18 @@ public abstract partial record PostSubmitAction<TParameter, TValue>
     /// <summary>
     /// Represents a post apply action that performs no operation.
     /// </summary>
-    public sealed record None : PostSubmitAction<TParameter, TValue>;
+    public sealed partial record None : PostSubmitAction<TParameter, TValue>;
 
     /// <summary>
     /// Represents an action that sets a value during post-processing.
     /// </summary>
     /// <param name="Value">The value to be set by this action.</param>
-    public sealed record SetValue(TValue Value) : PostSubmitAction<TParameter, TValue>;
+    public sealed partial record SetValue(TValue Value) : PostSubmitAction<TParameter, TValue>;
 
     /// <summary>
     /// Represents a post apply action that triggers a refresh of the value, carrying associated information.
     /// </summary>
-    public sealed record Refresh(TParameter Parameter) : PostSubmitAction<TParameter, TValue>;
+    public sealed partial record Refresh(TParameter Parameter) : PostSubmitAction<TParameter, TValue>;
 
     /// <summary>
     /// Represents a post-apply action that refreshes the target when it becomes idle.
@@ -40,5 +40,5 @@ public abstract partial record PostSubmitAction<TParameter, TValue>
     /// idle, which can be useful for scenarios where changes should only take effect once activity has ceased. This
     /// type is typically used in data binding or update scenarios to optimize performance by deferring invalidation
     /// until the system is not busy.</remarks>
-    public sealed record RefreshOnIdle(TParameter Parameter) : PostSubmitAction<TParameter, TValue>;
+    public sealed partial record RefreshOnIdle(TParameter Parameter) : PostSubmitAction<TParameter, TValue>;
 }

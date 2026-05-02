@@ -61,4 +61,4 @@ public abstract partial record PersonPastDto : IMigratable<PersonPastDto, __>
     public static IReadOnlyCollection<MigrationInfo> GetMigrationInfo() => DiscriminatedUnionMigrations.FromVersionNamedUnion<PersonPastDto>();
 }
 
-public sealed record PersonPast(string Name) : PersonPastDto;
+public sealed partial record PersonPast(string Name) : PersonPastDto;

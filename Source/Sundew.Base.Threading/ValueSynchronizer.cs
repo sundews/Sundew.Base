@@ -237,7 +237,6 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
 #else
         enabler.Cancel();
 #endif
-        //// using (await this.@lock.LockAsync(CancellationToken.None).ConfigureAwait(false))
         lock (this.@lock)
         {
             this.pendingSubmissions.Remove(submissionId, out var _);

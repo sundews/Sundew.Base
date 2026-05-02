@@ -103,9 +103,9 @@ public class MigrationTests
 [DiscriminatedUnion]
 public abstract partial record PersonDto : IMigratable<PersonDto, IPersonValueProvider>
 {
-    public sealed record V1(string Name) : PersonDto;
+    public sealed partial record V1(string Name) : PersonDto;
 
-    public sealed record V2(string Name, string LastName, Address.V1? Address) : PersonDto;
+    public sealed partial record V2(string Name, string LastName, Address.V1? Address) : PersonDto;
 
     public static async ValueTask<MigrationResult<PersonDto>> Migrate(PersonDto personDto, IPersonValueProvider valueProvider, CancellationToken cancellationToken)
     {
@@ -120,14 +120,14 @@ public abstract partial record PersonDto : IMigratable<PersonDto, IPersonValuePr
     public static IReadOnlyCollection<MigrationInfo> GetMigrationInfo() => DiscriminatedUnionMigrations.FromVersionNamedUnion<PersonDto>();
 }
 
-public sealed record Person(string Name, string LastName, int Age, Address.V2? Address) : PersonDto;
+public sealed partial record Person(string Name, string LastName, int Age, Address.V2? Address) : PersonDto;
 
 [DiscriminatedUnion]
 public abstract record Address
 {
-    public sealed record V1(string Street, string Number, string PostalCode, string City) : Address;
+    public sealed partial record V1(string Street, string Number, string PostalCode, string City) : Address;
 
-    public sealed record V2(string Street, string Number, string PostalCode, string City, string? Apartment, string? SecondLine) : Address;
+    public sealed partial record V2(string Street, string Number, string PostalCode, string City, string? Apartment, string? SecondLine) : Address;
 }
 
 public interface IPersonValueProvider
