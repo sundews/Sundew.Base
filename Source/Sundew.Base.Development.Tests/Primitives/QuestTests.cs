@@ -76,9 +76,10 @@ public class QuestTests
         using var cancellationTokenSource = new CancellationTokenSource();
         var quest = Quest.Create(
             __._,
-            _ =>
+            token =>
             {
                 Thread.Sleep(1000);
+                token.ThrowIfCancellationRequested();
                 return Task.CompletedTask;
             },
             cancellationTokenSource.Token);
