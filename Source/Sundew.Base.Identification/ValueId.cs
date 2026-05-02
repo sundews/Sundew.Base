@@ -167,11 +167,13 @@ public sealed record ValueId(string? Metadata, IValue Value)
             return defaultValue;
         }
 
+        static string GetRawString(IValue value) =>
+            value is ScalarValue scalarValue ? scalarValue.Value : value.ToString() ?? string.Empty;
+
         var argument = complexValue.Items.FirstOrDefault(x => x.Name == referenceName);
         if (argument.HasValue)
         {
-            var rawValue = argument.ValueId.Value is ScalarValue scalarValue ? scalarValue.Value : argument.ValueId.Value.ToString() ?? string.Empty;
-            return TValue.Parse(rawValue, formatProvider);
+            return TValue.Parse(GetRawString(argument.ValueId.Value), formatProvider);
         }
 
         var firstDotIndex = referenceName.IndexOf('.');
@@ -181,8 +183,7 @@ public sealed record ValueId(string? Metadata, IValue Value)
         argument = complexValue.Items.FirstOrDefault(x => x.Name == fallback);
         if (argument.HasValue)
         {
-            var rawValue = argument.ValueId.Value is ScalarValue scalarValue ? scalarValue.Value : argument.ValueId.Value.ToString() ?? string.Empty;
-            return TValue.Parse(rawValue, formatProvider);
+            return TValue.Parse(GetRawString(argument.ValueId.Value), formatProvider);
         }
 
         return defaultValue;
