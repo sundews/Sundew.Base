@@ -78,7 +78,34 @@ internal static class TargetEvaluator
 
         if (arguments.HasValue)
         {
-            return arguments.Items.Select(x => x.ValueId.TryGetType()).AllOrFailed(x => x.ToItem()).Map(x => (IReadOnlyList<Type>)x.Items);
+            var typesFromMetadata = arguments.Items.Select(x => x.ValueId.TryGetType()).AllOrFailed(x => x.ToItem());
+            if (typesFromMetadata.IsSuccess)
+            {
+                return typesFromMetadata.Map(x => (IReadOnlyList<Type>)x.Items);
+            }
+
+            // Fall back to member signature when some arguments lack metadata (e.g. primitives/defaults)
+            if (path.HasValue)
+            {
+                var fallbackMemberInfo = GetTargetMemberInfo(sourceType.Value, path);
+                if (fallbackMemberInfo is MethodInfo fallbackMethodInfo)
+                {
+                    var parameters = fallbackMethodInfo.GetParameters();
+                    if (parameters.Length == arguments.Items.Count)
+                    {
+                        var types = new Type[parameters.Length];
+                        for (var i = 0; i < parameters.Length; i++)
+                        {
+                            var argType = arguments.Items[i].ValueId.TryGetType();
+                            types[i] = argType.IsSuccess ? argType.Value : parameters[i].ParameterType;
+                        }
+
+                        return R.Success<IReadOnlyList<Type>>(types);
+                    }
+                }
+            }
+
+            return R.Error();
         }
 
         if (!path.HasValue)

@@ -281,7 +281,13 @@ public class Parser<TToken>
     /// <returns>A value indicating whether the undo was successful.</returns>
     public bool Undo()
     {
-        return this.stateStack.TryPop(out var _);
+        if (this.stateStack.Count > 1)
+        {
+            this.stateStack.Pop();
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
