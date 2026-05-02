@@ -166,7 +166,7 @@ public static class ResultExtensions
             return new R<(TSuccess1, TSuccess2, TSuccess3, TSuccess4), TError>(false, default, otherResult.Error);
         }
 
-        return new R<(TSuccess1, TSuccess2, TSuccess3, TSuccess4), TError>(true, default, result.Error);
+        return new R<(TSuccess1, TSuccess2, TSuccess3, TSuccess4), TError>(false, default, result.Error);
     }
 #pragma warning restore SA1101
 }
