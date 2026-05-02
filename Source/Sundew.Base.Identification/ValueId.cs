@@ -170,7 +170,8 @@ public sealed record ValueId(string? Metadata, IValue Value)
         var argument = complexValue.Items.FirstOrDefault(x => x.Name == referenceName);
         if (argument.HasValue)
         {
-            return TValue.Parse(argument.ValueId.Value.ToString() ?? string.Empty, formatProvider);
+            var rawValue = argument.ValueId.Value is ScalarValue scalarValue ? scalarValue.Value : argument.ValueId.Value.ToString() ?? string.Empty;
+            return TValue.Parse(rawValue, formatProvider);
         }
 
         var firstDotIndex = referenceName.IndexOf('.');
@@ -180,7 +181,8 @@ public sealed record ValueId(string? Metadata, IValue Value)
         argument = complexValue.Items.FirstOrDefault(x => x.Name == fallback);
         if (argument.HasValue)
         {
-            return TValue.Parse(argument.ValueId.Value.ToString() ?? string.Empty, formatProvider);
+            var rawValue = argument.ValueId.Value is ScalarValue scalarValue ? scalarValue.Value : argument.ValueId.Value.ToString() ?? string.Empty;
+            return TValue.Parse(rawValue, formatProvider);
         }
 
         return defaultValue;
