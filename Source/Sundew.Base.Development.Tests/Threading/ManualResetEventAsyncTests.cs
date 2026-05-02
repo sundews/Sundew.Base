@@ -230,8 +230,8 @@ public class ManualResetEventAsyncTests
     [Test]
     public async Task WaitAsync_When_Set_Then_AllWaitersShouldBeNotified()
     {
-        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
-        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync(TimeSpan.FromMilliseconds(1000)));
+        var waitTask1 = Task.Run(async () => await this.testee.WaitAsync());
+        var waitTask2 = Task.Run(async () => await this.testee.WaitAsync());
         await Task.Delay(10);
         this.testee.Set();
 

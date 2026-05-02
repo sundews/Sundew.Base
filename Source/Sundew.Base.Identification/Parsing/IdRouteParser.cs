@@ -154,13 +154,13 @@ internal static class IdRouteParser
             }
         }
 
-        string? fragment = null;
-        if (parser.TryAccept(Grammar.LiteralSeparator))
+        Arguments? fragment = null;
+        if (parser.TryAccept(Grammar.FragmentSeparator))
         {
             var valueIdsResult = Arguments(parser);
             if (valueIdsResult.IsSuccess)
             {
-                arguments = valueIdsResult.Value;
+                fragment = valueIdsResult.Value;
             }
             else
             {

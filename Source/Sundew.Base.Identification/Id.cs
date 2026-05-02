@@ -18,7 +18,7 @@ using Sundew.Base.Identification.Parsing;
 /// <summary>
 /// Represents any Id.
 /// </summary>
-public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null, string? Fragment = null) : IParsable<Id>
+public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null, Arguments? Fragment = null) : IParsable<Id>
 {
     /// <summary>
     /// Creates an Uri from this <see cref="Id"/>.
@@ -158,8 +158,8 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null, 
 
         if (this.Fragment.HasValue)
         {
-            stringBuilder.Append(Grammar.LiteralSeparator);
-            stringBuilder.Append(this.Fragment);
+            stringBuilder.Append(Grammar.FragmentSeparator);
+            this.Fragment.AppendInto(stringBuilder, formatProvider, new AppendOptions(true));
         }
     }
 
@@ -261,7 +261,7 @@ public sealed record Id(Source Source, Path? Path, Arguments? Arguments = null, 
     public static Id From<TSource>(Expression<Action<TSource>> targetExpression, IIdentifiable<InstanceId> value)
     {
         var (source, path, valueId) = ExpressionEvaluator.From(targetExpression, new ValueId(null, new LiteralValue(value.Id.Number.ToString())));
-        return new Id(source, path, valueId, value.Id.Number.ToString());
+        return new Id(source, path, valueId, null);
     }
 
     /// <summary>

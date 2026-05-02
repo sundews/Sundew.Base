@@ -24,6 +24,9 @@ internal static class Grammar
     /// <summary>The literal separator.</summary>
     public const char LiteralSeparator = '^';
 
+    /// <summary>The fragment separator.</summary>
+    public const char FragmentSeparator = '#';
+
     /// <summary>Metadata separator.</summary>
     public const char NameMetadataSeparator = '!';
 
