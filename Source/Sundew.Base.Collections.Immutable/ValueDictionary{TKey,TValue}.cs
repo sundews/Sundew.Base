@@ -162,13 +162,13 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
     public override int GetHashCode()
     {
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-        if (this.inner == null)
+        if (this.Count == 0)
         {
             return 0;
         }
 
         var hashCode = default(HashCode);
-        foreach (var pair in this.inner)
+        foreach (var pair in this.inner!)
         {
             hashCode.Add(pair.Key);
             hashCode.Add(pair.Value);
@@ -186,7 +186,7 @@ public readonly struct ValueDictionary<TKey, TValue> : IReadOnlyDictionary<TKey,
             }
         }
 
-        return this.inner == default ? 0 : Equality.Equality.GetItemsHashCode(this.inner.Select(x => CombineHashCode(x.Key?.GetHashCode() ?? 0, x.Value?.GetHashCode() ?? 0)));
+        return this.Count == 0 ? 0 : Equality.Equality.GetItemsHashCode(this.inner!.Select(x => CombineHashCode(x.Key?.GetHashCode() ?? 0, x.Value?.GetHashCode() ?? 0)));
 
 #endif
     }

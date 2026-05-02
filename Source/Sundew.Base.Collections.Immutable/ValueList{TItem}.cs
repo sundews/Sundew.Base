@@ -133,20 +133,20 @@ public readonly struct ValueList<TItem> : IReadOnlyList<TItem>, IEquatable<Value
     public override int GetHashCode()
     {
 #if NETSTANDARD2_0_OR_GREATER || NET6_0_OR_GREATER
-        if (this.inner == null)
+        if (this.Count == 0)
         {
             return 0;
         }
 
         var hashCode = default(HashCode);
-        foreach (var item in this.inner)
+        foreach (var item in this.inner!)
         {
             hashCode.Add(item?.GetHashCode() ?? 0);
         }
 
         return hashCode.ToHashCode();
 #else
-        return this.inner == default ? 0 : Equality.Equality.GetItemsHashCode(this.inner.Select(x => x?.GetHashCode() ?? 0));
+        return this.Count == 0 ? 0 : Equality.Equality.GetItemsHashCode(this.inner!.Select(x => x?.GetHashCode() ?? 0));
 
 #endif
     }
