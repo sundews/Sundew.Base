@@ -37,7 +37,7 @@ public class RegexLexerRule<TToken>(TToken token, Regex regex) : ILexerRule<TTok
     public R<(string Lexeme, int ConsumedLength), LexerError> TryGetLexeme(string input, Parser<TToken>.State state)
     {
         var match = regex.Match(input, state.Position);
-        if (match.Success)
+        if (match.Success && match.Index == state.Position)
         {
             if (match.Groups.TryGetValue(TokenGroupName, out var matchingGroup))
             {

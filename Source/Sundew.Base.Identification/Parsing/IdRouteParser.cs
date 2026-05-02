@@ -114,7 +114,7 @@ internal static class IdRouteParser
                 return R.Error(IIdRouteError._IdRouteIdError(idResult.Error));
             }
         }
-        while (!parser.TryAccept(Grammar.IdSeparator));
+        while (parser.TryAccept(Grammar.IdSeparator));
         return R.Success(new IdRoute(builder.ToValueList()));
     }
 
@@ -332,7 +332,7 @@ internal static class IdRouteParser
                     .And(() =>
                     {
                         var valueIds = ImmutableArray.CreateBuilder<ValueId>();
-                        while (!parser.IsNext(Grammar.GroupStart))
+                        while (!parser.IsNext(Grammar.ArrayEnd))
                         {
                             var singleValueIdResult = ValueId(parser);
                             if (singleValueIdResult.IsSuccess)
