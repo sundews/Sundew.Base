@@ -83,7 +83,7 @@ public sealed class ValueIdBuilder(Type type)
         {
             Empty<Argument> empty => new ValueId(metadata, new LiteralValue(@null)),
             Multiple<Argument> valueIds => new ValueId(metadata, new ComplexValue(valueIds.Items.ToValueArray())),
-            Single<Argument> single => single.Item.ValueId,
+            Single<Argument> single => new ValueId(metadata, new ComplexValue(new[] { single.Item }.ToValueArray())),
         };
     }
 
