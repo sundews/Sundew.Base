@@ -84,14 +84,14 @@ public class ReactiveEventTests
 
 #pragma warning disable SA1201
 
-public class ReactiveEventSource : INotify<IEvent>
+public class ReactiveEventSource : INotifyAny<IEvent>
 {
     private readonly Subject<IEvent> subject = new();
     private readonly Subscriptions subscriptions = new();
 
     internal Subscriptions ReactiveSubscriptions => this.subscriptions;
 
-    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, CancellationToken, ValueTask> handler)
+    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
         where TSubscribedEvent : IEvent
     {
         return ReactiveEventSubscriber<IEvent>.Subscribe(this.subject, handler, notificationTarget, this.subscriptions);

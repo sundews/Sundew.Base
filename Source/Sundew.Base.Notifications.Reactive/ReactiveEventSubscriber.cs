@@ -32,19 +32,30 @@ public class ReactiveEventSubscriber<TEvent>
     /// <returns>A subscription.</returns>
     public static Subscription Subscribe<TSubscribedEvent>(
         IObservable<TEvent> observable,
-        Func<TSubscribedEvent, CancellationToken, ValueTask> handler,
+        Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler,
         INotificationTarget notificationTarget,
         params IReadOnlyList<Subscriptions> subscriptionsList)
         where TSubscribedEvent : TEvent
     {
-        var disposable = observable.OfType<TSubscribedEvent>()
-            .Select(x =>
-                Observable.FromAsync(async cancellationToken =>
-                    await handler(x, cancellationToken).ConfigureAwait(false)))
-            .Concat()
-            .Subscribe();
-
+#if NET9_0_OR_GREATER
+        var @lock = new Lock();
+#else
+        var @lock = new object();
+#endif
+        IDisposable? disposable = null;
         var subscription = new Subscription(Unsubscribe);
+        lock (@lock)
+        {
+            disposable = observable.OfType<TSubscribedEvent>()
+                .Select(x =>
+                    Observable.FromAsync(async cancellationToken =>
+                    {
+                        await handler(x, subscription, cancellationToken).ConfigureAwait(false);
+                    }))
+                .Concat()
+                .Subscribe();
+        }
+
         notificationTarget.TargetSubscriptions.Add(subscription);
         foreach (var subscriptions in subscriptionsList)
         {
@@ -61,7 +72,66 @@ public class ReactiveEventSubscriber<TEvent>
             }
 
             notificationTarget.TargetSubscriptions.Remove(subscription);
-            disposable.Dispose();
+            lock (@lock)
+            {
+                disposable?.Dispose();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Subscribes to the specified event.
+    /// </summary>
+    /// <param name="observable">The observable.</param>
+    /// <param name="handler">The handler.</param>
+    /// <param name="notificationTarget">The subscription target.</param>
+    /// <param name="subscriptionsList">The subscriptions.</param>
+    /// <returns>A subscription.</returns>
+    public static Subscription Subscribe(
+        IObservable<TEvent> observable,
+        Func<TEvent, Subscription, CancellationToken, ValueTask> handler,
+        INotificationTarget notificationTarget,
+        params IReadOnlyList<Subscriptions> subscriptionsList)
+    {
+#if NET9_0_OR_GREATER
+        var @lock = new Lock();
+#else
+        var @lock = new object();
+#endif
+        IDisposable? disposable = null;
+        var subscription = new Subscription(Unsubscribe);
+        lock (@lock)
+        {
+            disposable = observable
+                .Select(x =>
+                    Observable.FromAsync(async cancellationToken =>
+                    {
+                        await handler(x, subscription, cancellationToken).ConfigureAwait(false);
+                    }))
+                .Concat()
+                .Subscribe();
+        }
+
+        notificationTarget.TargetSubscriptions.Add(subscription);
+        foreach (var subscriptions in subscriptionsList)
+        {
+            subscriptions.Add(subscription);
+        }
+
+        return subscription;
+
+        void Unsubscribe(Subscription subscription)
+        {
+            foreach (var subscriptions in subscriptionsList)
+            {
+                subscriptions.Remove(subscription);
+            }
+
+            notificationTarget.TargetSubscriptions.Remove(subscription);
+            lock (@lock)
+            {
+                disposable?.Dispose();
+            }
         }
     }
 }

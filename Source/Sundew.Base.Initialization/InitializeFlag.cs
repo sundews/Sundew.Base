@@ -9,6 +9,7 @@ namespace Sundew.Base.Initialization;
 
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -17,11 +18,17 @@ using System.Threading.Tasks;
 public sealed class InitializeFlag
 {
     private readonly TaskCompletionSource<bool> taskCompletionSource = new();
+    private int hasInitializationStarted;
 
     /// <summary>
-    /// Occurs when [initialized].
+    /// Occurs when this instance is initialized.
     /// </summary>
     public event EventHandler? Initialized;
+
+    /// <summary>
+    /// Gets a value indicating whether the initialization has started.
+    /// </summary>
+    public Task Task => this.taskCompletionSource.Task;
 
     /// <summary>
     /// Gets a value indicating whether this instance is initialized.
@@ -49,6 +56,63 @@ public sealed class InitializeFlag
     /// <returns>A value indicating whether the flag was just initialized.</returns>
     public bool Initialize()
     {
+        if (this.TrySetInitializationHasStarted())
+        {
+            return false;
+        }
+
+        var result = this.taskCompletionSource.TrySetResult(true);
+        if (result)
+        {
+            this.Initialized?.Invoke(this, EventArgs.Empty);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Initializes this instance.
+    /// </summary>
+    /// <returns>A value indicating whether the flag was just initialized.</returns>
+    public Task<bool> InitializeAsync()
+    {
+        if (this.TrySetInitializationHasStarted())
+        {
+            return Task.FromResult(false);
+        }
+
+        var result = this.taskCompletionSource.TrySetResult(true);
+        if (result)
+        {
+            this.Initialized?.Invoke(this, EventArgs.Empty);
+        }
+
+        return this.taskCompletionSource.Task;
+    }
+
+    /// <summary>
+    /// Initializes this instance.
+    /// </summary>
+    /// <param name="initializeAction">The initialization action.</param>
+    /// <returns>A value indicating whether the flag was just initialized.</returns>
+    public async Task<bool> TryInitializeAsync(Func<Task> initializeAction)
+    {
+        if (this.TrySetInitializationHasStarted())
+        {
+            await this.taskCompletionSource.Task.ConfigureAwait(false);
+            return false;
+        }
+
+        try
+        {
+            await initializeAction().ConfigureAwait(false);
+        }
+        catch (Exception ex)
+        {
+            this.taskCompletionSource.TrySetException(ex);
+            throw;
+        }
+
         var result = this.taskCompletionSource.TrySetResult(true);
         if (result)
         {
@@ -90,5 +154,10 @@ public sealed class InitializeFlag
                 }
             },
             TaskScheduler.Default);
+    }
+
+    private bool TrySetInitializationHasStarted()
+    {
+        return Interlocked.CompareExchange(ref this.hasInitializationStarted, 1, 0) != 0;
     }
 }

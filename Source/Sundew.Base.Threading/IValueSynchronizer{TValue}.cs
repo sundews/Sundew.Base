@@ -20,7 +20,7 @@ using Sundew.Base.Notifications;
 /// value asynchronously. This is useful in scenarios where value updates may occur over time or from external sources,
 /// and consumers need to react to or await the latest value.</remarks>
 /// <typeparam name="TValue">The type of the value object to synchronize. Must be a reference type.</typeparam>
-public interface IValueSynchronizer<TValue> : INotify<TValue>, IDisposable
+public interface IValueSynchronizer<TValue> : INotifyAny<TValue>, IDisposable
     where TValue : class
 {
     /// <summary>
@@ -52,5 +52,5 @@ public interface IValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TVa
     /// <param name="submissionFunc">A delegate that returns a task representing the apply action.</param>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>A task that represents the asynchronous operation. The task completes when the attempt to run the apply action has finished.</returns>
-    Task TrySubmitAsync(object submissionId,  Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> submissionFunc, Cancellation cancellation = default);
+    Task TrySubmitAsync(object submissionId, Func<CancellationToken, Task<PostSubmitAction<TParameter, TValue>>> submissionFunc, Cancellation cancellation = default);
 }

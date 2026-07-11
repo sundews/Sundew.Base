@@ -9,6 +9,7 @@
 namespace Sundew.Base.Development.Tests.Notifications;
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
@@ -48,7 +49,7 @@ public class DelegateEventTests
         result1.Should().BeFalse();
         result2.Should().BeFalse();
         notificationTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
-        eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(0);
+        eventSource.Subscriptions.Should().HaveCount(0);
     }
 
     [Test]
@@ -66,7 +67,7 @@ public class DelegateEventTests
         result1.Should().BeFalse();
         result2.Should().BeFalse();
         notificationTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
-        eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(0);
+        eventSource.Subscriptions.Should().HaveCount(0);
     }
 
     [Test]
@@ -85,7 +86,7 @@ public class DelegateEventTests
         result1.Should().BeFalse();
         result2.Should().BeFalse();
         notificationTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
-        eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(0);
+        eventSource.Subscriptions.Should().HaveCount(0);
     }
 
     [Test]
@@ -94,7 +95,7 @@ public class DelegateEventTests
         var eventSource = new DelegateEventSource();
         var notificationTarget = new DelegateNotificationTarget(eventSource);
         notificationTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(2);
-        eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(2);
+        eventSource.Subscriptions.Should().HaveCount(2);
 
         notificationTarget.ConcreteEvent1Subscription.Unsubscribe();
 
@@ -106,17 +107,17 @@ public class DelegateEventTests
         result1.Should().BeFalse();
         result2.Should().BeTrue();
         notificationTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(1);
-        eventSource.Subscriptions.GetUnsubscribers().Should().HaveCount(1);
+        eventSource.Subscriptions.Should().HaveCount(1);
     }
 }
 
-public class DelegateEventSource : INotify<IEvent>
+public class DelegateEventSource : INotifyAny<IEvent>
 {
     private readonly DelegateEvent<IEvent> delegateEvent = new();
 
-    internal Subscriptions Subscriptions => this.delegateEvent.Subscriptions;
+    internal IEnumerable<Subscription> Subscriptions => this.delegateEvent.GetSubscriptions();
 
-    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, CancellationToken, ValueTask> handler)
+    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
         where TSubscribedEvent : IEvent
     {
         return this.delegateEvent.Subscribe(handler, notificationTarget);

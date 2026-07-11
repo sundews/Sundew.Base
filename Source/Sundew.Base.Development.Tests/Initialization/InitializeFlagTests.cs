@@ -64,7 +64,7 @@ public class InitializeFlagTests
         _ = Task.Run(async () =>
         {
             await Task.Delay(100).ConfigureAwait(false);
-            testee.Initialize();
+            await testee.InitializeAsync();
         });
 
         var result = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(500)));
@@ -83,7 +83,7 @@ public class InitializeFlagTests
         _ = Task.Run(async () =>
         {
             await Task.Delay(500).ConfigureAwait(false);
-            testee.Initialize();
+            await testee.InitializeAsync();
         });
 
         var result = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(50)));
@@ -92,6 +92,75 @@ public class InitializeFlagTests
         {
             result.Should().BeFalse();
             testee.IsInitialized.Should().BeFalse();
+        }
+    }
+
+    [Test]
+    public async Task InitializeAsync_When_InitializeAsync_Then_IsInitializedShouldBeFalse()
+    {
+        var testee = new InitializeFlag();
+        _ = Task.Run(async () =>
+        {
+            await testee.InitializeAsync();
+        });
+
+        await Task.Delay(500).ConfigureAwait(false);
+        var result = await testee.InitializeAsync();
+
+        using (new AssertionScope())
+        {
+            result.Should().BeFalse();
+            testee.IsInitialized.Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public async Task InitializeAsync_When_InitializeAsync_Then_InitializeShouldNotBeCalled()
+    {
+        var initializeWasCalled = false;
+        var testee = new InitializeFlag();
+        _ = Task.Run(async () =>
+        {
+            await testee.InitializeAsync();
+        });
+
+        await Task.Delay(500).ConfigureAwait(false);
+        var result = await testee.TryInitializeAsync(() =>
+        {
+            initializeWasCalled = true;
+            return Task.CompletedTask;
+        });
+
+        using (new AssertionScope())
+        {
+            initializeWasCalled.Should().BeFalse();
+            result.Should().BeFalse();
+            testee.IsInitialized.Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public async Task InitializeAsync_When_InitializeAsync_Then_InitializeShouldBeCalledOnce()
+    {
+        var initializeWasCalled = 0;
+        var testee = new InitializeFlag();
+        _ = Task.Run(async () =>
+        {
+            await testee.TryInitializeAsync(() => Initialize());
+        });
+
+        await testee.TryInitializeAsync(() => Initialize());
+
+        using (new AssertionScope())
+        {
+            initializeWasCalled.Should().Be(1);
+            testee.IsInitialized.Should().BeTrue();
+        }
+
+        Task Initialize()
+        {
+            initializeWasCalled++;
+            return Task.CompletedTask;
         }
     }
 }

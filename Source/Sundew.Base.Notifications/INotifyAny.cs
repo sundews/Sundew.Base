@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="INotify.cs" company="Sundews">
+// <copyright file="INotifyAny.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -15,15 +15,18 @@ using System.Threading.Tasks;
 /// Interface for implementing an event source.
 /// </summary>
 /// <typeparam name="TEvent">The type of event.</typeparam>
-public interface INotify<TEvent>
+public interface INotifyAny<in TEvent>
+    where TEvent : class
 {
     /// <summary>
     /// Subscribes to the subscribed event.
     /// </summary>
+    /// <typeparam name="TSubscribedEvent">The subscribed event type.</typeparam>
     /// <param name="notificationTarget">The subscription target.</param>
     /// <param name="handler">The handler.</param>
     /// <returns>A subscription.</returns>
-    Subscription Subscribe(
+    Subscription Subscribe<TSubscribedEvent>(
         INotificationTarget notificationTarget,
-        Func<TEvent, Subscription, CancellationToken, ValueTask> handler);
+        Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
+        where TSubscribedEvent : TEvent;
 }

@@ -75,7 +75,7 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     /// <param name="handler">A delegate that handles the event. The delegate receives the event data and a cancellation token, and returns a
     /// ValueTask representing the asynchronous operation.</param>
     /// <returns>A Subscription object that can be disposed to unsubscribe the handler.</returns>
-    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, CancellationToken, ValueTask> handler)
+    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
         where TSubscribedEvent : TValue
     {
         return this.updateEvent.Subscribe(handler, notificationTarget);
