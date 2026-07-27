@@ -26,12 +26,12 @@ public static class SynchronizationContextExtensions
     {
         var sendContext = new AsyncVoidContext(action);
         synchronizationContext.Post(
-            o =>
+            async o =>
             {
                 var context = (AsyncVoidContext)o!;
                 try
                 {
-                    context.SendOrPostCallback().GetAwaiter().GetResult();
+                    await context.SendOrPostCallback().ConfigureAwait(true);
                     context.TaskCompletionSource.SetResult(__._);
                 }
                 catch (Exception e)
@@ -55,12 +55,12 @@ public static class SynchronizationContextExtensions
     {
         var sendContext = new AsyncResultContext<TResult>(func);
         synchronizationContext.Post(
-            o =>
+            async o =>
             {
                 var context = (AsyncResultContext<TResult>)o!;
                 try
                 {
-                    context.TaskCompletionSource.SetResult(context.SendOrPostCallback().GetAwaiter().GetResult());
+                    context.TaskCompletionSource.SetResult(await context.SendOrPostCallback().ConfigureAwait(true));
                 }
                 catch (Exception e)
                 {
@@ -140,12 +140,12 @@ public static class SynchronizationContextExtensions
     {
         var sendContext = new AsyncVoidContext<TState>(action, state);
         synchronizationContext.Post(
-            o =>
+            async o =>
             {
                 var context = (AsyncVoidContext<TState>)o!;
                 try
                 {
-                    context.SendOrPostCallback(context.State).GetAwaiter().GetResult();
+                    await context.SendOrPostCallback(context.State).ConfigureAwait(true);
                     context.TaskCompletionSource.SetResult(__._);
                 }
                 catch (Exception e)
@@ -171,12 +171,12 @@ public static class SynchronizationContextExtensions
     {
         var sendContext = new AsyncResultContext<TState, TResult>(func, state);
         synchronizationContext.Post(
-            o =>
+            async o =>
             {
                 var context = (AsyncResultContext<TState, TResult>)o!;
                 try
                 {
-                    context.TaskCompletionSource.SetResult(context.SendOrPostCallback(context.State).GetAwaiter().GetResult());
+                    context.TaskCompletionSource.SetResult(await context.SendOrPostCallback(context.State).ConfigureAwait(true));
                 }
                 catch (Exception e)
                 {

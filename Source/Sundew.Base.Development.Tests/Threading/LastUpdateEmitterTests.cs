@@ -8,6 +8,7 @@
 namespace Sundew.Base.Development.Tests.Threading;
 
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
 using AwesomeAssertions.Execution;
@@ -107,6 +108,26 @@ public class LastUpdateEmitterTests
         using (new AssertionScope())
         {
             expectedResult.Should().Equal("1", finalExpectedValue);
+        }
+    }
+
+    [Test]
+    public async Task Update_When_RacingWithProcessingCompletion_Then_LastValueShouldAlwaysBeEmitted()
+    {
+        for (var i = 0; i < 500; i++)
+        {
+            var lastEmittedValue = 0;
+            var testee = new LastUpdateEmitter<int>(x =>
+            {
+                Volatile.Write(ref lastEmittedValue, x);
+                return default;
+            });
+
+            _ = testee.Update(1);
+            await Task.Yield();
+            await testee.Update(2);
+
+            Volatile.Read(ref lastEmittedValue).Should().Be(2, "the last submitted value must never be lost (iteration {0})", i);
         }
     }
 }

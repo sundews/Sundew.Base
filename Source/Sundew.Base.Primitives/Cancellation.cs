@@ -345,8 +345,16 @@ public struct Cancellation
             var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
             if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue)
             {
-                this.cancellation.cancellationTokenSource.Cancel();
-                return true;
+                try
+                {
+                    this.cancellation.cancellationTokenSource.Cancel();
+                    return true;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The cancellation token source was disposed concurrently, meaning the operation it guarded has already completed.
+                    return false;
+                }
             }
 
             return false;
@@ -362,8 +370,16 @@ public struct Cancellation
             var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
             if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue)
             {
-                await this.cancellation.cancellationTokenSource.CancelAsync().ConfigureAwait(false);
-                return true;
+                try
+                {
+                    await this.cancellation.cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+                    return true;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The cancellation token source was disposed concurrently, meaning the operation it guarded has already completed.
+                    return false;
+                }
             }
 
             return false;
@@ -380,8 +396,16 @@ public struct Cancellation
         {
             if (this.cancellation.cancellationTokenSource.HasValue)
             {
-                this.cancellation.cancellationTokenSource.CancelAfter(timeSpan);
-                return true;
+                try
+                {
+                    this.cancellation.cancellationTokenSource.CancelAfter(timeSpan);
+                    return true;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The cancellation token source was disposed concurrently, meaning the operation it guarded has already completed.
+                    return false;
+                }
             }
 
             return false;

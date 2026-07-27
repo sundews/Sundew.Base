@@ -96,6 +96,26 @@ public class InitializeFlagTests
     }
 
     [Test]
+    public async Task Initialize_When_APreviousWhenInitializedTimedOut_Then_InitializationShouldStillSucceed()
+    {
+        var testee = new InitializeFlag();
+
+        var waitResult = await testee.WhenInitialized(new Cancellation(TimeSpan.FromMilliseconds(10)));
+#pragma warning disable VSTHRD103
+        var initializeResult = testee.Initialize();
+#pragma warning restore VSTHRD103
+
+        using (new AssertionScope())
+        {
+            waitResult.Should().BeFalse();
+            initializeResult.Should().BeTrue();
+            testee.IsInitialized.Should().BeTrue();
+        }
+
+        (await testee.WhenInitialized(new Cancellation(TimeSpan.FromSeconds(5)))).Should().BeTrue();
+    }
+
+    [Test]
     public async Task InitializeAsync_When_InitializeAsync_Then_IsInitializedShouldBeFalse()
     {
         var testee = new InitializeFlag();

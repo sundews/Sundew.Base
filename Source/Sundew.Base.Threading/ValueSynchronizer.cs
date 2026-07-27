@@ -193,38 +193,74 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
         {
             case PostSubmitAction<TParameter, TValue>.Refresh refresh:
                 {
-                    this.getCurrentValueTask = this.getValueFunc(refresh.Parameter, cancellationToken);
-                    var value = await this.getCurrentValueTask.ConfigureAwait(false);
+                    Task<TValue> valueTask;
+                    lock (this.@lock)
+                    {
+                        valueTask = this.getValueFunc(refresh.Parameter, cancellationToken);
+                        this.getCurrentValueTask = valueTask;
+                        this.refreshOnIdle = null;
+                    }
+
+                    var value = await valueTask.ConfigureAwait(false);
                     await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
-                    this.refreshOnIdle = null;
                     break;
                 }
 
             case PostSubmitAction<TParameter, TValue>.RefreshOnIdle refreshOnIdle:
-                if (this.pendingSubmissions.IsEmpty)
                 {
-                    this.getCurrentValueTask = this.getValueFunc(refreshOnIdle.Parameter, cancellationToken);
-                    var value = await this.getCurrentValueTask.ConfigureAwait(false);
-                    await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
-                    this.refreshOnIdle = null;
-                }
-                else
-                {
-                    this.refreshOnIdle = refreshOnIdle;
+                    Task<TValue>? valueTask = null;
+                    lock (this.@lock)
+                    {
+                        if (this.pendingSubmissions.Count == 0)
+                        {
+                            valueTask = this.getValueFunc(refreshOnIdle.Parameter, cancellationToken);
+                            this.getCurrentValueTask = valueTask;
+                            this.refreshOnIdle = null;
+                        }
+                        else
+                        {
+                            this.refreshOnIdle = refreshOnIdle;
+                        }
+                    }
+
+                    if (valueTask.HasValue)
+                    {
+                        var value = await valueTask.ConfigureAwait(false);
+                        await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
+                    }
+
+                    break;
                 }
 
-                break;
             case PostSubmitAction<TParameter, TValue>.None:
-                if (this.refreshOnIdle.HasValue)
                 {
-                    this.getCurrentValueTask = this.getValueFunc(this.refreshOnIdle.Parameter, cancellationToken);
-                    var value = await this.getCurrentValueTask.ConfigureAwait(false);
-                    await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
+                    Task<TValue>? valueTask = null;
+                    lock (this.@lock)
+                    {
+                        var pendingRefreshOnIdle = this.refreshOnIdle;
+                        if (pendingRefreshOnIdle.HasValue)
+                        {
+                            valueTask = this.getValueFunc(pendingRefreshOnIdle.Parameter, cancellationToken);
+                            this.getCurrentValueTask = valueTask;
+                            this.refreshOnIdle = null;
+                        }
+                    }
+
+                    if (valueTask.HasValue)
+                    {
+                        var value = await valueTask.ConfigureAwait(false);
+                        await this.updateEvent.RaiseAsync(value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
+                    }
+
+                    break;
                 }
 
-                break;
             case PostSubmitAction<TParameter, TValue>.SetValue setValue:
-                this.getCurrentValueTask = Task.FromResult(setValue.Value);
+                lock (this.@lock)
+                {
+                    this.getCurrentValueTask = Task.FromResult(setValue.Value);
+                }
+
                 await this.updateEvent.RaiseAsync(setValue.Value, Parallelism.Default, CancellationToken.None).ConfigureAwait(false);
                 break;
         }

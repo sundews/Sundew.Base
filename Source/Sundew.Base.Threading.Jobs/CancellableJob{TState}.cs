@@ -73,7 +73,16 @@ public sealed class CancellableJob<TState> : IJob
     /// <summary>
     /// Gets a value indicating whether the job is running.
     /// </summary>
-    public bool IsRunning { get; private set; }
+    public bool IsRunning
+    {
+        get
+        {
+            lock (this.@lock)
+            {
+                return this.jobContext.HasValue;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the exception.
@@ -109,12 +118,12 @@ public sealed class CancellableJob<TState> : IJob
     /// <returns>The job start result.</returns>
     public Task<JobStartResult> StartAsync(Cancellation cancellation)
     {
-        var cancellationEnabler = cancellation.EnableCancellation();
         //// using (await this.@lock.LockAsync(cancellationEnabler.Token).ConfigureAwait(false))
         lock (this.@lock)
         {
             if (!this.jobContext.HasValue)
             {
+                var cancellationEnabler = cancellation.EnableCancellation();
                 this.aggregateException = null;
                 const TaskCreationOptions taskCreationOptions = TaskCreationOptions.RunContinuationsAsynchronously | TaskCreationOptions.DenyChildAttach;
                 this.jobContext = new JobContext(
@@ -244,36 +253,28 @@ public sealed class CancellableJob<TState> : IJob
 
     private async Task TaskAction(CancellationToken cancellationToken)
     {
-        this.IsRunning = true;
-        try
+        while (!cancellationToken.IsCancellationRequested)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                try
-                {
-                    await this.taskAction.Invoke(this.State, cancellationToken).ConfigureAwait(false);
-                    return;
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (Exception e)
-                {
-                    var continueExecution = false;
-                    this.onException?.Invoke(e, ref continueExecution);
-                    if (continueExecution)
-                    {
-                        continue;
-                    }
-
-                    throw;
-                }
+                await this.taskAction.Invoke(this.State, cancellationToken).ConfigureAwait(false);
+                return;
             }
-        }
-        finally
-        {
-            this.IsRunning = false;
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception e)
+            {
+                var continueExecution = false;
+                this.onException?.Invoke(e, ref continueExecution);
+                if (continueExecution)
+                {
+                    continue;
+                }
+
+                throw;
+            }
         }
     }
 

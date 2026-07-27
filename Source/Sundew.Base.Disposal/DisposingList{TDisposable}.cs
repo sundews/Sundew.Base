@@ -151,8 +151,7 @@ IDisposable
     /// </summary>
     public void Dispose()
     {
-        var disposers = this.disposers;
-        this.Clear();
+        var disposers = Interlocked.Exchange(ref this.disposers, ImmutableList<Disposer>.Empty);
         if (this.concurrentDisposal)
         {
             Parallel.ForEach(disposers, x => x.Dispose(this.disposalReporter));
@@ -172,8 +171,7 @@ IDisposable
     /// <returns>An async task.</returns>
     public async ValueTask DisposeAsync()
     {
-        var disposers = this.disposers;
-        this.Clear();
+        var disposers = Interlocked.Exchange(ref this.disposers, ImmutableList<Disposer>.Empty);
         if (this.concurrentDisposal)
         {
             await Task.WhenAll(disposers.Select(x =>
@@ -221,14 +219,13 @@ IDisposable
 
     private void ReplaceList(Func<IImmutableList<Disposer>, IImmutableList<Disposer>> newListFunc)
     {
-        var disposers = this.disposers;
-        var newList = newListFunc(disposers);
-        Interlocked.CompareExchange(ref this.disposers, newList, disposers);
-        while (!ReferenceEquals(this.disposers, newList))
+        IImmutableList<Disposer> disposers;
+        IImmutableList<Disposer> newList;
+        do
         {
             disposers = this.disposers;
             newList = newListFunc(disposers);
-            Interlocked.CompareExchange(ref this.disposers, newList, disposers);
         }
+        while (!ReferenceEquals(Interlocked.CompareExchange(ref this.disposers, newList, disposers), disposers));
     }
 }

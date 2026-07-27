@@ -60,7 +60,7 @@ public sealed class AutoResetEventAsync
         try
         {
             await this.autoResetEventAsync.WaitAsync(cancellationToken).ConfigureAwait(false);
-            return !cancellationToken.IsCancellationRequested;
+            return true;
         }
         catch (OperationCanceledException)
         {
@@ -74,15 +74,15 @@ public sealed class AutoResetEventAsync
     /// <remarks>This method enables cancellation support for waiting on an <see cref="AutoResetEventAsync"/>,
     /// allowing the operation to be aborted if the provided cancellation token is triggered.</remarks>
     /// <param name="cancellation">A cancellation token that can be used to cancel the wait operation.</param>
-    /// <returns>A task that represents the asynchronous wait operation. The task result is <see langword="true"/> if the wait
-    /// was canceled; otherwise, <see langword="false"/>.</returns>
+    /// <returns>A task that represents the asynchronous wait operation. The task result is <see langword="true"/> if the event
+    /// was signaled; <see langword="false"/> if the wait was canceled or timed out.</returns>
     public async Task<bool> WaitAsync(Cancellation cancellation)
     {
         using var enabler = cancellation.EnableCancellation();
         try
         {
-            await this.autoResetEventAsync.WaitAsync(enabler.Token);
-            return !enabler.Token.IsCancellationRequested;
+            await this.autoResetEventAsync.WaitAsync(enabler.Token).ConfigureAwait(false);
+            return true;
         }
         catch (OperationCanceledException)
         {
@@ -96,15 +96,15 @@ public sealed class AutoResetEventAsync
     /// <remarks>This method uses a cancellation token to manage the wait operation. If the wait is canceled
     /// before the event is signaled, the method returns true.</remarks>
     /// <param name="timeSpan">The maximum duration to wait for the event to be signaled before timing out.</param>
-    /// <returns>A task that represents the asynchronous wait operation. The task result is true if the wait was canceled;
-    /// otherwise, false.</returns>
+    /// <returns>A task that represents the asynchronous wait operation. The task result is true if the event was signaled;
+    /// false if the wait timed out.</returns>
     public async Task<bool> WaitAsync(TimeSpan timeSpan)
     {
         using var cancellationTokenSource = new CancellationTokenSource(timeSpan);
         try
         {
-            await this.autoResetEventAsync.WaitAsync(cancellationTokenSource.Token);
-            return !cancellationTokenSource.IsCancellationRequested;
+            await this.autoResetEventAsync.WaitAsync(cancellationTokenSource.Token).ConfigureAwait(false);
+            return true;
         }
         catch (OperationCanceledException)
         {

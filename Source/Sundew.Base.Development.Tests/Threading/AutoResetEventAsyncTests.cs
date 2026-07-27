@@ -159,4 +159,24 @@ public class AutoResetEventAsyncTests
 
         otherTaskResult.Should().BeTrue();
     }
+
+    [Test]
+    public async Task WaitAsync_When_SetAndCancellationRace_Then_TheSignalShouldNeverBeLost()
+    {
+        for (var i = 0; i < 500; i++)
+        {
+            var autoResetEvent = new AutoResetEventAsync();
+            using var cancellationTokenSource = new CancellationTokenSource();
+            var waitTask = autoResetEvent.WaitAsync(cancellationTokenSource.Token);
+            var setTask = Task.Run(autoResetEvent.Set);
+            var cancelTask = Task.Run(cancellationTokenSource.Cancel);
+            await Task.WhenAll(setTask, cancelTask);
+
+            var result = await waitTask;
+            if (!result)
+            {
+                (await autoResetEvent.WaitAsync(TimeSpan.FromSeconds(5))).Should().BeTrue("a wait that reports cancellation must not have consumed the signal (iteration {0})", i);
+            }
+        }
+    }
 }

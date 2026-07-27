@@ -124,9 +124,9 @@ public abstract class TimerBase : ITimerControl
     {
         lock (this.lockObject)
         {
-            if (this.Interval != Timeout.InfiniteTimeSpan)
+            if (this.Interval == Timeout.InfiniteTimeSpan)
             {
-                this.IsEnabled = true;
+                this.IsEnabled = false;
             }
         }
 

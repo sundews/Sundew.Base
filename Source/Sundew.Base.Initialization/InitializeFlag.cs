@@ -136,24 +136,19 @@ public sealed class InitializeFlag
     /// </summary>
     /// <param name="cancellation">The cancellation.</param>
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    public Task<bool> WhenInitialized(Cancellation cancellation = default)
+    public async Task<bool> WhenInitialized(Cancellation cancellation = default)
     {
-        var enabler = cancellation.EnableCancellation();
-        var registration = enabler.Register(x => this.taskCompletionSource.TrySetResult(false));
-        return this.taskCompletionSource.Task.ContinueWith(
-            task =>
-            {
-                try
-                {
-                    return task.Result;
-                }
-                finally
-                {
-                    registration.Dispose();
-                    enabler.Dispose();
-                }
-            },
-            TaskScheduler.Default);
+        var initializationTask = this.taskCompletionSource.Task;
+        if (initializationTask.IsCompleted)
+        {
+            return await initializationTask.ConfigureAwait(false);
+        }
+
+        using var enabler = cancellation.EnableCancellation();
+        var waiterCompletionSource = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var registration = enabler.Register(() => waiterCompletionSource.TrySetResult(false));
+        var completedTask = await Task.WhenAny(initializationTask, waiterCompletionSource.Task).ConfigureAwait(false);
+        return await completedTask.ConfigureAwait(false);
     }
 
     private bool TrySetInitializationHasStarted()

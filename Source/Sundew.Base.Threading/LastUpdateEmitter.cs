@@ -60,6 +60,7 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
             var needUpdate = !this.comparer.Equals(value, this.currentValue);
             if (this.currentTask == null && needUpdate)
             {
+                this.currentValue = value;
                 this.currentTask = Task.Run(() => this.ProcessAsync(value));
             }
 
@@ -71,10 +72,8 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
     {
         try
         {
-            while (!this.comparer.Equals(this.currentValue, value))
+            do
             {
-                this.currentValue = value;
-
                 try
                 {
                     await this.emitterFunc(value).ConfigureAwait(false);
@@ -84,19 +83,33 @@ public sealed class LastUpdateEmitter<TValue> : IUpdateEmitter<TValue>
                 {
                     this.updateEmitterReporter?.ErrorDuringUpdate(ex);
                 }
-
-                lock (this.lockObject)
-                {
-                    value = this.nextValue;
-                }
             }
+            while (this.TryClaimNextValue(ref value));
         }
-        finally
+        catch
         {
             lock (this.lockObject)
             {
                 this.currentTask = null;
             }
+
+            throw;
+        }
+    }
+
+    private bool TryClaimNextValue(ref TValue? value)
+    {
+        lock (this.lockObject)
+        {
+            value = this.nextValue;
+            if (this.comparer.Equals(this.currentValue, value))
+            {
+                this.currentTask = null;
+                return false;
+            }
+
+            this.currentValue = value;
+            return true;
         }
     }
 }

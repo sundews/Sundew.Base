@@ -117,9 +117,7 @@ public abstract class ResetEventAsync
     /// <returns>A boolean result indicating whether the signal was received.</returns>
     public bool Wait(TimeSpan timeout, CancellationToken cancellationToken)
     {
-        var waitTask = this.WaitAsync(new Cancellation(timeout, cancellationToken));
-        waitTask.Wait(timeout);
-        return waitTask.Result;
+        return this.WaitAsync(new Cancellation(timeout, cancellationToken)).GetAwaiter().GetResult();
     }
 
     /// <summary>

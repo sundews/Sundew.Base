@@ -8,8 +8,10 @@
 namespace Sundew.Base.Development.Tests.Threading;
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Sundew.Base.Threading;
 
 using SingleThreadedSynchronizationContext = Microsoft.VisualStudio.Threading.SingleThreadedSynchronizationContext;
@@ -53,5 +55,54 @@ public class SynchronizationContextTests
         await task.ConfigureAwait(true);
 
         currentThreadList.Should().Equal(new List<int> { expectedThreadId, expectedThreadId, expectedThreadId });
+    }
+
+    [Test]
+    public async Task SendAsync_When_AsyncFuncResumesOnSingleThreadedContext_Then_ItShouldCompleteWithoutDeadlocking()
+    {
+        var currentThread = new CurrentThread();
+        var expectedThreadId = currentThread.ManagedThreadId;
+        var threadIds = new List<int>();
+        var synchronizationContext = new SingleThreadedSynchronizationContext();
+        var frame = new SingleThreadedSynchronizationContext.Frame();
+        var pumpStarted = new TaskCompletionSource<bool>();
+
+        var task = Task.Run(async () =>
+        {
+#pragma warning disable VSTHRD003
+            await pumpStarted.Task;
+#pragma warning restore VSTHRD003
+
+            var result = await synchronizationContext.SendAsync(async () =>
+            {
+                threadIds.Add(currentThread.ManagedThreadId);
+                await Task.Delay(1);
+                threadIds.Add(currentThread.ManagedThreadId);
+                return 42;
+            });
+
+            frame.Continue = false;
+            return result;
+        });
+
+        var originalContext = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(synchronizationContext);
+        try
+        {
+            pumpStarted.SetResult(true);
+            synchronizationContext.PushFrame(frame);
+        }
+        finally
+        {
+            SynchronizationContext.SetSynchronizationContext(originalContext);
+        }
+
+        var actualResult = await task.ConfigureAwait(true);
+
+        using (new AssertionScope())
+        {
+            actualResult.Should().Be(42);
+            threadIds.Should().Equal(new List<int> { expectedThreadId, expectedThreadId });
+        }
     }
 }

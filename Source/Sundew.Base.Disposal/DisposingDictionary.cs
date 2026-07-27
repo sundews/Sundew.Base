@@ -128,8 +128,7 @@ IDisposable
     /// </summary>
     public void Dispose()
     {
-        var disposables = this.disposables;
-        this.Clear();
+        var disposables = Interlocked.Exchange(ref this.disposables, ImmutableList<Item>.Empty);
         foreach (var disposer in GetDisposers(disposables))
         {
             disposer.Dispose(this.disposableReporter);
@@ -161,8 +160,7 @@ IDisposable
     /// <returns>An async task.</returns>
     public async ValueTask DisposeAsync()
     {
-        var disposables = this.disposables;
-        this.Clear();
+        var disposables = Interlocked.Exchange(ref this.disposables, ImmutableList<Item>.Empty);
         foreach (var disposer in GetDisposers(disposables))
         {
             await disposer.DisposeAsync(this.disposableReporter).ConfigureAwait(false);
@@ -232,15 +230,14 @@ IDisposable
 
     private void ReplaceList(Func<IImmutableList<Item>, IImmutableList<Item>> newListFunc)
     {
-        var disposables = this.disposables;
-        var newList = newListFunc(disposables);
-        Interlocked.CompareExchange(ref this.disposables, newList, disposables);
-        while (!ReferenceEquals(this.disposables, newList))
+        IImmutableList<Item> disposables;
+        IImmutableList<Item> newList;
+        do
         {
             disposables = this.disposables;
             newList = newListFunc(disposables);
-            Interlocked.CompareExchange(ref this.disposables, newList, disposables);
         }
+        while (!ReferenceEquals(Interlocked.CompareExchange(ref this.disposables, newList, disposables), disposables));
     }
 
     private readonly struct Item
