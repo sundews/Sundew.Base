@@ -11,6 +11,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using Sundew.Base.Threading;
 
 public class CancellationTests
@@ -130,6 +131,68 @@ public class CancellationTests
         await CancellableCall(cancellationWithTimeout, waitForCancellationTimeout);
 
         cancellationWithTimeout.Timeout.Should().Be(expectedTimeout);
+    }
+
+    [Test]
+    public void Timeout_When_Default_Then_ResultShouldBeInfinite()
+    {
+        Cancellation.None.Timeout.Should().Be(Timeout.InfiniteTimeSpan);
+    }
+
+    [Test]
+    public void Cancel_When_EnabledThroughMultipleCopies_Then_AllEnablersShouldBeLinked()
+    {
+        var cancellation = new Cancellation(TimeSpan.FromSeconds(30));
+        using var leafEnabler = PassAlong(cancellation);
+        using var localEnabler = cancellation.EnableCancellation();
+
+        var cancelResult = localEnabler.Cancel();
+
+        using (new AssertionScope())
+        {
+            cancelResult.Should().BeTrue();
+            leafEnabler.Token.IsCancellationRequested.Should().BeTrue();
+            leafEnabler.CancelReason.Should().Be(CancelReason.Internal);
+        }
+    }
+
+    [Test]
+    public void Cancel_When_AnotherEnablerWasDisposed_Then_RemainingEnablerShouldStillCancel()
+    {
+        var cancellation = new Cancellation(TimeSpan.FromSeconds(30));
+        using var outerEnabler = cancellation.EnableCancellation();
+        var innerEnabler = PassAlong(cancellation);
+
+        innerEnabler.Dispose();
+        var cancelResult = outerEnabler.Cancel();
+
+        using (new AssertionScope())
+        {
+            cancelResult.Should().BeTrue();
+            outerEnabler.Token.IsCancellationRequested.Should().BeTrue();
+        }
+    }
+
+    [Test]
+    public async Task EnableCancellation_When_EnabledAgainWhileRunning_Then_TimeoutShouldNotRestart()
+    {
+        var cancellation = new Cancellation(TimeSpan.FromMilliseconds(1000));
+        using var firstEnabler = cancellation.EnableCancellation();
+        await Task.Delay(800);
+        using var secondEnabler = cancellation.EnableCancellation();
+        await Task.Delay(800);
+
+        using (new AssertionScope())
+        {
+            firstEnabler.Token.IsCancellationRequested.Should().BeTrue();
+            secondEnabler.Token.IsCancellationRequested.Should().BeTrue();
+            secondEnabler.CancelReason.Should().Be(CancelReason.Timeout);
+        }
+    }
+
+    private static Cancellation.Enabler PassAlong(Cancellation cancellation)
+    {
+        return cancellation.EnableCancellation();
     }
 
     private static async Task<bool> CancellableCall(Cancellation cancellation, int waitTimeout)
