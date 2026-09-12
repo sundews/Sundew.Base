@@ -15,6 +15,7 @@ Contains various Linq style extension methods for collection types suchs IEnumer
 * Result types (R\<T, E\> and R\<T\>, RoE\<E\>)
 * Option type T? (through extension methods).
 * Flag is an Interlocked.Exchanged based flag.
+* Cancellation unifies CancellationToken and timeout support in a single parameter, avoiding token/timeout overloads: accept `Cancellation cancellation = default` and either pass it on, or call `EnableCancellation()` where cancellation is actually implemented.
 
 ## Computation
 * Attempter for implementing retry logic.

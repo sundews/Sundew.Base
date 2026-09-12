@@ -19,7 +19,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
     <PackageReleaseNotes>17.0 - Notifications improvements.
-16.0 - Added Sundew.Base.Identification
+16.0 - Added Sundew.Base.Identification, Cancellation redesign: all copies share one core, so enablers across a call chain are linked
 15.0 - .NET 10 support, dropped older than netstandard2.0
 14.0 - Result and collections improvements
 13.0 - Results improvements

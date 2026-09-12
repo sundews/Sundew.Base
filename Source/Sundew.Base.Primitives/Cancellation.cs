@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Cancellation.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
@@ -12,13 +12,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 /// <summary>
-/// A timeout cancellation token used to pass timeout into a cancellation token.
+/// Represents a cancellation intent combining an external <see cref="CancellationToken"/> with timeout support.
+/// All copies of a constructed <see cref="Cancellation"/> share the same underlying core, so enabling cancellation
+/// anywhere in a call chain links all participants: cancelling through any <see cref="Enabler"/> cancels them all.
+/// The default value represents no cancellation and does not allocate.
 /// </summary>
-public struct Cancellation
+public readonly struct Cancellation
 {
-    private readonly CancellationToken externalCancellationToken;
-    private readonly CancellationTokenSource? cancellationTokenSource;
-    private readonly Flag? consumedFlag = new Flag();
+    private readonly CancellationIdentity? core;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Cancellation"/> struct.
@@ -64,37 +65,23 @@ public struct Cancellation
     /// <param name="timeout">The timeout.</param>
     public Cancellation(CancellationToken cancellationToken, TimeSpan timeout)
     {
-        this.externalCancellationToken = cancellationToken;
-        this.Timeout = timeout;
+        this.core = new CancellationIdentity(cancellationToken, timeout);
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Cancellation"/> struct.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <param name="timeout">The timeout.</param>
-    /// <param name="cancellationTokenSource">The cancellation token source.</param>
-    private Cancellation(CancellationToken cancellationToken, TimeSpan timeout, CancellationTokenSource cancellationTokenSource)
-    {
-        this.externalCancellationToken = cancellationToken;
-        this.Timeout = timeout;
-        this.cancellationTokenSource = cancellationTokenSource;
-    }
-
-    /// <summary>
-    /// Gets a token that never cancels.
+    /// Gets a cancellation that never cancels.
     /// </summary>
     public static Cancellation None => default;
 
     /// <summary>
-    /// Gets the timeout.
+    /// Gets the timeout. <see cref="System.Threading.Timeout.InfiniteTimeSpan"/> indicates that there is no timeout.
     /// </summary>
-    public TimeSpan Timeout { get; }
+    public TimeSpan Timeout => this.core?.Timeout ?? System.Threading.Timeout.InfiniteTimeSpan;
 
     /// <summary>
-    /// Gets the token.
+    /// Gets the token. Once cancellation has been enabled, this returns the linked token shared by all copies.
     /// </summary>
-    public CancellationToken Token => this.cancellationTokenSource?.Token ?? this.externalCancellationToken;
+    public CancellationToken Token => this.core?.GetCurrentToken() ?? CancellationToken.None;
 
     /// <summary>
     /// Gets a value indicating whether cancellation is requested.
@@ -126,8 +113,9 @@ public struct Cancellation
 
     /// <summary>
     /// Create creates a <see cref="Cancellation.Enabler"/> and starts the timeout.
+    /// The timeout is only started by the first enabler; additional enablers share the running deadline.
     /// </summary>
-    /// <returns>The linked cancellation token source.</returns>
+    /// <returns>The enabler.</returns>
     public Enabler EnableCancellation()
     {
         return this.EnableCancellation(true);
@@ -135,46 +123,30 @@ public struct Cancellation
 
     /// <summary>
     /// Create creates a <see cref="Cancellation.Enabler"/> and starts the timeout if specified.
+    /// The timeout is only started once; additional enablers share the running deadline.
     /// </summary>
     /// <param name="startTimeout">The start timeout.</param>
-    /// <returns>The linked cancellation token source.</returns>
+    /// <returns>The enabler.</returns>
     public Enabler EnableCancellation(bool startTimeout)
     {
-        if (!this.cancellationTokenSource.HasValue)
-        {
-            this = new Cancellation(
-                this.externalCancellationToken,
-                this.consumedFlag.HasValue ? this.Timeout : System.Threading.Timeout.InfiniteTimeSpan,
-                this.externalCancellationToken != CancellationToken.None ? CancellationTokenSource.CreateLinkedTokenSource(this.externalCancellationToken) : new CancellationTokenSource());
-        }
-
-        if (startTimeout && this.Timeout != System.Threading.Timeout.InfiniteTimeSpan)
-        {
-            this.cancellationTokenSource?.CancelAfter(this.Timeout);
-        }
-
-        return new Enabler(this, this.Token);
+        var actualCore = this.core ?? new CancellationIdentity(CancellationToken.None, System.Threading.Timeout.InfiniteTimeSpan);
+        return actualCore.CreateEnabler(startTimeout);
     }
 
     /// <summary>
-    /// Represents a running cancellation.
+    /// Represents a running cancellation. All enablers created from copies of the same <see cref="Cancellation"/>
+    /// share one cancellation source: cancelling any enabler cancels them all, and the source is only disposed
+    /// when the last enabler has been disposed.
     /// </summary>
     public sealed class Enabler : IDisposable
     {
-        private const int InternalCancelReason = (int)Base.CancelReason.Internal;
-        private const int NoCancelReason = -1;
-        private readonly Cancellation cancellation;
+        private readonly CancellationIdentity cancellationIdentity;
         private readonly CancellationToken cancellationToken;
-        private int cancelReason = NoCancelReason;
+        private int isDisposed;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Enabler"/> class.
-        /// </summary>
-        /// <param name="cancellation">The cancellation.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
-        public Enabler(Cancellation cancellation, CancellationToken cancellationToken)
+        internal Enabler(CancellationIdentity cancellationIdentity, CancellationToken cancellationToken)
         {
-            this.cancellation = cancellation;
+            this.cancellationIdentity = cancellationIdentity;
             this.cancellationToken = cancellationToken;
         }
 
@@ -192,7 +164,7 @@ public struct Cancellation
         /// <summary>
         /// Gets the cancel reason if cancellation is requested.
         /// </summary>
-        public CancelReason? CancelReason => this.IsCancellationRequested ? this.GetCancelReason(this.cancellation.externalCancellationToken) : null;
+        public CancelReason? CancelReason => this.IsCancellationRequested ? this.cancellationIdentity.GetCancelReason() : null;
 
         /// <summary>
         /// Gets a value indicating whether cancellation is supported.
@@ -282,8 +254,7 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason> callback)
         {
-            var token = this.cancellation.externalCancellationToken;
-            return this.Register(_ => callback(this.GetCancelReason(token)), false);
+            return this.Register(_ => callback(this.cancellationIdentity.GetCancelReason()), false);
         }
 
         /// <summary>
@@ -294,8 +265,7 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason> callback, bool useSynchronizationContext)
         {
-            var token = this.cancellation.externalCancellationToken;
-            return this.Token.Register(_ => callback(this.GetCancelReason(token)), useSynchronizationContext);
+            return this.Token.Register(_ => callback(this.cancellationIdentity.GetCancelReason()), useSynchronizationContext);
         }
 
         /// <summary>
@@ -306,8 +276,7 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state)
         {
-            var token = this.cancellation.externalCancellationToken;
-            return this.Token.Register(x => callback(this.GetCancelReason(token), x), state);
+            return this.Token.Register(x => callback(this.cancellationIdentity.GetCancelReason(), x), state);
         }
 
         /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken">CancellationToken</see> is canceled.</summary>
@@ -318,8 +287,8 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason, object?, CancellationToken> callback, object? state)
         {
-            var token = this.cancellation.externalCancellationToken;
-            return this.Token.Register(x => callback(this.GetCancelReason(token), x, token), state, false);
+            var externalToken = this.cancellationIdentity.ExternalToken;
+            return this.Token.Register(x => callback(this.cancellationIdentity.GetCancelReason(), x, externalToken), state, false);
         }
 
         /// <summary>Registers a delegate that will be called when this <see cref="T:System.Threading.CancellationToken" /> is canceled.</summary>
@@ -332,57 +301,26 @@ public struct Cancellation
         /// <returns>The <see cref="T:System.Threading.CancellationTokenRegistration" /> instance that can be used to unregister the callback.</returns>
         public CancellationTokenRegistration Register(Action<CancelReason, object?> callback, object? state, bool useSynchronizationContext)
         {
-            var token = this.cancellation.externalCancellationToken;
-            return this.Token.Register(actualState => callback(this.GetCancelReason(token), actualState), state, useSynchronizationContext);
+            return this.Token.Register(actualState => callback(this.cancellationIdentity.GetCancelReason(), actualState), state, useSynchronizationContext);
         }
 
         /// <summary>
-        /// Requests cancellation.
+        /// Requests cancellation. All enablers sharing the same <see cref="Cancellation"/> observe the cancellation.
         /// </summary>
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
         public bool Cancel()
         {
-            var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
-            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue)
-            {
-                try
-                {
-                    this.cancellation.cancellationTokenSource.Cancel();
-                    return true;
-                }
-                catch (ObjectDisposedException)
-                {
-                    // The cancellation token source was disposed concurrently, meaning the operation it guarded has already completed.
-                    return false;
-                }
-            }
-
-            return false;
+            return this.cancellationIdentity.Cancel();
         }
 
 #if NET7_0_OR_GREATER
         /// <summary>
-        /// Requests cancellation.
+        /// Requests cancellation. All enablers sharing the same <see cref="Cancellation"/> observe the cancellation.
         /// </summary>
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
-        public async System.Threading.Tasks.Task<bool> CancelAsync()
+        public System.Threading.Tasks.Task<bool> CancelAsync()
         {
-            var result = Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason);
-            if (result == NoCancelReason && this.cancellation.cancellationTokenSource.HasValue)
-            {
-                try
-                {
-                    await this.cancellation.cancellationTokenSource.CancelAsync().ConfigureAwait(false);
-                    return true;
-                }
-                catch (ObjectDisposedException)
-                {
-                    // The cancellation token source was disposed concurrently, meaning the operation it guarded has already completed.
-                    return false;
-                }
-            }
-
-            return false;
+            return this.cancellationIdentity.CancelAsync();
         }
 
 #endif
@@ -394,37 +332,184 @@ public struct Cancellation
         /// <returns><c>true</c>, if cancellation was requested, otherwise <c>false</c>.</returns>
         public bool CancelAfter(TimeSpan timeSpan)
         {
-            if (this.cancellation.cancellationTokenSource.HasValue)
-            {
-                try
-                {
-                    this.cancellation.cancellationTokenSource.CancelAfter(timeSpan);
-                    return true;
-                }
-                catch (ObjectDisposedException)
-                {
-                    // The cancellation token source was disposed concurrently, meaning the operation it guarded has already completed.
-                    return false;
-                }
-            }
-
-            return false;
+            return this.cancellationIdentity.CancelAfter(timeSpan);
         }
 
         /// <summary>
-        /// Dispose the underlying <see cref="CancellationTokenSource"/>.
+        /// Releases this enabler. The shared <see cref="CancellationTokenSource"/> is disposed when the last enabler is released.
         /// </summary>
         public void Dispose()
         {
-            if (this.cancellation.consumedFlag?.Set() ?? false)
+            if (Interlocked.Exchange(ref this.isDisposed, 1) == 0)
             {
-                this.cancellation.cancellationTokenSource?.Dispose();
+                this.cancellationIdentity.Release();
+            }
+        }
+    }
+
+    internal sealed class CancellationIdentity
+    {
+        private const int InternalCancelReason = (int)Base.CancelReason.Internal;
+        private const int NoCancelReason = -1;
+
+        private readonly object lockObject = new();
+        private readonly CancellationToken externalCancellationToken;
+
+        private CancellationTokenSource? cancellationTokenSource;
+        private int enablerCount;
+        private bool isTimeoutStarted;
+        private int cancelReason = NoCancelReason;
+
+        public CancellationIdentity(CancellationToken externalCancellationToken, TimeSpan timeout)
+        {
+            this.externalCancellationToken = externalCancellationToken;
+            this.Timeout = timeout;
+        }
+
+        public TimeSpan Timeout { get; }
+
+        public CancellationToken ExternalToken => this.externalCancellationToken;
+
+        public CancellationToken GetCurrentToken()
+        {
+            lock (this.lockObject)
+            {
+                return this.cancellationTokenSource?.Token ?? this.externalCancellationToken;
             }
         }
 
-        private CancelReason GetCancelReason(in CancellationToken externalCancellationToken)
+        public Enabler CreateEnabler(bool startTimeout)
         {
-            return externalCancellationToken.IsCancellationRequested ? Base.CancelReason.External : this.cancelReason == NoCancelReason ? Base.CancelReason.Timeout : (CancelReason)this.cancelReason;
+            CancellationToken token;
+            lock (this.lockObject)
+            {
+                this.enablerCount++;
+                if (this.cancellationTokenSource == null)
+                {
+                    this.cancellationTokenSource = this.externalCancellationToken.CanBeCanceled
+                        ? CancellationTokenSource.CreateLinkedTokenSource(this.externalCancellationToken)
+                        : new CancellationTokenSource();
+                    this.cancelReason = NoCancelReason;
+                }
+
+                if (startTimeout && !this.isTimeoutStarted && this.Timeout != System.Threading.Timeout.InfiniteTimeSpan)
+                {
+                    this.cancellationTokenSource.CancelAfter(this.Timeout);
+                    this.isTimeoutStarted = true;
+                }
+
+                token = this.cancellationTokenSource.Token;
+            }
+
+            return new Enabler(this, token);
+        }
+
+        public bool Cancel()
+        {
+            var cancellationTokenSource = this.PrepareCancel();
+            if (!cancellationTokenSource.HasValue)
+            {
+                return false;
+            }
+
+            try
+            {
+                cancellationTokenSource.Cancel();
+                return true;
+            }
+            catch (ObjectDisposedException)
+            {
+                // The last enabler was disposed concurrently, meaning the operation the source guarded has already completed.
+                return false;
+            }
+        }
+
+#if NET7_0_OR_GREATER
+        public async System.Threading.Tasks.Task<bool> CancelAsync()
+        {
+            var cancellationTokenSource = this.PrepareCancel();
+            if (!cancellationTokenSource.HasValue)
+            {
+                return false;
+            }
+
+            try
+            {
+                await cancellationTokenSource.CancelAsync().ConfigureAwait(false);
+                return true;
+            }
+            catch (ObjectDisposedException)
+            {
+                // The last enabler was disposed concurrently, meaning the operation the source guarded has already completed.
+                return false;
+            }
+        }
+#endif
+
+        public bool CancelAfter(TimeSpan timeSpan)
+        {
+            CancellationTokenSource? cancellationTokenSource;
+            lock (this.lockObject)
+            {
+                cancellationTokenSource = this.cancellationTokenSource;
+            }
+
+            if (!cancellationTokenSource.HasValue)
+            {
+                return false;
+            }
+
+            try
+            {
+                cancellationTokenSource.CancelAfter(timeSpan);
+                return true;
+            }
+            catch (ObjectDisposedException)
+            {
+                // The last enabler was disposed concurrently, meaning the operation the source guarded has already completed.
+                return false;
+            }
+        }
+
+        public void Release()
+        {
+            CancellationTokenSource? cancellationTokenSourceToDispose = null;
+            lock (this.lockObject)
+            {
+                this.enablerCount--;
+                if (this.enablerCount == 0)
+                {
+                    cancellationTokenSourceToDispose = this.cancellationTokenSource;
+                    this.cancellationTokenSource = null;
+                    this.isTimeoutStarted = false;
+                }
+            }
+
+            cancellationTokenSourceToDispose?.Dispose();
+        }
+
+        public CancelReason GetCancelReason()
+        {
+            if (this.externalCancellationToken.IsCancellationRequested)
+            {
+                return Base.CancelReason.External;
+            }
+
+            var currentCancelReason = Volatile.Read(ref this.cancelReason);
+            return currentCancelReason == NoCancelReason ? Base.CancelReason.Timeout : (CancelReason)currentCancelReason;
+        }
+
+        private CancellationTokenSource? PrepareCancel()
+        {
+            if (Interlocked.CompareExchange(ref this.cancelReason, InternalCancelReason, NoCancelReason) != NoCancelReason)
+            {
+                return null;
+            }
+
+            lock (this.lockObject)
+            {
+                return this.cancellationTokenSource;
+            }
         }
     }
 }
