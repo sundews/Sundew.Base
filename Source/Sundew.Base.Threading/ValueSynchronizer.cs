@@ -71,11 +71,10 @@ public class ValueSynchronizer<TParameter, TValue> : IValueSynchronizer<TParamet
     /// <remarks>Disposing the returned Subscription will remove the handler from the list of subscribers. The
     /// handler will be invoked for each event of type TSubscribedEvent that is published.</remarks>
     /// <typeparam name="TSubscribedEvent">The type of event to subscribe to. Must derive from TValue.</typeparam>
+    /// <param name="handler">A delegate that handles the event. The delegate receives the event data and a cancellation token, and returns a ValueTask representing the asynchronous operation.</param>
     /// <param name="notificationTarget">The notification target that will receive the event notifications.</param>
-    /// <param name="handler">A delegate that handles the event. The delegate receives the event data and a cancellation token, and returns a
-    /// ValueTask representing the asynchronous operation.</param>
     /// <returns>A Subscription object that can be disposed to unsubscribe the handler.</returns>
-    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
+    public Subscription Subscribe<TSubscribedEvent>(Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler, INotificationTarget notificationTarget)
         where TSubscribedEvent : TValue
     {
         return this.updateEvent.Subscribe(handler, notificationTarget);

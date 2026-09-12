@@ -24,7 +24,7 @@ using Sundew.Base.Collections.Concurrent;
 /// a CancellationToken. This class is thread-safe and is intended for scenarios where event subscriptions and
 /// notifications may occur concurrently. Dispose the instance to release all subscriptions and handlers.</remarks>
 /// <typeparam name="TEvent">The type of the event data passed to event handlers.</typeparam>
-public sealed class DelegateEvent<TEvent> : IDisposable
+public sealed class DelegateEvent<TEvent> : IEvent<TEvent>, IDisposable
 {
     private readonly ConcurrentList<Registration> handlers = new();
 
@@ -74,7 +74,7 @@ public sealed class DelegateEvent<TEvent> : IDisposable
     /// <param name="event">The event data to pass to each handler.</param>
     /// <param name="parallelism">The parallelism options that control how event handlers are invoked concurrently.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-    public void Raise(TEvent @event, Parallelism parallelism, CancellationToken cancellationToken = default)
+    public void Raise(TEvent @event, Parallelism parallelism = default, CancellationToken cancellationToken = default)
     {
         this.RaiseAsync(@event, parallelism, cancellationToken).AsTask().GetAwaiter().GetResult();
     }
@@ -88,7 +88,7 @@ public sealed class DelegateEvent<TEvent> : IDisposable
     /// <param name="parallelism">The parallelism options that control how event handlers are invoked concurrently.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
     /// <returns>A ValueTask that represents the asynchronous operation of invoking all event handlers.</returns>
-    public async ValueTask RaiseAsync(TEvent @event, Parallelism parallelism, CancellationToken cancellationToken = default)
+    public async ValueTask RaiseAsync(TEvent @event, Parallelism parallelism = default, CancellationToken cancellationToken = default)
     {
         await this.handlers.ForEachAsync(parallelism, registration => registration.Handler(@event, registration.Subscription, cancellationToken)).ConfigureAwait(false);
     }

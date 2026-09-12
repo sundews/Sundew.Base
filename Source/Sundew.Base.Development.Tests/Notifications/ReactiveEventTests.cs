@@ -91,7 +91,7 @@ public class ReactiveEventSource : INotifyAny<IEvent>
 
     internal Subscriptions ReactiveSubscriptions => this.subscriptions;
 
-    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
+    public Subscription Subscribe<TSubscribedEvent>(Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler, INotificationTarget notificationTarget)
         where TSubscribedEvent : IEvent
     {
         return ReactiveEventSubscriber<IEvent>.Subscribe(this.subject, handler, notificationTarget, this.subscriptions);
@@ -112,11 +112,13 @@ public class ReactiveNotificationTarget : INotificationTarget
 {
     public ReactiveNotificationTarget(ReactiveEventSource reactiveEventSource)
     {
-        reactiveEventSource.Subscribe(this, (ConcreteEvent1 event1, CancellationToken token) =>
-        {
-            this.EventReceived.Set();
-            return ValueTask.CompletedTask;
-        });
+        reactiveEventSource.Subscribe(
+            (ConcreteEvent1 event1, CancellationToken token) =>
+            {
+                this.EventReceived.Set();
+                return ValueTask.CompletedTask;
+            },
+            this);
     }
 
     public Subscriptions TargetSubscriptions { get; } = new Subscriptions();

@@ -117,7 +117,7 @@ public class DelegateEventSource : INotifyAny<IEvent>
 
     internal IEnumerable<Subscription> Subscriptions => this.delegateEvent.GetSubscriptions();
 
-    public Subscription Subscribe<TSubscribedEvent>(INotificationTarget notificationTarget, Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
+    public Subscription Subscribe<TSubscribedEvent>(Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler, INotificationTarget notificationTarget)
         where TSubscribedEvent : IEvent
     {
         return this.delegateEvent.Subscribe(handler, notificationTarget);
@@ -139,17 +139,21 @@ public class DelegateNotificationTarget : INotificationTarget
 {
     public DelegateNotificationTarget(DelegateEventSource eventSource)
     {
-        this.ConcreteEvent1Subscription = eventSource.Subscribe(this, (ConcreteEvent1 event1, CancellationToken token) =>
-        {
-            this.Event1Received.Set();
-            return ValueTask.CompletedTask;
-        });
+        this.ConcreteEvent1Subscription = eventSource.Subscribe(
+            (ConcreteEvent1 event1, CancellationToken token) =>
+            {
+                this.Event1Received.Set();
+                return ValueTask.CompletedTask;
+            },
+            this);
 
-        this.ConcreteEvent2Subscription = eventSource.Subscribe(this, (ConcreteEvent2 event2, CancellationToken token) =>
-        {
-            this.Event2Received.Set();
-            return ValueTask.CompletedTask;
-        });
+        this.ConcreteEvent2Subscription = eventSource.Subscribe(
+            (ConcreteEvent2 event2, CancellationToken token) =>
+            {
+                this.Event2Received.Set();
+                return ValueTask.CompletedTask;
+            },
+            this);
     }
 
     public Subscription ConcreteEvent1Subscription { get; }
@@ -175,13 +179,15 @@ public class MultipleDelegateNotificationTarget : INotificationTarget
 
     public MultipleDelegateNotificationTarget(DelegateEventSource eventSource1, DelegateEventSource eventSource2)
     {
-        this.concreteEvent1Subscription = eventSource1.Subscribe(this, (ConcreteEvent1 event1, CancellationToken token) =>
-        {
-            this.EventReceived.Set();
-            return ValueTask.CompletedTask;
-        });
+        this.concreteEvent1Subscription = eventSource1.Subscribe(
+            (ConcreteEvent1 event1, CancellationToken token) =>
+            {
+                this.EventReceived.Set();
+                return ValueTask.CompletedTask;
+            },
+            this);
 
-        this.concreteEvent2Subscription = eventSource2.Subscribe(this, (ConcreteEvent2 event2, CancellationToken token) => ValueTask.CompletedTask);
+        this.concreteEvent2Subscription = eventSource2.Subscribe((ConcreteEvent2 event2, CancellationToken token) => ValueTask.CompletedTask, this);
     }
 
     public Subscriptions TargetSubscriptions { get; } = new Subscriptions();

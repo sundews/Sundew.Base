@@ -51,11 +51,13 @@ public class ValueSynchronizerTests
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var notificationTarget = new NotificationTarget();
         var results = new ConcurrentList<SynchronizedValue>();
-        testee.Subscribe(notificationTarget, (SynchronizedValue value, CancellationToken token) =>
-        {
-            results.Add(value);
-            return ValueTask.CompletedTask;
-        });
+        testee.Subscribe(
+            (SynchronizedValue value, CancellationToken token) =>
+            {
+                results.Add(value);
+                return ValueTask.CompletedTask;
+            },
+            notificationTarget);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -90,11 +92,13 @@ public class ValueSynchronizerTests
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var notificationTarget = new NotificationTarget();
         var results = new ConcurrentList<SynchronizedValue>();
-        testee.Subscribe(notificationTarget, (SynchronizedValue value, CancellationToken token) =>
-        {
-            results.Add(value);
-            return ValueTask.CompletedTask;
-        });
+        testee.Subscribe(
+            (SynchronizedValue value, CancellationToken token) =>
+            {
+                results.Add(value);
+                return ValueTask.CompletedTask;
+            },
+            notificationTarget);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -147,11 +151,13 @@ public class ValueSynchronizerTests
         var notificationTarget = new NotificationTarget();
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
-        testee.Subscribe(notificationTarget, (SynchronizedValue value, CancellationToken token) =>
-        {
-            results.Add(value);
-            return ValueTask.CompletedTask;
-        });
+        testee.Subscribe(
+            (SynchronizedValue value, CancellationToken token) =>
+            {
+                results.Add(value);
+                return ValueTask.CompletedTask;
+            },
+            notificationTarget);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -200,11 +206,13 @@ public class ValueSynchronizerTests
             (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
 
-        testee.Subscribe(notificationTarget, (SynchronizedValue value, CancellationToken token) =>
-        {
-            results.Add(value);
-            return ValueTask.CompletedTask;
-        });
+        testee.Subscribe(
+            (SynchronizedValue value, CancellationToken token) =>
+            {
+                results.Add(value);
+                return ValueTask.CompletedTask;
+            },
+            notificationTarget);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -249,11 +257,13 @@ public class ValueSynchronizerTests
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
 
-        testee.Subscribe(notificationTarget, (SynchronizedValue value, CancellationToken token) =>
-        {
-            results.Add(value);
-            return ValueTask.CompletedTask;
-        });
+        testee.Subscribe(
+            (SynchronizedValue value, CancellationToken token) =>
+            {
+                results.Add(value);
+                return ValueTask.CompletedTask;
+            },
+            notificationTarget);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -298,11 +308,13 @@ public class ValueSynchronizerTests
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
 
-        testee.Subscribe(notificationTarget, (SynchronizedValue value, CancellationToken token) =>
-        {
-            results.Add(value);
-            return ValueTask.CompletedTask;
-        });
+        testee.Subscribe(
+            (SynchronizedValue value, CancellationToken token) =>
+            {
+                results.Add(value);
+                return ValueTask.CompletedTask;
+            },
+            notificationTarget);
 
         var submission1 = testee.TrySubmitAsync(
             1,

@@ -22,11 +22,11 @@ public interface INotifyAny<in TEvent>
     /// Subscribes to the subscribed event.
     /// </summary>
     /// <typeparam name="TSubscribedEvent">The subscribed event type.</typeparam>
-    /// <param name="notificationTarget">The subscription target.</param>
     /// <param name="handler">The handler.</param>
+    /// <param name="notificationTarget">The subscription target.</param>
     /// <returns>A subscription.</returns>
     Subscription Subscribe<TSubscribedEvent>(
-        INotificationTarget notificationTarget,
-        Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler)
+        Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler,
+        INotificationTarget notificationTarget)
         where TSubscribedEvent : TEvent;
 }

@@ -41,6 +41,30 @@ public partial class R
     }
 
     /// <summary>
+    /// Converts the success option result into a <see cref="R{TValue}"/> which will fail if the value is null.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <returns>A <see cref="R{TValue}"/>.</returns>
+    public static R<TValue> MapAsync<TValue>(this SuccessOptionResult<TValue?> result)
+    {
+        return new R<TValue>(result.Value != null, result.Value);
+    }
+
+    /// <summary>
+    /// Converts the success option result into a <see cref="R{TValue}"/> which will fail if the value is null.
+    /// </summary>
+    /// <typeparam name="TValue">The value type.</typeparam>
+    /// <typeparam name="TError">The error type.</typeparam>
+    /// <param name="result">The result.</param>
+    /// <param name="errorFunc">The error func.</param>
+    /// <returns>A <see cref="R{TValue}"/>.</returns>
+    public static R<TValue, TError> MapAsync<TValue, TError>(this SuccessOptionResult<TValue?> result, Func<TError> errorFunc)
+    {
+        return new R<TValue, TError>(result.Value != null, result.Value, result.Value != null ? errorFunc() : default);
+    }
+
+    /// <summary>
     /// A successful result.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>

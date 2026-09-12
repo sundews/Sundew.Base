@@ -411,6 +411,7 @@ public static class ParallelEnumerableAsyncExtensions
         Parallelism parallelism,
         Func<TItem, int, CancellationToken, ValueTask<TOutItem>> func)
     {
+        parallelism = parallelism == default ? Parallelism.None : parallelism;
         var maxDegreeOfParallelism = Interval.From(1, Environment.ProcessorCount).Limit(parallelism.MaxDegreeOfParallelism);
         var taskScheduler = parallelism.TaskScheduler ?? TaskScheduler.Current;
         var enumerator = enumerable.GetEnumerator();

@@ -20,10 +20,10 @@ public interface INotify<TEvent>
     /// <summary>
     /// Subscribes to the subscribed event.
     /// </summary>
-    /// <param name="notificationTarget">The subscription target.</param>
     /// <param name="handler">The handler.</param>
+    /// <param name="notificationTarget">The subscription target.</param>
     /// <returns>A subscription.</returns>
     Subscription Subscribe(
-        INotificationTarget notificationTarget,
-        Func<TEvent, Subscription, CancellationToken, ValueTask> handler);
+        Func<TEvent, Subscription, CancellationToken, ValueTask> handler,
+        INotificationTarget notificationTarget);
 }

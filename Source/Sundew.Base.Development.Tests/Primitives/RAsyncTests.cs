@@ -139,7 +139,7 @@ public class RAsyncTests
     {
         static Task<R<TValue>> GenericAsync<TValue>(TValue value)
         {
-            return R.SuccessOption(value).Map();
+            return R.SuccessOption(value).MapAsync();
         }
 
         var result = await GenericAsync(expectedResult);
@@ -171,7 +171,7 @@ public class RAsyncTests
     {
         static Task<R<TValue>> GenericAsync<TValue>(TValue value)
         {
-            return R.SuccessOption(value).Map();
+            return R.SuccessOption(value).MapAsync();
         }
 
         var result = await GenericAsync(expectedResult);
@@ -201,7 +201,7 @@ public class RAsyncTests
     {
         static Task<R<TValue>> GenericAsync<TValue>(TValue value)
         {
-            return R.SuccessOption(value).Map();
+            return R.SuccessOption(value).MapAsync();
         }
 
         const string expectedResult = "string";

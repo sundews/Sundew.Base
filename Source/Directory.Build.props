@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Version>16.0</Version>
+    <Version>17.0</Version>
     <OutputPath>bin/$(Configuration)</OutputPath>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
@@ -18,7 +18,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <PackageReadmeFile>docs/README.md</PackageReadmeFile>
-    <PackageReleaseNotes>15.0 - .NET 10 support, dropped older than netstandard2.0
+    <PackageReleaseNotes>17.0 - Notifications improvements.
+16.0 - Added Sundew.Base.Identification
+15.0 - .NET 10 support, dropped older than netstandard2.0
 14.0 - Result and collections improvements
 13.0 - Results improvements
 12.0 - Restructing into smaller packages
