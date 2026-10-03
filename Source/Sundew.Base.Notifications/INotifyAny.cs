@@ -16,7 +16,6 @@ using System.Threading.Tasks;
 /// </summary>
 /// <typeparam name="TEvent">The type of event.</typeparam>
 public interface INotifyAny<in TEvent>
-    where TEvent : class
 {
     /// <summary>
     /// Subscribes to the subscribed event.

@@ -24,11 +24,22 @@ using Sundew.Base.Collections.Concurrent;
 /// a CancellationToken. This class is thread-safe and is intended for scenarios where event subscriptions and
 /// notifications may occur concurrently. Dispose the instance to release all subscriptions and handlers.</remarks>
 /// <typeparam name="TEvent">The type of the event data passed to event handlers.</typeparam>
-public sealed class DelegateEvent<TEvent> : IEvent<TEvent>, IDisposable
+public sealed class DelegateEvent<TEvent> : IEvents<TEvent>, IEvent<TEvent>, IDisposable
 {
     private readonly ConcurrentList<Registration> handlers = new();
 
     internal IEnumerable<Registration> Handlers => this.handlers;
+
+    /// <summary>
+    /// Subscribes to the specified event.
+    /// </summary>
+    /// <param name="handler">The handler.</param>
+    /// <param name="notificationTarget">The subscription target.</param>
+    /// <returns>An unsubscribe delegate.</returns>
+    public Subscription Subscribe(Func<TEvent, Subscription, CancellationToken, ValueTask> handler, INotificationTarget notificationTarget)
+    {
+        return this.Subscribe<TEvent>(handler, notificationTarget);
+    }
 
     /// <summary>
     /// Subscribes to the specified event.

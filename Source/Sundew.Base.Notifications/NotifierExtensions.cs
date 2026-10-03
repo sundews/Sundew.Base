@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EventExtensions.cs" company="Sundews">
+// <copyright file="NotifierExtensions.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -12,15 +12,15 @@ using System.Threading.Tasks;
 using Sundew.Base.Collections;
 
 /// <summary>
-/// Provides extension methods for the <see cref="IEvent{TEvent}"/> interface.
+/// Provides extension methods for the <see cref="INotifier{TEvent}"/> interface.
 /// </summary>
-public static class EventExtensions
+public static class NotifierExtensions
 {
     /// <summary>
     /// Extends events.
     /// </summary>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
-    extension<TEvent>(IEvent<TEvent> @event)
+    extension<TEvent>(INotifier<TEvent> notifier)
     {
         /// <summary>
         /// Invokes all registered event handlers for the specified event.
@@ -32,7 +32,7 @@ public static class EventExtensions
         public void Raise(TEvent actualEvent, CancellationToken cancellationToken)
         {
 #pragma warning disable SA1101
-            @event.Raise(@actualEvent, Parallelism.None, cancellationToken);
+            notifier.Raise(@actualEvent, Parallelism.None, cancellationToken);
 #pragma warning restore SA1101
         }
 
@@ -47,7 +47,7 @@ public static class EventExtensions
         public async ValueTask RaiseAsync(TEvent actualEvent, CancellationToken cancellationToken)
         {
 #pragma warning disable SA1101
-            await @event.RaiseAsync(@actualEvent, Parallelism.None, cancellationToken);
+            await notifier.RaiseAsync(@actualEvent, Parallelism.None, cancellationToken);
 #pragma warning restore SA1101
         }
     }

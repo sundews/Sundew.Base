@@ -21,7 +21,6 @@ public static class NotifyExtensions
     /// </summary>
     /// <typeparam name="TEvent">The type of the event.</typeparam>
     extension<TEvent>(INotifyAny<TEvent> notifyAny)
-        where TEvent : class
     {
         /// <summary>
         /// Subscribes the specified handler to the notification target.
@@ -93,7 +92,6 @@ public static class NotifyExtensions
         this INotify<TEvent> notifyAny,
         Func<TEvent, ValueTask> handler,
         INotificationTarget notificationTarget)
-        where TEvent : class
     {
         return notifyAny.Subscribe(
             (@event, _, _) => handler(@event),
@@ -112,7 +110,6 @@ public static class NotifyExtensions
         this INotify<TEvent> notifyAny,
         Func<TEvent, CancellationToken, ValueTask> handler,
         INotificationTarget notificationTarget)
-        where TEvent : class
     {
         return notifyAny.Subscribe(
             (@event, _, cancellationToken) => handler(@event, cancellationToken),
@@ -131,7 +128,6 @@ public static class NotifyExtensions
         this INotify<TEvent> notifyAny,
         Func<TEvent, Subscription, ValueTask> handler,
         INotificationTarget notificationTarget)
-        where TEvent : class
     {
         return notifyAny.Subscribe(
             (@event, subscription, _) => handler(@event, subscription),

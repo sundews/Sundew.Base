@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 /// Interface for implementing an event source.
 /// </summary>
 /// <typeparam name="TEvent">The type of event.</typeparam>
-public interface INotify<TEvent>
+public interface INotify<out TEvent>
 {
     /// <summary>
     /// Subscribes to the subscribed event.
