@@ -466,7 +466,7 @@ public static class ParallelEnumerableAsyncExtensions
         }
 
         return Task.WhenAll(tasks).ContinueWith(
-            _ =>
+            async task =>
             {
                 using (enumerator)
                 using (enabler)
@@ -474,7 +474,8 @@ public static class ParallelEnumerableAsyncExtensions
                 {
                 }
 
-                return Task.FromResult((IReadOnlyList<TOutItem>)concurrentList);
+                await task.ConfigureAwait(false);
+                return (IReadOnlyList<TOutItem>)concurrentList;
             },
             CancellationToken.None,
             TaskContinuationOptions.DenyChildAttach | TaskContinuationOptions.ExecuteSynchronously,
