@@ -19,8 +19,8 @@
     <PackageVersion Include="Paket.Core" Version="9.0.2" />
     <PackageVersion Include="PolySharp" Version="1.16.0" />
     <PackageVersion Include="StyleCop.Analyzers.Unstable" Version="1.2.0.556" />
-    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="6.0.1" />
-    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.12" />
+    <PackageVersion Include="Sundew.DiscriminatedUnions" Version="6.0.4" />
+    <PackageVersion Include="Sundew.Packaging.Publish" Version="10.0.14" />
     <PackageVersion Include="System.Reactive" Version="7.0.0" />
     <PackageVersion Include="System.Reflection.Metadata" Version="9.0.4" />
     <PackageVersion Include="System.Security.Permissions" Version="10.0.13" />
