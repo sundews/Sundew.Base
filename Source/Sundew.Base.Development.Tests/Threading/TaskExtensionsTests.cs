@@ -8,83 +8,99 @@
 namespace Sundew.Base.Development.Tests.Threading;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
+using Microsoft.VisualStudio.Threading;
 using Sundew.Base.Threading;
 
+[SuppressMessage("Usage", "VSTHRD012:Provide JoinableTaskFactory where allowed", Justification = "Tests the overloads without a JoinableTaskFactory.")]
 public class TaskExtensionsTests
 {
     [Test]
-    public void AsyncJoin_When_TaskCompletes_Then_ResultIsReturned()
+    public void RunAndJoin_When_FuncTaskCompletes_Then_ResultIsReturned()
     {
-        var result = Task.FromResult(42).AsyncJoin();
+        var result = Task.RunAndJoin(async () =>
+        {
+            await Task.Delay(10).ConfigureAwait(false);
+            return 42;
+        });
 
         result.Should().Be(42);
     }
 
     [Test]
-    public void AsyncJoin_When_TaskThrows_Then_ExceptionIsRethrown()
+    public void RunAndJoin_When_FuncTaskThrows_Then_ExceptionIsRethrown()
     {
-        const string? expectedMessage = "Failed";
-        var task = Task.FromException<int>(new InvalidOperationException(expectedMessage));
+        const string expectedMessage = "Failed";
 
-        var action = () => task.AsyncJoin();
+        var action = () => Task.RunAndJoin(() => Task.FromException<int>(new InvalidOperationException(expectedMessage)));
 
         action.Should().Throw<InvalidOperationException>().WithMessage(expectedMessage);
     }
 
     [Test]
-    public void AsyncJoin_When_TaskCompletesWithoutResult_Then_TaskCompletes()
+    public void RunAndJoin_When_FuncTaskCompletesWithoutResult_Then_TaskCompletes()
     {
         var executed = false;
-        var task = Task.Run(async () =>
+
+        Task.RunAndJoin(async () =>
         {
             await Task.Delay(10).ConfigureAwait(false);
             executed = true;
         });
 
-        task.AsyncJoin();
-
         executed.Should().BeTrue();
     }
 
     [Test]
-    public void AsyncJoin_When_FuncTaskCompletes_Then_ResultIsReturned()
+    public void RunAndJoin_When_MainThreadContextIsRegistered_Then_ItIsUsed()
     {
-        Func<Task<int>> func = async () =>
+        using var context = new JoinableTaskContext();
+        MainThreadContext.Register(context);
+        try
         {
-            await Task.Delay(10).ConfigureAwait(false);
-            return 42;
-        };
+            var wasWithinJoinableTask = Task.RunAndJoin(() => Task.FromResult(context.IsWithinJoinableTask));
 
-        var result = func.AsyncJoin();
-
-        result.Should().Be(42);
+            wasWithinJoinableTask.Should().BeTrue();
+        }
+        finally
+        {
+            MainThreadContext.Unregister(context);
+        }
     }
 
     [Test]
-    public void AsyncJoin_When_FuncTaskThrows_Then_ExceptionIsRethrown()
+    public void RunAndJoin_When_CalledOnThreadWithUnpumpedSynchronizationContext_Then_ContinuationRunsOnCallingThreadWithoutDeadlocking()
     {
-        const string? expectedMessage = "Failed";
-        Func<Task<int>> func = () => Task.FromException<int>(new InvalidOperationException(expectedMessage));
-
-        var action = () => func.AsyncJoin();
-
-        action.Should().Throw<InvalidOperationException>().WithMessage(expectedMessage);
-    }
-
-    [Test]
-    public void AsyncJoin_When_FuncTaskCompletesWithoutResult_Then_TaskCompletes()
-    {
-        var executed = false;
-        Func<Task> func = async () =>
+        var callingThreadId = -1;
+        var continuationThreadId = 0;
+        Exception? exception = null;
+        var thread = new Thread(() =>
         {
-            await Task.Delay(10).ConfigureAwait(false);
-            executed = true;
-        };
+            try
+            {
+                // Like a blocked UI thread: Anything posted to this context is never processed.
+                SynchronizationContext.SetSynchronizationContext(new SingleThreadedSynchronizationContext());
+                callingThreadId = Environment.CurrentManagedThreadId;
+                continuationThreadId = Task.RunAndJoin(async () =>
+                {
+                    await Task.Delay(10);
+                    return Environment.CurrentManagedThreadId;
+                });
+            }
+            catch (Exception e)
+            {
+                exception = e;
+            }
+        });
 
-        func.AsyncJoin();
+        thread.Start();
+        var hasCompleted = thread.Join(TimeSpan.FromSeconds(10));
 
-        executed.Should().BeTrue();
+        hasCompleted.Should().BeTrue();
+        exception.Should().BeNull();
+        continuationThreadId.Should().Be(callingThreadId);
     }
 }

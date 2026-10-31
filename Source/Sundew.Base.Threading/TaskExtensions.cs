@@ -12,75 +12,58 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Threading;
 
 /// <summary>
-/// Provides helpers for joining asynchronous work on a dedicated <see cref="JoinableTaskContext"/>.
+/// Provides helpers for synchronously running asynchronous work using a <see cref="JoinableTaskFactory"/>.
 /// </summary>
+/// <remarks>
+/// The asynchronous work is started inside the <see cref="JoinableTaskFactory"/>, so continuations that would otherwise be posted to a blocked thread are processed by the blocked thread instead.
+/// Tasks started before calling these methods are not covered, which is why only functions are accepted.
+/// </remarks>
 public static class TaskExtensions
 {
     /// <summary>
-    /// Extends functions that return a task to provide a synchronous join operation.
+    /// Extends <see cref="Task"/> with static members for synchronously running asynchronous work.
     /// </summary>
-    /// <typeparam name="TResult">The task result type.</typeparam>
-    extension<TResult>(Func<Task<TResult>> func)
+    extension(Task)
     {
         /// <summary>
-        /// Invokes the supplied factory and waits for the result to complete on a joinable context.
+        /// Blocks the calling thread while invoking the specified function and waiting for its task to complete.
         /// </summary>
+        /// <remarks>
+        /// Uses <see cref="MainThreadContext.Current"/> if available, otherwise a <see cref="JoinableTaskContext"/> treating the calling thread as the main thread is created for the call.
+        /// </remarks>
+        /// <param name="func">The function starting the asynchronous work.</param>
+        public static void RunAndJoin(Func<Task> func)
+        {
+            var mainThreadContext = MainThreadContext.Current;
+            if (mainThreadContext.HasValue)
+            {
+                mainThreadContext.Factory.Run(func);
+                return;
+            }
+
+            using var context = new JoinableTaskContext();
+            context.Factory.Run(func);
+        }
+
+        /// <summary>
+        /// Blocks the calling thread while invoking the specified function and waiting for its task to complete.
+        /// </summary>
+        /// <remarks>
+        /// Uses <see cref="MainThreadContext.Current"/> if available, otherwise a <see cref="JoinableTaskContext"/> treating the calling thread as the main thread is created for the call.
+        /// </remarks>
+        /// <typeparam name="TResult">The result type.</typeparam>
+        /// <param name="func">The function starting the asynchronous work.</param>
         /// <returns>The task result.</returns>
-#pragma warning disable SA1101
-        public TResult AsyncJoin()
-#pragma warning restore SA1101
+        public static TResult RunAndJoin<TResult>(Func<Task<TResult>> func)
         {
+            var mainThreadContext = MainThreadContext.Current;
+            if (mainThreadContext.HasValue)
+            {
+                return mainThreadContext.Factory.Run(func);
+            }
+
             using var context = new JoinableTaskContext();
-#pragma warning disable SA1101
-            var joinableTask = context.Factory.RunAsync(async () => await func().ConfigureAwait(false));
-#pragma warning restore SA1101
-            var result = joinableTask.Join();
-            return result;
+            return context.Factory.Run(func);
         }
-    }
-
-    /// <summary>
-    /// Extends functions that return a task to provide a synchronous join operation.
-    /// </summary>
-    extension(Func<Task> func)
-    {
-        /// <summary>
-        /// Invokes the supplied factory and waits for the task to complete on a joinable context.
-        /// </summary>
-#pragma warning disable SA1101
-        public void AsyncJoin()
-#pragma warning restore SA1101
-        {
-            using var context = new JoinableTaskContext();
-#pragma warning disable SA1101
-            var joinableTask = context.Factory.RunAsync(async () => await func().ConfigureAwait(false));
-#pragma warning restore SA1101
-            joinableTask.Join();
-        }
-    }
-
-    /// <summary>
-    /// Synchronously waits for the supplied task to complete while running it inside a joinable context.
-    /// </summary>
-    /// <typeparam name="TResult">The task result type.</typeparam>
-    /// <param name="task">The task to await synchronously.</param>
-    /// <returns>The task result when the operation completes.</returns>
-    public static TResult AsyncJoin<TResult>(this Task<TResult> task)
-    {
-        using var context = new JoinableTaskContext();
-        var joinableTask = context.Factory.RunAsync(async () => await task.ConfigureAwait(false));
-        var result = joinableTask.Join();
-        return result;
-    }
-
-    /// <summary>
-    /// Synchronously waits for the supplied task to complete while running it inside a joinable context.
-    /// </summary>
-    /// <param name="task">The task to await synchronously.</param>
-    public static void AsyncJoin(this Task task)
-    {
-        using var context = new JoinableTaskContext();
-        var joinableTask = context.Factory.RunAsync(async () => await task.ConfigureAwait(false));
-        joinableTask.Join();
     }
 }
