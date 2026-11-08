@@ -11,6 +11,7 @@ namespace Sundew.Base.Generator.Development.Tests.Notifications;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AwesomeAssertions;
 using Microsoft.CodeAnalysis;
@@ -224,7 +225,8 @@ public class NotificationOwnerGeneratorTests
 
     private static IEnumerable<MetadataReference> GetReferences()
     {
-        var trustedAssemblies = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(';');
+        // The list uses the platform's path separator: a semicolon on Windows, a colon elsewhere.
+        var trustedAssemblies = ((string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")!).Split(Path.PathSeparator);
         var sundewAssemblies = new[]
         {
             typeof(Sundew.Base.Notifications.Subscription).Assembly.Location,
