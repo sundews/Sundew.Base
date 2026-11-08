@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Sundew.Base.Migrations.System.Formats.Cbor\Sundew.Base.Migrations.System.Formats.Cbor.csproj" />
     <ProjectReference Include="..\Sundew.Base.Migrations.System.Text.Json\Sundew.Base.Migrations.System.Text.Json.csproj" />
     <ProjectReference Include="..\Sundew.Base.Migrations\Sundew.Base.Migrations.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Notifications.Generator\Sundew.Base.Notifications.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\Sundew.Base.Notifications.Reactive\Sundew.Base.Notifications.Reactive.csproj" />
     <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" />
     <ProjectReference Include="..\Sundew.Base.Numeric\Sundew.Base.Numeric.csproj" />

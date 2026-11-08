@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Source generator for Sundew.Base.Notifications that implements INotificationOwner for partial classes: TargetSubscriptions, and protected SubscribeTo methods for subscribing without passing the owner.</Description>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <!-- Shipped inside the Sundew.Base.Notifications package as an analyzer, not as a package of its own. -->
+    <IsPackable>false</IsPackable>
+    <!-- CS1574: INotificationOwner.cs documents members of the real Subscriptions type, which the stand-in does not have. -->
+    <NoWarn>$(NoWarn);RS2008;CS1574</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The contract is compiled into the generator so that it can be referenced by type instead of by name. -->
+    <Compile Include="..\Sundew.Base.Notifications\INotificationOwner.cs" Link="Contract\INotificationOwner.cs" />
+  </ItemGroup>
+
+</Project>

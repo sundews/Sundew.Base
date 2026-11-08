@@ -10,6 +10,7 @@ namespace Sundew.Base.Development.Tests.Notifications;
 
 using System;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AwesomeAssertions;
@@ -23,11 +24,11 @@ public class ReactiveEventTests
     public async Task Subscribe_WhenEventRaised_Then_EventShouldBeReceived()
     {
         var eventSource = new ReactiveEventSource();
-        var subscriberTarget = new ReactiveNotificationTarget(eventSource);
+        var notificationOwner = new ReactiveNotificationOwner(eventSource);
 
         eventSource.Raise();
 
-        var result = await subscriberTarget.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
+        var result = await notificationOwner.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
 
         result.Should().BeTrue();
     }
@@ -36,15 +37,15 @@ public class ReactiveEventTests
     public async Task Target_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new ReactiveEventSource();
-        var subscriberTarget = new ReactiveNotificationTarget(eventSource);
+        var notificationOwner = new ReactiveNotificationOwner(eventSource);
 
-        subscriberTarget.UnsubscribeAll();
+        notificationOwner.UnsubscribeAll();
         eventSource.Raise();
 
-        var result = await subscriberTarget.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
+        var result = await notificationOwner.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
 
         result.Should().BeFalse();
-        subscriberTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
+        ((INotificationOwner)notificationOwner).TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
         eventSource.ReactiveSubscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
@@ -52,15 +53,15 @@ public class ReactiveEventTests
     public async Task Source_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new ReactiveEventSource();
-        var subscriberTarget = new ReactiveNotificationTarget(eventSource);
+        var notificationOwner = new ReactiveNotificationOwner(eventSource);
 
         eventSource.UnsubscribeAll();
         eventSource.Raise();
 
-        var result = await subscriberTarget.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
+        var result = await notificationOwner.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
 
         result.Should().BeFalse();
-        subscriberTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
+        ((INotificationOwner)notificationOwner).TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
         eventSource.ReactiveSubscriptions.GetUnsubscribers().Should().HaveCount(0);
     }
 
@@ -68,17 +69,76 @@ public class ReactiveEventTests
     public async Task SourceAndTarget_UnsubscribeAll_WhenEventRaised_Then_EventShouldNotBeReceived()
     {
         var eventSource = new ReactiveEventSource();
-        var subscriberTarget = new ReactiveNotificationTarget(eventSource);
+        var notificationOwner = new ReactiveNotificationOwner(eventSource);
 
-        subscriberTarget.UnsubscribeAll();
+        notificationOwner.UnsubscribeAll();
         eventSource.UnsubscribeAll();
         eventSource.Raise();
 
-        var result = await subscriberTarget.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
+        var result = await notificationOwner.EventReceived.WaitAsync(TimeSpan.FromSeconds(1));
 
         result.Should().BeFalse();
-        subscriberTarget.TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
+        ((INotificationOwner)notificationOwner).TargetSubscriptions.GetUnsubscribers().Should().HaveCount(0);
         eventSource.ReactiveSubscriptions.GetUnsubscribers().Should().HaveCount(0);
+    }
+
+    [Test]
+    public async Task Subscribe_WhenPlainTargetIsCollected_Then_SourceSubscriptionShouldBeRemovedOnRaise()
+    {
+        var eventSource = new ReactiveEventSource();
+        var counter = new StrongBox<int>();
+        SubscribePlainTarget(eventSource, counter);
+        CollectGarbage();
+
+        eventSource.Raise();
+        await Task.Delay(50);
+
+        counter.Value.Should().Be(0);
+        eventSource.ReactiveSubscriptions.Count.Should().Be(0);
+    }
+
+    [Test]
+    public async Task Subscribe_WhenPlainTargetIsAlive_Then_EventShouldBeReceived()
+    {
+        var eventSource = new ReactiveEventSource();
+        var counter = new StrongBox<int>();
+        var notificationOwner = new PlainReactiveNotificationOwner(eventSource, counter);
+        CollectGarbage();
+
+        eventSource.Raise();
+        await Task.Delay(50);
+
+        counter.Value.Should().Be(1);
+        eventSource.ReactiveSubscriptions.Count.Should().Be(1);
+        GC.KeepAlive(notificationOwner);
+    }
+
+    [Test]
+    public async Task Subscriptions_UnsubscribeAll_WhenPlainTarget_Then_EventShouldNotBeReceived()
+    {
+        var eventSource = new ReactiveEventSource();
+        var counter = new StrongBox<int>();
+        var notificationOwner = new PlainReactiveNotificationOwner(eventSource, counter);
+
+        Subscriptions.UnsubscribeAll(notificationOwner);
+        eventSource.Raise();
+        await Task.Delay(50);
+
+        counter.Value.Should().Be(0);
+        eventSource.ReactiveSubscriptions.Count.Should().Be(0);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static void SubscribePlainTarget(ReactiveEventSource eventSource, StrongBox<int> counter)
+    {
+        _ = new PlainReactiveNotificationOwner(eventSource, counter);
+    }
+
+    private static void CollectGarbage()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 }
 
@@ -91,10 +151,10 @@ public class ReactiveEventSource : INotifyAny<IEvent>
 
     internal Subscriptions ReactiveSubscriptions => this.subscriptions;
 
-    public Subscription Subscribe<TSubscribedEvent>(Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler, INotificationTarget notificationTarget)
+    public Subscription Subscribe<TSubscribedEvent>(Func<TSubscribedEvent, Subscription, CancellationToken, ValueTask> handler, INotificationOwner notificationOwner)
         where TSubscribedEvent : IEvent
     {
-        return ReactiveEventSubscriber<IEvent>.Subscribe(this.subject, handler, notificationTarget, this.subscriptions);
+        return ReactiveEventSubscriber<IEvent>.Subscribe(this.subject, handler, notificationOwner, this.subscriptions);
     }
 
     public void Raise()
@@ -104,13 +164,13 @@ public class ReactiveEventSource : INotifyAny<IEvent>
 
     public void UnsubscribeAll()
     {
-        this.subscriptions.Dispose();
+        this.subscriptions.UnsubscribeAll();
     }
 }
 
-public class ReactiveNotificationTarget : INotificationTarget
+public partial class ReactiveNotificationOwner : INotificationOwner
 {
-    public ReactiveNotificationTarget(ReactiveEventSource reactiveEventSource)
+    public ReactiveNotificationOwner(ReactiveEventSource reactiveEventSource)
     {
         reactiveEventSource.Subscribe(
             (ConcreteEvent1 event1, CancellationToken token) =>
@@ -121,12 +181,27 @@ public class ReactiveNotificationTarget : INotificationTarget
             this);
     }
 
-    public Subscriptions TargetSubscriptions { get; } = new Subscriptions();
-
     public AutoResetEventAsync EventReceived { get; } = new AutoResetEventAsync();
 
     public void UnsubscribeAll()
     {
-        this.TargetSubscriptions.Dispose();
+        Subscriptions.UnsubscribeAll(this);
+    }
+}
+
+public sealed partial class PlainReactiveNotificationOwner : INotificationOwner
+{
+    private readonly StrongBox<int> counter;
+
+    public PlainReactiveNotificationOwner(ReactiveEventSource eventSource, StrongBox<int> counter)
+    {
+        this.counter = counter;
+        eventSource.Subscribe(
+            (ConcreteEvent1 event1, CancellationToken token) =>
+            {
+                this.counter.Value++;
+                return ValueTask.CompletedTask;
+            },
+            this);
     }
 }

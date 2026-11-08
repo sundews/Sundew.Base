@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net8.0;net48</TargetFrameworks>
+    <TargetFrameworks>net10.0;net8.0;net48</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -15,6 +15,15 @@
     <ProjectReference Include="..\Sundew.Base.Memory\Sundew.Base.Memory.csproj" />
     <ProjectReference Include="..\Sundew.Base.Text\Sundew.Base.Text.csproj" />
     <ProjectReference Include="..\Sundew.Base.Development.Baselines\Sundew.Base.Development.Baselines.csproj" />
+  </ItemGroup>
+
+  <!-- Sundew.Base.Notifications does not target .NET Framework, so its benchmarks are only built for the modern runtimes. -->
+  <ItemGroup Condition="'$(TargetFramework)' != 'net48'">
+    <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+    <Compile Remove="Notifications\**" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="INotificationTarget.cs" company="Sundews">
+// <copyright file="IUnsubscriber.cs" company="Sundews">
 // Copyright (c) Sundews. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 // </copyright>
@@ -8,13 +8,13 @@
 namespace Sundew.Base.Notifications;
 
 /// <summary>
-/// Interface for implementing a subscription target.
+/// A source that a <see cref="Subscription"/> can be removed from.
 /// </summary>
-public interface INotificationTarget
+internal interface IUnsubscriber
 {
     /// <summary>
-    /// Gets the subscriptions.
+    /// Removes the specified subscription from the source.
     /// </summary>
-    /// <returns>The subscriptions.</returns>
-    Subscriptions TargetSubscriptions { get; }
+    /// <param name="subscription">The subscription.</param>
+    void Unsubscribe(Subscription subscription);
 }

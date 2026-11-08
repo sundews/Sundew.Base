@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
@@ -11,6 +11,8 @@
     <PackageVersion Include="JustMock" Version="2026.3.811.528" />
     <PackageVersion Include="MemoryPack" Version="1.21.4" />
     <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="4.14.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.402" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.402" />

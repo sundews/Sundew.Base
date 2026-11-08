@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <EmbedUntrackedSources>false</EmbedUntrackedSources>
+    <Configurations>Debug;Release;Debug-Publish;Release-Publish</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Aliased because the generator carries its own copy of the notification contract, which must not clash with the library's. -->
+    <ProjectReference Include="..\Sundew.Base.Notifications.Generator\Sundew.Base.Notifications.Generator.csproj" Aliases="NotificationsGenerator" />
+    <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="coverlet.collector">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

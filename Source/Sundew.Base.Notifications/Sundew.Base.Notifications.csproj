@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net9.0;net8.0;net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
-    <Description>The IReporter interface for assisting with implementation of reporter/loggers.</Description>
+    <TargetFrameworks>net10.0;net9.0;net8.0;net6.0;netstandard2.1</TargetFrameworks>
+    <Description>Delegate events with explicitly owned subscriptions that do not keep their subscribers alive, and a source generator that implements INotificationOwner for partial classes.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,5 +10,17 @@
     <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
     <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- The generator is not a dependency: it is built first and packed into this package as an analyzer, so one package reference brings both. -->
+    <ProjectReference Include="..\Sundew.Base.Notifications.Generator\Sundew.Base.Notifications.Generator.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Target Name="PackGeneratorAssembly" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <!-- Pack runs in the outer build of this multi-targeted project, where the analyzer item is not resolved, so the path is spelled out: the generator's output path follows Directory.Build.props. -->
+      <None Include="..\Sundew.Base.Notifications.Generator\bin\$(Configuration)\netstandard2.0\Sundew.Base.Notifications.Generator.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+  </Target>
 
 </Project>

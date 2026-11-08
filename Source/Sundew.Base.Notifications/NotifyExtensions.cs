@@ -27,17 +27,17 @@ public static class NotifyExtensions
         /// </summary>
         /// <typeparam name="TSubscribedEvent">The type of event.</typeparam>
         /// <param name="handler">The handler.</param>
-        /// <param name="notificationTarget">The notification target.</param>
+        /// <param name="notificationOwner">The notification owner.</param>
         /// <returns>A subscription.</returns>
         public Subscription Subscribe<TSubscribedEvent>(
             Func<TSubscribedEvent, ValueTask> handler,
-            INotificationTarget notificationTarget)
+            INotificationOwner notificationOwner)
             where TSubscribedEvent : TEvent
         {
 #pragma warning disable SA1101
             return notifyAny.Subscribe<TSubscribedEvent>(
                 (@event, _, _) => handler(@event),
-                notificationTarget);
+                notificationOwner);
 #pragma warning restore SA1101
         }
 
@@ -46,17 +46,17 @@ public static class NotifyExtensions
         /// </summary>
         /// <typeparam name="TSubscribedEvent">The type of event.</typeparam>
         /// <param name="handler">The handler.</param>
-        /// <param name="notificationTarget">The notification target.</param>
+        /// <param name="notificationOwner">The notification owner.</param>
         /// <returns>A subscription.</returns>
         public Subscription Subscribe<TSubscribedEvent>(
             Func<TSubscribedEvent, CancellationToken, ValueTask> handler,
-            INotificationTarget notificationTarget)
+            INotificationOwner notificationOwner)
             where TSubscribedEvent : TEvent
         {
 #pragma warning disable SA1101
             return notifyAny.Subscribe<TSubscribedEvent>(
                 (@event, _, cancellationToken) => handler(@event, cancellationToken),
-                notificationTarget);
+                notificationOwner);
 #pragma warning restore SA1101
         }
 
@@ -65,17 +65,17 @@ public static class NotifyExtensions
         /// </summary>
         /// <typeparam name="TSubscribedEvent">The type of event.</typeparam>
         /// <param name="handler">The handler.</param>
-        /// <param name="notificationTarget">The notification target.</param>
+        /// <param name="notificationOwner">The notification owner.</param>
         /// <returns>A subscription.</returns>
         public Subscription Subscribe<TSubscribedEvent>(
             Func<TSubscribedEvent, Subscription, ValueTask> handler,
-            INotificationTarget notificationTarget)
+            INotificationOwner notificationOwner)
             where TSubscribedEvent : TEvent
         {
 #pragma warning disable SA1101
             return notifyAny.Subscribe<TSubscribedEvent>(
                 (@event, subscription, _) => handler(@event, subscription),
-                notificationTarget);
+                notificationOwner);
 #pragma warning restore SA1101
         }
     }
@@ -86,16 +86,16 @@ public static class NotifyExtensions
     /// <typeparam name="TEvent">The type of event.</typeparam>
     /// <param name="notifyAny">The notifyAny.</param>
     /// <param name="handler">The handler.</param>
-    /// <param name="notificationTarget">The notification target.</param>
+    /// <param name="notificationOwner">The notification owner.</param>
     /// <returns>A subscription.</returns>
     public static Subscription Subscribe<TEvent>(
         this INotify<TEvent> notifyAny,
         Func<TEvent, ValueTask> handler,
-        INotificationTarget notificationTarget)
+        INotificationOwner notificationOwner)
     {
         return notifyAny.Subscribe(
             (@event, _, _) => handler(@event),
-            notificationTarget);
+            notificationOwner);
     }
 
     /// <summary>
@@ -104,16 +104,16 @@ public static class NotifyExtensions
     /// <typeparam name="TEvent">The type of event.</typeparam>
     /// <param name="notifyAny">The notifyAny.</param>
     /// <param name="handler">The handler.</param>
-    /// <param name="notificationTarget">The notification target.</param>
+    /// <param name="notificationOwner">The notification owner.</param>
     /// <returns>A subscription.</returns>
     public static Subscription Subscribe<TEvent>(
         this INotify<TEvent> notifyAny,
         Func<TEvent, CancellationToken, ValueTask> handler,
-        INotificationTarget notificationTarget)
+        INotificationOwner notificationOwner)
     {
         return notifyAny.Subscribe(
             (@event, _, cancellationToken) => handler(@event, cancellationToken),
-            notificationTarget);
+            notificationOwner);
     }
 
     /// <summary>
@@ -122,15 +122,15 @@ public static class NotifyExtensions
     /// <typeparam name="TEvent">The type of event.</typeparam>
     /// <param name="notifyAny">The notifyAny.</param>
     /// <param name="handler">The handler.</param>
-    /// <param name="notificationTarget">The notification target.</param>
+    /// <param name="notificationOwner">The notification owner.</param>
     /// <returns>A subscription.</returns>
     public static Subscription Subscribe<TEvent>(
         this INotify<TEvent> notifyAny,
         Func<TEvent, Subscription, ValueTask> handler,
-        INotificationTarget notificationTarget)
+        INotificationOwner notificationOwner)
     {
         return notifyAny.Subscribe(
             (@event, subscription, _) => handler(@event, subscription),
-            notificationTarget);
+            notificationOwner);
     }
 }

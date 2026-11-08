@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Configurations>
     <BuildType Name="Debug" />
     <BuildType Name="Debug-Publish" />
@@ -27,6 +27,7 @@
       <BuildType Solution="Release-Publish|*" Project="Release" />
     </Project>
     <Project Path="Sundew.Base.Development.Tests/Sundew.Base.Development.Tests.csproj" />
+    <Project Path="Sundew.Base.Generator.Development.Tests/Sundew.Base.Generator.Development.Tests.csproj" />
   </Folder>
   <Project Path="Sundew.Base.Collections.Immutable/Sundew.Base.Collections.Immutable.csproj" />
   <Project Path="Sundew.Base.Collections.Linq/Sundew.Base.Collections.Linq.csproj" />
@@ -43,6 +44,7 @@
   <Project Path="Sundew.Base.Migrations.System.Formats.Cbor/Sundew.Base.Migrations.System.Formats.Cbor.csproj" />
     <Project Path="Sundew.Base.Migrations.System.Text.Json/Sundew.Base.Migrations.System.Text.Json.csproj" />
   <Project Path="Sundew.Base.Migrations/Sundew.Base.Migrations.csproj" />
+  <Project Path="Sundew.Base.Notifications.Generator/Sundew.Base.Notifications.Generator.csproj" />
   <Project Path="Sundew.Base.Notifications.Reactive/Sundew.Base.Notifications.Reactive.csproj" />
   <Project Path="Sundew.Base.Notifications/Sundew.Base.Notifications.csproj" />
   <Project Path="Sundew.Base.Numeric/Sundew.Base.Numeric.csproj" />

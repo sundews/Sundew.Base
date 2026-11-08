@@ -61,6 +61,25 @@ IAsyncDisposable is only supported on .NETStandard2.1
 * Buffer allows building arrays
 * Split extensions allows Linq style splitting memory in to segments.
 
+## Notifications
+* DelegateEvent\<TEvent\> is an asynchronous event that never keeps its subscribers alive. Handlers return ValueTask, may observe cancellation and can run sequentially or in parallel, and raising allocates nothing.
+* A subscription is owned by an INotificationOwner, a class with a Subscriptions property, and stays active exactly as long as those Subscriptions are reachable, so nothing has to be disposed. Subscriptions.UnsubscribeAll(owner) or Subscription.Unsubscribe() end subscriptions deterministically, and a dedicated Subscriptions instance controls the lifetime explicitly.
+* The package ships a source generator that implements INotificationOwner for partial classes and adds protected SubscribeTo methods, so a class subscribes with `this.SubscribeTo(source, handler)` without passing itself.
+* INotify\<TEvent\> and INotifyAny\<TEvent\> are the subscribe side, INotifier\<TEvent\> the raise side, and IEvent\<TEvent\> and IEvents\<TEvent\> combine them.
+* Notifications.Reactive bridges IObservable\<TEvent\> sources into the same subscription model with ReactiveEventSubscriber.
+
+```csharp
+public partial class Dashboard : INotificationOwner
+{
+    public Dashboard(IEvents<ISensorEvent> sensorEvents)
+    {
+        this.SubscribeTo(sensorEvents, (TemperatureChanged changed, CancellationToken token) => this.ShowAsync(changed, token));
+    }
+}
+```
+
+The dashboard receives temperature events for as long as it is alive and can be garbage collected while the event source lives on.
+
 ## Threading and Threading.Jobs
 * AsyncLazy provides a cancellable async lazy implementation
 * AsyncLock provides async locking.

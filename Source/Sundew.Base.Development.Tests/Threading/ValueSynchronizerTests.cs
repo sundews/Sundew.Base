@@ -49,7 +49,7 @@ public class ValueSynchronizerTests
 
         var externalService = new ExternalService(this.eventSequence, InitialName, InitialNumber);
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
-        var notificationTarget = new NotificationTarget();
+        var notificationOwner = new NotificationOwner();
         var results = new ConcurrentList<SynchronizedValue>();
         testee.Subscribe(
             (SynchronizedValue value, CancellationToken token) =>
@@ -57,7 +57,7 @@ public class ValueSynchronizerTests
                 results.Add(value);
                 return ValueTask.CompletedTask;
             },
-            notificationTarget);
+            notificationOwner);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -70,6 +70,7 @@ public class ValueSynchronizerTests
 
         await submission1;
 
+        GC.KeepAlive(notificationOwner);
         using (new AssertionScope())
         {
             results.Should().Equal(expectedResult);
@@ -90,7 +91,7 @@ public class ValueSynchronizerTests
 
         var externalService = new ExternalService(this.eventSequence, InitialName, InitialNumber);
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
-        var notificationTarget = new NotificationTarget();
+        var notificationOwner = new NotificationOwner();
         var results = new ConcurrentList<SynchronizedValue>();
         testee.Subscribe(
             (SynchronizedValue value, CancellationToken token) =>
@@ -98,7 +99,7 @@ public class ValueSynchronizerTests
                 results.Add(value);
                 return ValueTask.CompletedTask;
             },
-            notificationTarget);
+            notificationOwner);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -129,6 +130,7 @@ public class ValueSynchronizerTests
 
         await Task.WhenAll(submission1, submission2, submission3);
 
+        GC.KeepAlive(notificationOwner);
         using (new AssertionScope())
         {
             results.Should().EndWith(expectedResult);
@@ -148,7 +150,7 @@ public class ValueSynchronizerTests
         var secondExpectedValue = new SynchronizedValue(newName, newNumber);
 
         var externalService = new ExternalService(this.eventSequence, InitialName, InitialNumber);
-        var notificationTarget = new NotificationTarget();
+        var notificationOwner = new NotificationOwner();
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
         testee.Subscribe(
@@ -157,7 +159,7 @@ public class ValueSynchronizerTests
                 results.Add(value);
                 return ValueTask.CompletedTask;
             },
-            notificationTarget);
+            notificationOwner);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -178,6 +180,7 @@ public class ValueSynchronizerTests
 
         await Task.WhenAll(submission1, submission2);
 
+        GC.KeepAlive(notificationOwner);
         using (new AssertionScope())
         {
             results.Should().Contain(firstExpectedValue);
@@ -200,7 +203,7 @@ public class ValueSynchronizerTests
         var expectedResult = new SynchronizedValue(newName, newNumber);
 
         var externalService = new ExternalService(this.eventSequence, InitialName, InitialNumber);
-        var notificationTarget = new NotificationTarget();
+        var notificationOwner = new NotificationOwner();
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(
             UpdateTarget.None,
             (target, _) => externalService.GetValueAsync(target));
@@ -212,7 +215,7 @@ public class ValueSynchronizerTests
                 results.Add(value);
                 return ValueTask.CompletedTask;
             },
-            notificationTarget);
+            notificationOwner);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -233,6 +236,7 @@ public class ValueSynchronizerTests
 
         await Task.WhenAll(submission1, submission2);
 
+        GC.KeepAlive(notificationOwner);
         using (new AssertionScope())
         {
             results.Should().EndWith(expectedResult);
@@ -253,7 +257,7 @@ public class ValueSynchronizerTests
         var expectedResult = new SynchronizedValue(newName, newNumber);
 
         var externalService = new ExternalService(this.eventSequence, InitialName, InitialNumber);
-        var notificationTarget = new NotificationTarget();
+        var notificationOwner = new NotificationOwner();
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
 
@@ -263,7 +267,7 @@ public class ValueSynchronizerTests
                 results.Add(value);
                 return ValueTask.CompletedTask;
             },
-            notificationTarget);
+            notificationOwner);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -285,6 +289,7 @@ public class ValueSynchronizerTests
         await Task.WhenAll(submission1, submission2);
         var result = await testee.Value;
 
+        GC.KeepAlive(notificationOwner);
         using (new AssertionScope())
         {
             results.Should().Contain(firstExpectedValue);
@@ -304,7 +309,7 @@ public class ValueSynchronizerTests
         var expectedResult = new SynchronizedValue(newName, InitialNumber);
 
         var externalService = new ExternalService(this.eventSequence, InitialName, InitialNumber);
-        var notificationTarget = new NotificationTarget();
+        var notificationOwner = new NotificationOwner();
         using var testee = new ValueSynchronizer<UpdateTarget, SynchronizedValue>(UpdateTarget.None, (target, _) => externalService.GetValueAsync(target));
         var results = new ConcurrentList<SynchronizedValue>();
 
@@ -314,7 +319,7 @@ public class ValueSynchronizerTests
                 results.Add(value);
                 return ValueTask.CompletedTask;
             },
-            notificationTarget);
+            notificationOwner);
 
         var submission1 = testee.TrySubmitAsync(
             1,
@@ -331,6 +336,7 @@ public class ValueSynchronizerTests
 
         await Task.WhenAll(submission1, submission2);
 
+        GC.KeepAlive(notificationOwner);
         using (new AssertionScope())
         {
             results.Should().EndWith(expectedResult);
@@ -402,7 +408,7 @@ public class ExternalService(SequenceBuilder sequenceBuilder, string initialName
     }
 }
 
-public class NotificationTarget : INotificationTarget
+public class NotificationOwner : INotificationOwner
 {
     public Subscriptions TargetSubscriptions { get; } = new();
 }

@@ -12,8 +12,15 @@ using BenchmarkDotNet.Running;
 
 public class Program
 {
-    public static void Main()
+    public static void Main(string[] args)
     {
-        BenchmarkRunner.Run(typeof(Program).Assembly, ManualConfig.Create(DefaultConfig.Instance));
+        var config = ManualConfig.Create(DefaultConfig.Instance);
+        if (args.Length == 0)
+        {
+            BenchmarkRunner.Run(typeof(Program).Assembly, config);
+            return;
+        }
+
+        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, config);
     }
 }

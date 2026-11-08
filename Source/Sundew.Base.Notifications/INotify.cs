@@ -21,9 +21,9 @@ public interface INotify<out TEvent>
     /// Subscribes to the subscribed event.
     /// </summary>
     /// <param name="handler">The handler.</param>
-    /// <param name="notificationTarget">The subscription target.</param>
+    /// <param name="notificationOwner">The notification owner.</param>
     /// <returns>A subscription.</returns>
     Subscription Subscribe(
         Func<TEvent, Subscription, CancellationToken, ValueTask> handler,
-        INotificationTarget notificationTarget);
+        INotificationOwner notificationOwner);
 }

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" />
+    <ProjectReference Include="..\Sundew.Base.Notifications\Sundew.Base.Notifications.csproj" Condition="'$(TargetFramework)' != 'netstandard2.0'" />
     <ProjectReference Include="..\Sundew.Base.Disposal\Sundew.Base.Disposal.csproj" />
     <ProjectReference Include="..\Sundew.Base.Collections\Sundew.Base.Collections.csproj" />
     <ProjectReference Include="..\Sundew.Base.Primitives\Sundew.Base.Primitives.csproj" />
